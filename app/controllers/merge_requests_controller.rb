@@ -1,7 +1,13 @@
 class MergeRequestsController < ApplicationController
   def index
-    session[:merge_requests] ||= fetch_merge_requests
-    @authored_merge_requests = session[:merge_requests]
+    json = Rails.cache.read("authored_merge_requests")
+    @authored_merge_requests = json ? JSON.parse!(json) : nil
+
+    unless @authored_merge_requests
+      json = fetch_merge_requests.to_json
+      @authored_merge_requests = JSON.parse(json)
+      Rails.cache.write("authored_merge_requests", json)
+    end
   end
 
   private
