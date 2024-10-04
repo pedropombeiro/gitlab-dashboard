@@ -16,6 +16,19 @@ module GitlabDashboard
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
+    config.cache_store = :memory_store, { size: 32.megabytes }
+
+    config_files = %w[secrets.yml]
+    config_files.each do |file_name|
+      file_path = File.join(Rails.root, "config", file_name)
+      next unless File.exist?(file_path)
+
+      config_keys = HashWithIndifferentAccess.new(YAML.load(IO.read(file_path)))[Rails.env]
+      config_keys.each do |k, v|
+        ENV[k.upcase] ||= v
+      end
+    end
+
     # Configuration for the application, engines, and railties goes here.
     #
     # These settings can be overridden in specific environments using the files
