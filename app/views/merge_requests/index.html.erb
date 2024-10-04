@@ -1,0 +1,30 @@
+<h1>Merge Requests Dashboard</h1>
+<p><%= @authored_merge_requests.count %> merge requests</p>
+<table>
+  <th>
+    <tr>
+      <td>ID</td>
+      <td>Title</td>
+      <td>Reviewers</td>
+    </tr>
+  </th>
+  <tbody>
+    <% @authored_merge_requests.each do |mr| %>
+      <tr>
+        <td>
+          <a href="<%= mr.web_url %>"><%= mr.reference %></a>
+        </td>
+        <td>
+          <a href="<%= mr.web_url %>"><%= mr.title_html %></a>
+        </td>
+        <td>
+          <% mr.reviewers.nodes.each do |reviewer| %>
+            <a href="<%= reviewer.web_url %>">
+              <%= reviewer.username %>
+            </a>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
