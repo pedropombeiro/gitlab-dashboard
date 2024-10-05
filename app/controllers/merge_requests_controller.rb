@@ -88,6 +88,7 @@ class MergeRequestsController < ApplicationController
               webUrl
               titleHtml
               sourceBranch
+              targetBranch
               createdAt
               updatedAt
               approved
