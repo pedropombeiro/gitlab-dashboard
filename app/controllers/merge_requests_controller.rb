@@ -3,14 +3,11 @@ class MergeRequestsController < ApplicationController
   MERGE_STATUS_ALIASES = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "active" }.freeze
 
   def index
-    json = Rails.cache.read("authored_merge_requests")
-    @authored_merge_requests = json ? JSON.parse!(json) : nil
-
-    unless @authored_merge_requests
-      json = fetch_merge_requests.to_json
-      @authored_merge_requests = JSON.parse(json)
-      Rails.cache.write("authored_merge_requests", json)
+    json = Rails.cache.fetch("merge_requests_v1/authored_list", expires_in: 5.minutes) do
+      fetch_merge_requests.to_json
     end
+
+    @authored_merge_requests = json ? JSON.parse!(json) : nil
 
     @authored_merge_requests = @authored_merge_requests.map do |mr|
       mr.deep_merge({
