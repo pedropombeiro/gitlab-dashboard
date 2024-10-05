@@ -1,6 +1,6 @@
 class MergeRequestsController < ApplicationController
-  STATUS_ALIASES = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "active" }.freeze
-  MERGE_STATUS_ALIASES = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "active" }.freeze
+  STATUS_ALIASES = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
+  MERGE_STATUS_ALIASES = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary" }.freeze
   REVIEW_ICON = {
     "UNREVIEWED" => "fa-solid fa-hourglass-start",
     "REVIEWED" => "fa-solid fa-check",
@@ -32,8 +32,8 @@ class MergeRequestsController < ApplicationController
     @authored_merge_requests = response.dig(*%i[currentUser authoredMergeRequests nodes]).map do |mr|
       mr.deep_merge({
         bootstrapClass: {
-          pipeline: STATUS_ALIASES.fetch(mr.dig(*%i[headPipeline status]), "primary"),
-          mergeStatus: MERGE_STATUS_ALIASES.fetch(mr[:detailedMergeStatus], "primary")
+          pipeline: STATUS_ALIASES.fetch(mr.dig(*%i[headPipeline status]), "secondary"),
+          mergeStatus: MERGE_STATUS_ALIASES.fetch(mr[:detailedMergeStatus], "secondary")
         },
         headPipeline: {
           status: mr.dig(*%i[headPipeline status]).capitalize
