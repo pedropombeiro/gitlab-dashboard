@@ -1,11 +1,16 @@
 <div class="container">
   <h1>Merge Requests Dashboard</h1>
-  <p><%= @authored_merge_requests.count %> merge requests</p>
+
+  <p class="btn btn-primary">
+    <span class="badge badge-dark"><%= @authored_merge_requests.count %></span> <span class="sr-only">merge requests</span>
+  </p>
+
   <div class="table-responsive">
     <table class="table table-hover table-sm">
       <thead>
         <tr>
           <th scope="col">ID</th>
+          <th scope="col">Merge status</th>
           <th scope="col">Title</th>
           <th scope="col">Reviewers</th>
         </tr>
@@ -13,21 +18,19 @@
 
       <tbody>
         <% @authored_merge_requests.each do |mr| %>
-          <tr
-            <% pipeline_status = mr['headPipeline']['status'] %>
-            <% if pipeline_status == 'FAILED' %>
-              class="table-warning"
-            <% elsif pipeline_status == 'SUCCESS' %>
-              class="table-success"
-            <% elsif pipeline_status == 'RUNNING' %>
-              class="table-active"
-            <% end %>
-          >
+          <% pipeline_class = mr['bootstrapClass']['pipeline'] %>
+          <% mr_status_class = mr['bootstrapClass']['mergeStatus'] %>
+
+          <tr class="table-<%= pipeline_class %>">
             <th scope="row">
               <a href="<%= mr['webUrl'] %>">
                 <%= mr['reference'] %>
-                <span class="badge badge-pill badge-danger"><%= pipeline_status %></span>
               </a>
+              &nbsp;
+              <span class="badge badge-pill bg-<%= pipeline_class %> badge-<%= pipeline_class %>"><%= mr['headPipeline']['status'] %></span>
+            </th>
+            <td>
+              <span class="badge bg-<%= mr_status_class %> badge-<%= mr_status_class %>"><%= mr['detailedMergeStatus'] %></span>
             </td>
             <td>
               <a href="<%= mr['webUrl'] %>"><%= mr['titleHtml'] %></a>
@@ -37,7 +40,7 @@
                 <a href="<%= reviewer['webUrl'] %>">
                   <%= reviewer['username'] %>
                 </a>
-                <%= index < reviewers.count - 1 ? ', ': '' %>
+                <%= index < reviewers.count - 1 ? ', ' : '' %>
               <% end %>
             </td>
           </tr>

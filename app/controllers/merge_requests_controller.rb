@@ -1,4 +1,7 @@
 class MergeRequestsController < ApplicationController
+  STATUS_ALIASES = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "active" }.freeze
+  MERGE_STATUS_ALIASES = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "active" }.freeze
+
   def index
     json = Rails.cache.read("authored_merge_requests")
     @authored_merge_requests = json ? JSON.parse!(json) : nil
@@ -7,6 +10,19 @@ class MergeRequestsController < ApplicationController
       json = fetch_merge_requests.to_json
       @authored_merge_requests = JSON.parse(json)
       Rails.cache.write("authored_merge_requests", json)
+    end
+
+    @authored_merge_requests = @authored_merge_requests.map do |mr|
+      mr.deep_merge({
+        "bootstrapClass" => {
+          "pipeline" => STATUS_ALIASES.fetch(mr["headPipeline"]["status"], "primary"),
+          "mergeStatus" => MERGE_STATUS_ALIASES.fetch(mr["detailedMergeStatus"], "primary")
+        },
+        "headPipeline" => {
+          "status" => mr["headPipeline"]["status"].capitalize
+        },
+        "detailedMergeStatus" => mr["detailedMergeStatus"].sub("STATUS", "").tr("_", " ").capitalize
+      })
     end
   end
 
