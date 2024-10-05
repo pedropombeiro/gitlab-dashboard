@@ -4,6 +4,7 @@
 #   Ensure the SQLite 3 gem is defined in your Gemfile
 #   gem "sqlite3"
 #
+---
 default: &default
   adapter: sqlite3
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
@@ -20,7 +21,6 @@ test:
   <<: *default
   database: storage/test.sqlite3
 
-
 # SQLite3 write its data on the local filesystem, as such it requires
 # persistent disks. If you are deploying to a managed service, you should
 # make sure it provides disk persistence, as many don't.
@@ -29,4 +29,4 @@ test:
 # ensure the database is located in a persisted volume.
 production:
   <<: *default
-  # database: path/to/persistent/storage/production.sqlite3
+  database: storage/production.sqlite3
