@@ -14,6 +14,11 @@ gem "importmap-rails"
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
+# Bundle and process CSS [https://github.com/rails/cssbundling-rails]
+gem "cssbundling-rails"
+
+gem "jsbundling-rails", "~> 1.3"
+
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 # Use Redis adapter to run Action Cable in production
@@ -57,7 +62,3 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-
-gem "cssbundling-rails", "~> 1.4"
-
-gem "jsbundling-rails", "~> 1.3"
