@@ -143,9 +143,13 @@ class MergeRequestsController < ApplicationController
   end
 
   def humanized_duration(seconds)
-    ActiveSupport::Duration.build(seconds).parts.except(:seconds)
+    duration = ActiveSupport::Duration.build(seconds).parts.except(:seconds)
       .reduce("") { |output, (key, val)| output += "#{val}#{key.to_s.first} " }
       .strip
+
+    return "just now" if duration.blank?
+
+    "#{duration} ago"
   end
 
   def review_icon_class(reviewer)
