@@ -27,7 +27,7 @@
             <th scope="col">Conflicts?</th>
           <% end %>
           <th scope="col">Title</th>
-          <th scope="col"><i class="fa-regular fa-thumbs-up"></i></th>
+          <th scope="col"><i class="fa-regular fa-thumbs-up" title="Approvals"></i></th>
           <th scope="col"><i class="fa-solid fa-magnifying-glass"></i> Reviewers</th>
           <th scope="col"><i class="fa-solid fa-code-branch"></i> Source branch</th>
         </tr>
@@ -122,7 +122,15 @@
             </td>
 
             <td>
-              <i class="fa-solid fa-code-branch"></i> <span><%= mr[:sourceBranch] %></span>
+              <nobr>
+                <i class="fa-solid fa-code-branch"></i> <span><%= mr[:sourceBranch] %></span>
+              </nobr>
+              <% if %w[master main].exclude?(mr[:targetBranch]) %>
+                <br/>
+                <nobr>
+                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i> <span><%= mr[:targetBranch] %></span>
+                </nobr>
+              <% end %>
             </td>
           </tr>
         <% end %>
