@@ -12,7 +12,7 @@
       <% any_rebase = @authored_merge_requests.any? { |mr| mr[:shouldBeRebased] } %>
       <% any_conflicts = @authored_merge_requests.any? { |mr| mr[:conflicts] } %>
 
-      <caption><%= @authored_merge_requests.count %></span> merge requests, updated <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %> ago</abbr></caption>
+      <caption><%= @authored_merge_requests.count %></span> merge requests, updated <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
 
       <thead>
         <tr>
