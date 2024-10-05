@@ -25,31 +25,31 @@ class MergeRequestsController < ApplicationController
       fetch_merge_requests.to_json
     end
 
-    response = json ? JSON.parse!(json) : nil
+    response = json ? JSON.parse!(json, symbolize_names: true) : nil
 
-    @current_user = response["currentUser"]
-    @updated_at = Time.parse(response["updatedAt"])
-    @authored_merge_requests = response.dig(*%w[currentUser authoredMergeRequests nodes]).map do |mr|
+    @current_user = response[:currentUser]
+    @updated_at = Time.parse(response[:updatedAt])
+    @authored_merge_requests = response.dig(*%i[currentUser authoredMergeRequests nodes]).map do |mr|
       mr.deep_merge({
-        "bootstrapClass" => {
-          "pipeline" => STATUS_ALIASES.fetch(mr.dig(*%w[headPipeline status]), "primary"),
-          "mergeStatus" => MERGE_STATUS_ALIASES.fetch(mr["detailedMergeStatus"], "primary")
+        bootstrapClass: {
+          pipeline: STATUS_ALIASES.fetch(mr.dig(*%i[headPipeline status]), "primary"),
+          mergeStatus: MERGE_STATUS_ALIASES.fetch(mr[:detailedMergeStatus], "primary")
         },
-        "headPipeline" => {
-          "status" => mr.dig(*%w[headPipeline status]).capitalize
+        headPipeline: {
+          status: mr.dig(*%i[headPipeline status]).capitalize
         },
-        "reviewers" => {
-          "nodes" => mr.dig(*%w[reviewers nodes]).map do |reviewer|
+        reviewers: {
+          nodes: mr.dig(*%i[reviewers nodes]).map do |reviewer|
             reviewer.deep_merge(
-              "bootstrapClass" => {
-                "icon" => review_icon_class(reviewer),
-                "text" => review_text_class(reviewer)
+              bootstrapClass: {
+                icon: review_icon_class(reviewer),
+                text: review_text_class(reviewer)
               },
-              "review" => reviewer.dig(*%w[mergeRequestInteraction reviewState]),
+              review: reviewer.dig(*%i[mergeRequestInteraction reviewState]),
             )
           end
         },
-        "detailedMergeStatus" => humanized_enum(mr["detailedMergeStatus"].sub("STATUS", ""))
+        detailedMergeStatus: humanized_enum(mr[:detailedMergeStatus].sub("STATUS", ""))
       })
     end
   end
@@ -148,10 +148,10 @@ class MergeRequestsController < ApplicationController
   end
 
   def review_icon_class(reviewer)
-    REVIEW_ICON[reviewer.dig(*%w[mergeRequestInteraction reviewState])]
+    REVIEW_ICON[reviewer.dig(*%i[mergeRequestInteraction reviewState])]
   end
 
   def review_text_class(reviewer)
-    REVIEW_TEXT[reviewer.dig(*%w[mergeRequestInteraction reviewState])]
+    REVIEW_TEXT[reviewer.dig(*%i[mergeRequestInteraction reviewState])]
   end
 end
