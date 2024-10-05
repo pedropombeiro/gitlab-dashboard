@@ -57,7 +57,7 @@ class MergeRequestsController < ApplicationController
   private
 
   def gitlab_instance_url
-    "https://gitlab.com"
+    @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
   end
 
   def authorization
