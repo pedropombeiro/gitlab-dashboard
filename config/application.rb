@@ -18,6 +18,14 @@ module GitlabDashboard
 
     config.cache_store = :memory_store, { size: 32.megabytes }
 
+    # Support _FILE Docker secrets
+    ENV.select { |k, v| k.match(/.+_FILE/) }.each do |secret_env_var, file_path|
+      next unless File.exist?(file_path)
+
+      ENV[secret_env_var.delete_suffix("_FILE")] = File.read(file_path)
+    end
+
+    # Load secrets files
     config_files = %w[secrets.yml]
     config_files.each do |file_name|
       file_path = File.join(Rails.root, "config", file_name)
