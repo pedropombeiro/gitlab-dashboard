@@ -1,6 +1,8 @@
+# frozen_string_literal: true
+
 class MergeRequestsController < ApplicationController
-  STATUS_ALIASES = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
-  MERGE_STATUS_ALIASES = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary" }.freeze
+  PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
+  MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary" }.freeze
   REVIEW_ICON = {
     "UNREVIEWED" => "fa-solid fa-hourglass-start",
     "REVIEWED" => "fa-solid fa-check",
@@ -9,7 +11,7 @@ class MergeRequestsController < ApplicationController
     "UNAPPROVED" => "fa-solid fa-arrow-rotate-left",
     "REVIEW_STARTED" => "fa-solid fa-hourglass-half"
   }.freeze
-  REVIEW_TEXT = {
+  REVIEW_TEXT_BS_CLASS = {
     "UNREVIEWED" => "dark",
     "REVIEWED" => "secondary",
     "REQUESTED_CHANGES" => "danger",
@@ -32,8 +34,8 @@ class MergeRequestsController < ApplicationController
     @authored_merge_requests = response.dig(*%i[currentUser authoredMergeRequests nodes]).map do |mr|
       mr.deep_merge({
         bootstrapClass: {
-          pipeline: STATUS_ALIASES.fetch(mr.dig(*%i[headPipeline status]), "secondary"),
-          mergeStatus: MERGE_STATUS_ALIASES.fetch(mr[:detailedMergeStatus], "secondary")
+          pipeline: PIPELINE_BS_CLASS.fetch(mr.dig(*%i[headPipeline status]), "secondary"),
+          mergeStatus: MERGE_STATUS_BS_CLASS.fetch(mr[:detailedMergeStatus], "secondary")
         },
         headPipeline: {
           status: mr.dig(*%i[headPipeline status]).capitalize
@@ -139,7 +141,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def humanized_enum(value)
-    value.tr("_", " ").capitalize
+    value.tr("_", " ").capitalize.strip
   end
 
   def humanized_duration(seconds)
@@ -157,6 +159,6 @@ class MergeRequestsController < ApplicationController
   end
 
   def review_text_class(reviewer)
-    REVIEW_TEXT[reviewer.dig(*%i[mergeRequestInteraction reviewState])]
+    REVIEW_TEXT_BS_CLASS[reviewer.dig(*%i[mergeRequestInteraction reviewState])]
   end
 end

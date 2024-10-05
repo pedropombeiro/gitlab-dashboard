@@ -3,26 +3,22 @@
     <span class="navbar-brand mb-0 h1">
       Merge Requests Dashboard for
         <img width=24 class="rounded float-left" src="<%= make_full_url(@current_user[:avatarUrl]) %>" />
-        <a href="<%= @current_user[:webUrl] %>"><%= @current_user[:username] %></a>
+        <%= link_to @current_user[:username], @current_user[:webUrl] %>
     </span>
   </nav>
 
   <div class="table-responsive-sm">
     <table class="table table-hover table-sm" style="cursor: pointer;">
-      <% any_rebase = @authored_merge_requests.any? { |mr| mr[:shouldBeRebased] } %>
       <% any_conflicts = @authored_merge_requests.any? { |mr| mr[:conflicts] } %>
 
       <caption><%= @authored_merge_requests.count %></span> merge requests, updated <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
 
       <thead>
         <tr>
-          <th scope="col"><i class="fa-solid fa-exclamation"></i> ID</th>
+          <th scope="col">ID</th>
           <th scope="col">Status</th>
           <th scope="col"><i class="fa-solid fa-timeline"></i></th>
           <th scope="col"><i class="fa-solid fa-angles-down" title="Squash?"></i></th>
-          <% if any_rebase %>
-            <th scope="col">Rebase?</th>
-          <% end %>
           <% if any_conflicts %>
             <th scope="col">Conflicts?</th>
           <% end %>
@@ -41,11 +37,10 @@
           <% pipeline_finished_at = mr.dig(*%i[headPipeline finishedAt]) %>
           <% pipeline_started_at = Time.parse(pipeline_started_at) if pipeline_started_at %>
           <% pipeline_finished_at = Time.parse(pipeline_finished_at) if pipeline_finished_at %>
-          <% pipeline_failed_jobs = mr.dig(*%i[headPipeline failedJobs count]).to_i %>
 
           <tr class="table-<%= pipeline_class %>">
             <th scope="row">
-              <a href="<%= mr[:webUrl] %>"><%= mr[:reference] %></a>
+              <%= link_to mr[:reference], mr[:webUrl], target: "_blank" %>
             </th>
 
             <td>
@@ -55,50 +50,40 @@
             <td>
               <nobr>
                 <span class="badge badge-pill bg-<%= pipeline_class %> badge-<%= pipeline_class %>">
-                  <a class="text-light" href="<%= make_full_url(mr.dig(*%i[headPipeline path])) %>">
-                    <%= mr.dig(*%i[headPipeline status]) || '??' %>
-                  </a>
+                  <%= link_to mr.dig(*%i[headPipeline status]) || '??', make_full_url(mr.dig(*%i[headPipeline path])), class: "text-light", target: "_blank" %>
                 </span>
                 <% if mr.dig(*%i[headPipeline failedJobs count]).to_i.positive? && mr.dig(*%i[headPipeline status]) != 'Success' %>
-                  <span class="text-warning" title="One or more jobs have failed in the pipeline"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                  <abbr class="text-warning" title="One or more jobs have failed in the pipeline"><i class="fa-solid fa-triangle-exclamation"></i></abbr>
                 <% end %>
                 <% if pipeline_started_at && pipeline_finished_at.nil? %>
                   <%= humanized_duration(Time.current - pipeline_started_at) %>
                 <% end %>
                 <% if pipeline_finished_at < 8.hours.ago %>
-                  <span title="Pipeline too old, must be re-run before being merged">🥶</span>
+                  <abbr title="Pipeline too old, must be re-run before being merged">🥶</abbr>
                 <% end %>
 
                 <% if mr[:autoMergeEnabled] %>
-                  <span title="Auto-merge is enabled">🚀</span>
+                  <abbr title="Auto-merge is enabled">🚀</abbr>
                 <% end %>
               <nobr>
             </td>
 
             <td class="text-center">
               <% if mr[:squashOnMerge] %>
-                <span class="text-success"><i class="fa-solid fa-angles-down"></i></span>
+                <abbr class="text-success" title="MR set to squash on merge"><i class="fa-solid fa-angles-down"></i></abbr>
               <% end %>
             </td>
-
-            <% if any_rebase %>
-              <td class="text-center">
-                <% if mr[:shouldBeRebased] %>
-                  <span class="text-warning"><i class="fa-solid fa-code-pull-request"></i></span>
-                <% end %>
-              </td>
-            <% end %>
 
             <% if any_conflicts %>
               <td class="text-center">
                 <% if mr[:conflicts] %>
-                  <span class="text-danger"><i class="fa-solid fa-burst"></i></span>
+                  <abbr class="text-danger" title="MR branch has conflicts and should be rebased"><i class="fa-solid fa-burst"></i></abbr>
                 <% end %>
               </td>
             <% end %>
 
             <td>
-              <a href="<%= mr[:webUrl] %>"><%= mr[:titleHtml] %></a>
+              <%= link_to mr[:titleHtml], mr[:webUrl], target: "_blank" %>
             </td>
 
             <td class="text-end">
@@ -113,7 +98,7 @@
               <% reviewers = mr.dig(*%i[reviewers nodes]); reviewers.each_with_index do |reviewer, index| %>
                 <span class="badge bg-light">
                   <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer[:avatarUrl]) %>" />
-                  <a href="<%= reviewer[:webUrl] %>" title="<%= reviewer[:review] %>"><%= reviewer[:username] %></a>
+                  <%= link_to reviewer[:username], reviewer[:webUrl], title: reviewer[:review], target: "_blank" %>
                   <span class="float-right text-<%= reviewer.dig(*%i[bootstrapClass text])%>" title="<%= humanized_enum(reviewer.dig(*%i[mergeRequestInteraction reviewState])) %>">
                     <i class="<%= reviewer.dig(*%i[bootstrapClass icon])%>"></i>
                   </span>
