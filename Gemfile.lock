@@ -307,7 +307,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   capybara
-  cssbundling-rails (~> 1.4)
+  cssbundling-rails
   debug
   graphlient
   importmap-rails
