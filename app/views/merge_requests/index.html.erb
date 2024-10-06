@@ -1,9 +1,19 @@
+<script>
+  var link = document.querySelector("link[rel~='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    document.head.appendChild(link);
+  }
+  link.href = "<%= make_full_url(@user.avatarUrl) %>";
+</script>
+
 <div class="container-fluid" style="margin:0 !important; padding:0 !important;">
   <nav class="navbar navbar-light bg-dark">
     <span class="navbar-brand mb-0 ms-1 h1 text-light">
       Merge Requests Dashboard for
-        <img width=24 class="rounded float-left" src="<%= make_full_url(@current_user.avatarUrl) %>" />
-        <%= link_to @current_user.username, @current_user.webUrl %>
+        <img width=24 class="rounded float-left" src="<%= make_full_url(@user.avatarUrl) %>" />
+        <%= link_to @user.username, @user.webUrl %>
     </span>
   </nav>
 

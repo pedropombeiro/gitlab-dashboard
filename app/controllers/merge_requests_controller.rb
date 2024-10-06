@@ -25,15 +25,18 @@ class MergeRequestsController < ApplicationController
   helper_method :humanized_duration, :humanized_enum, :make_full_url, :reviewer_help_title
 
   def index
-    json = Rails.cache.fetch("merge_requests_v1/authored_list", expires_in: 5.minutes) do
-      fetch_merge_requests.to_json
+    assignee = params[:assignee]
+    json = Rails.cache.fetch("merge_requests_v1/authored_list/#{assignee}", expires_in: 5.minutes) do
+      fetch_merge_requests(assignee).to_json
     end
 
     response = json ? JSON.parse!(json, object_class: OpenStruct) : nil
 
-    @current_user = response.currentUser
+    @user = response.user
+    return render_404 unless @user
+
     @updated_at = Time.parse(response.updatedAt)
-    @authored_merge_requests = response.currentUser.authoredMergeRequests.nodes.map do |mr|
+    @authored_merge_requests = response.user.authoredMergeRequests.nodes.map do |mr|
       mr.bootstrapClass = {
         pipeline: PIPELINE_BS_CLASS.fetch(mr.headPipeline.status, "secondary"),
         mergeStatus: MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
@@ -62,6 +65,14 @@ class MergeRequestsController < ApplicationController
 
   private
 
+  def render_404
+    respond_to do |format|
+      format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      format.xml  { head :not_found }
+      format.any  { head :not_found }
+    end
+  end
+
   def gitlab_instance_url
     @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
   end
@@ -81,10 +92,10 @@ class MergeRequestsController < ApplicationController
     )
   end
 
-  def fetch_merge_requests
+  def fetch_merge_requests(username)
     response = client.query <<~GRAPHQL
       query {
-        currentUser {
+        user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
           username
           webUrl
           avatarUrl
@@ -140,7 +151,7 @@ class MergeRequestsController < ApplicationController
     GRAPHQL
 
     {
-      currentUser: response.data.current_user,
+      user: response.data.user,
       updatedAt: Time.current
     }
   end
