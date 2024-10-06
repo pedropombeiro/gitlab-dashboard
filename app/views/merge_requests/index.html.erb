@@ -2,14 +2,14 @@
   <nav class="navbar navbar-light bg-dark">
     <span class="navbar-brand mb-0 ms-1 h1 text-light">
       Merge Requests Dashboard for
-        <img width=24 class="rounded float-left" src="<%= make_full_url(@current_user[:avatarUrl]) %>" />
-        <%= link_to @current_user[:username], @current_user[:webUrl] %>
+        <img width=24 class="rounded float-left" src="<%= make_full_url(@current_user.avatarUrl) %>" />
+        <%= link_to @current_user.username, @current_user.webUrl %>
     </span>
   </nav>
 
   <div class="table-responsive-sm">
     <table class="table table-hover table-sm" style="cursor: pointer;">
-      <% any_conflicts = @authored_merge_requests.any? { |mr| mr[:conflicts] } %>
+      <% any_conflicts = @authored_merge_requests.any? { |mr| mr.conflicts } %>
 
       <caption><%= @authored_merge_requests.count %></span> merge requests, updated <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
 
@@ -31,28 +31,28 @@
 
       <tbody>
         <% @authored_merge_requests.each do |mr| %>
-          <% pipeline_class = mr.dig(*%i[bootstrapClass pipeline]) %>
-          <% mr_status_class = mr.dig(*%i[bootstrapClass mergeStatus]) %>
-          <% pipeline_started_at = mr.dig(*%i[headPipeline startedAt]) %>
-          <% pipeline_finished_at = mr.dig(*%i[headPipeline finishedAt]) %>
+          <% pipeline_class = mr.bootstrapClass[:pipeline] %>
+          <% mr_status_class = mr.bootstrapClass[:mergeStatus] %>
+          <% pipeline_started_at = mr.headPipeline.startedAt %>
+          <% pipeline_finished_at = mr.headPipeline.finishedAt %>
           <% pipeline_started_at = Time.parse(pipeline_started_at) if pipeline_started_at %>
           <% pipeline_finished_at = Time.parse(pipeline_finished_at) if pipeline_finished_at %>
 
           <tr class="table-<%= pipeline_class %>">
             <th scope="row">
-              <%= link_to mr[:reference], mr[:webUrl], target: "_blank" %>
+              <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
             </th>
 
             <td>
-              <span class="badge bg-<%= mr_status_class %> badge-<%= mr_status_class %>"><%= mr[:detailedMergeStatus] %></span>
+              <span class="badge bg-<%= mr_status_class %> badge-<%= mr_status_class %>"><%= mr.detailedMergeStatus %></span>
             </td>
 
             <td>
               <nobr>
                 <span class="badge badge-pill bg-<%= pipeline_class %> badge-<%= pipeline_class %>">
-                  <%= link_to mr.dig(*%i[headPipeline status]) || '??', make_full_url(mr.dig(*%i[headPipeline path])), class: "text-light", target: "_blank" %>
+                  <%= link_to mr.headPipeline.status || '??', make_full_url(mr.headPipeline.path), class: "text-light", target: "_blank" %>
                 </span>
-                <% if mr.dig(*%i[headPipeline failedJobs count]).to_i.positive? && mr.dig(*%i[headPipeline status]) != 'Success' %>
+                <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'Success' %>
                   <abbr class="text-warning" title="One or more jobs have failed in the pipeline"><i class="fa-solid fa-triangle-exclamation"></i></abbr>
                 <% end %>
                 <% if pipeline_started_at && pipeline_finished_at.nil? %>
@@ -62,51 +62,51 @@
                   <abbr title="Pipeline too old, must be re-run before being merged">🥶</abbr>
                 <% end %>
 
-                <% if mr[:autoMergeEnabled] %>
+                <% if mr.autoMergeEnabled %>
                   <abbr title="Auto-merge is enabled">🚀</abbr>
                 <% end %>
               <nobr>
 
               <br/>
 
-              <% labels = mr.dig(*%i[labels nodes]); labels.each do |label| %>
-                <span class="badge bg-primary text-light"><%= label[:title] %></span>
+              <% mr.labels.nodes.each do |label| %>
+                <span class="badge bg-primary text-light"><%= label.title %></span>
               <% end %>
             </td>
 
             <td class="text-center">
-              <% if mr[:squashOnMerge] %>
+              <% if mr.squashOnMerge %>
                 <abbr class="text-success" title="MR set to squash on merge"><i class="fa-solid fa-angles-down"></i></abbr>
               <% end %>
             </td>
 
             <% if any_conflicts %>
               <td class="text-center">
-                <% if mr[:conflicts] %>
+                <% if mr.conflicts %>
                   <abbr class="text-danger" title="MR branch has conflicts and should be rebased"><i class="fa-solid fa-burst"></i></abbr>
                 <% end %>
               </td>
             <% end %>
 
             <td>
-              <%= link_to mr[:titleHtml], mr[:webUrl], target: "_blank" %>
+              <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
             </td>
 
             <td class="text-end">
-              <% if mr[:approved] %>
+              <% if mr.approved %>
                 <span class="text-success"><i class="fa-regular fa-thumbs-up"></i></span>
               <% else %>
-                <%= "#{mr[:approvalsRequired] - mr[:approvalsLeft]}/#{mr[:approvalsRequired]}" %>
+                <%= "#{mr.approvalsRequired - mr.approvalsLeft}/#{mr.approvalsRequired}" %>
               <% end %>
             </td>
 
             <td>
-              <% reviewers = mr.dig(*%i[reviewers nodes]); reviewers.each do |reviewer| %>
+              <% mr.reviewers.nodes.each do |reviewer| %>
                 <span class="badge bg-light">
-                  <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer[:avatarUrl]) %>" />
-                  <%= link_to reviewer[:username], reviewer[:webUrl], title: reviewer[:review], target: "_blank" %>
-                  <span class="float-right text-<%= reviewer.dig(*%i[bootstrapClass text])%>" title="<%= humanized_enum(reviewer.dig(*%i[mergeRequestInteraction reviewState])) %>">
-                    <i class="<%= reviewer.dig(*%i[bootstrapClass icon]) %>"></i>
+                  <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer.avatarUrl) %>" />
+                  <%= link_to reviewer.username, reviewer.webUrl, title: reviewer.review, target: "_blank" %>
+                  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>" title="<%= humanized_enum(reviewer.mergeRequestInteraction.reviewState) %>">
+                    <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
                   </span>
                 </span>
               <% end %>
@@ -114,12 +114,12 @@
 
             <td>
               <nobr>
-                <i class="fa-solid fa-code-branch"></i> <span><%= mr[:sourceBranch] %></span>
+                <i class="fa-solid fa-code-branch"></i> <span><%= mr.sourceBranch %></span>
               </nobr>
-              <% if %w[master main].exclude?(mr[:targetBranch]) %>
+              <% if %w[master main].exclude?(mr.targetBranch) %>
                 <br/>
                 <nobr>
-                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i> <span><%= mr[:targetBranch] %></span>
+                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i> <span><%= mr.targetBranch %></span>
                 </nobr>
               <% end %>
             </td>

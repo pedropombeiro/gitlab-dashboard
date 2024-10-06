@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "ostruct"
+
 class MergeRequestsController < ApplicationController
   PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
   MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary" }.freeze
@@ -27,35 +29,28 @@ class MergeRequestsController < ApplicationController
       fetch_merge_requests.to_json
     end
 
-    response = json ? JSON.parse!(json, symbolize_names: true) : nil
+    response = json ? JSON.parse!(json, object_class: OpenStruct) : nil
 
-    @current_user = response[:currentUser]
-    @updated_at = Time.parse(response[:updatedAt])
-    @authored_merge_requests = response.dig(*%i[currentUser authoredMergeRequests nodes]).map do |mr|
-      mr.deep_merge({
-        bootstrapClass: {
-          pipeline: PIPELINE_BS_CLASS.fetch(mr.dig(*%i[headPipeline status]), "secondary"),
-          mergeStatus: MERGE_STATUS_BS_CLASS.fetch(mr[:detailedMergeStatus], "secondary")
-        },
-        headPipeline: {
-          status: mr.dig(*%i[headPipeline status]).capitalize
-        },
-        reviewers: {
-          nodes: mr.dig(*%i[reviewers nodes]).map do |reviewer|
-            reviewer.deep_merge(
-              bootstrapClass: {
-                icon: review_icon_class(reviewer),
-                text: review_text_class(reviewer)
-              },
-              review: reviewer.dig(*%i[mergeRequestInteraction reviewState]),
-            )
-          end
-        },
-        labels: {
-          nodes: mr.dig(*%i[labels nodes]).filter { |label| label[:title].start_with?("pipeline::") }
-        },
-        detailedMergeStatus: humanized_enum(mr[:detailedMergeStatus].sub("STATUS", ""))
-      })
+    @current_user = response.currentUser
+    @updated_at = Time.parse(response.updatedAt)
+    @authored_merge_requests = response.currentUser.authoredMergeRequests.nodes.map do |mr|
+      mr.bootstrapClass = {
+        pipeline: PIPELINE_BS_CLASS.fetch(mr.headPipeline.status, "secondary"),
+        mergeStatus: MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
+      }
+      mr.headPipeline.status = mr.headPipeline.status.capitalize
+      mr.reviewers.nodes.each do |reviewer|
+        reviewer.bootstrapClass = {
+          icon: review_icon_class(reviewer),
+          text: review_text_class(reviewer)
+        }
+        reviewer.review = reviewer.mergeRequestInteraction.reviewState
+      end
+
+      mr.labels.nodes.filter! do |label| label.title.start_with?("pipeline::") end
+      mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
+
+      mr
     end
   end
 
@@ -161,10 +156,10 @@ class MergeRequestsController < ApplicationController
   end
 
   def review_icon_class(reviewer)
-    REVIEW_ICON[reviewer.dig(*%i[mergeRequestInteraction reviewState])]
+    REVIEW_ICON[reviewer.mergeRequestInteraction.reviewState]
   end
 
   def review_text_class(reviewer)
-    REVIEW_TEXT_BS_CLASS[reviewer.dig(*%i[mergeRequestInteraction reviewState])]
+    REVIEW_TEXT_BS_CLASS[reviewer.mergeRequestInteraction.reviewState]
   end
 end
