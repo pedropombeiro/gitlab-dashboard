@@ -66,6 +66,12 @@
                   <abbr title="Auto-merge is enabled">🚀</abbr>
                 <% end %>
               <nobr>
+
+              <br/>
+
+              <% labels = mr.dig(*%i[labels nodes]); labels.each do |label| %>
+                <span class="badge bg-primary text-light"><%= label[:title] %></span>
+              <% end %>
             </td>
 
             <td class="text-center">
@@ -95,12 +101,12 @@
             </td>
 
             <td>
-              <% reviewers = mr.dig(*%i[reviewers nodes]); reviewers.each_with_index do |reviewer, index| %>
+              <% reviewers = mr.dig(*%i[reviewers nodes]); reviewers.each do |reviewer| %>
                 <span class="badge bg-light">
                   <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer[:avatarUrl]) %>" />
                   <%= link_to reviewer[:username], reviewer[:webUrl], title: reviewer[:review], target: "_blank" %>
                   <span class="float-right text-<%= reviewer.dig(*%i[bootstrapClass text])%>" title="<%= humanized_enum(reviewer.dig(*%i[mergeRequestInteraction reviewState])) %>">
-                    <i class="<%= reviewer.dig(*%i[bootstrapClass icon])%>"></i>
+                    <i class="<%= reviewer.dig(*%i[bootstrapClass icon]) %>"></i>
                   </span>
                 </span>
               <% end %>
