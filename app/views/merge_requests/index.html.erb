@@ -21,7 +21,7 @@
     <table class="table table-hover table-sm" style="cursor: pointer;">
       <% any_conflicts = @authored_merge_requests.any? { |mr| mr.conflicts } %>
 
-      <caption><%= @authored_merge_requests.count %></span> merge requests, updated <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
+      <caption><%= @authored_merge_requests.count %> merge requests, updated <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
 
       <thead>
         <tr>
@@ -85,7 +85,7 @@
                 <% if mr.autoMergeEnabled %>
                   <abbr title="Auto-merge is enabled">🚀</abbr>
                 <% end %>
-              <nobr>
+              </nobr>
 
               <br/>
 
