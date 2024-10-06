@@ -16,6 +16,8 @@
       <thead>
         <tr>
           <th scope="col">ID</th>
+          <th scope="col">Created</th>
+          <th scope="col">Updated</th>
           <th scope="col">Status</th>
           <th scope="col"><i class="fa-solid fa-timeline"></i></th>
           <th scope="col"><i class="fa-solid fa-angles-down" title="Squash?"></i></th>
@@ -42,6 +44,18 @@
             <th scope="row">
               <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
             </th>
+
+            <td>
+              <abbr title="<%= mr.createdAt %>"><%= humanized_duration(Time.current - mr.createdAt, most_significant_only: true) %></abbr>
+            </td>
+
+            <td>
+              <% if mr.updatedAt %>
+                <abbr title="<%= mr.updatedAt %>"><%= humanized_duration(Time.current - mr.updatedAt, most_significant_only: true) %></abbr>
+              <% else %>
+                N/A
+              <% end %>
+            </td>
 
             <td>
               <span class="badge bg-<%= mr_status_class %> badge-<%= mr_status_class %>"><%= mr.detailedMergeStatus %></span>
