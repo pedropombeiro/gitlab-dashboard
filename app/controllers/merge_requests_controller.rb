@@ -115,6 +115,12 @@ class MergeRequestsController < ApplicationController
               detailedMergeStatus
               squashOnMerge
               conflicts
+              assignees {
+                nodes {
+                  avatarUrl
+                  webUrl
+                }
+              }
               reviewers {
                 nodes {
                   avatarUrl

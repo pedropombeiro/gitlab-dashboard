@@ -109,6 +109,12 @@
             <% end %>
 
             <td> <!-- Title -->
+              <span>
+                <% mr.assignees.nodes.each do |assignee| %>
+                  <a href="<%= assignee.webUrl %>" target="_blank"><img width=16 class="rounded float-left" src="<%= make_full_url(assignee.avatarUrl) %>" /></a>
+                <% end %>
+              </span>
+
               <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
             </td>
 
@@ -117,6 +123,23 @@
                 <span class="text-success"><i class="fa-regular fa-thumbs-up"></i></span>
               <% else %>
                 <%= "#{mr.approvalsRequired - mr.approvalsLeft}/#{mr.approvalsRequired}" %>
+              <% end %>
+              <% mr.reviewers.nodes.each do |reviewer| %>
+                <span class="badge bg-light" title="<%= reviewer_help_title(reviewer) %>">
+                  <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer.avatarUrl) %>" />
+                  <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
+                  <% if reviewer.status&.availability == "BUSY" %>
+                    <abbr class="float-right" title="<%= reviewer.status&.availability %>">🔴</abbr>
+                  <% end %>
+                  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
+                    <abbr title="<%= reviewer.mergeRequestInteraction.reviewState %>">
+                      <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
+                    </abbr>
+                    <% if reviewer.bootstrapClass[:activity_icon] %>
+                      <i class="<%= reviewer.bootstrapClass[:activity_icon] %>"></i>
+                    <% end %>
+                  </span>
+                </span>
               <% end %>
             </td>
 
