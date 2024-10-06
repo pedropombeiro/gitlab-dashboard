@@ -38,6 +38,8 @@ class MergeRequestsController < ApplicationController
         pipeline: PIPELINE_BS_CLASS.fetch(mr.headPipeline.status, "secondary"),
         mergeStatus: MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
       }
+      mr.createdAt = Time.parse(mr.createdAt)
+      mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
       mr.headPipeline.status = mr.headPipeline.status.capitalize
       mr.reviewers.nodes.each do |reviewer|
         reviewer.bootstrapClass = {
@@ -145,10 +147,10 @@ class MergeRequestsController < ApplicationController
     value.tr("_", " ").capitalize.strip
   end
 
-  def humanized_duration(seconds)
-    duration = ActiveSupport::Duration.build(seconds).parts.except(:seconds)
-      .reduce("") { |output, (key, val)| output += "#{val}#{key.to_s.first} " }
-      .strip
+  def humanized_duration(seconds, most_significant_only: false)
+    parts = ActiveSupport::Duration.build(seconds).parts.except(:seconds)
+    parts = parts.take(1) if most_significant_only
+    duration = parts.reduce("") { |output, (key, val)| output += "#{val}#{key.to_s.first} " }.strip
 
     return "just now" if duration.blank?
 
