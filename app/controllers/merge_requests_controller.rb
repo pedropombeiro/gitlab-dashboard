@@ -51,6 +51,9 @@ class MergeRequestsController < ApplicationController
             )
           end
         },
+        labels: {
+          nodes: mr.dig(*%i[labels nodes]).filter { |label| label[:title].start_with?("pipeline::") }
+        },
         detailedMergeStatus: humanized_enum(mr[:detailedMergeStatus].sub("STATUS", ""))
       })
     end
@@ -121,6 +124,9 @@ class MergeRequestsController < ApplicationController
                 failedJobs: jobs(statuses: FAILED, retried: false) {
                   count
                 }
+              }
+              labels {
+                nodes { title }
               }
             }
           }
