@@ -22,7 +22,7 @@ class MergeRequestsController < ApplicationController
     "REVIEW_STARTED" => "info"
   }.freeze
 
-  helper_method :humanized_duration, :humanized_enum, :make_full_url
+  helper_method :humanized_duration, :humanized_enum, :make_full_url, :reviewer_help_title
 
   def index
     json = Rails.cache.fetch("merge_requests_v1/authored_list", expires_in: 5.minutes) do
@@ -40,17 +40,21 @@ class MergeRequestsController < ApplicationController
       }
       mr.createdAt = Time.parse(mr.createdAt)
       mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
-      mr.headPipeline.status = mr.headPipeline.status.capitalize
+      mr.headPipeline.status.capitalize!
+      mr.headPipeline.startedAt = Time.parse(mr.headPipeline.startedAt) if mr.headPipeline.startedAt
+      mr.headPipeline.finishedAt = Time.parse(mr.headPipeline.finishedAt) if mr.headPipeline.finishedAt
+      mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
       mr.reviewers.nodes.each do |reviewer|
-        reviewer.bootstrapClass = {
-          icon: review_icon_class(reviewer),
-          text: review_text_class(reviewer)
-        }
+        reviewer.lastActivityOn = Time.parse(reviewer.lastActivityOn) if reviewer.lastActivityOn
         reviewer.review = reviewer.mergeRequestInteraction.reviewState
+        reviewer.bootstrapClass = {
+          text: review_text_class(reviewer),
+          icon: review_icon_class(reviewer),
+          activity_icon: reviewer_activity_icon_class(reviewer)
+        }.compact
       end
 
       mr.labels.nodes.filter! do |label| label.title.start_with?("pipeline::") end
-      mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
 
       mr
     end
@@ -107,6 +111,10 @@ class MergeRequestsController < ApplicationController
                   webUrl
                   lastActivityOn
                   location
+                  status {
+                    availability
+                    message
+                  }
                   mergeRequestInteraction {
                     approved
                     reviewState
@@ -155,6 +163,20 @@ class MergeRequestsController < ApplicationController
     return "just now" if duration.blank?
 
     "#{duration} ago"
+  end
+
+  def reviewer_help_title(reviewer)
+    {
+    "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
+    "Location": reviewer.location,
+    "Last activity on": reviewer.lastActivityOn&.strftime("%v"),
+    "Message": reviewer.status&.message
+    }.filter_map { |title, value| value&.present? ? "#{title}: #{value}" : nil }
+      .join("\n")
+  end
+
+  def reviewer_activity_icon_class(reviewer)
+    "fa-solid fa-moon" if Time.current - reviewer.lastActivityOn > 1.day
   end
 
   def review_icon_class(reviewer)
