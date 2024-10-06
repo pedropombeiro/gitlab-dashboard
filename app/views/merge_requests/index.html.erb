@@ -12,8 +12,12 @@
   <nav class="navbar navbar-light bg-dark">
     <span class="navbar-brand mb-0 ms-1 h1 text-light">
       Merge Requests Dashboard for
-        <img width=24 class="rounded float-left" src="<%= make_full_url(@user.avatarUrl) %>" />
-        <%= link_to @user.username, @user.webUrl %>
+      <img
+        width="24"
+        class="rounded float-left"
+        src="<%= make_full_url(@user.avatarUrl) %>"
+      />
+      <%= link_to @user.username, @user.webUrl %>
     </span>
   </nav>
 
@@ -21,7 +25,9 @@
     <table class="table table-hover table-sm" style="cursor: pointer;">
       <% any_conflicts = @authored_merge_requests.any? { |mr| mr.conflicts } %>
 
-      <caption><%= @authored_merge_requests.count %> merge requests, updated <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
+      <caption><%= @authored_merge_requests.count %>
+        merge requests, updated
+        <abbr title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
 
       <thead>
         <tr>
@@ -36,8 +42,10 @@
           <% end %>
           <th scope="col">Title</th>
           <th scope="col"><i class="fa-regular fa-thumbs-up" title="Approvals"></i></th>
-          <th scope="col"><i class="fa-solid fa-magnifying-glass"></i> Reviewers</th>
-          <th scope="col"><i class="fa-solid fa-code-branch"></i> Source branch</th>
+          <th scope="col"><i class="fa-solid fa-magnifying-glass"></i>
+            Reviewers</th>
+          <th scope="col"><i class="fa-solid fa-code-branch"></i>
+            Source branch</th>
         </tr>
       </thead>
 
@@ -47,30 +55,39 @@
           <% mr_status_class = mr.bootstrapClass[:mergeStatus] %>
 
           <tr class="table-<%= pipeline_class %>">
-            <th scope="row"> <!-- MR ID -->
+            <!-- MR ID -->
+            <th scope="row">
               <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
             </th>
-
-            <td> <!-- Created at -->
+            <!-- Created at -->
+            <td>
               <abbr title="<%= mr.createdAt %>"><%= humanized_duration(Time.current - mr.createdAt, most_significant_only: true) %></abbr>
             </td>
-
-            <td> <!-- Updated at -->
+            <!-- Updated at -->
+            <td>
               <% if mr.updatedAt %>
                 <abbr title="<%= mr.updatedAt %>"><%= humanized_duration(Time.current - mr.updatedAt, most_significant_only: true) %></abbr>
               <% else %>
                 N/A
               <% end %>
             </td>
-
-            <td> <!-- Merge status -->
+            <!-- Merge status -->
+            <td>
               <span class="badge bg-<%= mr_status_class %> badge-<%= mr_status_class %>"><%= mr.detailedMergeStatus %></span>
             </td>
-
-            <td> <!-- Pipeline -->
+            <!-- Pipeline -->
+            <td>
               <nobr>
-                <span class="badge badge-pill bg-<%= pipeline_class %> badge-<%= pipeline_class %>">
-                  <%= link_to mr.headPipeline.status || '??', make_full_url(mr.headPipeline.path), class: "text-light", target: "_blank" %>
+                <span
+                  class="
+                    badge badge-pill bg-<%= pipeline_class %>
+                    badge-<%= pipeline_class %>
+                  "
+                >
+                  <%= link_to mr.headPipeline.status || "??",
+                  make_full_url(mr.headPipeline.path),
+                  class: "text-light",
+                  target: "_blank" %>
                 </span>
                 <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'Success' %>
                   <abbr class="text-warning" title="One or more jobs have failed in the pipeline"><i class="fa-solid fa-triangle-exclamation"></i></abbr>
@@ -93,32 +110,36 @@
                 <span class="badge bg-primary text-light"><%= label.title %></span>
               <% end %>
             </td>
-
-            <td class="text-center"> <!-- Squash on merge -->
+            <!-- Squash on merge -->
+            <td class="text-center">
               <% if mr.squashOnMerge %>
                 <abbr class="text-success" title="MR set to squash on merge"><i class="fa-solid fa-angles-down"></i></abbr>
               <% end %>
             </td>
-
+            <!-- Conflicts -->
             <% if any_conflicts %>
-              <td class="text-center"> <!-- Conflicts -->
+              <td class="text-center">
                 <% if mr.conflicts %>
                   <abbr class="text-danger" title="MR branch has conflicts and should be rebased"><i class="fa-solid fa-burst"></i></abbr>
                 <% end %>
               </td>
             <% end %>
-
-            <td> <!-- Title -->
+            <!-- Title -->
+            <td>
               <span>
                 <% mr.assignees.nodes.each do |assignee| %>
-                  <a href="<%= assignee.webUrl %>" target="_blank"><img width=16 class="rounded float-left" src="<%= make_full_url(assignee.avatarUrl) %>" /></a>
+                  <a href="<%= assignee.webUrl %>" target="_blank"><img
+                      width="16"
+                      class="rounded float-left"
+                      src="<%= make_full_url(assignee.avatarUrl) %>"
+                    /></a>
                 <% end %>
               </span>
 
               <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
             </td>
-
-            <td class="text-end"> <!-- Approvals -->
+            <!-- Approvals -->
+            <td class="text-end">
               <% if mr.approved %>
                 <span class="text-success"><i class="fa-regular fa-thumbs-up"></i></span>
               <% else %>
@@ -126,7 +147,11 @@
               <% end %>
               <% mr.reviewers.nodes.each do |reviewer| %>
                 <span class="badge bg-light" title="<%= reviewer_help_title(reviewer) %>">
-                  <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer.avatarUrl) %>" />
+                  <img
+                    width="16"
+                    class="rounded float-left"
+                    src="<%= make_full_url(reviewer.avatarUrl) %>"
+                  />
                   <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
                   <% if reviewer.status&.availability == "BUSY" %>
                     <abbr class="float-right" title="<%= reviewer.status&.availability %>">🔴</abbr>
@@ -142,11 +167,15 @@
                 </span>
               <% end %>
             </td>
-
-            <td> <!-- Reviewers -->
+            <!-- Reviewers -->
+            <td>
               <% mr.reviewers.nodes.each do |reviewer| %>
                 <span class="badge bg-light" title="<%= reviewer_help_title(reviewer) %>">
-                  <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer.avatarUrl) %>" />
+                  <img
+                    width="16"
+                    class="rounded float-left"
+                    src="<%= make_full_url(reviewer.avatarUrl) %>"
+                  />
                   <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
                   <% if reviewer.status&.availability == "BUSY" %>
                     <abbr class="float-right" title="<%= reviewer.status&.availability %>">🔴</abbr>
@@ -162,15 +191,17 @@
                 </span>
               <% end %>
             </td>
-
-            <td> <!-- Source branch -->
+            <!-- Source branch -->
+            <td>
               <nobr>
-                <i class="fa-solid fa-code-branch"></i> <span><%= mr.sourceBranch %></span>
+                <i class="fa-solid fa-code-branch"></i>
+                <span><%= mr.sourceBranch %></span>
               </nobr>
               <% if %w[master main].exclude?(mr.targetBranch) %>
                 <br/>
                 <nobr>
-                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i> <span><%= mr.targetBranch %></span>
+                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
+                  <span><%= mr.targetBranch %></span>
                 </nobr>
               <% end %>
             </td>
