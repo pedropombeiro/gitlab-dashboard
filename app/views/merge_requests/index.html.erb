@@ -35,21 +35,17 @@
         <% @authored_merge_requests.each do |mr| %>
           <% pipeline_class = mr.bootstrapClass[:pipeline] %>
           <% mr_status_class = mr.bootstrapClass[:mergeStatus] %>
-          <% pipeline_started_at = mr.headPipeline.startedAt %>
-          <% pipeline_finished_at = mr.headPipeline.finishedAt %>
-          <% pipeline_started_at = Time.parse(pipeline_started_at) if pipeline_started_at %>
-          <% pipeline_finished_at = Time.parse(pipeline_finished_at) if pipeline_finished_at %>
 
           <tr class="table-<%= pipeline_class %>">
-            <th scope="row">
+            <th scope="row"> <!-- MR ID -->
               <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
             </th>
 
-            <td>
+            <td> <!-- Created at -->
               <abbr title="<%= mr.createdAt %>"><%= humanized_duration(Time.current - mr.createdAt, most_significant_only: true) %></abbr>
             </td>
 
-            <td>
+            <td> <!-- Updated at -->
               <% if mr.updatedAt %>
                 <abbr title="<%= mr.updatedAt %>"><%= humanized_duration(Time.current - mr.updatedAt, most_significant_only: true) %></abbr>
               <% else %>
@@ -57,11 +53,11 @@
               <% end %>
             </td>
 
-            <td>
+            <td> <!-- Merge status -->
               <span class="badge bg-<%= mr_status_class %> badge-<%= mr_status_class %>"><%= mr.detailedMergeStatus %></span>
             </td>
 
-            <td>
+            <td> <!-- Pipeline -->
               <nobr>
                 <span class="badge badge-pill bg-<%= pipeline_class %> badge-<%= pipeline_class %>">
                   <%= link_to mr.headPipeline.status || '??', make_full_url(mr.headPipeline.path), class: "text-light", target: "_blank" %>
@@ -69,10 +65,10 @@
                 <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'Success' %>
                   <abbr class="text-warning" title="One or more jobs have failed in the pipeline"><i class="fa-solid fa-triangle-exclamation"></i></abbr>
                 <% end %>
-                <% if pipeline_started_at && pipeline_finished_at.nil? %>
-                  <%= humanized_duration(Time.current - pipeline_started_at) %>
+                <% if mr.headPipeline.startedAt && mr.headPipeline.finishedAt.nil? %>
+                  <%= humanized_duration(Time.current - mr.headPipeline.startedAt) %>
                 <% end %>
-                <% if pipeline_finished_at < 8.hours.ago %>
+                <% if mr.headPipeline.finishedAt < 8.hours.ago %>
                   <abbr title="Pipeline too old, must be re-run before being merged">🥶</abbr>
                 <% end %>
 
@@ -88,25 +84,25 @@
               <% end %>
             </td>
 
-            <td class="text-center">
+            <td class="text-center"> <!-- Squash on merge -->
               <% if mr.squashOnMerge %>
                 <abbr class="text-success" title="MR set to squash on merge"><i class="fa-solid fa-angles-down"></i></abbr>
               <% end %>
             </td>
 
             <% if any_conflicts %>
-              <td class="text-center">
+              <td class="text-center"> <!-- Conflicts -->
                 <% if mr.conflicts %>
                   <abbr class="text-danger" title="MR branch has conflicts and should be rebased"><i class="fa-solid fa-burst"></i></abbr>
                 <% end %>
               </td>
             <% end %>
 
-            <td>
+            <td> <!-- Title -->
               <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
             </td>
 
-            <td class="text-end">
+            <td class="text-end"> <!-- Approvals -->
               <% if mr.approved %>
                 <span class="text-success"><i class="fa-regular fa-thumbs-up"></i></span>
               <% else %>
@@ -114,19 +110,27 @@
               <% end %>
             </td>
 
-            <td>
+            <td> <!-- Reviewers -->
               <% mr.reviewers.nodes.each do |reviewer| %>
-                <span class="badge bg-light">
+                <span class="badge bg-light" title="<%= reviewer_help_title(reviewer) %>">
                   <img width=16 class="rounded float-left" src="<%= make_full_url(reviewer.avatarUrl) %>" />
-                  <%= link_to reviewer.username, reviewer.webUrl, title: reviewer.review, target: "_blank" %>
-                  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>" title="<%= humanized_enum(reviewer.mergeRequestInteraction.reviewState) %>">
-                    <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
+                  <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
+                  <% if reviewer.status&.availability == "BUSY" %>
+                    <abbr class="float-right" title="<%= reviewer.status&.availability %>">🔴</abbr>
+                  <% end %>
+                  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
+                    <abbr title="<%= reviewer.mergeRequestInteraction.reviewState %>">
+                      <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
+                    </abbr>
+                    <% if reviewer.bootstrapClass[:activity_icon] %>
+                      <i class="<%= reviewer.bootstrapClass[:activity_icon] %>"></i>
+                    <% end %>
                   </span>
                 </span>
               <% end %>
             </td>
 
-            <td>
+            <td> <!-- Source branch -->
               <nobr>
                 <i class="fa-solid fa-code-branch"></i> <span><%= mr.sourceBranch %></span>
               </nobr>
