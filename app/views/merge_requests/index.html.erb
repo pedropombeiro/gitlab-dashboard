@@ -112,7 +112,7 @@
                       data-bs-title="One or more jobs have failed in the pipeline"
                     ><i class="fa-solid fa-triangle-exclamation"></i></abbr>
                   <% end %>
-                  <% if mr.headPipeline.startedAt && mr.headPipeline.finishedAt.nil? %>
+                  <% if mr.headPipeline.startedAt %>
                     <% if mr.headPipeline.finishedAt.nil? %>
                       <%= humanized_duration(Time.current - mr.headPipeline.startedAt) %>
                     <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
