@@ -182,18 +182,19 @@ class MergeRequestsController < ApplicationController
     "#{duration} ago"
   end
 
+  include ActionView::Helpers::DateHelper
   def reviewer_help_title(reviewer)
     {
       "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
       "Location": reviewer.location,
-      "Last activity on": reviewer.lastActivityOn&.strftime("%v"),
+      "Last activity": Time.current - reviewer.lastActivityOn < 1.day ? "today" : "#{time_ago_in_words(reviewer.lastActivityOn)} ago",
       "Message": reviewer.status&.messageHtml
     }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
       .join
   end
 
   def reviewer_activity_icon_class(reviewer)
-    "fa-solid fa-moon" if Time.current - reviewer.lastActivityOn > 1.day
+    "fa-solid fa-moon" if Time.current - reviewer.lastActivityOn >= 1.day
   end
 
   def review_icon_class(reviewer)
