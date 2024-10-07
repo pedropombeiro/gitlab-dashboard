@@ -130,7 +130,7 @@ class MergeRequestsController < ApplicationController
                   location
                   status {
                     availability
-                    message
+                    messageHtml
                   }
                   mergeRequestInteraction {
                     approved
@@ -184,12 +184,12 @@ class MergeRequestsController < ApplicationController
 
   def reviewer_help_title(reviewer)
     {
-    "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
-    "Location": reviewer.location,
-    "Last activity on": reviewer.lastActivityOn&.strftime("%v"),
-    "Message": reviewer.status&.message
-    }.filter_map { |title, value| value&.present? ? "#{title}: #{value}" : nil }
-      .join("\n")
+      "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
+      "Location": reviewer.location,
+      "Last activity on": reviewer.lastActivityOn&.strftime("%v"),
+      "Message": reviewer.status&.messageHtml
+    }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
+      .join
   end
 
   def reviewer_activity_icon_class(reviewer)
