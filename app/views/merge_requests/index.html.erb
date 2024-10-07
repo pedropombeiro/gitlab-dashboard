@@ -93,32 +93,34 @@
             <!-- Pipeline -->
             <td>
               <nobr>
-                <span
-                  class="
-                    badge badge-pill bg-<%= pipeline_class %>
-                    badge-<%= pipeline_class %>
-                  "
-                >
-                  <%= link_to mr.headPipeline&.status || "??",
-                  make_full_url(mr.headPipeline&.path),
-                  class: "text-light",
-                  target: "_blank" %>
-                </span>
-                <% if mr.headPipeline && mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'Success' %>
-                  <abbr
-                    class="text-warning"
-                    data-bs-toggle="tooltip"
-                    data-bs-title="One or more jobs have failed in the pipeline"
-                  ><i class="fa-solid fa-triangle-exclamation"></i></abbr>
-                <% end %>
-                <% if mr.headPipeline && mr.headPipeline.startedAt && mr.headPipeline.finishedAt.nil? %>
-                  <% if mr.headPipeline.finishedAt.nil? %>
-                    <%= humanized_duration(Time.current - mr.headPipeline.startedAt) %>
-                  <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
+                <% if mr.headPipeline %>
+                  <span
+                    class="
+                      badge badge-pill bg-<%= pipeline_class %>
+                      badge-<%= pipeline_class %>
+                    "
+                  >
+                    <%= link_to mr.headPipeline&.status&.capitalize || "??",
+                    mr.headPipeline&.webUrl,
+                    class: "text-light",
+                    target: "_blank" %>
+                  </span>
+                  <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'SUCCESS' %>
                     <abbr
+                      class="text-warning"
                       data-bs-toggle="tooltip"
-                      data-bs-title="Pipeline too old, must be re-run before being merged"
-                    >🥶</abbr>
+                      data-bs-title="One or more jobs have failed in the pipeline"
+                    ><i class="fa-solid fa-triangle-exclamation"></i></abbr>
+                  <% end %>
+                  <% if mr.headPipeline.startedAt && mr.headPipeline.finishedAt.nil? %>
+                    <% if mr.headPipeline.finishedAt.nil? %>
+                      <%= humanized_duration(Time.current - mr.headPipeline.startedAt) %>
+                    <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
+                      <abbr
+                        data-bs-toggle="tooltip"
+                        data-bs-title="Pipeline too old, must be re-run before being merged"
+                      >🥶</abbr>
+                    <% end %>
                   <% end %>
                 <% end %>
 

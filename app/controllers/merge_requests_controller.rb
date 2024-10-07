@@ -44,9 +44,16 @@ class MergeRequestsController < ApplicationController
       mr.createdAt = Time.parse(mr.createdAt)
       mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
       if mr.headPipeline
-        mr.headPipeline.status.capitalize!
         mr.headPipeline.startedAt = Time.parse(mr.headPipeline.startedAt) if mr.headPipeline.startedAt
         mr.headPipeline.finishedAt = Time.parse(mr.headPipeline.finishedAt) if mr.headPipeline.finishedAt
+
+        if mr.headPipeline&.path
+          if mr.headPipeline.status == "FAILED"
+            mr.headPipeline.webUrl = "#{make_full_url(mr.headPipeline.path)}/failures"
+          else
+            mr.headPipeline.webUrl = make_full_url(mr.headPipeline.path)
+          end
+        end
       end
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
       mr.reviewers.nodes.each do |reviewer|
@@ -165,7 +172,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def make_full_url(path)
-    return path if path.start_with?("http")
+    return path if path.nil? || path.start_with?("http")
 
     "#{gitlab_instance_url}#{path}"
   end
