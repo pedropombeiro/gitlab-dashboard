@@ -38,14 +38,16 @@ class MergeRequestsController < ApplicationController
     @updated_at = Time.parse(response.updatedAt)
     @authored_merge_requests = response.user.authoredMergeRequests.nodes.map do |mr|
       mr.bootstrapClass = {
-        pipeline: PIPELINE_BS_CLASS.fetch(mr.headPipeline.status, "secondary"),
+        pipeline: PIPELINE_BS_CLASS.fetch(mr.headPipeline&.status, "secondary"),
         mergeStatus: MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
       }
       mr.createdAt = Time.parse(mr.createdAt)
       mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
-      mr.headPipeline.status.capitalize!
-      mr.headPipeline.startedAt = Time.parse(mr.headPipeline.startedAt) if mr.headPipeline.startedAt
-      mr.headPipeline.finishedAt = Time.parse(mr.headPipeline.finishedAt) if mr.headPipeline.finishedAt
+      if mr.headPipeline
+        mr.headPipeline.status.capitalize!
+        mr.headPipeline.startedAt = Time.parse(mr.headPipeline.startedAt) if mr.headPipeline.startedAt
+        mr.headPipeline.finishedAt = Time.parse(mr.headPipeline.finishedAt) if mr.headPipeline.finishedAt
+      end
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
       mr.reviewers.nodes.each do |reviewer|
         reviewer.lastActivityOn = Time.parse(reviewer.lastActivityOn) if reviewer.lastActivityOn
