@@ -1,2 +1,6 @@
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+
+.wide-tooltip {
+  --bs-tooltip-max-width: 400px !important;
+}
