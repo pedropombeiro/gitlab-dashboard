@@ -8,8 +8,16 @@
   link.href = "<%= make_full_url(@user.avatarUrl) %>";
 </script>
 
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
+  integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
+  crossorigin="anonymous"
+></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js"
+  integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13"
+  crossorigin="anonymous"
+></script>
 
 <div class="container-fluid" style="margin:0 !important; padding:0 !important;">
   <nav class="navbar navbar-light bg-dark">
@@ -39,7 +47,11 @@
           <th scope="col">Updated</th>
           <th scope="col">Status</th>
           <th scope="col"><i class="fa-solid fa-timeline"></i></th>
-          <th scope="col"><i class="fa-solid fa-angles-down" data-bs-toggle="tooltip" data-bs-title="Squash?"></i></th>
+          <th scope="col"><i
+              class="fa-solid fa-angles-down"
+              data-bs-toggle="tooltip"
+              data-bs-title="Squash?"
+            ></i></th>
           <% if any_conflicts %>
             <th scope="col">Conflicts?</th>
           <% end %>
@@ -93,13 +105,20 @@
                   target: "_blank" %>
                 </span>
                 <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'Success' %>
-                  <abbr class="text-warning" data-bs-toggle="tooltip" data-bs-title="One or more jobs have failed in the pipeline"><i class="fa-solid fa-triangle-exclamation"></i></abbr>
+                  <abbr
+                    class="text-warning"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="One or more jobs have failed in the pipeline"
+                  ><i class="fa-solid fa-triangle-exclamation"></i></abbr>
                 <% end %>
                 <% if mr.headPipeline.startedAt && mr.headPipeline.finishedAt.nil? %>
                   <%= humanized_duration(Time.current - mr.headPipeline.startedAt) %>
                 <% end %>
                 <% if mr.headPipeline.finishedAt < 8.hours.ago %>
-                  <abbr data-bs-toggle="tooltip" data-bs-title="Pipeline too old, must be re-run before being merged">🥶</abbr>
+                  <abbr
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Pipeline too old, must be re-run before being merged"
+                  >🥶</abbr>
                 <% end %>
 
                 <% if mr.autoMergeEnabled %>
@@ -116,14 +135,22 @@
             <!-- Squash on merge -->
             <td class="text-center">
               <% if mr.squashOnMerge %>
-                <abbr class="text-success" data-bs-toggle="tooltip" data-bs-title="MR set to squash on merge"><i class="fa-solid fa-angles-down"></i></abbr>
+                <abbr
+                  class="text-success"
+                  data-bs-toggle="tooltip"
+                  data-bs-title="MR set to squash on merge"
+                ><i class="fa-solid fa-angles-down"></i></abbr>
               <% end %>
             </td>
             <!-- Conflicts -->
             <% if any_conflicts %>
               <td class="text-center">
                 <% if mr.conflicts %>
-                  <abbr class="text-danger" data-bs-toggle="tooltip" data-bs-title="MR branch has conflicts and should be rebased"><i class="fa-solid fa-burst"></i></abbr>
+                  <abbr
+                    class="text-danger"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="MR branch has conflicts and should be rebased"
+                  ><i class="fa-solid fa-burst"></i></abbr>
                 <% end %>
               </td>
             <% end %>
@@ -149,7 +176,13 @@
                 <%= "#{mr.approvalsRequired - mr.approvalsLeft}/#{mr.approvalsRequired}" %>
               <% end %>
               <% mr.reviewers.nodes.each do |reviewer| %>
-                <span class="badge bg-light" data-bs-toggle="tooltip" data-bs-custom-class="wide-tooltip" data-bs-html="true" data-bs-title="<%= reviewer_help_title(reviewer) %>">
+                <span
+                  class="badge bg-light"
+                  data-bs-toggle="tooltip"
+                  data-bs-custom-class="wide-tooltip"
+                  data-bs-html="true"
+                  data-bs-title="<%= reviewer_help_title(reviewer) %>"
+                >
                   <img
                     width="16"
                     class="rounded float-left"
@@ -157,14 +190,24 @@
                   />
                   <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
                   <% if reviewer.status&.availability == "BUSY" %>
-                    <abbr class="float-right" data-bs-toggle="tooltip" data-bs-title="<%= reviewer.status&.availability %>">🔴</abbr>
+                    <abbr
+                      class="float-right"
+                      data-bs-toggle="tooltip"
+                      data-bs-title="<%= reviewer.status&.availability %>"
+                    >🔴</abbr>
                   <% end %>
                   <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
-                    <abbr data-bs-toggle="tooltip" data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>">
+                    <abbr
+                      data-bs-toggle="tooltip"
+                      data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>"
+                    >
                       <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
                     </abbr>
                     <% if reviewer.bootstrapClass[:activity_icon] %>
-                      <abbr data-bs-toggle="tooltip" data-bs-title="User has been inactive for more than 1 day">
+                      <abbr
+                        data-bs-toggle="tooltip"
+                        data-bs-title="User has been inactive for more than 1 day"
+                      >
                         <i class="<%= reviewer.bootstrapClass[:activity_icon] %>"></i>
                       </abbr>
                     <% end %>
@@ -175,7 +218,13 @@
             <!-- Reviewers -->
             <td>
               <% mr.reviewers.nodes.each do |reviewer| %>
-                <span class="badge bg-light" data-bs-toggle="tooltip" data-bs-custom-class="wide-tooltip" data-bs-html="true" data-bs-title="<%= reviewer_help_title(reviewer) %>">
+                <span
+                  class="badge bg-light"
+                  data-bs-toggle="tooltip"
+                  data-bs-custom-class="wide-tooltip"
+                  data-bs-html="true"
+                  data-bs-title="<%= reviewer_help_title(reviewer) %>"
+                >
                   <img
                     width="16"
                     class="rounded float-left"
@@ -183,10 +232,17 @@
                   />
                   <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
                   <% if reviewer.status&.availability == "BUSY" %>
-                    <abbr class="float-right" data-bs-toggle="tooltip" data-bs-title="<%= reviewer.status&.availability %>">🔴</abbr>
+                    <abbr
+                      class="float-right"
+                      data-bs-toggle="tooltip"
+                      data-bs-title="<%= reviewer.status&.availability %>"
+                    >🔴</abbr>
                   <% end %>
                   <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
-                    <abbr data-bs-toggle="tooltip" data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>">
+                    <abbr
+                      data-bs-toggle="tooltip"
+                      data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>"
+                    >
                       <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
                     </abbr>
                     <% if reviewer.bootstrapClass[:activity_icon] %>
