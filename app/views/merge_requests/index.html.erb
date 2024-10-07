@@ -175,45 +175,6 @@
               <% else %>
                 <%= "#{mr.approvalsRequired - mr.approvalsLeft}/#{mr.approvalsRequired}" %>
               <% end %>
-              <% mr.reviewers.nodes.each do |reviewer| %>
-                <span
-                  class="badge bg-light"
-                  data-bs-toggle="tooltip"
-                  data-bs-custom-class="wide-tooltip"
-                  data-bs-html="true"
-                  data-bs-title="<%= reviewer_help_title(reviewer) %>"
-                >
-                  <img
-                    width="16"
-                    class="rounded float-left"
-                    src="<%= make_full_url(reviewer.avatarUrl) %>"
-                  />
-                  <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
-                  <% if reviewer.status&.availability == "BUSY" %>
-                    <abbr
-                      class="float-right"
-                      data-bs-toggle="tooltip"
-                      data-bs-title="<%= reviewer.status&.availability %>"
-                    >🔴</abbr>
-                  <% end %>
-                  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
-                    <abbr
-                      data-bs-toggle="tooltip"
-                      data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>"
-                    >
-                      <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
-                    </abbr>
-                    <% if reviewer.bootstrapClass[:activity_icon] %>
-                      <abbr
-                        data-bs-toggle="tooltip"
-                        data-bs-title="User has been inactive for more than 1 day"
-                      >
-                        <i class="<%= reviewer.bootstrapClass[:activity_icon] %>"></i>
-                      </abbr>
-                    <% end %>
-                  </span>
-                </span>
-              <% end %>
             </td>
             <!-- Reviewers -->
             <td>
