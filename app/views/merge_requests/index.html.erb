@@ -181,7 +181,7 @@
             <td>
               <% mr.reviewers.nodes.each do |reviewer| %>
                 <span
-                  class="badge bg-light"
+                  class="badge <%= reviewer.review == 'APPROVED' ? 'bg-info text-light' : 'bg-light' %>"
                   data-bs-toggle="tooltip"
                   data-bs-custom-class="wide-tooltip"
                   data-bs-html="true"
@@ -192,7 +192,10 @@
                     class="rounded float-left"
                     src="<%= make_full_url(reviewer.avatarUrl) %>"
                   />
-                  <%= link_to reviewer.username, reviewer.webUrl, target: "_blank" %>
+                  <%= link_to reviewer.username,
+                  reviewer.webUrl,
+                  target: "_blank",
+                  class: reviewer.review == "APPROVED" ? "bg-info text-light" : "" %>
                   <% if reviewer.status&.availability == "BUSY" %>
                     <abbr
                       class="float-right"
