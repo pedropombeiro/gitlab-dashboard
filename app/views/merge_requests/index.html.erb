@@ -69,7 +69,18 @@
           <tr class="table-<%= mr.bootstrapClass[:row] %>">
             <!-- MR ID -->
             <th scope="row">
-              <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
+              <nobr>
+                <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
+                <button
+                  class="btn btn-sm float-right"
+                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
+                  data-bs-toggle="tooltip"
+                  data-bs-title="Click to copy"
+                  onclick="navigator.clipboard.writeText('<%= mr.reference %>')"
+                >
+                  <i class="fa fa-clipboard" aria-hidden="true"></i>
+                </button>
+              </nobr>
             </th>
             <!-- Created at -->
             <td>
@@ -216,6 +227,15 @@
               <nobr>
                 <i class="fa-solid fa-code-branch"></i>
                 <span><%= mr.sourceBranch %></span>
+                <button
+                  class="btn btn-sm float-right"
+                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
+                  data-bs-toggle="tooltip"
+                  data-bs-title="Click to copy"
+                  onclick="navigator.clipboard.writeText('<%= mr.sourceBranch %>')"
+                >
+                  <i class="fa fa-clipboard" aria-hidden="true"></i>
+                </button>
               </nobr>
               <% if %w[master main].exclude?(mr.targetBranch) %>
                 <br/>
@@ -225,6 +245,15 @@
                     <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
                   <% end %>
                   <span><%= mr.targetBranch %></span>
+                  <button
+                    class="btn btn-sm float-right"
+                    style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Click to copy"
+                    onclick="navigator.clipboard.writeText('<%= mr.targetBranch %>')"
+                  >
+                    <i class="fa fa-clipboard" aria-hidden="true"></i>
+                  </button>
                 </nobr>
               <% end %>
             </td>
