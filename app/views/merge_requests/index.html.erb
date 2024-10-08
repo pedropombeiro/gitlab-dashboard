@@ -66,10 +66,7 @@
 
       <tbody>
         <% @authored_merge_requests.each do |mr| %>
-          <% pipeline_class = mr.bootstrapClass[:pipeline] %>
-          <% mr_status_class = mr.bootstrapClass[:mergeStatus] %>
-
-          <tr class="table-<%= pipeline_class %>">
+          <tr class="table-<%= mr.bootstrapClass[:row] %>">
             <!-- MR ID -->
             <th scope="row">
               <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
@@ -88,18 +85,13 @@
             </td>
             <!-- Merge status -->
             <td>
-              <span class="badge bg-<%= mr_status_class %> badge-<%= mr_status_class %>"><%= mr.detailedMergeStatus %></span>
+              <span class="badge bg-<%= mr.bootstrapClass[:mergeStatus] %>"><%= mr.detailedMergeStatus %></span>
             </td>
             <!-- Pipeline -->
             <td>
               <nobr>
                 <% if mr.headPipeline %>
-                  <span
-                    class="
-                      badge badge-pill bg-<%= pipeline_class %>
-                      badge-<%= pipeline_class %>
-                    "
-                  >
+                  <span class="badge badge-pill bg-<%= mr.bootstrapClass[:pipeline] %>">
                     <%= link_to humanized_enum(mr.headPipeline&.status) || "??",
                     mr.headPipeline&.webUrl,
                     class: "text-light",
