@@ -115,6 +115,13 @@
                       data-bs-title="One or more jobs have failed in the pipeline"
                     ><i class="fa-solid fa-triangle-exclamation"></i></abbr>
                   <% end %>
+                  <% if mr.headPipeline.failureReason %>
+                    <abbr
+                      class="text-warning"
+                      data-bs-toggle="tooltip"
+                      data-bs-title="<%= mr.headPipeline.failureReason %>"
+                    ><i class="fa-solid fa-comment-dots"></i></abbr>
+                  <% end %>
                   <% if mr.headPipeline.startedAt %>
                     <% if mr.headPipeline.finishedAt.nil? %>
                       <%= humanized_duration(Time.current - mr.headPipeline.startedAt) %>
