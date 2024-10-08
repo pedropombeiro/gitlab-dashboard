@@ -178,7 +178,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def humanized_enum(value)
-    value.tr("_", " ").capitalize.strip
+    value.tr("_", " ").capitalize.sub("Ci ", "CI ").strip
   end
 
   def humanized_duration(seconds, most_significant_only: false)

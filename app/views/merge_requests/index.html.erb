@@ -229,6 +229,9 @@
                 <br/>
                 <nobr>
                   <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
+                  <% if @authored_merge_requests.any? { |other_mr| other_mr.sourceBranch == mr.targetBranch && other_mr.autoMergeEnabled } %>
+                    <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
+                  <% end %>
                   <span><%= mr.targetBranch %></span>
                 </nobr>
               <% end %>
