@@ -97,6 +97,22 @@
             <!-- Merge status -->
             <td>
               <span class="badge bg-<%= mr.bootstrapClass[:mergeStatus] %>"><%= mr.detailedMergeStatus %></span>
+              <% if mr.blockingMergeRequests&.visibleMergeRequests %>
+                <% open_blockers =
+                  mr
+                    .blockingMergeRequests
+                    .visibleMergeRequests
+                    .filter { |blocker| blocker.state == "opened" }
+                    .count %>
+
+                <% if open_blockers.positive? %>
+                  <abbr
+                    class="text-danger"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="This MR is blocked by <%= open_blockers %> merge requests"
+                  ><i class="fa-solid fa-road-barrier"></i></abbr>
+                <% end %>
+              <% end %>
             </td>
             <!-- Pipeline -->
             <td>
