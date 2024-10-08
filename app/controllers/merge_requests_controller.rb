@@ -3,6 +3,8 @@
 require "ostruct"
 
 class MergeRequestsController < ApplicationController
+  include ActionView::Helpers::DateHelper
+
   PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
   MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary" }.freeze
   REVIEW_ICON = {
@@ -38,8 +40,9 @@ class MergeRequestsController < ApplicationController
     @updated_at = Time.parse(response.updatedAt)
     @authored_merge_requests = response.user.authoredMergeRequests.nodes.map do |mr|
       mr.bootstrapClass = {
-        pipeline: PIPELINE_BS_CLASS.fetch(mr.headPipeline&.status, "secondary"),
-        mergeStatus: MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
+        row: row_class(mr),
+        pipeline: pipeline_class(mr),
+        mergeStatus: merge_status_class(mr)
       }
       mr.createdAt = Time.parse(mr.createdAt)
       mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
@@ -191,7 +194,6 @@ class MergeRequestsController < ApplicationController
     "#{duration} ago"
   end
 
-  include ActionView::Helpers::DateHelper
   def reviewer_help_title(reviewer)
     {
       "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
@@ -200,6 +202,22 @@ class MergeRequestsController < ApplicationController
       "Message": reviewer.status&.messageHtml
     }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
       .join
+  end
+
+  def row_class(mr)
+    return "warning" if mr.conflicts
+    return "secondary" if mr.detailedMergeStatus == "BLOCKED_STATUS"
+    return "info" if mr.reviewers.nodes.any? { |reviewer| reviewer.mergeRequestInteraction.reviewState == "REVIEWED" }
+
+    merge_status_class(mr)
+  end
+
+  def merge_status_class(mr)
+    MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
+  end
+
+  def pipeline_class(mr)
+    PIPELINE_BS_CLASS.fetch(mr.headPipeline&.status, "secondary")
   end
 
   def reviewer_activity_icon_class(reviewer)
