@@ -34,9 +34,9 @@
 
   <div class="table-responsive-sm">
     <table class="table table-hover table-sm" style="cursor: pointer;">
-      <% any_conflicts = @authored_merge_requests.any? { |mr| mr.conflicts } %>
+      <% any_conflicts = @open_merge_requests.any?(&:conflicts) %>
 
-      <caption><%= @authored_merge_requests.count %>
+      <caption><%= @open_merge_requests.count %>
         merge requests, updated
         <abbr data-bs-toggle="tooltip" data-bs-title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
 
@@ -65,7 +65,7 @@
       </thead>
 
       <tbody>
-        <% @authored_merge_requests.each do |mr| %>
+        <% @open_merge_requests.each do |mr| %>
           <tr class="table-<%= mr.bootstrapClass[:row] %>">
             <!-- MR ID -->
             <th scope="row">
@@ -264,7 +264,7 @@
                 <br/>
                 <nobr>
                   <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
-                  <% if @authored_merge_requests.any? { |other_mr| other_mr.sourceBranch == mr.targetBranch && other_mr.autoMergeEnabled } %>
+                  <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == mr.targetBranch && other_mr.autoMergeEnabled } %>
                     <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
                   <% end %>
                   <span><%= mr.targetBranch %></span>
