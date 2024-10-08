@@ -127,6 +127,11 @@ class MergeRequestsController < ApplicationController
               detailedMergeStatus
               squashOnMerge
               conflicts
+              blockingMergeRequests {
+                visibleMergeRequests {
+                  state
+                }
+              }
               assignees {
                 nodes {
                   avatarUrl
