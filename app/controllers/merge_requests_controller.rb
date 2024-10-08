@@ -155,6 +155,7 @@ class MergeRequestsController < ApplicationController
                 status
                 startedAt
                 finishedAt
+                failureReason
                 failedJobs: jobs(statuses: FAILED, retried: false) {
                   count
                 }
