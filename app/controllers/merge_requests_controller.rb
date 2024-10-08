@@ -38,7 +38,7 @@ class MergeRequestsController < ApplicationController
     return render_404 unless @user
 
     @updated_at = Time.parse(response.updatedAt)
-    @authored_merge_requests = response.user.authoredMergeRequests.nodes.map do |mr|
+    @open_merge_requests = response.user.openMergeRequests.nodes.map do |mr|
       mr.bootstrapClass = {
         row: row_class(mr),
         pipeline: pipeline_class(mr),
@@ -111,7 +111,7 @@ class MergeRequestsController < ApplicationController
           username
           webUrl
           avatarUrl
-          authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
+          openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
             nodes {
               reference
               webUrl
