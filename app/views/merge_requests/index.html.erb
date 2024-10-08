@@ -100,7 +100,7 @@
                       badge-<%= pipeline_class %>
                     "
                   >
-                    <%= link_to mr.headPipeline&.status&.capitalize || "??",
+                    <%= link_to humanized_enum(mr.headPipeline&.status) || "??",
                     mr.headPipeline&.webUrl,
                     class: "text-light",
                     target: "_blank" %>
