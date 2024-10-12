@@ -47,6 +47,7 @@
           <th scope="col">Updated</th>
           <th scope="col">Status</th>
           <th scope="col"><i class="fa-solid fa-timeline"></i></th>
+          <th scope="col">Title</th>
           <th scope="col"><i
               class="fa-solid fa-angles-down"
               data-bs-toggle="tooltip"
@@ -55,12 +56,9 @@
           <% if any_conflicts %>
             <th scope="col">Conflicts?</th>
           <% end %>
-          <th scope="col">Title</th>
           <th scope="col"><i class="fa-regular fa-thumbs-up" title="Approvals"></i></th>
           <th scope="col"><i class="fa-solid fa-magnifying-glass"></i>
             Reviewers</th>
-          <th scope="col"><i class="fa-solid fa-code-branch"></i>
-            Source branch</th>
         </tr>
       </thead>
 
@@ -161,6 +159,55 @@
                 <span class="badge bg-primary text-light"><%= label.title %></span>
               <% end %>
             </td>
+            <!-- Title -->
+            <td>
+              <span>
+                <% mr.assignees.nodes.each do |assignee| %>
+                  <a href="<%= assignee.webUrl %>" target="_blank"><img
+                      width="16"
+                      class="rounded float-left"
+                      src="<%= make_full_url(assignee.avatarUrl) %>"
+                    /></a>
+                <% end %>
+              </span>
+
+              <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
+
+              <br/>
+
+              <nobr>
+                <i class="fa-solid fa-code-branch"></i>
+                <span><%= mr.sourceBranch %></span>
+                <button
+                  class="btn btn-sm float-right"
+                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
+                  data-bs-toggle="tooltip"
+                  data-bs-title="Click to copy"
+                  onclick="navigator.clipboard.writeText('<%= mr.sourceBranch %>')"
+                >
+                  <i class="fa fa-clipboard" aria-hidden="true"></i>
+                </button>
+              </nobr>
+              <% if %w[master main].exclude?(mr.targetBranch) %>
+                <br/>
+                <nobr>
+                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
+                  <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == mr.targetBranch && other_mr.autoMergeEnabled } %>
+                    <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
+                  <% end %>
+                  <span><%= mr.targetBranch %></span>
+                  <button
+                    class="btn btn-sm float-right"
+                    style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Click to copy"
+                    onclick="navigator.clipboard.writeText('<%= mr.targetBranch %>')"
+                  >
+                    <i class="fa fa-clipboard" aria-hidden="true"></i>
+                  </button>
+                </nobr>
+              <% end %>
+            </td>
             <!-- Squash on merge -->
             <td class="text-center">
               <% if mr.squashOnMerge %>
@@ -183,20 +230,6 @@
                 <% end %>
               </td>
             <% end %>
-            <!-- Title -->
-            <td>
-              <span>
-                <% mr.assignees.nodes.each do |assignee| %>
-                  <a href="<%= assignee.webUrl %>" target="_blank"><img
-                      width="16"
-                      class="rounded float-left"
-                      src="<%= make_full_url(assignee.avatarUrl) %>"
-                    /></a>
-                <% end %>
-              </span>
-
-              <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
-            </td>
             <!-- Approvals -->
             <td class="text-end">
               <% if mr.approved %>
@@ -243,41 +276,6 @@
                     <% end %>
                   </span>
                 </span>
-              <% end %>
-            </td>
-            <!-- Source branch -->
-            <td>
-              <nobr>
-                <i class="fa-solid fa-code-branch"></i>
-                <span><%= mr.sourceBranch %></span>
-                <button
-                  class="btn btn-sm float-right"
-                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Click to copy"
-                  onclick="navigator.clipboard.writeText('<%= mr.sourceBranch %>')"
-                >
-                  <i class="fa fa-clipboard" aria-hidden="true"></i>
-                </button>
-              </nobr>
-              <% if %w[master main].exclude?(mr.targetBranch) %>
-                <br/>
-                <nobr>
-                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
-                  <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == mr.targetBranch && other_mr.autoMergeEnabled } %>
-                    <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
-                  <% end %>
-                  <span><%= mr.targetBranch %></span>
-                  <button
-                    class="btn btn-sm float-right"
-                    style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                    data-bs-toggle="tooltip"
-                    data-bs-title="Click to copy"
-                    onclick="navigator.clipboard.writeText('<%= mr.targetBranch %>')"
-                  >
-                    <i class="fa fa-clipboard" aria-hidden="true"></i>
-                  </button>
-                </nobr>
               <% end %>
             </td>
           </tr>
