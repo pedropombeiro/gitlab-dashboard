@@ -27,7 +27,7 @@ class MergeRequestsController < ApplicationController
     "workflow::staging-canary" => "info",
     "workflow::canary" => "info",
     "workflow::staging" => "info",
-    "workflow::production" => "success",
+    "workflow::production" => "primary",
     "workflow::post-deploy-db-staging" => "success",
     "workflow::post-deploy-db-production" => "success"
   }.freeze
@@ -88,11 +88,13 @@ class MergeRequestsController < ApplicationController
       mr.labels.nodes.filter! do |label|
         WORKFLOW_LABELS.any? { |prefix| label.title.start_with?(prefix) }
       end
-      mr.labels.nodes.each { |label| label.title.delete_prefix!("workflow::") }
+      workflow_label = mr.labels.nodes.first&.title
+      mr.workflowLabel = workflow_label&.delete_prefix("workflow::")
 
       mr.bootstrapClass = {
         row: mr.labels.nodes.any? ? "primary" : "secondary",
-        mergeStatus: "primary"
+        mergeStatus: "primary",
+        label: "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(workflow_label, "secondary")} text-light"
       }
       mr.createdAt = Time.parse(mr.createdAt) if mr.createdAt
       mr.mergedAt = Time.parse(mr.mergedAt) if mr.mergedAt

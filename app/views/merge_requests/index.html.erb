@@ -231,14 +231,14 @@
             <td>
               <% if mr.mergedAt %>
                 <%= render 'partials/relative_timestamp', timestamp: mr.mergedAt, most_significant_only: true %>
-                by <%= render 'partials/user_badge', user: mr.mergeUser %>
+                by <br/><%= render 'partials/user_badge', user: mr.mergeUser %>
               <% else %>
                 N/A
               <% end %>
             </td>
             <!-- Labels -->
             <td>
-              <%= render 'partials/labels', labels: mr.labels.nodes %>
+              <span class="badge <%= mr.bootstrapClass[:label]%>"><%= mr.workflowLabel %></span>
             </td>
             <!-- Title -->
             <td>
