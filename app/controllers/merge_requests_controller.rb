@@ -23,8 +23,17 @@ class MergeRequestsController < ApplicationController
     "UNAPPROVED" => "info",
     "REVIEW_STARTED" => "info"
   }.freeze
+  WORKFLOW_LABELS_BS_CLASS = {
+    "workflow::staging-canary" => "info",
+    "workflow::canary" => "info",
+    "workflow::staging" => "info",
+    "workflow::production" => "success",
+    "workflow::post-deploy-db-staging" => "success",
+    "workflow::post-deploy-db-production" => "success"
+  }.freeze
+  WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys
 
-  helper_method :humanized_duration, :humanized_enum, :make_full_url, :reviewer_help_title
+  helper_method :humanized_duration, :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
 
   def index
     assignee = params[:assignee]
@@ -38,13 +47,14 @@ class MergeRequestsController < ApplicationController
     return render_404 unless @user
 
     @updated_at = Time.parse(response.updatedAt)
+
     @open_merge_requests = response.user.openMergeRequests.nodes.map do |mr|
       mr.bootstrapClass = {
         row: row_class(mr),
         pipeline: pipeline_class(mr),
         mergeStatus: merge_status_class(mr)
       }
-      mr.createdAt = Time.parse(mr.createdAt)
+      mr.createdAt = Time.parse(mr.createdAt) if mr.createdAt
       mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
       if mr.headPipeline
         mr.headPipeline.startedAt = Time.parse(mr.headPipeline.startedAt) if mr.headPipeline.startedAt
@@ -65,11 +75,28 @@ class MergeRequestsController < ApplicationController
         reviewer.bootstrapClass = {
           text: review_text_class(reviewer),
           icon: review_icon_class(reviewer),
-          activity_icon: reviewer_activity_icon_class(reviewer)
+          activity_icon: user_activity_icon_class(reviewer)
         }.compact
       end
 
-      mr.labels.nodes.filter! do |label| label.title.start_with?("pipeline::") end
+      mr.labels.nodes.filter! { |label| label.title.start_with?("pipeline::") }
+
+      mr
+    end
+
+    @merged_merge_requests = merged_merge_requests(response.user.mergedMergeRequests.nodes).filter_map do |mr|
+      mr.labels.nodes.filter! do |label|
+        WORKFLOW_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+      end
+      mr.labels.nodes.each { |label| label.title.delete_prefix!("workflow::") }
+
+      mr.bootstrapClass = {
+        row: mr.labels.nodes.any? ? "primary" : "secondary",
+        mergeStatus: "primary"
+      }
+      mr.createdAt = Time.parse(mr.createdAt) if mr.createdAt
+      mr.mergedAt = Time.parse(mr.mergedAt) if mr.mergedAt
+      mr.mergeUser.lastActivityOn = Time.parse(mr.mergeUser.lastActivityOn) if mr.mergeUser.lastActivityOn
 
       mr
     end
@@ -80,8 +107,8 @@ class MergeRequestsController < ApplicationController
   def render_404
     respond_to do |format|
       format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
-      format.xml  { head :not_found }
-      format.any  { head :not_found }
+      format.xml { head :not_found }
+      format.any { head :not_found }
     end
   end
 
@@ -170,6 +197,42 @@ class MergeRequestsController < ApplicationController
               }
             }
           }
+          mergedMergeRequests: authoredMergeRequests(
+            state: merged
+            sort: MERGED_AT_DESC
+            first: 20
+          ) {
+            nodes {
+              iid
+              reference
+              webUrl
+              titleHtml
+              sourceBranch
+              targetBranch
+              createdAt
+              mergedAt
+              mergeUser {
+                username
+                avatarUrl
+                webUrl
+                lastActivityOn
+                location
+                status {
+                  availability
+                  messageHtml
+                }
+              }
+              assignees {
+                nodes {
+                  avatarUrl
+                  webUrl
+                }
+              }
+              labels {
+                nodes { title }
+              }
+            }
+          }
         }
       }
     GRAPHQL
@@ -178,6 +241,22 @@ class MergeRequestsController < ApplicationController
       user: response.data.user,
       updatedAt: Time.current
     }
+  end
+
+  def fetch_open_issues(iids)
+    response = client.query <<~GRAPHQL
+        query {
+          project(fullPath: "gitlab-org/gitlab") {
+            issues(iids: [#{iids.map { |iid| "\"#{iid}\"" }.join(", ")}], state: opened) {
+            nodes {
+              iid
+            }
+          }
+        }
+      }
+    GRAPHQL
+
+    response.data.project.issues.nodes
   end
 
   def make_full_url(path)
@@ -200,6 +279,15 @@ class MergeRequestsController < ApplicationController
     "#{duration} ago"
   end
 
+  def user_help_title(user)
+    {
+      "Location": user.location,
+      "Last activity": Time.current - user.lastActivityOn < 1.day ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
+      "Message": user.status&.messageHtml
+    }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
+      .join
+  end
+
   def reviewer_help_title(reviewer)
     {
       "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
@@ -213,7 +301,7 @@ class MergeRequestsController < ApplicationController
   def row_class(mr)
     return "warning" if mr.conflicts
     return "secondary" if mr.detailedMergeStatus == "BLOCKED_STATUS"
-    return "info" if mr.reviewers.nodes.any? { |reviewer| reviewer.mergeRequestInteraction.reviewState == "REVIEWED" }
+    return "info" if mr.reviewers&.nodes&.any? { |reviewer| reviewer.mergeRequestInteraction.reviewState == "REVIEWED" }
 
     merge_status_class(mr)
   end
@@ -226,8 +314,8 @@ class MergeRequestsController < ApplicationController
     PIPELINE_BS_CLASS.fetch(mr.headPipeline&.status, "secondary")
   end
 
-  def reviewer_activity_icon_class(reviewer)
-    "fa-solid fa-moon" if Time.current - reviewer.lastActivityOn >= 1.day
+  def user_activity_icon_class(user)
+    "fa-solid fa-moon" if Time.current - user.lastActivityOn >= 1.day
   end
 
   def review_icon_class(reviewer)
@@ -236,5 +324,31 @@ class MergeRequestsController < ApplicationController
 
   def review_text_class(reviewer)
     REVIEW_TEXT_BS_CLASS[reviewer.mergeRequestInteraction.reviewState]
+  end
+
+  MR_ISSUE_PATTERN = %r{^(security[-/])?pedropombeiro/(?<issue_id>\d+)/[a-z0-9\-+_]+$}i.freeze
+
+  def merged_merge_requests(merge_requests)
+    merged_request_issue_iids = merge_requests.to_h do |mr|
+      match_data = MR_ISSUE_PATTERN.match(mr.sourceBranch)
+
+      if match_data
+        [mr.iid, match_data[:issue_id]]
+      else
+        [mr.iid, nil]
+      end
+    end
+
+    issue_iids = merged_request_issue_iids.values.compact.sort.uniq
+
+    json = Rails.cache.fetch("issues_v1/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
+      fetch_open_issues(issue_iids).to_json
+    end
+
+    return unless json
+
+    open_issue_iids = JSON.parse!(json, object_class: OpenStruct).map(&:iid)
+
+    merge_requests.filter { |mr| open_issue_iids.include?(merged_request_issue_iids[mr.iid]) }
   end
 end
