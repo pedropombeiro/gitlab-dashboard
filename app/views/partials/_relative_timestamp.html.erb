@@ -1,0 +1,3 @@
+<% most_significant_only ||= false %>
+
+<abbr data-bs-toggle="tooltip" data-bs-title="<%= timestamp %>"><%= humanized_duration(Time.now - timestamp, most_significant_only: most_significant_only) %></abbr></caption>

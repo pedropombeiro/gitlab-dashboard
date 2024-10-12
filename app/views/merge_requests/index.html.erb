@@ -37,8 +37,7 @@
       <% any_conflicts = @open_merge_requests.any?(&:conflicts) %>
 
       <caption><%= @open_merge_requests.count %>
-        open merge requests, updated
-        <abbr data-bs-toggle="tooltip" data-bs-title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
+        open merge requests, updated <%= render 'partials/relative_timestamp', timestamp: @updated_at %>
 
       <thead>
         <tr>
@@ -67,27 +66,16 @@
           <tr class="table-<%= mr.bootstrapClass[:row] %>">
             <!-- MR ID -->
             <th scope="row">
-              <nobr>
-                <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
-                <button
-                  class="btn btn-sm float-right"
-                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Click to copy"
-                  onclick="navigator.clipboard.writeText('<%= mr.reference %>')"
-                >
-                  <i class="fa fa-clipboard" aria-hidden="true"></i>
-                </button>
-              </nobr>
+              <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
             </th>
             <!-- Created at -->
             <td>
-              <abbr data-bs-toggle="tooltip" data-bs-title="<%= mr.createdAt %>"><%= humanized_duration(Time.current - mr.createdAt, most_significant_only: true) %></abbr>
+              <%= render 'partials/relative_timestamp', timestamp: mr.createdAt, most_significant_only: true %>
             </td>
             <!-- Updated at -->
             <td>
               <% if mr.updatedAt %>
-                <abbr data-bs-toggle="tooltip" data-bs-title="<%= mr.updatedAt %>"><%= humanized_duration(Time.current - mr.updatedAt, most_significant_only: true) %></abbr>
+                <%= render 'partials/relative_timestamp', timestamp: mr.updatedAt, most_significant_only: true %>
               <% else %>
                 N/A
               <% end %>
@@ -138,7 +126,7 @@
                   <% end %>
                   <% if mr.headPipeline.startedAt %>
                     <% if mr.headPipeline.finishedAt.nil? %>
-                      <%= humanized_duration(Time.current - mr.headPipeline.startedAt) %>
+                      <%= render 'partials/relative_timestamp', timestamp: mr.headPipeline.startedAt %>
                     <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
                       <abbr
                         data-bs-toggle="tooltip"
@@ -155,19 +143,13 @@
 
               <br/>
 
-              <% mr.labels.nodes.each do |label| %>
-                <span class="badge bg-primary text-light"><%= label.title %></span>
-              <% end %>
+              <%= render 'partials/labels', labels: mr.labels.nodes %>
             </td>
             <!-- Title -->
             <td>
               <span>
                 <% mr.assignees.nodes.each do |assignee| %>
-                  <a href="<%= assignee.webUrl %>" target="_blank"><img
-                      width="16"
-                      class="rounded float-left"
-                      src="<%= make_full_url(assignee.avatarUrl) %>"
-                    /></a>
+                  <%= render 'partials/user_avatar', user: assignee %>
                 <% end %>
               </span>
 
@@ -175,38 +157,7 @@
 
               <br/>
 
-              <nobr>
-                <i class="fa-solid fa-code-branch"></i>
-                <span><%= mr.sourceBranch %></span>
-                <button
-                  class="btn btn-sm float-right"
-                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Click to copy"
-                  onclick="navigator.clipboard.writeText('<%= mr.sourceBranch %>')"
-                >
-                  <i class="fa fa-clipboard" aria-hidden="true"></i>
-                </button>
-              </nobr>
-              <% if %w[master main].exclude?(mr.targetBranch) %>
-                <br/>
-                <nobr>
-                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
-                  <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == mr.targetBranch && other_mr.autoMergeEnabled } %>
-                    <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
-                  <% end %>
-                  <span><%= mr.targetBranch %></span>
-                  <button
-                    class="btn btn-sm float-right"
-                    style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                    data-bs-toggle="tooltip"
-                    data-bs-title="Click to copy"
-                    onclick="navigator.clipboard.writeText('<%= mr.targetBranch %>')"
-                  >
-                    <i class="fa fa-clipboard" aria-hidden="true"></i>
-                  </button>
-                </nobr>
-              <% end %>
+              <%= render 'partials/branch_ref', source_branch: mr.sourceBranch, target_branch: mr.targetBranch %>
             </td>
             <!-- Squash on merge -->
             <td class="text-center">
@@ -241,41 +192,7 @@
             <!-- Reviewers -->
             <td>
               <% mr.reviewers.nodes.each do |reviewer| %>
-                <span
-                  class="badge <%= reviewer.review == 'APPROVED' ? 'bg-info text-light' : 'bg-light' %>"
-                  data-bs-toggle="tooltip"
-                  data-bs-custom-class="wide-tooltip"
-                  data-bs-html="true"
-                  data-bs-title="<%= reviewer_help_title(reviewer) %>"
-                >
-                  <img
-                    width="16"
-                    class="rounded float-left"
-                    src="<%= make_full_url(reviewer.avatarUrl) %>"
-                  />
-                  <%= link_to reviewer.username,
-                  reviewer.webUrl,
-                  target: "_blank",
-                  class: reviewer.review == "APPROVED" ? "bg-info text-light" : "" %>
-                  <% if reviewer.status&.availability == "BUSY" %>
-                    <abbr
-                      class="float-right"
-                      data-bs-toggle="tooltip"
-                      data-bs-title="<%= reviewer.status&.availability %>"
-                    >🔴</abbr>
-                  <% end %>
-                  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
-                    <abbr
-                      data-bs-toggle="tooltip"
-                      data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>"
-                    >
-                      <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
-                    </abbr>
-                    <% if reviewer.bootstrapClass[:activity_icon] %>
-                      <i class="<%= reviewer.bootstrapClass[:activity_icon] %>"></i>
-                    <% end %>
-                  </span>
-                </span>
+                <%= render 'partials/reviewer_badge', reviewer: reviewer %>
               <% end %>
             </td>
           </tr>
@@ -287,8 +204,7 @@
 
     <table class="table table-hover table-sm" style="cursor: pointer;">
       <caption><%= @merged_merge_requests.count %>
-        merged merge requests with open issues, updated
-        <abbr data-bs-toggle="tooltip" data-bs-title="<%= @updated_at %>"><%= humanized_duration(Time.now - @updated_at) %></abbr></caption>
+        merged merge requests with open issues, updated <%= render 'partials/relative_timestamp', timestamp: @updated_at %>
 
       <thead>
         <tr>
@@ -305,71 +221,30 @@
           <tr class="table-<%= mr.bootstrapClass[:row] %>">
             <!-- MR ID -->
             <th scope="row">
-              <nobr>
-                <%= link_to mr.reference, mr.webUrl, target: "_blank" %>
-                <button
-                  class="btn btn-sm float-right"
-                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Click to copy"
-                  onclick="navigator.clipboard.writeText('<%= mr.reference %>')"
-                >
-                  <i class="fa fa-clipboard" aria-hidden="true"></i>
-                </button>
-              </nobr>
+              <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
             </th>
             <!-- Created at -->
             <td>
-              <abbr data-bs-toggle="tooltip" data-bs-title="<%= mr.createdAt %>"><%= humanized_duration(Time.current - mr.createdAt, most_significant_only: true) %></abbr>
+              <%= render 'partials/relative_timestamp', timestamp: mr.createdAt, most_significant_only: true %>
             </td>
             <!-- Merged at -->
             <td>
               <% if mr.mergedAt %>
-                <abbr data-bs-toggle="tooltip" data-bs-title="<%= mr.mergedAt %>"><%= humanized_duration(Time.current - mr.mergedAt, most_significant_only: true) %></abbr>
-                by
-                <span
-                  class="badge bg-info text-light' %>"
-                  data-bs-toggle="tooltip"
-                  data-bs-custom-class="wide-tooltip"
-                  data-bs-html="true"
-                  data-bs-title="<%= user_help_title(mr.mergeUser) %>"
-                >
-                  <img
-                    width="16"
-                    class="rounded float-left"
-                    src="<%= make_full_url(mr.mergeUser.avatarUrl) %>"
-                  />
-                  <%= link_to mr.mergeUser.username,
-                  mr.mergeUser.webUrl,
-                  target: "_blank",
-                  class: "bg-info text-light" %>
-                  <% if mr.mergeUser.status&.availability == "BUSY" %>
-                    <abbr
-                      class="float-right"
-                      data-bs-toggle="tooltip"
-                      data-bs-title="<%= mr.mergeUser.status&.availability %>"
-                    >🔴</abbr>
-                  <% end %>
-                </span>
+                <%= render 'partials/relative_timestamp', timestamp: mr.mergedAt, most_significant_only: true %>
+                by <%= render 'partials/user_badge', user: mr.mergeUser %>
               <% else %>
                 N/A
               <% end %>
             </td>
             <!-- Labels -->
             <td>
-              <% mr.labels.nodes.each do |label| %>
-                <span class="badge bg-primary text-light"><%= label.title %></span>
-              <% end %>
+              <%= render 'partials/labels', labels: mr.labels.nodes %>
             </td>
             <!-- Title -->
             <td>
               <span>
                 <% mr.assignees.nodes.each do |assignee| %>
-                  <a href="<%= mr.mergeUser.webUrl %>" target="_blank"><img
-                      width="16"
-                      class="rounded float-left"
-                      src="<%= make_full_url(mr.mergeUser.avatarUrl) %>"
-                    /></a>
+                  <%= render 'partials/user_avatar', user: assignee %>
                 <% end %>
               </span>
 
@@ -377,38 +252,7 @@
 
               <br/>
 
-              <nobr>
-                <i class="fa-solid fa-code-branch"></i>
-                <span><%= mr.sourceBranch %></span>
-                <button
-                  class="btn btn-sm float-right"
-                  style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="Click to copy"
-                  onclick="navigator.clipboard.writeText('<%= mr.sourceBranch %>')"
-                >
-                  <i class="fa fa-clipboard" aria-hidden="true"></i>
-                </button>
-              </nobr>
-              <% if %w[master main].exclude?(mr.targetBranch) %>
-                <br/>
-                <nobr>
-                  <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
-                  <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == mr.targetBranch && other_mr.autoMergeEnabled } %>
-                    <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
-                  <% end %>
-                  <span><%= mr.targetBranch %></span>
-                  <button
-                    class="btn btn-sm float-right"
-                    style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-                    data-bs-toggle="tooltip"
-                    data-bs-title="Click to copy"
-                    onclick="navigator.clipboard.writeText('<%= mr.targetBranch %>')"
-                  >
-                    <i class="fa fa-clipboard" aria-hidden="true"></i>
-                  </button>
-                </nobr>
-              <% end %>
+              <%= render 'partials/branch_ref', source_branch: mr.sourceBranch, target_branch: mr.targetBranch %>
             </td>
           </tr>
         <% end %>

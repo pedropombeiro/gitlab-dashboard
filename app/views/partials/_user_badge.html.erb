@@ -1,0 +1,24 @@
+<span
+  class="badge bg-info text-light' %>"
+  data-bs-toggle="tooltip"
+  data-bs-custom-class="wide-tooltip"
+  data-bs-html="true"
+  data-bs-title="<%= user_help_title(user) %>"
+>
+  <img
+    width="16"
+    class="rounded float-left"
+    src="<%= make_full_url(user.avatarUrl) %>"
+  />
+  <%= link_to user.username,
+  user.webUrl,
+  target: "_blank",
+  class: "bg-info text-light" %>
+  <% if user.status&.availability == "BUSY" %>
+    <abbr
+      class="float-right"
+      data-bs-toggle="tooltip"
+      data-bs-title="<%= user.status&.availability %>"
+    >🔴</abbr>
+  <% end %>
+</span>

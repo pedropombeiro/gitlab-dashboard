@@ -1,0 +1,35 @@
+<span
+  class="badge <%= reviewer.review == 'APPROVED' ? 'bg-info text-light' : 'bg-light' %>"
+  data-bs-toggle="tooltip"
+  data-bs-custom-class="wide-tooltip"
+  data-bs-html="true"
+  data-bs-title="<%= reviewer_help_title(reviewer) %>"
+>
+  <img
+    width="16"
+    class="rounded float-left"
+    src="<%= make_full_url(reviewer.avatarUrl) %>"
+  />
+  <%= link_to reviewer.username,
+  reviewer.webUrl,
+  target: "_blank",
+  class: reviewer.review == "APPROVED" ? "bg-info text-light" : "" %>
+  <% if reviewer.status&.availability == "BUSY" %>
+    <abbr
+      class="float-right"
+      data-bs-toggle="tooltip"
+      data-bs-title="<%= reviewer.status&.availability %>"
+    >🔴</abbr>
+  <% end %>
+  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
+    <abbr
+      data-bs-toggle="tooltip"
+      data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>"
+    >
+      <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
+    </abbr>
+    <% if reviewer.bootstrapClass[:activity_icon] %>
+      <i class="<%= reviewer.bootstrapClass[:activity_icon] %>"></i>
+    <% end %>
+  </span>
+</span>
