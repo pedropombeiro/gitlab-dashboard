@@ -5,6 +5,8 @@ require "ostruct"
 class MergeRequestsController < ApplicationController
   include ActionView::Helpers::DateHelper
 
+  MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
+
   PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
   MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary" }.freeze
   REVIEW_ICON = {
@@ -56,6 +58,8 @@ class MergeRequestsController < ApplicationController
       }
       mr.createdAt = Time.parse(mr.createdAt) if mr.createdAt
       mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
+      mr.issue = issue_from_mr(mr)
+
       if mr.headPipeline
         mr.headPipeline.startedAt = Time.parse(mr.headPipeline.startedAt) if mr.headPipeline.startedAt
         mr.headPipeline.finishedAt = Time.parse(mr.headPipeline.finishedAt) if mr.headPipeline.finishedAt
@@ -68,6 +72,7 @@ class MergeRequestsController < ApplicationController
           end
         end
       end
+
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
       mr.reviewers.nodes.each do |reviewer|
         reviewer.lastActivityOn = Time.parse(reviewer.lastActivityOn) if reviewer.lastActivityOn
@@ -90,6 +95,7 @@ class MergeRequestsController < ApplicationController
       end
       workflow_label = mr.labels.nodes.first&.title
       mr.workflowLabel = workflow_label&.delete_prefix("workflow::")
+      mr.issue = issue_from_mr(mr)
 
       mr.bootstrapClass = {
         row: mr.labels.nodes.any? ? "primary" : "secondary",
@@ -328,19 +334,24 @@ class MergeRequestsController < ApplicationController
     REVIEW_TEXT_BS_CLASS[reviewer.mergeRequestInteraction.reviewState]
   end
 
-  MR_ISSUE_PATTERN = %r{^(security[-/])?pedropombeiro/(?<issue_id>\d+)/[a-z0-9\-+_]+$}i.freeze
+  def issue_from_mr(mr)
+    match_data = MR_ISSUE_PATTERN.match(mr.sourceBranch)
+    iid = match_data&.named_captures&.fetch("issue_id")
+
+    return unless iid
+
+    OpenStruct.new(
+      iid: iid,
+      webUrl: mr.webUrl.gsub(%r{merge_requests/[0-9]+}, "issues/#{iid}")
+    )
+  end
+
+  def merge_request_issue_iids(merge_requests)
+    merge_requests.to_h { |mr| [mr.iid, issue_from_mr(mr)&.iid] }
+  end
 
   def merged_merge_requests(merge_requests)
-    merged_request_issue_iids = merge_requests.to_h do |mr|
-      match_data = MR_ISSUE_PATTERN.match(mr.sourceBranch)
-
-      if match_data
-        [mr.iid, match_data[:issue_id]]
-      else
-        [mr.iid, nil]
-      end
-    end
-
+    merged_request_issue_iids = merge_request_issue_iids(merge_requests)
     issue_iids = merged_request_issue_iids.values.compact.sort.uniq
 
     json = Rails.cache.fetch("issues_v1/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do

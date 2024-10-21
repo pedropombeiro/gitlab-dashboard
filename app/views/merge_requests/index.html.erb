@@ -67,6 +67,10 @@
             <!-- MR ID -->
             <th scope="row">
               <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
+              <% if mr.issue %>
+                <br/>
+                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl %>
+              <% end %>
             </th>
             <!-- Created at -->
             <td>
@@ -222,6 +226,10 @@
             <!-- MR ID -->
             <th scope="row">
               <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
+              <% if mr.issue %>
+                <br/>
+                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl %>
+              <% end %>
             </th>
             <!-- Created at -->
             <td>
