@@ -56,8 +56,8 @@
             <th scope="col">Conflicts?</th>
           <% end %>
           <th scope="col"><i class="fa-regular fa-thumbs-up" title="Approvals"></i></th>
-          <th scope="col"><i class="fa-solid fa-magnifying-glass"></i>
-            Reviewers</th>
+          <th scope="col"><i class="fa-solid fa-magnifying-glass"></i> Reviewers</th>
+          <th scope="col">Associated Issue</th>
         </tr>
       </thead>
 
@@ -67,14 +67,6 @@
             <!-- MR ID -->
             <th scope="row">
               <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
-              <% if mr.issue %>
-                <br/>
-                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl,
-                  kwattrs: {
-                    "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
-                    "data-bs-title" => mr.issue.titleHtml
-                  } %>
-              <% end %>
             </th>
             <!-- Created at -->
             <td>
@@ -203,6 +195,16 @@
                 <%= render 'partials/reviewer_badge', reviewer: reviewer %>
               <% end %>
             </td>
+            <!-- Associated Issue -->
+            <td scope="row">
+              <% if mr.issue %>
+                <%= render 'partials/link', title: "\##{mr.issue.iid}", web_url: mr.issue.webUrl,
+                  kwattrs: {
+                    "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
+                    "data-bs-title" => mr.issue.titleHtml
+                  } %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>
@@ -221,6 +223,7 @@
           <th scope="col">Merged</th>
           <th scope="col">Labels</th>
           <th scope="col">Title</th>
+          <th scope="col">Associated Issue</th>
         </tr>
       </thead>
 
@@ -230,14 +233,6 @@
             <!-- MR ID -->
             <th scope="row">
               <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
-              <% if mr.issue %>
-                <br/>
-                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl,
-                  kwattrs: {
-                    "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
-                    "data-bs-title" => mr.issue.titleHtml
-                  } %>
-              <% end %>
             </th>
             <!-- Created at -->
             <td>
@@ -269,6 +264,16 @@
               <br/>
 
               <%= render 'partials/branch_ref', source_branch: mr.sourceBranch, target_branch: mr.targetBranch %>
+            </td>
+            <!-- Associated Issue -->
+            <td>
+              <% if mr.issue %>
+                <%= render 'partials/link', title: "\##{mr.issue.iid}", web_url: mr.issue.webUrl,
+                  kwattrs: {
+                    "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
+                    "data-bs-title" => mr.issue.titleHtml
+                  } %>
+              <% end %>
             </td>
           </tr>
         <% end %>
