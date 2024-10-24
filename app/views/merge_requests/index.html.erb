@@ -69,7 +69,11 @@
               <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
               <% if mr.issue %>
                 <br/>
-                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl %>
+                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl,
+                  kwattrs: {
+                    "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
+                    "data-bs-title" => mr.issue.titleHtml
+                  } %>
               <% end %>
             </th>
             <!-- Created at -->
@@ -228,7 +232,11 @@
               <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
               <% if mr.issue %>
                 <br/>
-                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl %>
+                <%= render 'partials/link', title: "(\##{mr.issue.iid})", web_url: mr.issue.webUrl,
+                  kwattrs: {
+                    "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
+                    "data-bs-title" => mr.issue.titleHtml
+                  } %>
               <% end %>
             </th>
             <!-- Created at -->

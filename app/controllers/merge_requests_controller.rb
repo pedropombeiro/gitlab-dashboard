@@ -50,6 +50,9 @@ class MergeRequestsController < ApplicationController
 
     @updated_at = Time.parse(response.updatedAt)
 
+    @open_issues_by_iid =
+      open_issues_from_merge_requests(response.user.openMergeRequests.nodes + response.user.mergedMergeRequests.nodes)
+
     @open_merge_requests = response.user.openMergeRequests.nodes.map do |mr|
       mr.bootstrapClass = {
         row: row_class(mr),
@@ -148,6 +151,7 @@ class MergeRequestsController < ApplicationController
           avatarUrl
           openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
             nodes {
+              iid
               reference
               webUrl
               titleHtml
@@ -258,6 +262,8 @@ class MergeRequestsController < ApplicationController
             issues(iids: [#{iids.map { |iid| "\"#{iid}\"" }.join(", ")}], state: opened) {
             nodes {
               iid
+              webUrl
+              titleHtml
             }
           }
         }
@@ -334,23 +340,21 @@ class MergeRequestsController < ApplicationController
     REVIEW_TEXT_BS_CLASS[reviewer.mergeRequestInteraction.reviewState]
   end
 
-  def issue_from_mr(mr)
+  def issue_iid_from_mr(mr)
     match_data = MR_ISSUE_PATTERN.match(mr.sourceBranch)
-    iid = match_data&.named_captures&.fetch("issue_id")
+    match_data&.named_captures&.fetch("issue_id")
+  end
 
-    return unless iid
-
-    OpenStruct.new(
-      iid: iid,
-      webUrl: mr.webUrl.gsub(%r{merge_requests/[0-9]+}, "issues/#{iid}")
-    )
+  def issue_from_mr(mr)
+    iid = issue_iid_from_mr(mr)
+    @open_issues_by_iid[iid]
   end
 
   def merge_request_issue_iids(merge_requests)
-    merge_requests.to_h { |mr| [mr.iid, issue_from_mr(mr)&.iid] }
+    merge_requests.to_h { |mr| [mr.iid, issue_iid_from_mr(mr)] }
   end
 
-  def merged_merge_requests(merge_requests)
+  def open_issues_from_merge_requests(merge_requests)
     merged_request_issue_iids = merge_request_issue_iids(merge_requests)
     issue_iids = merged_request_issue_iids.values.compact.sort.uniq
 
@@ -360,7 +364,14 @@ class MergeRequestsController < ApplicationController
 
     return unless json
 
-    open_issue_iids = JSON.parse!(json, object_class: OpenStruct).map(&:iid)
+    JSON.parse!(json, object_class: OpenStruct).to_h { |issue| [issue.iid, issue] }
+  end
+
+  def merged_merge_requests(merge_requests)
+    return unless @open_issues_by_iid
+
+    open_issue_iids = @open_issues_by_iid.keys
+    merged_request_issue_iids = merge_request_issue_iids(merge_requests)
 
     merge_requests.filter { |mr| open_issue_iids.include?(merged_request_issue_iids[mr.iid]) }
   end
