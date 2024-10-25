@@ -5,11 +5,7 @@
   data-bs-html="true"
   data-bs-title="<%= reviewer_help_title(reviewer) %>"
 >
-  <img
-    width="16"
-    class="rounded float-left"
-    src="<%= make_full_url(reviewer.avatarUrl) %>"
-  />
+  <%= image_tag(make_full_url(reviewer.avatarUrl), size: "16", class: "rounded float-left") %>
   <%= link_to reviewer.username,
   reviewer.webUrl,
   target: "_blank",
