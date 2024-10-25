@@ -74,11 +74,7 @@
             </td>
             <!-- Updated at -->
             <td>
-              <% if mr.updatedAt %>
-                <%= render 'partials/relative_timestamp', timestamp: mr.updatedAt, most_significant_only: true %>
-              <% else %>
-                N/A
-              <% end %>
+              <%= render 'partials/relative_timestamp', timestamp: mr.updatedAt, most_significant_only: true %>
             </td>
             <!-- Merge status -->
             <td>
@@ -234,12 +230,8 @@
             </td>
             <!-- Merged at -->
             <td>
-              <% if mr.mergedAt %>
-                <%= render 'partials/relative_timestamp', timestamp: mr.mergedAt, most_significant_only: true %>
-                by <br/><%= render 'partials/user_badge', user: mr.mergeUser %>
-              <% else %>
-                N/A
-              <% end %>
+              <%= render 'partials/relative_timestamp', timestamp: mr.mergedAt, most_significant_only: true %>
+              by <br/><%= render 'partials/user_badge', user: mr.mergeUser %>
             </td>
             <!-- Labels -->
             <td>
