@@ -1,8 +1,5 @@
-<% most_significant_only ||= false %>
-<% timestamp ||= nil %>
-
-<% if timestamp %>
-  <abbr data-bs-toggle="tooltip" data-bs-title="<%= timestamp %>"><%= humanized_duration(Time.now - timestamp, most_significant_only: most_significant_only) %></abbr></caption>
+<% if local_assigns[:timestamp] %>
+  <abbr data-bs-toggle="tooltip" data-bs-title="<%= timestamp %>"><%= humanized_duration(Time.now - timestamp, most_significant_only: local_assigns[:most_significant_only] || false) %></abbr></caption>
 <% else %>
   N/A
 <% end %>

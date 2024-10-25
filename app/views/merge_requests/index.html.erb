@@ -23,11 +23,7 @@
   <nav class="navbar navbar-light bg-dark">
     <span class="navbar-brand mb-0 ms-1 h1 text-light">
       Merge Requests Dashboard for
-      <%= image_tag(
-        make_full_url(@user.avatarUrl),
-        size: "24",
-        class: "rounded float-left",
-      ) %>
+      <%= render 'partials/user_image', user: @user, size: 24 %>
       <%= link_to @user.username, @user.webUrl %>
     </span>
   </nav>
