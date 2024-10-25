@@ -1,0 +1,59 @@
+<table class="table table-hover table-sm" style="cursor: pointer;">
+  <caption><%= merge_requests.count %>
+    merged merge requests with open issues, updated <%= render 'partials/relative_timestamp', timestamp: @updated_at %>
+
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Created</th>
+      <th scope="col">Merged</th>
+      <th scope="col">Labels</th>
+      <th scope="col">Title</th>
+      <th scope="col">Associated Issue</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% merge_requests.each do |mr| %>
+      <tr class="table-<%= mr.bootstrapClass[:row] %>">
+        <!-- MR ID -->
+        <th scope="row">
+          <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
+        </th>
+        <!-- Created at -->
+        <td>
+          <%= render 'partials/relative_timestamp', timestamp: mr.createdAt, most_significant_only: true %>
+        </td>
+        <!-- Merged at -->
+        <td>
+          <%= render 'partials/relative_timestamp', timestamp: mr.mergedAt, most_significant_only: true %>
+          by <br/><%= render 'partials/user_badge', user: mr.mergeUser %>
+        </td>
+        <!-- Labels -->
+        <td>
+          <span class="badge <%= mr.bootstrapClass[:label]%>"><%= mr.workflowLabel %></span>
+        </td>
+        <!-- Title -->
+        <td>
+          <%= render partial: 'partials/user_avatar', collection: mr.assignees.nodes, as: :user %>
+
+          <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
+
+          <br/>
+
+          <%= render 'partials/branch_ref', source_branch: mr.sourceBranch, target_branch: mr.targetBranch %>
+        </td>
+        <!-- Associated Issue -->
+        <td>
+          <% if mr.issue %>
+            <%= render 'partials/link', title: "\##{mr.issue.iid}", web_url: mr.issue.webUrl,
+              kwattrs: {
+                "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
+                "data-bs-title" => mr.issue.titleHtml
+              } %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
