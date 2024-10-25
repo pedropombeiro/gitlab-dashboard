@@ -1,6 +1,7 @@
 <table class="table table-hover table-sm" style="cursor: pointer;">
   <caption><%= merge_requests.count %>
     merged merge requests with open issues, updated <%= render 'partials/relative_timestamp', timestamp: @updated_at %>
+  </caption>
 
   <thead>
     <tr>
@@ -15,7 +16,7 @@
 
   <tbody>
     <% merge_requests.each do |mr| %>
-      <tr class="table-<%= mr.bootstrapClass[:row] %>">
+      <%= tag.tr(class: "table-#{mr.bootstrapClass[:row]}") do %>
         <!-- MR ID -->
         <th scope="row">
           <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
@@ -48,12 +49,14 @@
           <% if mr.issue %>
             <%= render 'partials/link', title: "\##{mr.issue.iid}", web_url: mr.issue.webUrl,
               kwattrs: {
-                "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
-                "data-bs-title" => mr.issue.titleHtml
+                data: {
+                  bs_toggle: "tooltip", bs_html: "true", bs_custom_class: "x-wide-tooltip",
+                  bs_title: mr.issue.titleHtml
+                }
               } %>
           <% end %>
         </td>
-      </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>

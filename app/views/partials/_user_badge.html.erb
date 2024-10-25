@@ -1,26 +1,30 @@
-<span
-  class="badge bg-info text-light' %>"
-  data-bs-toggle="tooltip"
-  data-bs-custom-class="wide-tooltip"
-  data-bs-html="true"
-  data-bs-title="<%= user_help_title(user) %>"
->
+<%= tag.span(
+  class: %w[badge bg-info text-light],
+  data: {
+    bs_toggle: "tooltip",
+    bs_custom_class: "wide-tooltip",
+    bs_html: "true",
+    bs_title: user_help_title(user)
+  }) do %>
   <%= image_tag(
     make_full_url(user.avatarUrl),
     size: "16",
-    class: "rounded float-left",
+    class: %w[rounded float-left],
   ) %>
   <%= link_to(
     user.username,
     user.webUrl,
     target: "_blank",
-    class: "bg-info text-light",
+    class: %w[bg-info text-light],
   ) %>
   <% if user.status&.availability == "BUSY" %>
-    <abbr
-      class="float-right"
-      data-bs-toggle="tooltip"
-      data-bs-title="<%= user.status&.availability %>"
-    >🔴</abbr>
+    <%= tag.abbr(
+      "🔴",
+      class: "float-right",
+      data: {
+        bs_toggle: "tooltip",
+        bs_title: user.status&.availability,
+      },
+    ) %>
   <% end %>
-</span>
+<% end %>

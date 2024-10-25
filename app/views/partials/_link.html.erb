@@ -1,14 +1,4 @@
-<% kwattrs ||= {} %>
-
 <nobr>
-  <%= link_to title, web_url, target: "_blank", **kwattrs %>
-  <button
-    class="btn btn-sm float-right"
-    style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-    data-bs-toggle="tooltip"
-    data-bs-title="Click to copy"
-    onclick="navigator.clipboard.writeText('<%= title %>')"
-  >
-    <i class="fa fa-clipboard" aria-hidden="true"></i>
-  </button>
+<%= link_to title, web_url, target: "_blank", **(local_assigns[:kwattrs] || {}) %>
+  <%= render 'partials/clipboard_button', text: title %>
 </nobr>

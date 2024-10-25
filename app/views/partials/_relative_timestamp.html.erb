@@ -1,5 +1,10 @@
 <% if local_assigns[:timestamp] %>
-  <abbr data-bs-toggle="tooltip" data-bs-title="<%= timestamp %>"><%= humanized_duration(Time.now - timestamp, most_significant_only: local_assigns[:most_significant_only] || false) %></abbr></caption>
+  <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: timestamp }) do %>
+    <%= humanized_duration(
+      Time.now - timestamp,
+      most_significant_only: local_assigns[:most_significant_only] || false,
+    ) %>
+  <% end %>
 <% else %>
   N/A
 <% end %>

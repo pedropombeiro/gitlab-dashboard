@@ -1,31 +1,32 @@
-<span
-  class="badge <%= reviewer.review == 'APPROVED' ? 'bg-info text-light' : 'bg-light' %>"
-  data-bs-toggle="tooltip"
-  data-bs-custom-class="wide-tooltip"
-  data-bs-html="true"
-  data-bs-title="<%= reviewer_help_title(reviewer) %>"
->
-  <%= render 'partials/user_image', user: reviewer %>
+<%= tag.span(
+  class: ["badge", reviewer.review == "APPROVED" ? "bg-info text-light" : "bg-light"],
+  data: {
+    bs_toggle: "tooltip",
+    bs_custom_class: "wide-tooltip",
+    bs_html: "true",
+    bs_title: reviewer_help_title(reviewer)
+  }) do %>
+  <%= render "partials/user_image", user: reviewer %>
   <%= link_to reviewer.username,
   reviewer.webUrl,
   target: "_blank",
   class: reviewer.review == "APPROVED" ? "bg-info text-light" : "" %>
   <% if reviewer.status&.availability == "BUSY" %>
-    <abbr
-      class="float-right"
-      data-bs-toggle="tooltip"
-      data-bs-title="<%= reviewer.status&.availability %>"
-    >🔴</abbr>
+    <%= tag.abbr(
+      "🔴",
+      class: "float-right",
+      data: {
+        bs_toggle: "tooltip",
+        bs_title: reviewer.status&.availability,
+      },
+    ) %>
   <% end %>
-  <span class="float-right text-<%= reviewer.bootstrapClass[:text] %>">
-    <abbr
-      data-bs-toggle="tooltip"
-      data-bs-title="<%= reviewer.mergeRequestInteraction.reviewState %>"
-    >
-      <i class="<%= reviewer.bootstrapClass[:icon] %>"></i>
-    </abbr>
-    <% if reviewer.bootstrapClass[:activity_icon] %>
-      <i class="<%= reviewer.bootstrapClass[:activity_icon] %>"></i>
+  <%= tag.span(class: ["float-right", "text-#{reviewer.bootstrapClass[:text]}"]) do %>
+    <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
+      <%= tag.i class: reviewer.bootstrapClass[:icon] %>
     <% end %>
-  </span>
-</span>
+    <% if reviewer.bootstrapClass[:activity_icon] %>
+      <%= tag.i class: reviewer.bootstrapClass[:activity_icon] %>
+    <% end %>
+  <% end %>
+<% end %>
