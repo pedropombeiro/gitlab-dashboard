@@ -1,0 +1,167 @@
+<table class="table table-hover table-sm" style="cursor: pointer;">
+  <% any_conflicts = merge_requests.any?(&:conflicts) %>
+
+  <caption><%= merge_requests.count %>
+    open merge requests, updated <%= render 'partials/relative_timestamp', timestamp: @updated_at %>
+
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Created</th>
+      <th scope="col">Updated</th>
+      <th scope="col">Status</th>
+      <th scope="col"><i class="fa-solid fa-timeline"></i></th>
+      <th scope="col">Title</th>
+      <th scope="col"><i
+          class="fa-solid fa-angles-down"
+          data-bs-toggle="tooltip"
+          data-bs-title="Squash?"
+        ></i></th>
+      <% if any_conflicts %>
+        <th scope="col">Conflicts?</th>
+      <% end %>
+      <th scope="col"><i class="fa-regular fa-thumbs-up" title="Approvals"></i></th>
+      <th scope="col"><i class="fa-solid fa-magnifying-glass"></i> Reviewers</th>
+      <th scope="col">Associated Issue</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% merge_requests.each do |mr| %>
+      <tr class="table-<%= mr.bootstrapClass[:row] %>">
+        <!-- MR ID -->
+        <th scope="row">
+          <%= render 'partials/link', title: mr.reference, web_url: mr.webUrl %>
+        </th>
+        <!-- Created at -->
+        <td>
+          <%= render 'partials/relative_timestamp', timestamp: mr.createdAt, most_significant_only: true %>
+        </td>
+        <!-- Updated at -->
+        <td>
+          <%= render 'partials/relative_timestamp', timestamp: mr.updatedAt, most_significant_only: true %>
+        </td>
+        <!-- Merge status -->
+        <td>
+          <span class="badge bg-<%= mr.bootstrapClass[:mergeStatus] %>"><%= mr.detailedMergeStatus %></span>
+          <% if mr.blockingMergeRequests&.visibleMergeRequests %>
+            <% open_blockers =
+              mr
+                .blockingMergeRequests
+                .visibleMergeRequests
+                .filter { |blocker| blocker.state == "opened" }
+                .count %>
+
+            <% if open_blockers.positive? %>
+              <abbr
+                class="text-danger"
+                data-bs-toggle="tooltip"
+                data-bs-title="This MR is blocked by <%= open_blockers %> merge requests"
+              ><i class="fa-solid fa-road-barrier"></i></abbr>
+            <% end %>
+          <% end %>
+        </td>
+        <!-- Pipeline -->
+        <td>
+          <nobr>
+            <% if mr.headPipeline %>
+              <span class="badge badge-pill bg-<%= mr.bootstrapClass[:pipeline] %>">
+                <%= link_to humanized_enum(mr.headPipeline&.status) || "??",
+                mr.headPipeline&.webUrl,
+                class: "text-light",
+                target: "_blank" %>
+              </span>
+              <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'SUCCESS' %>
+                <abbr
+                  class="text-warning"
+                  data-bs-toggle="tooltip"
+                  data-bs-title="One or more jobs have failed in the pipeline"
+                ><i class="fa-solid fa-triangle-exclamation"></i></abbr>
+              <% end %>
+              <% if mr.headPipeline.failureReason %>
+                <abbr
+                  class="text-warning"
+                  data-bs-toggle="tooltip"
+                  data-bs-title="<%= mr.headPipeline.failureReason %>"
+                ><i class="fa-solid fa-comment-dots"></i></abbr>
+              <% end %>
+              <% if mr.headPipeline.startedAt %>
+                <% if mr.headPipeline.finishedAt.nil? %>
+                  <%= render 'partials/relative_timestamp', timestamp: mr.headPipeline.startedAt %>
+                <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
+                  <abbr
+                    data-bs-toggle="tooltip"
+                    data-bs-title="Pipeline too old, must be re-run before being merged"
+                  >🥶</abbr>
+                <% end %>
+              <% end %>
+            <% end %>
+
+            <% if mr.autoMergeEnabled %>
+              <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
+            <% end %>
+          </nobr>
+
+          <br/>
+
+          <%= render partial: 'partials/label', collection: mr.labels.nodes %>
+        </td>
+        <!-- Title -->
+        <td>
+          <%= render partial: 'partials/user_avatar', collection: mr.assignees.nodes, as: :user %>
+
+          <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
+
+          <br/>
+
+          <%= render 'partials/branch_ref', source_branch: mr.sourceBranch, target_branch: mr.targetBranch %>
+        </td>
+        <!-- Squash on merge -->
+        <td class="text-center">
+          <% if mr.squashOnMerge %>
+            <abbr
+              class="text-success"
+              data-bs-toggle="tooltip"
+              data-bs-title="MR set to squash on merge"
+            ><i class="fa-solid fa-angles-down"></i></abbr>
+          <% end %>
+        </td>
+        <!-- Conflicts -->
+        <% if any_conflicts %>
+          <td class="text-center">
+            <% if mr.conflicts %>
+              <abbr
+                class="text-danger"
+                data-bs-toggle="tooltip"
+                data-bs-title="MR branch has conflicts and should be rebased"
+              ><i class="fa-solid fa-burst"></i></abbr>
+            <% end %>
+          </td>
+        <% end %>
+        <!-- Approvals -->
+        <td class="text-end">
+          <% if mr.approved %>
+            <span class="text-success"><i class="fa-regular fa-thumbs-up"></i></span>
+          <% else %>
+            <%= "#{mr.approvalsRequired - mr.approvalsLeft}/#{mr.approvalsRequired}" %>
+          <% end %>
+        </td>
+        <!-- Reviewers -->
+        <td>
+          <%= render partial: 'partials/reviewer_badge', collection: mr.reviewers.nodes, as: :reviewer %>
+        </td>
+        <!-- Associated Issue -->
+        <td scope="row">
+          <% if mr.issue %>
+            <%= render 'partials/link', title: "\##{mr.issue.iid}", web_url: mr.issue.webUrl,
+              kwattrs: {
+                "data-bs-toggle" => "tooltip", "data-bs-html" => "true", "data-bs-custom-class" => "x-wide-tooltip",
+                "data-bs-title" => mr.issue.titleHtml
+              } %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
