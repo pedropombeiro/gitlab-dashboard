@@ -147,11 +147,7 @@
             </td>
             <!-- Title -->
             <td>
-              <span>
-                <% mr.assignees.nodes.each do |assignee| %>
-                  <%= render 'partials/user_avatar', user: assignee %>
-                <% end %>
-              </span>
+              <%= render partial: 'partials/user_avatar', collection: mr.assignees.nodes, as: :user %>
 
               <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
 
@@ -191,9 +187,7 @@
             </td>
             <!-- Reviewers -->
             <td>
-              <% mr.reviewers.nodes.each do |reviewer| %>
-                <%= render 'partials/reviewer_badge', reviewer: reviewer %>
-              <% end %>
+              <%= render partial: 'partials/reviewer_badge', collection: mr.reviewers.nodes, as: :reviewer %>
             </td>
             <!-- Associated Issue -->
             <td scope="row">
@@ -253,11 +247,7 @@
             </td>
             <!-- Title -->
             <td>
-              <span>
-                <% mr.assignees.nodes.each do |assignee| %>
-                  <%= render 'partials/user_avatar', user: assignee %>
-                <% end %>
-              </span>
+              <%= render partial: 'partials/user_avatar', collection: mr.assignees.nodes, as: :user %>
 
               <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
 
