@@ -1,15 +1,7 @@
 <nobr>
   <i class="fa-solid fa-code-branch"></i>
-  <span><%= source_branch %></span>
-  <button
-    class="btn btn-sm float-right"
-    style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-    data-bs-toggle="tooltip"
-    data-bs-title="Click to copy"
-    onclick="navigator.clipboard.writeText('<%= source_branch %>')"
-  >
-    <i class="fa fa-clipboard" aria-hidden="true"></i>
-  </button>
+  <%= tag.span source_branch %>
+  <%= render 'partials/clipboard_button', text: source_branch %>
 </nobr>
 <% if %w[master main].exclude?(target_branch) %>
   <br/>
@@ -18,15 +10,7 @@
     <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
       <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
     <% end %>
-    <span><%= target_branch %></span>
-    <button
-      class="btn btn-sm float-right"
-      style="--bs-btn-padding-y: 0; --bs-btn-padding-x: 0"
-      data-bs-toggle="tooltip"
-      data-bs-title="Click to copy"
-      onclick="navigator.clipboard.writeText('<%= target_branch %>')"
-    >
-      <i class="fa fa-clipboard" aria-hidden="true"></i>
-    </button>
+    <%= tag.span target_branch %>
+    <%= render 'partials/clipboard_button', text: target_branch %>
   </nobr>
 <% end %>
