@@ -1,5 +1,3 @@
-<a href="<%= user.webUrl %>" target="_blank"><img
-    width="16"
-    class="rounded float-left"
-    src="<%= make_full_url(user.avatarUrl) %>"
-  /></a>
+<%= link_to user.webUrl, target: "_blank" do %>
+  <%= image_tag(make_full_url(user.avatarUrl), size: "16", class: "rounded float-left") %>
+<% end %>
