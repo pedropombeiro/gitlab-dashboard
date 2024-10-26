@@ -1,16 +1,18 @@
 <nobr>
   <i class="fa-solid fa-code-branch"></i>
   <%= tag.span source_branch %>
-  <%= render 'partials/clipboard_button', text: source_branch %>
+  <%= render "partials/clipboard_button", text: source_branch %>
 </nobr>
 <% if %w[master main].exclude?(target_branch) %>
   <br/>
   <nobr>
     <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
     <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
-      <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
+      <%= render "partials/icon_with_title",
+      content: "🚀",
+      title: "Auto-merge is enabled" %>
     <% end %>
     <%= tag.span target_branch %>
-    <%= render 'partials/clipboard_button', text: target_branch %>
+    <%= render "partials/clipboard_button", text: target_branch %>
   </nobr>
 <% end %>

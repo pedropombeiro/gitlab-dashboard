@@ -13,16 +13,19 @@
       <th scope="col">Status</th>
       <th scope="col"><i class="fa-solid fa-timeline"></i></th>
       <th scope="col">Title</th>
-      <th scope="col"><i
-          class="fa-solid fa-angles-down"
-          data-bs-toggle="tooltip"
-          data-bs-title="Squash?"
-        ></i></th>
+      <th scope="col"><%= tag.i(
+          class: %w[fa-solid fa-angles-down],
+          data: {
+            bs_toggle: "tooltip",
+            bs_title: "Squash?",
+          },
+        ) %>
+      </th>
       <% if any_conflicts %>
         <th scope="col">Conflicts?</th>
       <% end %>
-      <th scope="col"><i class="fa-regular fa-thumbs-up" title="Approvals"></i></th>
-      <th scope="col"><i class="fa-solid fa-magnifying-glass"></i>
+      <th scope="col"><%= tag.i class: %w[fa-regular fa-thumbs-up], title: "Approvals" %></th>
+      <th scope="col"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
         Reviewers</th>
       <th scope="col">Associated Issue</th>
     </tr>
@@ -39,6 +42,7 @@
         <td>
           <%= render "partials/relative_timestamp",
           timestamp: mr.createdAt,
+          age_warning: true,
           most_significant_only: true %>
         </td>
         <!-- Updated at -->
@@ -59,11 +63,10 @@
                 .count %>
 
             <% if open_blockers.positive? %>
-              <abbr
-                class="text-danger"
-                data-bs-toggle="tooltip"
-                data-bs-title="This MR is blocked by <%= open_blockers %> merge requests"
-              ><i class="fa-solid fa-road-barrier"></i></abbr>
+              <%= render "partials/icon_with_title",
+              content: tag.i(class: %w[fa-solid fa-road-barrier]),
+              class: "text-danger",
+              title: "This MR is blocked by #{pluralize(open_blockers, "merge request")}" %>
             <% end %>
           <% end %>
         </td>
@@ -78,34 +81,31 @@
                 target: "_blank" %>
               <% end %>
               <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'SUCCESS' %>
-                <abbr
-                  class="text-warning"
-                  data-bs-toggle="tooltip"
-                  data-bs-title="One or more jobs have failed in the pipeline"
-                ><i class="fa-solid fa-triangle-exclamation"></i></abbr>
+                <%= render "partials/icon_with_title",
+                content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
+                title:
+                  "#{pluralize(mr.headPipeline.failedJobs.count.to_i, "job")} have failed in the pipeline",
+                class: "text-warning" %>
               <% end %>
               <% if mr.headPipeline.failureReason %>
-                <%= tag.abbr(class: "text-warning", data: { bs_toggle: "tooltip", bs_title: mr.headPipeline.failureReason }) do %>
-                  <% tag.i class: "fa-solid fa-comment-dots" %>
-                <% end %>
+                <%= render "partials/icon_with_title",
+                content: tag.i(class: %w[fa-solid fa-comment-dots]),
+                class: "text-warning",
+                title: mr.headPipeline.failureReason %>
               <% end %>
               <% if mr.headPipeline.startedAt %>
                 <% if mr.headPipeline.finishedAt.nil? %>
                   <%= render "partials/relative_timestamp", timestamp: mr.headPipeline.startedAt %>
                 <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
-                  <%= tag.abbr(
-                    "🥶",
-                    data: {
-                      bs_toggle: "tooltip",
-                      bs_title: "Pipeline too old, must be re-run before being merged",
-                    },
-                  ) %>
+                  <%= render "partials/icon_with_title",
+                  content: "🥶",
+                  title: "Pipeline too old, must be re-run before being merged" %>
                 <% end %>
               <% end %>
             <% end %>
 
             <% if mr.autoMergeEnabled %>
-              <abbr data-bs-toggle="tooltip" data-bs-title="Auto-merge is enabled">🚀</abbr>
+              <%= render "partials/icon_with_title", content: "🚀", title: "Auto-merge is enabled" %>
             <% end %>
           </nobr>
 
@@ -130,38 +130,42 @@
         <!-- Squash on merge -->
         <td class="text-center">
           <% if mr.squashOnMerge %>
-            <abbr
-              class="text-success"
-              data-bs-toggle="tooltip"
-              data-bs-title="MR set to squash on merge"
-            ><i class="fa-solid fa-angles-down"></i></abbr>
+            <%= render "partials/icon_with_title",
+            content: tag.i(class: %w[fa-solid fa-angles-down]),
+            title: "MR set to squash on merge",
+            class: "text-success" %>
           <% end %>
         </td>
         <!-- Conflicts -->
         <% if any_conflicts %>
           <td class="text-center">
             <% if mr.conflicts %>
-              <abbr
-                class="text-danger"
-                data-bs-toggle="tooltip"
-                data-bs-title="MR branch has conflicts and should be rebased"
-              ><i class="fa-solid fa-burst"></i></abbr>
+              <%= render "partials/icon_with_title",
+              content: tag.i(class: %w[fa-solid fa-burst]),
+              class: "text-danger",
+              title: "MR branch has conflicts and should be rebased" %>
             <% end %>
           </td>
         <% end %>
         <!-- Approvals -->
         <td class="text-end">
           <% if mr.approved %>
-            <span class="text-success"><i class="fa-regular fa-thumbs-up"></i></span>
+            <%= render "partials/icon_with_title",
+            content: tag.i(class: %w[fa-regular fa-thumbs-up]),
+            class: "text-success",
+            title: "Approved" %>
           <% else %>
             <%= "#{mr.approvalsRequired - mr.approvalsLeft}/#{mr.approvalsRequired}" %>
           <% end %>
         </td>
         <!-- Reviewers -->
         <td>
-          <%= render partial: "partials/reviewer_badge",
-          collection: mr.reviewers.nodes,
-          as: :reviewer %>
+          <%= render(
+            partial: "partials/reviewer_badge",
+            spacer_template: "partials/space",
+            collection: mr.reviewers.nodes,
+            as: :reviewer,
+          ) || "Not assigned" %>
         </td>
         <!-- Associated Issue -->
         <td scope="row">
