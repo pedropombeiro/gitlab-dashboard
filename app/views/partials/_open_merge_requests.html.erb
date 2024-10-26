@@ -1,8 +1,7 @@
 <table class="table table-hover table-sm" style="cursor: pointer;">
   <% any_conflicts = merge_requests.any?(&:conflicts) %>
 
-  <caption><%= number_to_human(merge_requests.count) %>
-    open merge requests, updated
+  <caption><%= pluralize(merge_requests.count, "open merge request") %>, updated
     <%= render "partials/relative_timestamp", timestamp: @updated_at %>
   </caption>
 
