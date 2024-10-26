@@ -126,7 +126,7 @@ class MergeRequestsController < ApplicationController
 
   private
 
-  MERGE_REQUESTS_GRAPHQL_QUERY = <<~GRAPHQL
+  MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
     query($username: String!) {
       user(username: $username) {
         username
@@ -270,9 +270,9 @@ class MergeRequestsController < ApplicationController
 
   def fetch_open_issues(iids)
     query = <<-GRAPHQL
-        query($projectPath : ID!, $iids: [String!]) {
-          project(fullPath: $projectPath) {
-            issues(iids: $iids, state: opened) {
+      query($projectPath : ID!, $iids: [String!]) {
+        project(fullPath: $projectPath) {
+          issues(iids: $iids, state: opened) {
             nodes {
               iid
               webUrl
