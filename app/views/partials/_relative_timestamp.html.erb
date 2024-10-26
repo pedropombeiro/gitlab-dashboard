@@ -2,7 +2,7 @@
   <%= render "partials/icon_with_title",
   content: "#{time_ago_in_words(timestamp)} ago",
   class: local_assigns[:age_warning] && Time.now - timestamp > 2.weeks ? "text-danger" : nil,
-  title: timestamp.to_formatted_s(:rfc822) %>
+  title: timestamp.localtime.to_formatted_s(:long_ordinal) %>
 <% else %>
   N/A
 <% end %>
