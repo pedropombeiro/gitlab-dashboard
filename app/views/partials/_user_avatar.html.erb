@@ -1,3 +1,3 @@
-<%= link_to user.webUrl, target: "_blank" do %>
-  <%= render 'partials/user_image', user: user %>
+<%= link_to user.webUrl, target: "_blank", style: [ "text-decoration: none" ] do %>
+  <%= render "partials/user_image", user: user %>
 <% end %>
