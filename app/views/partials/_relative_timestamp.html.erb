@@ -1,9 +1,6 @@
 <% if local_assigns[:timestamp] %>
   <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: timestamp }) do %>
-    <%= humanized_duration(
-      Time.now - timestamp,
-      most_significant_only: local_assigns[:most_significant_only] || false,
-    ) %>
+    <%= time_ago_in_words(timestamp) %> ago
   <% end %>
 <% else %>
   N/A

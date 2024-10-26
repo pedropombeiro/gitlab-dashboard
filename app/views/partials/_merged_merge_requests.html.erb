@@ -1,5 +1,5 @@
 <table class="table table-hover table-sm" style="cursor: pointer;">
-  <caption><%= merge_requests.count %>
+  <caption><%= number_to_human(merge_requests.count) %>
     merged merge requests with open issues, updated <%= render 'partials/relative_timestamp', timestamp: @updated_at %>
   </caption>
 
@@ -37,7 +37,6 @@
         <!-- Title -->
         <td>
           <%= render partial: 'partials/user_avatar', collection: mr.assignees.nodes, as: :user %>
-
           <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
 
           <br/>
