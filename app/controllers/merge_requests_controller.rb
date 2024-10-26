@@ -35,7 +35,7 @@ class MergeRequestsController < ApplicationController
   }.freeze
   WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys
 
-  helper_method :humanized_duration, :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
+  helper_method :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
 
   def index
     assignee = params[:assignee]
@@ -281,16 +281,6 @@ class MergeRequestsController < ApplicationController
 
   def humanized_enum(value)
     value.tr("_", " ").capitalize.sub("Ci ", "CI ").strip
-  end
-
-  def humanized_duration(seconds, most_significant_only: false)
-    parts = ActiveSupport::Duration.build(seconds).parts.except(:seconds)
-    parts = parts.take(1) if most_significant_only
-    duration = parts.reduce("") { |output, (key, val)| output += "#{val}#{key.to_s.first} " }.strip
-
-    return "just now" if duration.blank?
-
-    "#{duration} ago"
   end
 
   def user_help_title(user)
