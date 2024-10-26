@@ -1,7 +1,8 @@
 <% if local_assigns[:timestamp] %>
-  <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: timestamp.to_formatted_s(:rfc822) }) do %>
-    <%= time_ago_in_words(timestamp) %> ago
-  <% end %>
+  <%= render "partials/icon_with_title",
+  content: "#{time_ago_in_words(timestamp)} ago",
+  class: local_assigns[:age_warning] && Time.now - timestamp > 2.weeks ? "text-danger" : nil,
+  title: timestamp.to_formatted_s(:rfc822) %>
 <% else %>
   N/A
 <% end %>
