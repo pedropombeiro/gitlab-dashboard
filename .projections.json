@@ -1,0 +1,24 @@
+{
+  "*": {
+    "make": "rake",
+    "start": "bin/dev"
+  },
+  "spec/*_spec.rb": {
+    "dispatch": "rspec {file}"
+  },
+  "app/controllers/*_controller.rb": {
+    "type": "controller",
+    "alternate": "app/views/{}/index.html.erb"
+  },
+  "app/models/*.rb": {
+    "type": "model",
+    "alternate": "app/controllers/{}_controller.rb"
+  },
+  "app/views/*/index.html.erb": {
+    "type": "view",
+    "alternate": "app/controllers/{}_controller.rb"
+  },
+  "app/views/partials/_*.html.erb": {
+    "type": "partial"
+  }
+}
