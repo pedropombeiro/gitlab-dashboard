@@ -1,7 +1,7 @@
 <table class="table table-hover table-sm" style="cursor: pointer;">
   <caption><%= pluralize(merge_requests.count, "merged merge request") %>
     with open issues, updated
-    <%= render "partials/relative_timestamp", timestamp: @updated_at %>
+    <%= render "relative_timestamp", timestamp: @updated_at %>
   </caption>
 
   <thead>
@@ -20,21 +20,19 @@
       <%= tag.tr(class: "table-#{mr.bootstrapClass[:row]}") do %>
         <!-- MR ID -->
         <th scope="row">
-          <%= render "partials/link", title: mr.reference, web_url: mr.webUrl %>
+          <%= render "link", title: mr.reference, web_url: mr.webUrl %>
         </th>
         <!-- Created at -->
         <td>
-          <%= render "partials/relative_timestamp",
+          <%= render "relative_timestamp",
           timestamp: mr.createdAt,
           most_significant_only: true %>
         </td>
         <!-- Merged at -->
         <td>
-          <%= render "partials/relative_timestamp",
-          timestamp: mr.mergedAt,
-          most_significant_only: true %>
+          <%= render "relative_timestamp", timestamp: mr.mergedAt, most_significant_only: true %>
           by
-          <br/><%= render "partials/user_badge", user: mr.mergeUser %>
+          <br/><%= render "user_badge", user: mr.mergeUser %>
         </td>
         <!-- Labels -->
         <td>
@@ -42,30 +40,26 @@
         </td>
         <!-- Title -->
         <td>
-          <%= render partial: "partials/user_avatar",
-          collection: mr.assignees.nodes,
-          as: :user %>
+          <%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
           <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
 
           <br/>
 
-          <%= render "partials/branch_ref",
+          <%= render "branch_ref",
           source_branch: mr.sourceBranch,
           target_branch: mr.targetBranch %>
         </td>
         <!-- Associated Issue -->
         <td>
           <% if mr.issue %>
-            <%= render "partials/link",
+            <%= render "link",
             title: "\##{mr.issue.iid}",
             web_url: mr.issue.webUrl,
-            kwattrs: {
-              data: {
-                bs_toggle: "tooltip",
-                bs_html: "true",
-                bs_custom_class: "x-wide-tooltip",
-                bs_title: mr.issue.titleHtml,
-              },
+            data: {
+              bs_toggle: "tooltip",
+              bs_html: "true",
+              bs_custom_class: "x-wide-tooltip",
+              bs_title: mr.issue.titleHtml,
             } %>
           <% end %>
         </td>
