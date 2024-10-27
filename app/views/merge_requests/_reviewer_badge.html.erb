@@ -6,7 +6,7 @@
     bs_html: "true",
     bs_title: reviewer_help_title(reviewer)
   }) do %>
-  <%= render "partials/user_image", user: reviewer %>
+  <%= render "user_image", user: reviewer %>
   <%= link_to reviewer.username,
   reviewer.webUrl,
   target: "_blank",

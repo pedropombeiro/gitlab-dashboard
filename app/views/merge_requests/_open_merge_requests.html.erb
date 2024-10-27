@@ -2,7 +2,7 @@
   <% any_conflicts = merge_requests.any?(&:conflicts) %>
 
   <caption><%= pluralize(merge_requests.count, "open merge request") %>, updated
-    <%= render "partials/relative_timestamp", timestamp: @updated_at %>
+    <%= render "relative_timestamp", timestamp: @updated_at %>
   </caption>
 
   <thead>
@@ -36,18 +36,18 @@
       <tr class="table-<%= mr.bootstrapClass[:row] %>">
         <!-- MR ID -->
         <th scope="row">
-          <%= render "partials/link", title: mr.reference, web_url: mr.webUrl %>
+          <%= render "link", title: mr.reference, web_url: mr.webUrl %>
         </th>
         <!-- Created at -->
         <td>
-          <%= render "partials/relative_timestamp",
+          <%= render "relative_timestamp",
           timestamp: mr.createdAt,
           age_warning: true,
           most_significant_only: true %>
         </td>
         <!-- Updated at -->
         <td>
-          <%= render "partials/relative_timestamp",
+          <%= render "relative_timestamp",
           timestamp: mr.updatedAt,
           most_significant_only: true %>
         </td>
@@ -63,7 +63,7 @@
                 .count %>
 
             <% if open_blockers.positive? %>
-              <%= render "partials/icon_with_title",
+              <%= render "icon_with_title",
               content: tag.i(class: %w[fa-solid fa-road-barrier]),
               class: "text-danger",
               title: "This MR is blocked by #{pluralize(open_blockers, "merge request")}" %>
@@ -81,23 +81,23 @@
                 target: "_blank" %>
               <% end %>
               <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'SUCCESS' %>
-                <%= render "partials/icon_with_title",
+                <%= render "icon_with_title",
                 content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
                 title:
                   "#{pluralize(mr.headPipeline.failedJobs.count.to_i, "job")} have failed in the pipeline",
                 class: "text-warning" %>
               <% end %>
               <% if mr.headPipeline.failureReason %>
-                <%= render "partials/icon_with_title",
+                <%= render "icon_with_title",
                 content: tag.i(class: %w[fa-solid fa-comment-dots]),
                 class: "text-warning",
                 title: mr.headPipeline.failureReason %>
               <% end %>
               <% if mr.headPipeline.startedAt %>
                 <% if mr.headPipeline.finishedAt.nil? %>
-                  <%= render "partials/relative_timestamp", timestamp: mr.headPipeline.startedAt %>
+                  <%= render "relative_timestamp", timestamp: mr.headPipeline.startedAt %>
                 <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
-                  <%= render "partials/icon_with_title",
+                  <%= render "icon_with_title",
                   content: "🥶",
                   title: "Pipeline too old, must be re-run before being merged" %>
                 <% end %>
@@ -105,32 +105,30 @@
             <% end %>
 
             <% if mr.autoMergeEnabled %>
-              <%= render "partials/icon_with_title", content: "🚀", title: "Auto-merge is enabled" %>
+              <%= render "icon_with_title", content: "🚀", title: "Auto-merge is enabled" %>
             <% end %>
           </nobr>
 
           <br/>
 
-          <%= render partial: "partials/label", collection: mr.labels.nodes %>
+          <%= render partial: "label", collection: mr.labels.nodes %>
         </td>
         <!-- Title -->
         <td>
-          <%= render partial: "partials/user_avatar",
-          collection: mr.assignees.nodes,
-          as: :user %>
+          <%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
 
           <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
 
           <br/>
 
-          <%= render "partials/branch_ref",
+          <%= render "branch_ref",
           source_branch: mr.sourceBranch,
           target_branch: mr.targetBranch %>
         </td>
         <!-- Squash on merge -->
         <td class="text-center">
           <% if mr.squashOnMerge %>
-            <%= render "partials/icon_with_title",
+            <%= render "icon_with_title",
             content: tag.i(class: %w[fa-solid fa-angles-down]),
             title: "MR set to squash on merge",
             class: "text-success" %>
@@ -140,7 +138,7 @@
         <% if any_conflicts %>
           <td class="text-center">
             <% if mr.conflicts %>
-              <%= render "partials/icon_with_title",
+              <%= render "icon_with_title",
               content: tag.i(class: %w[fa-solid fa-burst]),
               class: "text-danger",
               title: "MR branch has conflicts and should be rebased" %>
@@ -150,7 +148,7 @@
         <!-- Approvals -->
         <td class="text-end">
           <% if mr.approved %>
-            <%= render "partials/icon_with_title",
+            <%= render "icon_with_title",
             content: tag.i(class: %w[fa-regular fa-thumbs-up]),
             class: "text-success",
             title: "Approved" %>
@@ -169,8 +167,8 @@
         <!-- Reviewers -->
         <td>
           <%= render(
-            partial: "partials/reviewer_badge",
-            spacer_template: "partials/space",
+            partial: "reviewer_badge",
+            spacer_template: "space",
             collection: mr.reviewers.nodes,
             as: :reviewer,
           ) || "Not assigned" %>
@@ -178,16 +176,14 @@
         <!-- Associated Issue -->
         <td scope="row">
           <% if mr.issue %>
-            <%= render "partials/link",
+            <%= render "link",
             title: "\##{mr.issue.iid}",
             web_url: mr.issue.webUrl,
-            kwattrs: {
-              data: {
-                bs_toggle: "tooltip",
-                bs_html: "true",
-                bs_custom_class: "x-wide-tooltip",
-                bs_title: mr.issue.titleHtml,
-              },
+            data: {
+              bs_toggle: "tooltip",
+              bs_html: "true",
+              bs_custom_class: "x-wide-tooltip",
+              bs_title: mr.issue.titleHtml,
             } %>
           <% end %>
         </td>

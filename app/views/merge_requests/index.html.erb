@@ -23,17 +23,17 @@
   <nav class="navbar navbar-light bg-dark">
     <span class="navbar-brand mb-0 ms-1 h1 text-light">
       Merge Requests Dashboard for
-      <%= render 'partials/user_image', user: @user, size: 24 %>
+      <%= render "user_image", user: @user, size: 24 %>
       <%= link_to @user.username, @user.webUrl %>
     </span>
   </nav>
 
   <div class="table-responsive-sm">
-    <%= render "partials/open_merge_requests", merge_requests: @open_merge_requests %>
+    <%= render "open_merge_requests", merge_requests: @open_merge_requests %>
 
     <hr/>
 
-    <%= render "partials/merged_merge_requests", merge_requests: @merged_merge_requests %>
+    <%= render "merged_merge_requests", merge_requests: @merged_merge_requests %>
   </div>
 </div>
 

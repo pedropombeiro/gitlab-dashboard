@@ -18,7 +18,7 @@
     "type": "view",
     "alternate": "app/controllers/{}_controller.rb"
   },
-  "app/views/partials/_*.html.erb": {
+  "app/views/**/_*.html.erb": {
     "type": "partial"
   }
 }
