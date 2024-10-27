@@ -155,7 +155,15 @@
             class: "text-success",
             title: "Approved" %>
           <% else %>
-            <%= "#{mr.approvalsRequired - mr.approvalsLeft}/#{mr.approvalsRequired}" %>
+            <%= tag.progress(
+              value: mr.approvalsRequired - mr.approvalsLeft,
+              max: mr.approvalsRequired,
+              style: "width: 20px",
+              data: {
+                bs_toggle: "tooltip",
+                bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
+              },
+            ) %>
           <% end %>
         </td>
         <!-- Reviewers -->
