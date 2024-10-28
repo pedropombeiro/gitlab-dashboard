@@ -38,22 +38,11 @@ class MergeRequestsController < ApplicationController
   helper_method :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
 
   def index
-    assignee = params[:assignee]
-    json = Rails.cache.fetch("user_info_v1/#{assignee}", expires_in: 1.day) do
-      response = client.query <<~GRAPHQL
-        query {
-          currentUser { username }
-        }
-      GRAPHQL
+    assignee = fetch_username(params[:assignee])
 
-      response.to_json
-    end
-    current_user = JSON.parse!(json, object_class: OpenStruct).data.currentUser
-    unless current_user
+    unless assignee
       return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
     end
-
-    assignee = current_user.username
 
     json = Rails.cache.fetch("merge_requests_v1/authored_list/#{assignee}", expires_in: 5.minutes) do
       fetch_merge_requests(assignee).to_json
@@ -236,6 +225,21 @@ class MergeRequestsController < ApplicationController
       }
     }
   GRAPHQL
+
+  def fetch_username(username)
+    username ||= Digest::SHA256.hexdigest(ENV["GITLAB_TOKEN"] || "Anonymous")[0..15]
+    json = Rails.cache.fetch("user_info_v1/#{username}", expires_in: 1.day) do
+      response = client.query <<~GRAPHQL
+        query {
+          currentUser { username }
+        }
+      GRAPHQL
+
+      response.to_json
+    end
+
+    JSON.parse!(json, object_class: OpenStruct).data.currentUser&.username
+  end
 
   def render_404
     respond_to do |format|
