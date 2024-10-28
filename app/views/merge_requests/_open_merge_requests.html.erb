@@ -74,18 +74,28 @@
         <td>
           <nobr>
             <% if mr.headPipeline %>
+              <% failed_jobs = mr.headPipeline.failedJobs.nodes %>
+
               <%= tag.span(class: ["badge", "badge-pill", "bg-#{mr.bootstrapClass[:pipeline]}"]) do %>
                 <%= link_to humanized_enum(mr.headPipeline&.status) || "??",
                 mr.headPipeline&.webUrl,
                 class: "text-light",
                 target: "_blank" %>
               <% end %>
-              <% if mr.headPipeline.failedJobs.count.to_i.positive? && mr.headPipeline.status != 'SUCCESS' %>
-                <%= render "icon_with_title",
-                content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
-                title:
-                  "#{pluralize(mr.headPipeline.failedJobs.count.to_i, "job")} have failed in the pipeline",
-                class: "text-warning" %>
+
+              <% if failed_jobs.any? && mr.headPipeline.status != 'SUCCESS' %>
+                <%= link_to(mr.headPipeline.webUrl, target: "_blank", style: [ "text-decoration: none" ]) do %>
+                  <%= render "icon_with_title",
+                  content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
+                  title:
+                    "#{pluralize(mr.headPipeline.failedJobs.count, "job")} have failed in the pipeline:<br/><br/>" +
+                      "#{tag.ul(failed_jobs.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}",
+                  class: "text-warning",
+                  data: {
+                    bs_html: "true",
+                    bs_custom_class: "x-wide-tooltip",
+                  } %>
+                <% end %>
               <% end %>
               <% if mr.headPipeline.failureReason %>
                 <%= render "icon_with_title",

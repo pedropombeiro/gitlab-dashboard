@@ -179,6 +179,9 @@ class MergeRequestsController < ApplicationController
               failureReason
               failedJobs: jobs(statuses: FAILED, retried: false) {
                 count
+                nodes {
+                  name
+                }
               }
             }
             labels {
