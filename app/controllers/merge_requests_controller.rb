@@ -53,7 +53,7 @@ class MergeRequestsController < ApplicationController
     @user = response.user
     return render_404 unless @user
 
-    @updated_at = Time.parse(response.updatedAt)
+    @updated_at = parse_graphql_time(response.updatedAt)
 
     @open_issues_by_iid =
       open_issues_from_merge_requests(response.user.openMergeRequests.nodes + response.user.mergedMergeRequests.nodes)
@@ -64,26 +64,23 @@ class MergeRequestsController < ApplicationController
         pipeline: pipeline_class(mr),
         mergeStatus: merge_status_class(mr)
       }
-      mr.createdAt = Time.parse(mr.createdAt) if mr.createdAt
-      mr.updatedAt = Time.parse(mr.updatedAt) if mr.updatedAt
+      mr.createdAt = parse_graphql_time(mr.createdAt)
+      mr.updatedAt = parse_graphql_time(mr.updatedAt)
       mr.issue = issue_from_mr(mr)
 
       if mr.headPipeline
-        mr.headPipeline.startedAt = Time.parse(mr.headPipeline.startedAt) if mr.headPipeline.startedAt
-        mr.headPipeline.finishedAt = Time.parse(mr.headPipeline.finishedAt) if mr.headPipeline.finishedAt
+        mr.headPipeline.startedAt = parse_graphql_time(mr.headPipeline.startedAt)
+        mr.headPipeline.finishedAt = parse_graphql_time(mr.headPipeline.finishedAt)
 
-        if mr.headPipeline&.path
-          if mr.headPipeline.status == "FAILED"
-            mr.headPipeline.webUrl = "#{make_full_url(mr.headPipeline.path)}/failures"
-          else
-            mr.headPipeline.webUrl = make_full_url(mr.headPipeline.path)
-          end
+        if mr.headPipeline.path
+          mr.headPipeline.webUrl = make_full_url(mr.headPipeline.path)
+          mr.headPipeline.webUrl += "/failures" if mr.headPipeline.status == "FAILED"
         end
       end
 
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
       mr.reviewers.nodes.each do |reviewer|
-        reviewer.lastActivityOn = Time.parse(reviewer.lastActivityOn) if reviewer.lastActivityOn
+        reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
         reviewer.review = reviewer.mergeRequestInteraction.reviewState
         reviewer.bootstrapClass = {
           text: review_text_class(reviewer),
@@ -110,9 +107,9 @@ class MergeRequestsController < ApplicationController
         mergeStatus: "primary",
         label: "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(workflow_label, "secondary")} text-light"
       }
-      mr.createdAt = Time.parse(mr.createdAt) if mr.createdAt
-      mr.mergedAt = Time.parse(mr.mergedAt) if mr.mergedAt
-      mr.mergeUser.lastActivityOn = Time.parse(mr.mergeUser.lastActivityOn) if mr.mergeUser.lastActivityOn
+      mr.createdAt = parse_graphql_time(mr.createdAt)
+      mr.mergedAt = parse_graphql_time(mr.mergedAt)
+      mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
       mr
     end
@@ -271,6 +268,10 @@ class MergeRequestsController < ApplicationController
     )
   end
 
+  def parse_graphql_time(timestamp)
+    Time.parse(timestamp) if timestamp
+  end
+
   def fetch_merge_requests(username)
     response = client.query(MERGE_REQUESTS_GRAPHQL_QUERY, username: username)
 
@@ -311,7 +312,7 @@ class MergeRequestsController < ApplicationController
   def user_help_title(user)
     {
       "Location": user.location,
-      "Last activity": Time.current - user.lastActivityOn < 1.day ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
+      "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
       "Message": user.status&.messageHtml
     }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
       .join
@@ -321,7 +322,7 @@ class MergeRequestsController < ApplicationController
     {
       "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
       "Location": reviewer.location,
-      "Last activity": Time.current - reviewer.lastActivityOn < 1.day ? "today" : "#{time_ago_in_words(reviewer.lastActivityOn)} ago",
+      "Last activity": reviewer.lastActivityOn > 1.day.ago ? "today" : "#{time_ago_in_words(reviewer.lastActivityOn)} ago",
       "Message": reviewer.status&.messageHtml
     }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
       .join
@@ -344,7 +345,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def user_activity_icon_class(user)
-    "fa-solid fa-moon" if Time.current - user.lastActivityOn >= 1.day
+    "fa-solid fa-moon" if user.lastActivityOn < 1.day.ago
   end
 
   def review_icon_class(reviewer)
