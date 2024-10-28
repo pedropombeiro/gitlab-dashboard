@@ -48,7 +48,12 @@ class MergeRequestsController < ApplicationController
 
       response.to_json
     end
-    assignee = JSON.parse!(json, object_class: OpenStruct).data.currentUser.username
+    current_user = JSON.parse!(json, object_class: OpenStruct).data.currentUser
+    unless current_user
+      return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
+    end
+
+    assignee = current_user.username
 
     json = Rails.cache.fetch("merge_requests_v1/authored_list/#{assignee}", expires_in: 5.minutes) do
       fetch_merge_requests(assignee).to_json
