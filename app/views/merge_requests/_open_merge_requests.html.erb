@@ -33,7 +33,7 @@
 
   <tbody>
     <% merge_requests.each do |mr| %>
-      <tr class="table-<%= mr.bootstrapClass[:row] %>">
+      <%= tag.tr(class: "table-#{mr.bootstrapClass[:row]}") do %>
         <!-- MR ID -->
         <th scope="row">
           <%= render "link", title: mr.reference, web_url: mr.webUrl %>
@@ -53,7 +53,7 @@
         </td>
         <!-- Merge status -->
         <td>
-          <span class="badge bg-<%= mr.bootstrapClass[:mergeStatus] %>"><%= mr.detailedMergeStatus %></span>
+          <%= tag.span(mr.detailedMergeStatus, class: ["badge", "bg-#{mr.bootstrapClass[:mergeStatus]}"]) %>
           <% if mr.blockingMergeRequests&.visibleMergeRequests %>
             <% open_blockers =
               mr
@@ -209,7 +209,7 @@
             } %>
           <% end %>
         </td>
-      </tr>
+      <% end %>
     <% end %>
   </tbody>
 </table>
