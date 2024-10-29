@@ -76,20 +76,32 @@
             <% if mr.headPipeline %>
               <% failed_jobs = mr.headPipeline.failedJobs.nodes %>
 
-              <%= tag.span(class: ["badge", "badge-pill", "bg-#{mr.bootstrapClass[:pipeline]}"]) do %>
-                <%= link_to humanized_enum(mr.headPipeline&.status) || "??",
-                mr.headPipeline&.webUrl,
+              <%= tag.span(class: %w[badge badge-pill] + ["bg-#{mr.bootstrapClass[:pipeline]}"]) do %>
+                <%= link_to humanized_enum(mr.headPipeline.status) || "??",
+                mr.headPipeline.webUrl,
                 class: "text-light",
-                target: "_blank" %>
+                target: "_blank",
+                **(
+                  if mr.headPipeline.status == "FAILED"
+                    {
+                      title: mr.headPipeline.failureSummary,
+                      data: {
+                        bs_toggle: "tooltip",
+                        bs_html: true,
+                        bs_custom_class: "x-wide-tooltip",
+                      },
+                    }
+                  else
+                    {}
+                  end
+                ) %>
               <% end %>
 
-              <% if failed_jobs.any? && mr.headPipeline.status != 'SUCCESS' %>
+              <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(mr.headPipeline.status) %>
                 <%= link_to(mr.headPipeline.webUrl, target: "_blank", style: [ "text-decoration: none" ]) do %>
                   <%= render "icon_with_title",
                   content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
-                  title:
-                    "#{pluralize(mr.headPipeline.failedJobs.count, "job")} have failed in the pipeline:<br/><br/>" +
-                      "#{tag.ul(failed_jobs.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}",
+                  title: mr.headPipeline.failureSummary,
                   class: "text-warning",
                   data: {
                     bs_html: "true",

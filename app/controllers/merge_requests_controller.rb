@@ -76,6 +76,18 @@ class MergeRequestsController < ApplicationController
           mr.headPipeline.webUrl = make_full_url(mr.headPipeline.path)
           mr.headPipeline.webUrl += "/failures" if mr.headPipeline.status == "FAILED"
         end
+
+        failed_jobs = mr.headPipeline.failedJobs
+        tag = view_context.tag
+        mr.headPipeline.failureSummary =
+          if failed_jobs.count.positive?
+            <<~HTML
+            #{view_context.pluralize(failed_jobs.count, "job")} #{view_context.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>
+            #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
+            HTML
+          else
+            nil
+          end
       end
 
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
