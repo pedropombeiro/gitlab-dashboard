@@ -67,15 +67,16 @@ class MergeRequestsController < ApplicationController
       mr.issue = issue_from_mr(mr)
 
       if mr.headPipeline
+        failed_jobs = mr.headPipeline.failedJobs
+
         mr.headPipeline.startedAt = parse_graphql_time(mr.headPipeline.startedAt)
         mr.headPipeline.finishedAt = parse_graphql_time(mr.headPipeline.finishedAt)
 
         if mr.headPipeline.path
           mr.headPipeline.webUrl = make_full_url(mr.headPipeline.path)
-          mr.headPipeline.webUrl += "/failures" if mr.headPipeline.status == "FAILED"
+          mr.headPipeline.webUrl += "/failures" if failed_jobs.count.positive?
         end
 
-        failed_jobs = mr.headPipeline.failedJobs
         tag = view_context.tag
         mr.headPipeline.failureSummary =
           if failed_jobs.count.positive?
