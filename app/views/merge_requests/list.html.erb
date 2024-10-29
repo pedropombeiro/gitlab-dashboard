@@ -1,0 +1,14 @@
+<%= turbo_frame_tag "merge_requests" do %>
+  <div class="table-responsive-sm">
+    <%= render "open_merge_requests", merge_requests: @open_merge_requests %>
+
+    <hr/>
+
+    <%= render "merged_merge_requests", merge_requests: @merged_merge_requests %>
+  </div>
+
+  <script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+  </script>
+<% end %>

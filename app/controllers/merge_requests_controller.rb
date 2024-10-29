@@ -36,20 +36,21 @@ class MergeRequestsController < ApplicationController
   helper_method :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
 
   def index
-    assignee = fetch_username(params[:assignee])
-
-    unless assignee
+    @user = fetch_user(params[:assignee])
+    unless params[:assignee] || ENV["GITLAB_TOKEN"]
       return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
     end
 
-    json = Rails.cache.fetch("merge_requests_v1/authored_list/#{assignee}", expires_in: 5.minutes) do
+    params[:assignee] = @user.username
+  end
+
+  def list
+    assignee = params[:assignee]
+    json = Rails.cache.fetch("merge_requests_v1/authored_list/#{user_hash(assignee)}", expires_in: 5.minutes) do
       fetch_merge_requests(assignee).to_json
     end
 
     response = json ? JSON.parse!(json, object_class: OpenStruct) : nil
-
-    @user = response.user
-    return render_404 unless @user
 
     @updated_at = parse_graphql_time(response.updatedAt)
 
@@ -128,128 +129,26 @@ class MergeRequestsController < ApplicationController
 
   private
 
-  MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
-    query($username: String!) {
-      user(username: $username) {
-        username
-        webUrl
-        avatarUrl
-        openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
-          nodes {
-            iid
-            reference
-            webUrl
-            titleHtml
-            sourceBranch
-            targetBranch
-            createdAt
-            updatedAt
-            approved
-            approvalsRequired
-            approvalsLeft
-            autoMergeEnabled
-            detailedMergeStatus
-            squashOnMerge
-            conflicts
-            blockingMergeRequests {
-              visibleMergeRequests {
-                state
-              }
-            }
-            assignees {
-              nodes {
-                avatarUrl
-                webUrl
-              }
-            }
-            reviewers {
-              nodes {
-                avatarUrl
-                username
-                webUrl
-                lastActivityOn
-                location
-                status {
-                  availability
-                  messageHtml
-                }
-                mergeRequestInteraction {
-                  approved
-                  reviewState
-                }
-              }
-            }
-            headPipeline {
-              path
-              status
-              startedAt
-              finishedAt
-              failureReason
-              failedJobs: jobs(statuses: FAILED, retried: false) {
-                count
-                nodes {
-                  name
-                }
-              }
-            }
-            labels {
-              nodes { title }
-            }
-          }
-        }
-        mergedMergeRequests: authoredMergeRequests(
-          state: merged
-          sort: MERGED_AT_DESC
-          first: 20
-        ) {
-          nodes {
-            iid
-            reference
-            webUrl
-            titleHtml
-            sourceBranch
-            targetBranch
-            createdAt
-            mergedAt
-            mergeUser {
-              username
-              avatarUrl
-              webUrl
-              lastActivityOn
-              location
-              status {
-                availability
-                messageHtml
-              }
-            }
-            assignees {
-              nodes {
-                avatarUrl
-                webUrl
-              }
-            }
-            labels {
-              nodes { title }
-            }
-          }
-        }
-      }
-    }
-  GRAPHQL
+  def user_hash(username)
+    Digest::SHA256.hexdigest(username || ENV["GITLAB_TOKEN"] || "Anonymous")[0..15]
+  end
 
-  def fetch_username(username)
-    username ||= Digest::SHA256.hexdigest(ENV["GITLAB_TOKEN"] || "Anonymous")[0..15]
-    json = Rails.cache.fetch("user_info_v1/#{username}", expires_in: 1.day) do
+  def fetch_user(username)
+    json = Rails.cache.fetch("user_info_v1/#{user_hash(username)}", expires_in: 1.day) do
       response = client.query <<-GRAPHQL
         query {
-          currentUser { username }
+          user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
+            username
+            avatarUrl
+            webUrl
+          }
         }
       GRAPHQL
 
       response.to_json
     end
 
-    JSON.parse!(json, object_class: OpenStruct).data.currentUser&.username
+    JSON.parse!(json, object_class: OpenStruct).data.user
   end
 
   def render_404
@@ -284,7 +183,113 @@ class MergeRequestsController < ApplicationController
   end
 
   def fetch_merge_requests(username)
-    response = client.query(MERGE_REQUESTS_GRAPHQL_QUERY, username: username)
+    merge_requests_graphql_query = <<-GRAPHQL
+      query($username: String!) {
+        user: #{username ? "user(username: $username)" : "currentUser"} {
+          openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
+            nodes {
+              iid
+              reference
+              webUrl
+              titleHtml
+              sourceBranch
+              targetBranch
+              createdAt
+              updatedAt
+              approved
+              approvalsRequired
+              approvalsLeft
+              autoMergeEnabled
+              detailedMergeStatus
+              squashOnMerge
+              conflicts
+              blockingMergeRequests {
+                visibleMergeRequests {
+                  state
+                }
+              }
+              assignees {
+                nodes {
+                  avatarUrl
+                  webUrl
+                }
+              }
+              reviewers {
+                nodes {
+                  avatarUrl
+                  username
+                  webUrl
+                  lastActivityOn
+                  location
+                  status {
+                    availability
+                    messageHtml
+                  }
+                  mergeRequestInteraction {
+                    approved
+                    reviewState
+                  }
+                }
+              }
+              headPipeline {
+                path
+                status
+                startedAt
+                finishedAt
+                failureReason
+                failedJobs: jobs(statuses: FAILED, retried: false) {
+                  count
+                  nodes {
+                    name
+                  }
+                }
+              }
+              labels {
+                nodes { title }
+              }
+            }
+          }
+          mergedMergeRequests: authoredMergeRequests(
+            state: merged
+            sort: MERGED_AT_DESC
+            first: 20
+          ) {
+            nodes {
+              iid
+              reference
+              webUrl
+              titleHtml
+              sourceBranch
+              targetBranch
+              createdAt
+              mergedAt
+              mergeUser {
+                username
+                avatarUrl
+                webUrl
+                lastActivityOn
+                location
+                status {
+                  availability
+                  messageHtml
+                }
+              }
+              assignees {
+                nodes {
+                  avatarUrl
+                  webUrl
+                }
+              }
+              labels {
+                nodes { title }
+              }
+            }
+          }
+        }
+      }
+    GRAPHQL
+
+    response = client.query(merge_requests_graphql_query, username: username)
 
     {
       user: response.data.user,
