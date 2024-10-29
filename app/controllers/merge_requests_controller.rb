@@ -3,8 +3,6 @@
 require "ostruct"
 
 class MergeRequestsController < ApplicationController
-  include ActionView::Helpers::DateHelper
-
   MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
 
   PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
@@ -82,7 +80,7 @@ class MergeRequestsController < ApplicationController
         mr.headPipeline.failureSummary =
           if failed_jobs.count.positive?
             <<~HTML
-            #{view_context.pluralize(failed_jobs.count, "job")} #{view_context.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>
+            #{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>
             #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
             HTML
           else
@@ -241,7 +239,7 @@ class MergeRequestsController < ApplicationController
   def fetch_username(username)
     username ||= Digest::SHA256.hexdigest(ENV["GITLAB_TOKEN"] || "Anonymous")[0..15]
     json = Rails.cache.fetch("user_info_v1/#{username}", expires_in: 1.day) do
-      response = client.query <<~GRAPHQL
+      response = client.query <<-GRAPHQL
         query {
           currentUser { username }
         }
@@ -321,23 +319,29 @@ class MergeRequestsController < ApplicationController
     value.tr("_", " ").capitalize.sub("Ci ", "CI ").strip
   end
 
-  def user_help_title(user)
-    {
-      "Location": user.location,
-      "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
-      "Message": user.status&.messageHtml
-    }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
+  def tooltip_from_hash(hash)
+    tag = view_context.tag
+
+    hash
+      .filter_map { |title, value| value&.present? ? tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) : nil }
       .join
   end
 
+  def user_help_title(user)
+    tooltip_from_hash(
+      "Location": user.location,
+      "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{helpers.time_ago_in_words(user.lastActivityOn)} ago",
+      "Message": user.status&.messageHtml
+    )
+  end
+
   def reviewer_help_title(reviewer)
-    {
+    tooltip_from_hash(
       "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
       "Location": reviewer.location,
-      "Last activity": reviewer.lastActivityOn > 1.day.ago ? "today" : "#{time_ago_in_words(reviewer.lastActivityOn)} ago",
+      "Last activity": reviewer.lastActivityOn > 1.day.ago ? "today" : "#{helpers.time_ago_in_words(reviewer.lastActivityOn)} ago",
       "Message": reviewer.status&.messageHtml
-    }.filter_map { |title, value| value&.present? ? "<div class=\"text-start\"><b>#{title}</b>: #{value}</div>" : nil }
-      .join
+    )
   end
 
   def row_class(mr)
@@ -357,7 +361,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def user_activity_icon_class(user)
-    "fa-solid fa-moon" if user.lastActivityOn < 1.day.ago
+    %w[fa-solid fa-moon] if user.lastActivityOn < 1.day.ago
   end
 
   def review_icon_class(reviewer)
