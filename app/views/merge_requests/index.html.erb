@@ -28,16 +28,11 @@
     </span>
   </nav>
 
-  <div class="table-responsive-sm">
-    <%= render "open_merge_requests", merge_requests: @open_merge_requests %>
-
-    <hr/>
-
-    <%= render "merged_merge_requests", merge_requests: @merged_merge_requests %>
-  </div>
+  <%= turbo_frame_tag "merge_requests", src: "/mrs/list/#{params[:assignee]}", loading: "lazy" do %>
+    <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center">
+      <div class="spinner-border" role="status" aria-hidden="true"></div>
+      &nbsp;
+      <div>Loading merge requests…</div>
+    </div>
+  <% end %>
 </div>
-
-<script>
-  const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-  const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-</script>
