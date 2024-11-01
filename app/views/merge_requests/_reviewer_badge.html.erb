@@ -1,5 +1,5 @@
 <%= tag.span(
-  class: ["badge", reviewer.review == "APPROVED" ? "bg-info text-light" : "bg-light"],
+  class: ["badge"] + (reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[bg-light]),
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
@@ -14,14 +14,13 @@
   <% if reviewer.status&.availability == "BUSY" %>
     <%= tag.abbr(
       "🔴",
-      class: "float-right",
       data: {
         bs_toggle: "tooltip",
         bs_title: reviewer.status&.availability,
       },
     ) %>
   <% end %>
-  <%= tag.span(class: ["float-right", "text-#{reviewer.bootstrapClass[:text]}"]) do %>
+  <%= tag.span(class: "text-#{reviewer.bootstrapClass[:text]}") do %>
     <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
       <%= tag.i class: reviewer.bootstrapClass[:icon] %>
     <% end %>
