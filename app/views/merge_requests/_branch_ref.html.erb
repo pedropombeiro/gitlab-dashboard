@@ -8,7 +8,7 @@
   <nobr>
     <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
     <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
-      <%= render "icon_with_title", content: "🚀", title: "Auto-merge is enabled" %>
+      <%= render "abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
     <% end %>
     <%= tag.span target_branch %>
     <%= render "clipboard_button", text: target_branch %>
