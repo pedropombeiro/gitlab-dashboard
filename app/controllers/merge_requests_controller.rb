@@ -115,8 +115,8 @@ class MergeRequestsController < ApplicationController
 
   def fetch_merge_requests(username)
     merge_requests_graphql_query = <<-GRAPHQL
-      query($username: String!) {
-        user: #{username ? "user(username: $username)" : "currentUser"} {
+      query {
+        user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
           openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
             nodes {
               iid
@@ -220,7 +220,7 @@ class MergeRequestsController < ApplicationController
       }
     GRAPHQL
 
-    response = client.query(merge_requests_graphql_query, username: username)
+    response = client.query(merge_requests_graphql_query)
 
     {
       user: response.data.user,
