@@ -63,7 +63,7 @@
                 .count %>
 
             <% if open_blockers.positive? %>
-              <%= render "icon_with_title",
+              <%= render "abbr_with_title",
               content: tag.i(class: %w[fa-solid fa-road-barrier]),
               class: "text-danger",
               title: "This MR is blocked by #{pluralize(open_blockers, "merge request")}" %>
@@ -99,7 +99,7 @@
 
               <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(mr.headPipeline.status) %>
                 <%= link_to(mr.headPipeline.webUrl, target: "_blank", style: [ "text-decoration: none" ]) do %>
-                  <%= render "icon_with_title",
+                  <%= render "abbr_with_title",
                   content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
                   title: mr.headPipeline.failureSummary,
                   class: "text-warning",
@@ -110,7 +110,7 @@
                 <% end %>
               <% end %>
               <% if mr.headPipeline.failureReason %>
-                <%= render "icon_with_title",
+                <%= render "abbr_with_title",
                 content: tag.i(class: %w[fa-solid fa-comment-dots]),
                 class: "text-warning",
                 title: mr.headPipeline.failureReason %>
@@ -119,7 +119,7 @@
                 <% if mr.headPipeline.finishedAt.nil? %>
                   <%= render "relative_timestamp", timestamp: mr.headPipeline.startedAt %>
                 <% elsif mr.headPipeline.finishedAt < 8.hours.ago %>
-                  <%= render "icon_with_title",
+                  <%= render "abbr_with_title",
                   content: "🥶",
                   title: "Pipeline too old, must be re-run before being merged" %>
                 <% end %>
@@ -127,7 +127,7 @@
             <% end %>
 
             <% if mr.autoMergeEnabled %>
-              <%= render "icon_with_title", content: "🚀", title: "Auto-merge is enabled" %>
+              <%= render "abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
             <% end %>
           </nobr>
 
@@ -150,7 +150,7 @@
         <!-- Squash on merge -->
         <td class="text-center">
           <% if mr.squashOnMerge %>
-            <%= render "icon_with_title",
+            <%= render "abbr_with_title",
             content: tag.i(class: %w[fa-solid fa-angles-down]),
             title: "MR set to squash on merge",
             class: "text-success" %>
@@ -160,7 +160,7 @@
         <% if any_conflicts %>
           <td class="text-center">
             <% if mr.conflicts %>
-              <%= render "icon_with_title",
+              <%= render "abbr_with_title",
               content: tag.i(class: %w[fa-solid fa-burst]),
               class: "text-danger",
               title: "MR branch has conflicts and should be rebased" %>
@@ -170,7 +170,7 @@
         <!-- Approvals -->
         <td class="text-end">
           <% if mr.approved %>
-            <%= render "icon_with_title",
+            <%= render "abbr_with_title",
             content: tag.i(class: %w[fa-regular fa-thumbs-up]),
             class: "text-success",
             title: "Approved" %>
