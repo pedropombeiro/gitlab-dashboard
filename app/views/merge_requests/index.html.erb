@@ -28,7 +28,7 @@
     </span>
   </nav>
 
-  <%= turbo_frame_tag "merge_requests", src: "/mrs/list/#{params[:assignee]}", loading: "lazy" do %>
+  <%= turbo_frame_tag "merge_requests", src: "/mrs/list/#{params[:assignee]}" do %>
     <div class="position-absolute w-100 h-100 d-flex justify-content-center align-items-center">
       <div class="spinner-border" role="status" aria-hidden="true"></div>
       &nbsp;
