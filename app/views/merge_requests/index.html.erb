@@ -28,7 +28,7 @@
     </span>
   </nav>
 
-  <%= turbo_frame_tag "merge_requests", src: "/mrs/list/#{params[:assignee]}" do %>
+  <%= turbo_frame_tag "merge_requests", src: "/mrs/#{params[:assignee]}/list" do %>
     <%= tag.div(style: "background-color: rgba(0, 0, 0, 0.6);",
       class: %w[position-absolute w-100 h-100 d-flex justify-content-center align-items-center]) do %>
       <div class="spinner-border text-light" role="status" aria-hidden="true"></div>
