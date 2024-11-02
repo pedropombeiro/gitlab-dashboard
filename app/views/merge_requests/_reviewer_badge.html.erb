@@ -10,7 +10,7 @@
   <%= link_to reviewer.username,
   reviewer.webUrl,
   target: "_blank",
-  class: reviewer.review == "APPROVED" ? "bg-info text-light" : "" %>
+  class: reviewer.review == "APPROVED" ? %w[bg-info text-light] : [] %>
   <% if reviewer.status&.availability == "BUSY" %>
     <%= tag.abbr(
       "🔴",
