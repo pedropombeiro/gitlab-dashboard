@@ -33,10 +33,10 @@
       class: %w[position-absolute w-100 h-100 d-flex justify-content-center align-items-center]) do %>
       <div class="spinner-border text-light" role="status" aria-hidden="true"></div>
       &nbsp;
-      <div class="text-light">Loading merge requests…
+      <div class="text-light">
+        <span>Loading merge requests…</span>
         <% if @updated_at %>
-          (Last fetched
-          <%= render("relative_timestamp", timestamp: @updated_at) %>)
+          <span>(last fetched <%= render("relative_timestamp", timestamp: @updated_at) -%>)</span>
         <% end %>
       </div>
     <% end %>
