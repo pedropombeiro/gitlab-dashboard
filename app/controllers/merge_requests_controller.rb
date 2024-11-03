@@ -43,19 +43,20 @@ class MergeRequestsController < ApplicationController
 
     params[:assignee] = @user.username
 
-    json = Rails.cache.read(last_authored_mr_lists_cache_key(params[:assignee]))
+    response = Rails.cache.read(last_authored_mr_lists_cache_key(params[:assignee]))
 
-    parse_response(json)
+    parse_response(response)
   end
 
   def list
     assignee = params[:assignee]
-    json = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: 5.minutes) do
-      fetch_merge_requests(assignee).to_json
+    response = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: 5.minutes) do
+      mrs = fetch_merge_requests(assignee)
+      Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
+      mrs
     end
-    Rails.cache.write(last_authored_mr_lists_cache_key(assignee), json)
 
-    parse_response(json)
+    parse_response(response)
   end
 
   private
@@ -65,7 +66,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def fetch_user(username)
-    json = Rails.cache.fetch("user_info_v1/#{user_hash(username)}", expires_in: 1.day) do
+    response = Rails.cache.fetch("user_info_v2/#{user_hash(username)}", expires_in: 1.day) do
       response = client.query <<-GRAPHQL
         query {
           user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
@@ -76,10 +77,10 @@ class MergeRequestsController < ApplicationController
         }
       GRAPHQL
 
-      response.to_json
+      make_serializable(response)
     end
 
-    JSON.parse!(json, object_class: OpenStruct).data.user
+    response.data.user
   end
 
   def render_404
@@ -222,10 +223,10 @@ class MergeRequestsController < ApplicationController
 
     response = client.query(merge_requests_graphql_query)
 
-    {
-      user: response.data.user,
-      updatedAt: Time.current
-    }
+    OpenStruct.new(
+      user: make_serializable(response.data.user),
+      updated_at: Time.current
+    )
   end
 
   def fetch_open_issues(iids)
@@ -243,14 +244,19 @@ class MergeRequestsController < ApplicationController
       }
     GRAPHQL
 
-    client.query(query, projectPath: "gitlab-org/gitlab", iids: iids).data.project.issues.nodes
+    response = client.query(query, projectPath: "gitlab-org/gitlab", iids: iids)
+    make_serializable(response.data.project.issues.nodes)
   end
 
-  def parse_response(json)
-    response = json ? JSON.parse!(json, object_class: OpenStruct) : nil
+  def make_serializable(obj)
+    # GraphQL types cannot be serialized, so we work around that by reparsing from JSON into anonymous objects
+    JSON.parse!(obj.to_json, object_class: OpenStruct)
+  end
+
+  def parse_response(response)
     return unless response
 
-    @updated_at = parse_graphql_time(response.updatedAt)
+    @updated_at = response.updated_at
 
     @open_issues_by_iid =
       open_issues_from_merge_requests(response.user.openMergeRequests.nodes + response.user.mergedMergeRequests.nodes)
@@ -326,11 +332,11 @@ class MergeRequestsController < ApplicationController
   end
 
   def authored_mr_lists_cache_key(user)
-    "merge_requests_v1/authored_list/#{user_hash(user)}"
+    "merge_requests_v2/authored_list/#{user_hash(user)}"
   end
 
   def last_authored_mr_lists_cache_key(user)
-    "merge_requests_v1/authored_list/#{user_hash(user)}/last"
+    "merge_requests_v2/authored_list/#{user_hash(user)}/last"
   end
 
   def make_full_url(path)
@@ -414,13 +420,13 @@ class MergeRequestsController < ApplicationController
     merged_request_issue_iids = merge_request_issue_iids(merge_requests)
     issue_iids = merged_request_issue_iids.values.compact.sort.uniq
 
-    json = Rails.cache.fetch("issues_v1/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
-      fetch_open_issues(issue_iids).to_json
+    response = Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
+      fetch_open_issues(issue_iids)
     end
 
-    return unless json
+    return unless response
 
-    JSON.parse!(json, object_class: OpenStruct).to_h { |issue| [issue.iid, issue] }
+    response.to_h { |issue| [issue.iid, issue] }
   end
 
   def merged_merge_requests(merge_requests)
