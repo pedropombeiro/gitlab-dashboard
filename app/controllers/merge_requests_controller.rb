@@ -46,6 +46,7 @@ class MergeRequestsController < ApplicationController
     response = Rails.cache.read(last_authored_mr_lists_cache_key(params[:assignee]))
 
     parse_response(response)
+    fresh_when(response)
   end
 
   def list
@@ -57,6 +58,7 @@ class MergeRequestsController < ApplicationController
     end
 
     parse_response(response)
+    fresh_when(response)
   end
 
   private
