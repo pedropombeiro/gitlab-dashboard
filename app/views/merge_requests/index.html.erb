@@ -35,20 +35,17 @@
       <div class="text-light">
         <span>Loading merge requests…</span>
         <% if @updated_at %>
-          <span>(last fetched <%= render("relative_timestamp", timestamp: @updated_at) -%>)</span>
+          <span>(last fetched
+            <%= render("relative_timestamp", timestamp: @updated_at) -%>)</span>
         <% end %>
       </div>
     <% end %>
 
     <% if @updated_at %>
       <!-- Show last stored state, while we wait for the refreshed state -->
-      <div class="table-responsive-sm">
-        <%= render "open_merge_requests", merge_requests: @open_merge_requests %>
-
-        <hr/>
-
-        <%= render "merged_merge_requests", merge_requests: @merged_merge_requests %>
-      </div>
+      <%= render "user_merge_requests",
+      open_merge_requests: @open_merge_requests,
+      merged_merge_requests: @merged_merge_requests %>
     <% end %>
   <% end %>
 </div>
