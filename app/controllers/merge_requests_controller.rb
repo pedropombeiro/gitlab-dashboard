@@ -59,6 +59,11 @@ class MergeRequestsController < ApplicationController
 
     parse_response(response)
     fresh_when(response)
+
+    respond_to do |format|
+      format.html
+      format.json { render json: response }
+    end
   end
 
   private
