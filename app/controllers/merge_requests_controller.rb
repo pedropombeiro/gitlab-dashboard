@@ -230,7 +230,7 @@ class MergeRequestsController < ApplicationController
     )
   end
 
-  def fetch_issues(issue_iids, open_issue_iids)
+  def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     query = <<-GRAPHQL
       query($projectPath : ID!, $issueIids: [String!], $openIssueIids: [String!]) {
         project(fullPath: $projectPath) {
@@ -250,8 +250,15 @@ class MergeRequestsController < ApplicationController
       }
     GRAPHQL
 
-    response = client.query(query, projectPath: "gitlab-org/gitlab", issueIids: issue_iids, openIssueIids: open_issue_iids)
-    make_serializable(response.data.project.issues.nodes)
+    response = client.query(
+      query,
+      projectPath: "gitlab-org/gitlab",
+      issueIids: open_mr_issue_iids,
+      openIssueIids: merged_mr_issue_iids # Only fetch open issues for merged MRs
+    )
+
+    project = make_serializable(response.data.project)
+    project.issues.nodes + project.openIssues.nodes
   end
 
   def make_serializable(obj)
@@ -438,13 +445,12 @@ class MergeRequestsController < ApplicationController
   end
 
   def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
-    open_merged_request_issue_iids = merge_request_issue_iids(open_merge_requests)
-    merged_merge_request_issue_iids = merge_request_issue_iids(merged_merge_requests)
-    issue_iids = open_merged_request_issue_iids.values.compact.sort.uniq
-    open_issue_iids = merged_merge_request_issue_iids.values.compact.sort.uniq
+    open_mr_issue_iids = merge_request_issue_iids(open_merge_requests).values.compact.sort.uniq
+    merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).values.compact.sort.uniq
+    issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).sort.uniq
 
     response = Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
-      fetch_issues(issue_iids, open_issue_iids)
+      fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     end
 
     return unless response
@@ -455,9 +461,9 @@ class MergeRequestsController < ApplicationController
   def merged_merge_requests(merge_requests)
     return unless @open_issues_by_iid
 
-    open_issue_iids = @open_issues_by_iid.keys
+    open_mr_issue_iids = @open_issues_by_iid.keys
     merged_request_issue_iids = merge_request_issue_iids(merge_requests)
 
-    merge_requests.filter { |mr| open_issue_iids.include?(merged_request_issue_iids[mr.iid]) }
+    merge_requests.filter { |mr| open_mr_issue_iids.include?(merged_request_issue_iids[mr.iid]) }
   end
 end
