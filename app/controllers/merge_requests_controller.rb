@@ -156,6 +156,14 @@ class MergeRequestsController < ApplicationController
                 startedAt
                 finishedAt
                 failureReason
+                runningJobs: jobs(statuses: RUNNING, retried: false) {
+                  count
+                }
+                firstRunningJob: jobs(statuses: RUNNING, first: 1, retried: false) {
+                  nodes {
+                    webPath
+                  }
+                }
                 failedJobs: jobs(statuses: FAILED, retried: false) {
                   count
                   nodes {
@@ -275,10 +283,24 @@ class MergeRequestsController < ApplicationController
         mr.headPipeline.startedAt = parse_graphql_time(mr.headPipeline.startedAt)
         mr.headPipeline.finishedAt = parse_graphql_time(mr.headPipeline.finishedAt)
 
-        if mr.headPipeline.path
-          mr.headPipeline.webUrl = make_full_url(mr.headPipeline.path)
-          mr.headPipeline.webUrl += "/failures" if failed_jobs.count.positive?
-        end
+        mr.headPipeline.webUrl =
+          if mr.headPipeline.path
+            web_path = mr.headPipeline.path
+
+            # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
+            if failed_jobs.count.positive?
+              web_path += "/failures"
+            elsif mr.headPipeline.status == "RUNNING"
+              running_jobs = mr.headPipeline.firstRunningJob.nodes
+              web_path = mr.headPipeline.runningJobs.count == 1 ? running_jobs.first.webPath : "#{web_path}/builds"
+              mr.headPipeline.summary =
+                <<~HTML
+                  #{helpers.pluralize(mr.headPipeline.runningJobs.count, "job")} still running
+                HTML
+            end
+
+            make_full_url(web_path)
+          end
 
         tag = view_context.tag
         mr.headPipeline.failureSummary =
