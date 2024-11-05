@@ -312,6 +312,7 @@ class MergeRequestsController < ApplicationController
           else
             nil
           end
+        mr.headPipeline.summary ||= mr.headPipeline.failureSummary if mr.headPipeline.status == "FAILED"
       end
 
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
