@@ -127,13 +127,7 @@ class MergeRequestsController < ApplicationController
         user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
           openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
             nodes {
-              iid
-              reference
-              webUrl
-              titleHtml
-              sourceBranch
-              targetBranch
-              createdAt
+              ...CoreMergeRequestFields
               updatedAt
               approved
               approvalsRequired
@@ -147,23 +141,9 @@ class MergeRequestsController < ApplicationController
                   state
                 }
               }
-              assignees {
-                nodes {
-                  avatarUrl
-                  webUrl
-                }
-              }
               reviewers {
                 nodes {
-                  avatarUrl
-                  username
-                  webUrl
-                  lastActivityOn
-                  location
-                  status {
-                    availability
-                    messageHtml
-                  }
+                  ...CoreUserFields
                   mergeRequestInteraction {
                     approved
                     reviewState
@@ -183,9 +163,6 @@ class MergeRequestsController < ApplicationController
                   }
                 }
               }
-              labels {
-                nodes { title }
-              }
             }
           }
           mergedMergeRequests: authoredMergeRequests(
@@ -195,35 +172,44 @@ class MergeRequestsController < ApplicationController
           ) {
             nodes {
               iid
-              reference
-              webUrl
-              titleHtml
-              sourceBranch
-              targetBranch
-              createdAt
+              ...CoreMergeRequestFields
               mergedAt
               mergeUser {
-                username
-                avatarUrl
-                webUrl
-                lastActivityOn
-                location
-                status {
-                  availability
-                  messageHtml
-                }
-              }
-              assignees {
-                nodes {
-                  avatarUrl
-                  webUrl
-                }
-              }
-              labels {
-                nodes { title }
+                ...CoreUserFields
               }
             }
           }
+        }
+      }
+
+      fragment CoreUserFields on User {
+        username
+        avatarUrl
+        webUrl
+        lastActivityOn
+        location
+        status {
+          availability
+          messageHtml
+        }
+      }
+
+      fragment CoreMergeRequestFields on MergeRequest {
+        iid
+        reference
+        webUrl
+        titleHtml
+        sourceBranch
+        targetBranch
+        createdAt
+        assignees {
+          nodes {
+            avatarUrl
+            webUrl
+          }
+        }
+        labels {
+          nodes { title }
         }
       }
     GRAPHQL
@@ -236,22 +222,27 @@ class MergeRequestsController < ApplicationController
     )
   end
 
-  def fetch_open_issues(iids)
+  def fetch_issues(issue_iids, open_issue_iids)
     query = <<-GRAPHQL
-      query($projectPath : ID!, $iids: [String!]) {
+      query($projectPath : ID!, $issueIids: [String!], $openIssueIids: [String!]) {
         project(fullPath: $projectPath) {
-          issues(iids: $iids, state: opened) {
-            nodes {
-              iid
-              webUrl
-              titleHtml
-            }
+          issues(iids: $issueIids) {
+            nodes { ...CoreIssueFields }
+          }
+          openIssues: issues(iids: $openIssueIids, state: opened) {
+            nodes { ...CoreIssueFields }
           }
         }
       }
+
+      fragment CoreIssueFields on Issue {
+        iid
+        webUrl
+        titleHtml
+      }
     GRAPHQL
 
-    response = client.query(query, projectPath: "gitlab-org/gitlab", iids: iids)
+    response = client.query(query, projectPath: "gitlab-org/gitlab", issueIids: issue_iids, openIssueIids: open_issue_iids)
     make_serializable(response.data.project.issues.nodes)
   end
 
@@ -266,7 +257,7 @@ class MergeRequestsController < ApplicationController
     @updated_at = response.updated_at
 
     @open_issues_by_iid =
-      open_issues_from_merge_requests(response.user.openMergeRequests.nodes + response.user.mergedMergeRequests.nodes)
+      issues_from_merge_requests(response.user.openMergeRequests.nodes, response.user.mergedMergeRequests.nodes)
 
     @open_merge_requests = response.user.openMergeRequests.nodes.map do |mr|
       mr.bootstrapClass = {
@@ -423,12 +414,14 @@ class MergeRequestsController < ApplicationController
     merge_requests.to_h { |mr| [mr.iid, issue_iid_from_mr(mr)] }
   end
 
-  def open_issues_from_merge_requests(merge_requests)
-    merged_request_issue_iids = merge_request_issue_iids(merge_requests)
-    issue_iids = merged_request_issue_iids.values.compact.sort.uniq
+  def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
+    open_merged_request_issue_iids = merge_request_issue_iids(open_merge_requests)
+    merged_merge_request_issue_iids = merge_request_issue_iids(merged_merge_requests)
+    issue_iids = open_merged_request_issue_iids.values.compact.sort.uniq
+    open_issue_iids = merged_merge_request_issue_iids.values.compact.sort.uniq
 
     response = Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
-      fetch_open_issues(issue_iids)
+      fetch_issues(issue_iids, open_issue_iids)
     end
 
     return unless response
