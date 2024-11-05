@@ -82,9 +82,9 @@
                 class: "text-light",
                 target: "_blank",
                 **(
-                  if mr.headPipeline.status == "FAILED"
+                  if mr.headPipeline.status == "FAILED" || mr.headPipeline.summary
                     {
-                      title: mr.headPipeline.failureSummary,
+                      title: mr.headPipeline.failureSummary || mr.headPipeline.summary,
                       data: {
                         bs_toggle: "tooltip",
                         bs_html: true,
