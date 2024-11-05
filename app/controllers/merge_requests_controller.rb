@@ -33,6 +33,52 @@ class MergeRequestsController < ApplicationController
   }.freeze
   WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys
 
+  CORE_USER_FRAGMENT = <<-GRAPHQL
+      fragment CoreUserFields on User {
+        username
+        avatarUrl
+        webUrl
+      }
+    GRAPHQL
+
+  EXT_USER_FRAGMENT = <<-GRAPHQL
+      fragment ExtendedUserFields on User {
+        ...CoreUserFields
+        lastActivityOn
+        location
+        status {
+          availability
+          messageHtml
+        }
+      }
+    GRAPHQL
+
+  CORE_ISSUE_FRAGMENT = <<-GRAPHQL
+      fragment CoreIssueFields on Issue {
+        iid
+        webUrl
+        titleHtml
+      }
+    GRAPHQL
+
+  CORE_MERGE_REQUEST_FRAGMENT = <<-GRAPHQL
+      fragment CoreMergeRequestFields on MergeRequest {
+        iid
+        webUrl
+        titleHtml
+        reference
+        sourceBranch
+        targetBranch
+        createdAt
+        assignees {
+          nodes { ...CoreUserFields }
+        }
+        labels {
+          nodes { title }
+        }
+      }
+    GRAPHQL
+
   helper_method :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
 
   def index
@@ -77,11 +123,11 @@ class MergeRequestsController < ApplicationController
       response = client.query <<-GRAPHQL
         query {
           user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
-            username
-            avatarUrl
-            webUrl
+            ...CoreUserFields
           }
         }
+
+        #{CORE_USER_FRAGMENT}
       GRAPHQL
 
       make_serializable(response)
@@ -125,6 +171,16 @@ class MergeRequestsController < ApplicationController
     merge_requests_graphql_query = <<-GRAPHQL
       query {
         user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
+          mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
+            nodes {
+              iid
+              ...CoreMergeRequestFields
+              mergedAt
+              mergeUser {
+                ...ExtendedUserFields
+              }
+            }
+          }
           openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
             nodes {
               ...CoreMergeRequestFields
@@ -143,7 +199,7 @@ class MergeRequestsController < ApplicationController
               }
               reviewers {
                 nodes {
-                  ...CoreUserFields
+                  ...ExtendedUserFields
                   mergeRequestInteraction {
                     approved
                     reviewState
@@ -173,53 +229,12 @@ class MergeRequestsController < ApplicationController
               }
             }
           }
-          mergedMergeRequests: authoredMergeRequests(
-            state: merged
-            sort: MERGED_AT_DESC
-            first: 20
-          ) {
-            nodes {
-              iid
-              ...CoreMergeRequestFields
-              mergedAt
-              mergeUser {
-                ...CoreUserFields
-              }
-            }
-          }
         }
       }
 
-      fragment CoreUserFields on User {
-        username
-        avatarUrl
-        webUrl
-        lastActivityOn
-        location
-        status {
-          availability
-          messageHtml
-        }
-      }
-
-      fragment CoreMergeRequestFields on MergeRequest {
-        iid
-        reference
-        webUrl
-        titleHtml
-        sourceBranch
-        targetBranch
-        createdAt
-        assignees {
-          nodes {
-            avatarUrl
-            webUrl
-          }
-        }
-        labels {
-          nodes { title }
-        }
-      }
+      #{CORE_USER_FRAGMENT}
+      #{EXT_USER_FRAGMENT}
+      #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
     response = client.query(merge_requests_graphql_query)
@@ -243,11 +258,7 @@ class MergeRequestsController < ApplicationController
         }
       }
 
-      fragment CoreIssueFields on Issue {
-        iid
-        webUrl
-        titleHtml
-      }
+      #{CORE_ISSUE_FRAGMENT}
     GRAPHQL
 
     response = client.query(
