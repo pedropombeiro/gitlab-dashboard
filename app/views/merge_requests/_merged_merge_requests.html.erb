@@ -9,7 +9,7 @@
       <th scope="col">ID</th>
       <th scope="col">Created</th>
       <th scope="col">Merged</th>
-      <th scope="col">Labels</th>
+      <th scope="col">Workflow Labels</th>
       <th scope="col">Title</th>
       <th scope="col">Associated Issue</th>
     </tr>
@@ -34,9 +34,9 @@
           by
           <br/><%= render "user_badge", user: mr.mergeUser %>
         </td>
-        <!-- Labels -->
+        <!-- Workflow Labels -->
         <td>
-          <%= tag.span mr.workflowLabel, class: ["badge", mr.bootstrapClass[:label]] %>
+          <%= render partial: "gitlab_label", collection: mr.labels.nodes, as: :label %>
         </td>
         <!-- Title -->
         <td>

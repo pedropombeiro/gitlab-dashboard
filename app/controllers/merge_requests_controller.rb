@@ -6,7 +6,7 @@ class MergeRequestsController < ApplicationController
   MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
 
   PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
-  MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary" }.freeze
+  MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary", "MERGEABLE" => "success" }.freeze
   REVIEW_ICON = {
     "UNREVIEWED" => "fa-solid fa-hourglass-start",
     "REVIEWED" => "fa-solid fa-check",
@@ -169,8 +169,8 @@ class MergeRequestsController < ApplicationController
 
   def fetch_merge_requests(username)
     merge_requests_graphql_query = <<-GRAPHQL
-      query {
-        user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
+      query($username: String!) {
+        user(username: $username) {
           mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
             nodes {
               iid
@@ -208,9 +208,9 @@ class MergeRequestsController < ApplicationController
               }
               headPipeline {
                 path
-                status
                 startedAt
                 finishedAt
+                status
                 failureReason
                 runningJobs: jobs(statuses: RUNNING, retried: false) {
                   count
@@ -237,7 +237,7 @@ class MergeRequestsController < ApplicationController
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
-    response = client.query(merge_requests_graphql_query)
+    response = client.query(merge_requests_graphql_query, username: username)
 
     OpenStruct.new(
       user: make_serializable(response.data.user),
@@ -277,15 +277,44 @@ class MergeRequestsController < ApplicationController
     JSON.parse!(obj.to_json, object_class: OpenStruct)
   end
 
-  def parse_response(response)
-    return unless response
+  def convert_mr_pipeline(pipeline)
+    return unless pipeline
 
-    @updated_at = response.updated_at
+    failed_jobs = pipeline.failedJobs
 
-    @open_issues_by_iid =
-      issues_from_merge_requests(response.user.openMergeRequests.nodes, response.user.mergedMergeRequests.nodes)
+    pipeline.startedAt = parse_graphql_time(pipeline.startedAt)
+    pipeline.finishedAt = parse_graphql_time(pipeline.finishedAt)
 
-    @open_merge_requests = response.user.openMergeRequests.nodes.map do |mr|
+    pipeline.webUrl =
+      if pipeline.path
+        web_path = pipeline.path
+
+        # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
+        if failed_jobs.count.positive?
+          web_path += "/failures"
+        elsif pipeline.status == "RUNNING"
+          running_jobs = pipeline.firstRunningJob.nodes
+          web_path = pipeline.runningJobs.count == 1 ? running_jobs.first.webPath : "#{web_path}/builds"
+          pipeline.summary = "#{helpers.pluralize(pipeline.runningJobs.count, "job")} still running"
+        end
+
+        make_full_url(web_path)
+      end
+
+    tag = view_context.tag
+    pipeline.failureSummary =
+      if failed_jobs.count.positive?
+        <<~HTML
+          #{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>
+          #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
+        HTML
+      end
+
+    pipeline.summary ||= pipeline.failureSummary if pipeline.status == "FAILED"
+  end
+
+  def convert_open_merge_request(merge_request)
+    merge_request.tap do |mr|
       mr.bootstrapClass = {
         row: row_class(mr),
         pipeline: pipeline_class(mr),
@@ -295,45 +324,10 @@ class MergeRequestsController < ApplicationController
       mr.updatedAt = parse_graphql_time(mr.updatedAt)
       mr.issue = issue_from_mr(mr)
 
-      if mr.headPipeline
-        failed_jobs = mr.headPipeline.failedJobs
-
-        mr.headPipeline.startedAt = parse_graphql_time(mr.headPipeline.startedAt)
-        mr.headPipeline.finishedAt = parse_graphql_time(mr.headPipeline.finishedAt)
-
-        mr.headPipeline.webUrl =
-          if mr.headPipeline.path
-            web_path = mr.headPipeline.path
-
-            # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
-            if failed_jobs.count.positive?
-              web_path += "/failures"
-            elsif mr.headPipeline.status == "RUNNING"
-              running_jobs = mr.headPipeline.firstRunningJob.nodes
-              web_path = mr.headPipeline.runningJobs.count == 1 ? running_jobs.first.webPath : "#{web_path}/builds"
-              mr.headPipeline.summary =
-                <<~HTML
-                  #{helpers.pluralize(mr.headPipeline.runningJobs.count, "job")} still running
-                HTML
-            end
-
-            make_full_url(web_path)
-          end
-
-        tag = view_context.tag
-        mr.headPipeline.failureSummary =
-          if failed_jobs.count.positive?
-            <<~HTML
-            #{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>
-            #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
-            HTML
-          else
-            nil
-          end
-        mr.headPipeline.summary ||= mr.headPipeline.failureSummary if mr.headPipeline.status == "FAILED"
-      end
+      convert_mr_pipeline(mr.headPipeline)
 
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
+      mr.labels.nodes.filter! { |label| label.title.start_with?("pipeline::") }
       mr.reviewers.nodes.each do |reviewer|
         reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
         reviewer.review = reviewer.mergeRequestInteraction.reviewState
@@ -343,31 +337,43 @@ class MergeRequestsController < ApplicationController
           activity_icon: user_activity_icon_class(reviewer)
         }.compact
       end
-
-      mr.labels.nodes.filter! { |label| label.title.start_with?("pipeline::") }
-
-      mr
     end
+  end
 
-    @merged_merge_requests = merged_merge_requests(response.user.mergedMergeRequests.nodes).filter_map do |mr|
-      mr.labels.nodes.filter! do |label|
-        WORKFLOW_LABELS.any? { |prefix| label.title.start_with?(prefix) }
-      end
-      workflow_label = mr.labels.nodes.first&.title
-      mr.workflowLabel = workflow_label&.delete_prefix("workflow::")
+  def convert_merged_merge_request(merge_request)
+    merge_request.tap do |mr|
       mr.issue = issue_from_mr(mr)
-
-      mr.bootstrapClass = {
-        row: mr.labels.nodes.any? ? "primary" : "secondary",
-        mergeStatus: "primary",
-        label: "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(workflow_label, "secondary")} text-light"
-      }
       mr.createdAt = parse_graphql_time(mr.createdAt)
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
-      mr
+      labels = mr.labels.nodes
+      labels.filter! { |label| WORKFLOW_LABELS.any? { |prefix| label.title.start_with?(prefix) } }
+      mr.bootstrapClass = {
+        row: labels.any? ? "primary" : "secondary",
+        mergeStatus: "primary"
+      }
+
+      labels.each do |label|
+        label.bootstrapClass = [
+          "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label.title, "secondary")}",
+          "text-light"
+        ]
+        label.title.delete_prefix!("workflow::")
+      end
     end
+  end
+
+  def parse_response(response)
+    return unless response
+
+    @updated_at = response.updated_at
+    open_mrs = response.user.openMergeRequests.nodes
+    merged_mrs = response.user.mergedMergeRequests.nodes
+
+    @open_issues_by_iid = issues_from_merge_requests(open_mrs, merged_mrs)
+    @open_merge_requests = open_mrs.map { |mr| convert_open_merge_request(mr) }
+    @merged_merge_requests = merged_merge_requests(merged_mrs).map { |mr| convert_merged_merge_request(mr) }
   end
 
   def authored_mr_lists_cache_key(user)
@@ -392,31 +398,33 @@ class MergeRequestsController < ApplicationController
     tag = view_context.tag
 
     hash
-      .filter_map { |title, value| value&.present? ? tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) : nil }
+      .filter_map { |title, value| value.present? ? tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) : nil }
       .join
   end
 
-  def user_help_title(user)
-    tooltip_from_hash(
+  def user_help_hash(user)
+    {
       "Location": user.location,
       "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{helpers.time_ago_in_words(user.lastActivityOn)} ago",
       "Message": user.status&.messageHtml
-    )
+    }
+  end
+
+  def user_help_title(user)
+    tooltip_from_hash(user_help_hash(user))
   end
 
   def reviewer_help_title(reviewer)
     tooltip_from_hash(
       "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
-      "Location": reviewer.location,
-      "Last activity": reviewer.lastActivityOn > 1.day.ago ? "today" : "#{helpers.time_ago_in_words(reviewer.lastActivityOn)} ago",
-      "Message": reviewer.status&.messageHtml
+      **user_help_hash(reviewer)
     )
   end
 
   def row_class(mr)
     return "warning" if mr.conflicts
     return "secondary" if mr.detailedMergeStatus == "BLOCKED_STATUS"
-    return "info" if mr.reviewers&.nodes&.any? { |reviewer| reviewer.mergeRequestInteraction.reviewState == "REVIEWED" }
+    return "info" if mr.reviewers.nodes.any? { |reviewer| reviewer.mergeRequestInteraction.reviewState == "REVIEWED" }
 
     merge_status_class(mr)
   end
@@ -460,13 +468,9 @@ class MergeRequestsController < ApplicationController
     merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).values.compact.sort.uniq
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).sort.uniq
 
-    response = Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
+    Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
       fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
-    end
-
-    return unless response
-
-    response.to_h { |issue| [issue.iid, issue] }
+    end&.to_h { |issue| [issue.iid, issue] }
   end
 
   def merged_merge_requests(merge_requests)
