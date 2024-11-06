@@ -121,8 +121,8 @@ class MergeRequestsController < ApplicationController
       end
 
       end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      @request_duration = (end_t - start_t).seconds.round(1)
 
+      merge_requests.request_duration = (end_t - start_t).seconds.round(1)
       merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
       merge_requests.tap do |mrs|
         Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
@@ -444,6 +444,7 @@ class MergeRequestsController < ApplicationController
     return unless response
 
     @updated_at = response.updated_at
+    @request_duration = response.request_duration
     @next_update =
       Rails.application.config.action_controller.perform_caching ? MR_CACHE_VALIDITY.after(response.updated_at) : nil
     open_mrs = response.user.openMergeRequests.nodes
