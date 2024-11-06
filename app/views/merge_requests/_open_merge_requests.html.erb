@@ -141,7 +141,7 @@
 
           <%= render partial: "gitlab_label",
           spacer_template: "space",
-          collection: mr.labels.nodes,
+          collection: mr.contextualLabels,
           as: :label %>
         </td>
         <!-- Title -->

@@ -31,7 +31,10 @@ class MergeRequestsController < ApplicationController
     "workflow::post-deploy-db-staging" => "success",
     "workflow::post-deploy-db-production" => "success"
   }.freeze
-  WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys
+  DEPLOYMENT_LABELS = ["Pick into auto-deploy"].freeze
+  WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys.freeze
+  OPEN_MRS_CONTEXTUAL_LABELS = ["pipeline::"].freeze
+  MERGED_MRS_CONTEXTUAL_LABELS = (DEPLOYMENT_LABELS + WORKFLOW_LABELS).freeze
 
   CORE_USER_FRAGMENT = <<-GRAPHQL
       fragment CoreUserFields on User {
@@ -317,16 +320,20 @@ class MergeRequestsController < ApplicationController
     pipeline.summary ||= pipeline.failureSummary if pipeline.status == "FAILED"
   end
 
-  def convert_core_merge_request(merge_request)
+  def convert_core_merge_request(merge_request, contextual_labels)
     merge_request.tap do |mr|
       mr.issue = issue_from_mr(mr)
       mr.createdAt = parse_graphql_time(mr.createdAt)
       mr.updatedAt = parse_graphql_time(mr.updatedAt)
+
+      mr.contextualLabels = mr.labels.nodes.filter do |label|
+        contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
+      end
     end
   end
 
   def convert_open_merge_request(merge_request)
-    convert_core_merge_request(merge_request).tap do |mr|
+    convert_core_merge_request(merge_request, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.bootstrapClass = {
         row: row_class(mr),
         pipeline: pipeline_class(mr),
@@ -336,7 +343,6 @@ class MergeRequestsController < ApplicationController
       convert_mr_pipeline(mr.headPipeline)
 
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
-      mr.labels.nodes.filter! { |label| label.title.start_with?("pipeline::") }
       mr.labels.nodes.each { |label| label.bootstrapClass = [] } # Use label's predefined colors
       mr.reviewers.nodes.each do |reviewer|
         reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
@@ -351,22 +357,25 @@ class MergeRequestsController < ApplicationController
   end
 
   def convert_merged_merge_request(merge_request)
-    convert_core_merge_request(merge_request).tap do |mr|
+    convert_core_merge_request(merge_request, MERGED_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
-      labels = mr.labels.nodes
-      labels.filter! { |label| WORKFLOW_LABELS.any? { |prefix| label.title.start_with?(prefix) } }
       mr.bootstrapClass = {
-        row: labels.any? ? "primary" : "secondary",
+        row: mr.contextualLabels.any? ? "primary" : "secondary",
         mergeStatus: "primary"
       }
 
-      labels.each do |label|
-        label.bootstrapClass = [
-          "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label.title, "secondary")}",
-          "text-light"
-        ]
+      mr.labels.nodes.each do |label|
+        label.bootstrapClass =
+          if label.title.start_with?("workflow::")
+            [
+              "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label.title, "secondary")}",
+              "text-light"
+            ]
+          else
+            []
+          end
         label.title.delete_prefix!("workflow::")
       end
     end
