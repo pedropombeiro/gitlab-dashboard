@@ -70,6 +70,7 @@ class MergeRequestsController < ApplicationController
         sourceBranch
         targetBranch
         createdAt
+        updatedAt
         assignees {
           nodes { ...CoreUserFields }
         }
@@ -188,7 +189,6 @@ class MergeRequestsController < ApplicationController
           openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
             nodes {
               ...CoreMergeRequestFields
-              updatedAt
               approved
               approvalsRequired
               approvalsLeft
@@ -317,16 +317,21 @@ class MergeRequestsController < ApplicationController
     pipeline.summary ||= pipeline.failureSummary if pipeline.status == "FAILED"
   end
 
-  def convert_open_merge_request(merge_request)
+  def convert_core_merge_request(merge_request)
     merge_request.tap do |mr|
+      mr.issue = issue_from_mr(mr)
+      mr.createdAt = parse_graphql_time(mr.createdAt)
+      mr.updatedAt = parse_graphql_time(mr.updatedAt)
+    end
+  end
+
+  def convert_open_merge_request(merge_request)
+    convert_core_merge_request(merge_request).tap do |mr|
       mr.bootstrapClass = {
         row: row_class(mr),
         pipeline: pipeline_class(mr),
         mergeStatus: merge_status_class(mr)
       }
-      mr.createdAt = parse_graphql_time(mr.createdAt)
-      mr.updatedAt = parse_graphql_time(mr.updatedAt)
-      mr.issue = issue_from_mr(mr)
 
       convert_mr_pipeline(mr.headPipeline)
 
@@ -346,9 +351,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def convert_merged_merge_request(merge_request)
-    merge_request.tap do |mr|
-      mr.issue = issue_from_mr(mr)
-      mr.createdAt = parse_graphql_time(mr.createdAt)
+    convert_core_merge_request(merge_request).tap do |mr|
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
