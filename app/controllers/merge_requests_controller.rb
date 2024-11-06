@@ -48,7 +48,7 @@ class MergeRequestsController < ApplicationController
         location
         status {
           availability
-          messageHtml
+          message
         }
       }
     GRAPHQL
@@ -406,7 +406,7 @@ class MergeRequestsController < ApplicationController
     {
       "Location": user.location,
       "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{helpers.time_ago_in_words(user.lastActivityOn)} ago",
-      "Message": user.status&.messageHtml
+      "Message": user.status&.message
     }
   end
 
