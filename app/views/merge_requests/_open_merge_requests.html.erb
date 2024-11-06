@@ -4,11 +4,11 @@
   <caption class="ms-1">
     <%= pluralize(merge_requests.count, "open merge request") %>, updated
     <%= render "relative_timestamp", timestamp: @updated_at %>.
+    <span class="text-secondary">Fetched in <%= @request_duration -%> seconds, </span>
     <% if @next_update %>
-      <span>Cached until
-        <%= @next_update.localtime.to_formatted_s(:time) -%>.</span>
+      <span class="text-secondary">cached until <%= @next_update.localtime.to_formatted_s(:time) -%>.</span>
     <% else %>
-      <span>Not cached.</span>
+      <span class="text-secondary">not cached.</span>
     <% end %>
   </caption>
 
