@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "async"
 require "ostruct"
 
 class MergeRequestsController < ApplicationController
@@ -110,14 +111,19 @@ class MergeRequestsController < ApplicationController
     assignee = params[:assignee]
     response = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
       start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      merge_requests = nil
+      merged_merge_requests = nil
 
-      # Fetch merge requests in 2 calls to reduce query complexity
-      merge_requests = fetch_open_merge_requests(assignee)
-      merge_requests.user.mergedMergeRequests = fetch_merged_merge_requests(assignee).user.mergedMergeRequests
+      Sync do
+        # Fetch merge requests in 2 calls to reduce query complexity
+        Async { merge_requests = fetch_open_merge_requests(assignee) }
+        Async { merged_merge_requests = fetch_merged_merge_requests(assignee) }
+      end
 
       end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       @request_duration = (end_t - start_t).seconds.round(1)
 
+      merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
       merge_requests.tap do |mrs|
         Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
       end
@@ -445,7 +451,7 @@ class MergeRequestsController < ApplicationController
 
     @open_issues_by_iid = issues_from_merge_requests(open_mrs, merged_mrs)
     @open_merge_requests = open_mrs.map { |mr| convert_open_merge_request(mr) }
-    @merged_merge_requests = merged_merge_requests(merged_mrs).map { |mr| convert_merged_merge_request(mr) }
+    @merged_merge_requests = filter_merged_merge_requests(merged_mrs).map { |mr| convert_merged_merge_request(mr) }
   end
 
   def authored_mr_lists_cache_key(user)
@@ -546,7 +552,7 @@ class MergeRequestsController < ApplicationController
     end&.to_h { |issue| [issue.iid, issue] }
   end
 
-  def merged_merge_requests(merge_requests)
+  def filter_merged_merge_requests(merge_requests)
     return unless @open_issues_by_iid
 
     open_mr_issue_iids = @open_issues_by_iid.keys
