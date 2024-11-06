@@ -9,6 +9,7 @@
       <th scope="col">ID</th>
       <th scope="col">Created</th>
       <th scope="col">Merged</th>
+      <th scope="col">Updated</th>
       <th scope="col">Workflow Labels</th>
       <th scope="col">Title</th>
       <th scope="col">Associated Issue</th>
@@ -33,6 +34,12 @@
           <%= render "relative_timestamp", timestamp: mr.mergedAt, most_significant_only: true %>
           by
           <br/><%= render "user_badge", user: mr.mergeUser %>
+        </td>
+        <!-- Updated at -->
+        <td>
+          <%= render "relative_timestamp",
+          timestamp: mr.updatedAt,
+          most_significant_only: true %>
         </td>
         <!-- Workflow Labels -->
         <td>
