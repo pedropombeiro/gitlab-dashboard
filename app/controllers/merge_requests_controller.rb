@@ -479,6 +479,9 @@ class MergeRequestsController < ApplicationController
     open_mr_issue_iids = @open_issues_by_iid.keys
     merged_request_issue_iids = merge_request_issue_iids(merge_requests)
 
-    merge_requests.filter { |mr| open_mr_issue_iids.include?(merged_request_issue_iids[mr.iid]) }
+    merge_requests.filter do |mr|
+      open_mr_issue_iids.include?(merged_request_issue_iids[mr.iid]) ||
+        mr.mergedAt >= 2.days.ago
+    end
   end
 end
