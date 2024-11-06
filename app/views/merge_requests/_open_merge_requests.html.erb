@@ -139,7 +139,10 @@
 
           <br/>
 
-          <%= render partial: "gitlab_label", collection: mr.labels.nodes, as: :label %>
+          <%= render partial: "gitlab_label",
+          spacer_template: "space",
+          collection: mr.labels.nodes,
+          as: :label %>
         </td>
         <!-- Title -->
         <td>
