@@ -179,7 +179,7 @@ class MergeRequestsController < ApplicationController
 
   def fetch_merge_requests(username)
     merge_requests_graphql_query = <<-GRAPHQL
-      query($username: String!) {
+      query($username: String!, $activeReviewsAfter: Time) {
         user(username: $username) {
           mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
             nodes {
@@ -212,6 +212,11 @@ class MergeRequestsController < ApplicationController
                   mergeRequestInteraction {
                     approved
                     reviewState
+                  }
+                  activeReviews: reviewRequestedMergeRequests(
+                    state: opened, approved: false, updatedAfter: $activeReviewsAfter
+                  ) {
+                    count
                   }
                 }
               }
@@ -246,7 +251,7 @@ class MergeRequestsController < ApplicationController
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
-    response = client.query(merge_requests_graphql_query, username: username)
+    response = client.query(merge_requests_graphql_query, username: username, activeReviewsAfter: 7.days.ago)
 
     OpenStruct.new(
       user: make_serializable(response.data.user),
@@ -437,6 +442,7 @@ class MergeRequestsController < ApplicationController
   def reviewer_help_title(reviewer)
     tooltip_from_hash(
       "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
+      "Active reviews": reviewer.activeReviews.count,
       **user_help_hash(reviewer)
     )
   end
