@@ -74,7 +74,11 @@ class MergeRequestsController < ApplicationController
           nodes { ...CoreUserFields }
         }
         labels {
-          nodes { title }
+          nodes {
+            title
+            color
+            textColor
+          }
         }
       }
     GRAPHQL
@@ -328,6 +332,7 @@ class MergeRequestsController < ApplicationController
 
       mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
       mr.labels.nodes.filter! { |label| label.title.start_with?("pipeline::") }
+      mr.labels.nodes.each { |label| label.bootstrapClass = [] } # Use label's predefined colors
       mr.reviewers.nodes.each do |reviewer|
         reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
         reviewer.review = reviewer.mergeRequestInteraction.reviewState
