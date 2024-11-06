@@ -392,7 +392,8 @@ class MergeRequestsController < ApplicationController
     return unless response
 
     @updated_at = response.updated_at
-    @next_update = MR_CACHE_VALIDITY.after(response.updated_at)
+    @next_update =
+      Rails.application.config.action_controller.perform_caching ? MR_CACHE_VALIDITY.after(response.updated_at) : nil
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
 
