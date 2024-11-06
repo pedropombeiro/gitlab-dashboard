@@ -100,7 +100,7 @@
                       title: pipeline.summary,
                       data: {
                         bs_toggle: "tooltip",
-                        bs_html: true,
+                        bs_html: "true",
                         bs_custom_class: "x-wide-tooltip",
                       },
                     }
@@ -126,7 +126,11 @@
                 <%= render "abbr_with_title",
                 content: tag.i(class: %w[fa-solid fa-comment-dots]),
                 class: "text-warning",
-                title: pipeline.failureReason %>
+                title: pipeline.failureReason,
+                data: {
+                  bs_html: "true",
+                  bs_custom_class: "x-wide-tooltip",
+                } %>
               <% end %>
               <% if pipeline.startedAt %>
                 <% if pipeline.finishedAt.nil? %>

@@ -108,7 +108,11 @@ class MergeRequestsController < ApplicationController
   def list
     assignee = params[:assignee]
     response = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
-      fetch_merge_requests(assignee).tap do |mrs|
+      # Fetch merge requests in 2 calls to reduce query complexity
+      merge_requests = fetch_open_merge_requests(assignee)
+      merge_requests.user.mergedMergeRequests = fetch_merged_merge_requests(assignee).user.mergedMergeRequests
+
+      merge_requests.tap do |mrs|
         Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
       end
     end
@@ -177,20 +181,10 @@ class MergeRequestsController < ApplicationController
     Time.parse(timestamp) if timestamp
   end
 
-  def fetch_merge_requests(username)
+  def fetch_open_merge_requests(username)
     merge_requests_graphql_query = <<-GRAPHQL
       query($username: String!, $activeReviewsAfter: Time) {
         user(username: $username) {
-          mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
-            nodes {
-              iid
-              ...CoreMergeRequestFields
-              mergedAt
-              mergeUser {
-                ...ExtendedUserFields
-              }
-            }
-          }
           openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
             nodes {
               ...CoreMergeRequestFields
@@ -240,6 +234,12 @@ class MergeRequestsController < ApplicationController
                     name
                   }
                 }
+                failedJobTraces: jobs(statuses: FAILED, first: 1, retried: false) {
+                  nodes {
+                    name
+                    trace { htmlSummary }
+                  }
+                }
               }
             }
           }
@@ -252,6 +252,36 @@ class MergeRequestsController < ApplicationController
     GRAPHQL
 
     response = client.query(merge_requests_graphql_query, username: username, activeReviewsAfter: 7.days.ago)
+
+    OpenStruct.new(
+      user: make_serializable(response.data.user),
+      updated_at: Time.current
+    )
+  end
+
+  def fetch_merged_merge_requests(username)
+    merge_requests_graphql_query = <<-GRAPHQL
+      query($username: String!) {
+        user(username: $username) {
+          mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
+            nodes {
+              iid
+              ...CoreMergeRequestFields
+              mergedAt
+              mergeUser {
+                ...ExtendedUserFields
+              }
+            }
+          }
+        }
+      }
+
+      #{CORE_USER_FRAGMENT}
+      #{EXT_USER_FRAGMENT}
+      #{CORE_MERGE_REQUEST_FRAGMENT}
+    GRAPHQL
+
+    response = client.query(merge_requests_graphql_query, username: username)
 
     OpenStruct.new(
       user: make_serializable(response.data.user),
@@ -316,10 +346,20 @@ class MergeRequestsController < ApplicationController
       end
 
     tag = view_context.tag
+    header = "#{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>"
     pipeline.failureSummary =
-      if failed_jobs.count.positive?
+      if failed_jobs.count == 1
+        failed_job_trace = pipeline.failedJobTraces.nodes.first
+
         <<~HTML
-          #{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>
+          #{header}
+          #{tag.code(failed_job_trace.name, escape: false)}:
+          <br/>
+          #{failed_job_trace.trace.htmlSummary}
+        HTML
+      elsif failed_jobs.count.positive?
+        <<~HTML
+          #{header}
           #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
         HTML
       end
