@@ -109,9 +109,14 @@ class MergeRequestsController < ApplicationController
   def list
     assignee = params[:assignee]
     response = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
+      start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
       # Fetch merge requests in 2 calls to reduce query complexity
       merge_requests = fetch_open_merge_requests(assignee)
       merge_requests.user.mergedMergeRequests = fetch_merged_merge_requests(assignee).user.mergedMergeRequests
+
+      end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+      @request_duration = (end_t - start_t).seconds.round(1)
 
       merge_requests.tap do |mrs|
         Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
