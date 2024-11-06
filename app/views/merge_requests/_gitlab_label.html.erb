@@ -1,1 +1,18 @@
-<%= render "label", title: label.title, class: label.bootstrapClass, style: "color: #{label.textColor}; background-color : #{label.color}" -%>
+<%= tag.span(
+  label.title,
+  class: %w[badge] + (label.bootstrapClass || %w[bg-primary text-light]),
+  style: "color: #{label.textColor}; background-color : #{label.color}",
+  data:
+    (
+      if label.descriptionHtml.present?
+        {
+          bs_toggle: "tooltip",
+          bs_html: "true",
+          bs_custom_class: "wide-tooltip",
+          bs_title: label.descriptionHtml,
+        }
+      else
+        nil
+      end
+    ),
+) -%>

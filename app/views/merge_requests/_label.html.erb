@@ -1,1 +1,5 @@
-<%= tag.span title, class: %w[badge] + (local_assigns[:class] || %w[bg-primary text-light]), **local_assigns.except(:class) -%>
+<%= tag.span(
+  title,
+  class: %w[badge] + (local_assigns[:class] || %w[bg-primary text-light]),
+  **local_assigns.except(:class),
+) -%>
