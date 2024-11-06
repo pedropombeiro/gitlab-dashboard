@@ -4,6 +4,8 @@ require "ostruct"
 
 class MergeRequestsController < ApplicationController
   MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
+  USER_CACHE_VALIDITY = 1.day
+  MR_CACHE_VALIDITY = 5.minutes
 
   PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
   MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary", "MERGEABLE" => "success" }.freeze
@@ -105,10 +107,10 @@ class MergeRequestsController < ApplicationController
 
   def list
     assignee = params[:assignee]
-    response = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: 5.minutes) do
-      mrs = fetch_merge_requests(assignee)
-      Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
-      mrs
+    response = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
+      fetch_merge_requests(assignee).tap do |mrs|
+        Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
+      end
     end
 
     parse_response(response)
@@ -127,7 +129,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def fetch_user(username)
-    response = Rails.cache.fetch("user_info_v2/#{user_hash(username)}", expires_in: 1.day) do
+    response = Rails.cache.fetch("user_info_v2/#{user_hash(username)}", expires_in: USER_CACHE_VALIDITY) do
       response = client.query <<-GRAPHQL
         query {
           user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
@@ -385,6 +387,7 @@ class MergeRequestsController < ApplicationController
     return unless response
 
     @updated_at = response.updated_at
+    @next_update = MR_CACHE_VALIDITY.after(response.updated_at)
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
 
@@ -485,7 +488,7 @@ class MergeRequestsController < ApplicationController
     merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).values.compact.sort.uniq
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).sort.uniq
 
-    Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: 5.minutes) do
+    Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: MR_CACHE_VALIDITY) do
       fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     end&.to_h { |issue| [issue.iid, issue] }
   end
