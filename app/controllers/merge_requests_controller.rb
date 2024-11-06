@@ -82,6 +82,7 @@ class MergeRequestsController < ApplicationController
         labels {
           nodes {
             title
+            descriptionHtml
             color
             textColor
           }
