@@ -394,7 +394,7 @@ class MergeRequestsController < ApplicationController
   def convert_open_merge_request(merge_request)
     convert_core_merge_request(merge_request, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.bootstrapClass = {
-        row: row_class(mr),
+        row: open_merge_request_row_class(mr),
         pipeline: pipeline_class(mr),
         mergeStatus: merge_status_class(mr)
       }
@@ -501,10 +501,13 @@ class MergeRequestsController < ApplicationController
     )
   end
 
-  def row_class(mr)
+  def open_merge_request_row_class(mr)
     return "warning" if mr.conflicts
     return "secondary" if mr.detailedMergeStatus == "BLOCKED_STATUS"
-    return "info" if mr.reviewers.nodes.any? { |reviewer| reviewer.mergeRequestInteraction.reviewState == "REVIEWED" }
+
+    if mr.reviewers.nodes.map(&:mergeRequestInteraction).any? { |mri| mri.reviewState == "REVIEWED" && !mri.approved }
+      return "warning"
+    end
 
     merge_status_class(mr)
   end
