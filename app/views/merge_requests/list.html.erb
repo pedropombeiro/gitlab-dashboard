@@ -4,6 +4,12 @@
   merged_merge_requests: @merged_merge_requests %>
 
   <script>
+    setTimeout(function(){
+      window.location.reload();
+    }, <%= ([10, @next_update ? 5.seconds.after(@next_update) - Time.current : 0].max * 1000).round.to_i %>);
+  </script>
+
+  <script>
     const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
     const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
   </script>
