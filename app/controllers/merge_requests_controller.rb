@@ -19,8 +19,8 @@ class MergeRequestsController < ApplicationController
     "REVIEW_STARTED" => "fa-solid fa-hourglass-half"
   }.freeze
   REVIEW_TEXT_BS_CLASS = {
-    "UNREVIEWED" => "dark",
-    "REVIEWED" => "secondary",
+    "UNREVIEWED" => "light",
+    "REVIEWED" => "info",
     "REQUESTED_CHANGES" => "danger",
     "APPROVED" => "success",
     "UNAPPROVED" => "info",

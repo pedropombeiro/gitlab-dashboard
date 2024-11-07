@@ -18,10 +18,14 @@
 
   <tbody>
     <% merge_requests.each do |mr| %>
-      <%= tag.tr(class: "table-#{mr.bootstrapClass[:row]}") do %>
+      <%= tag.tr do %>
         <!-- MR ID -->
         <th scope="row">
-          <%= render "link", title: mr.reference, web_url: mr.webUrl %>
+          <div class="d-inline-flex align-items-center">
+            <%= tag.span class: "badge badge-circle xs text-#{mr.bootstrapClass[:row]}" %>
+            &nbsp;
+            <%= render "link", title: mr.reference, web_url: mr.webUrl %>
+          </div>
         </th>
         <!-- Created at -->
         <td>
