@@ -1,16 +1,16 @@
-<nobr>
+<span class="d-flex align-items-center">
   <i class="fa-solid fa-code-branch"></i>
-  <%= tag.span source_branch %>
+  <%= tag.span source_branch, class: %w[text-truncate mx-1] %>
   <%= render "clipboard_button", text: source_branch %>
-</nobr>
+</span>
 <% if %w[master main].exclude?(target_branch) %>
   <br/>
-  <nobr>
+  <span class="d-flex align-items-center">
     <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
     <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
       <%= render "abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
     <% end %>
-    <%= tag.span target_branch %>
+    <%= tag.span target_branch, class: %w[text-truncate mx-1] %>
     <%= render "clipboard_button", text: target_branch %>
-  </nobr>
+  </span>
 <% end %>

@@ -1,7 +1,11 @@
-  <div class="table-responsive-sm">
-    <%= render "open_merge_requests", merge_requests: open_merge_requests %>
+  <div class="table-responsive-sm bg-light bg-gradient w-100 p-3">
+    <% mr_list_panel_class = %w[shadow rounded p-2 mb-5 overflow-scroll bg-body bg-gradient] %>
 
-    <hr/>
+    <%= tag.div(class: mr_list_panel_class) do %>
+      <%= render "open_merge_requests", merge_requests: open_merge_requests %>
+    <% end %>
 
-    <%= render "merged_merge_requests", merge_requests: merged_merge_requests %>
+    <%= tag.div(class: mr_list_panel_class) do %>
+      <%= render "merged_merge_requests", merge_requests: merged_merge_requests %>
+    <% end %>
   </div>

@@ -1,5 +1,5 @@
 <%= tag.span(
-  class: ["badge"] + (reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[bg-light]),
+  class: ["badge"] + (reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[bg-secondary]),
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
@@ -10,7 +10,7 @@
   <%= link_to reviewer.username,
   reviewer.webUrl,
   target: "_blank",
-  class: reviewer.review == "APPROVED" ? %w[bg-info text-light] : [] %>
+  class: reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[text-light] %>
   <% if reviewer.status&.availability == "BUSY" %>
     <%= tag.abbr(
       "🔴",
