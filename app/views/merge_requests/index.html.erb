@@ -29,17 +29,17 @@
   </nav>
 
   <%= turbo_frame_tag "merge_requests", src: "/mrs/#{params[:assignee]}/list" do %>
-    <%= tag.div(class: %w[position-absolute w-100 h-100 d-flex justify-content-center align-items-center bg-dark opacity-75]) do %>
-      <div class="spinner-border text-light" role="status" aria-hidden="true"></div>
+    <div class="shadow p-4 mb-5 bg-body rounded position-absolute top-50 start-50 translate-middle d-flex justify-content-center align-items-center">
+      <div class="spinner-border text-dark" role="status" aria-hidden="true"></div>
       &nbsp;
-      <div class="text-light">
+      <div class="text-dark">
         <span>Loading merge requests…</span>
         <% if @updated_at %>
           <span>(last fetched
             <%= render("relative_timestamp", timestamp: @updated_at) -%>)</span>
         <% end %>
       </div>
-    <% end %>
+    </div>
 
     <% if @updated_at %>
       <!-- Show last stored state, while we wait for the refreshed state -->
