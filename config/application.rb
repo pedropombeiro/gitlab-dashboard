@@ -16,8 +16,6 @@ module GitlabDashboard
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.cache_store = :memory_store, { size: 32.megabytes }
-
     # Support _FILE Docker secrets
     ENV.select { |k, v| k.match(/.+_FILE/) }.each do |secret_env_var, file_path|
       next unless File.exist?(file_path)
