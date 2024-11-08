@@ -232,6 +232,12 @@ class MergeRequestsController < ApplicationController
                 finishedAt
                 status
                 failureReason
+                jobs(retried: false) {
+                  count
+                }
+                finishedJobs: jobs(statuses: [SUCCESS, FAILED, CANCELED, SKIPPED], retried: false) {
+                  count
+                }
                 runningJobs: jobs(statuses: RUNNING, retried: false) {
                   count
                 }
@@ -349,9 +355,9 @@ class MergeRequestsController < ApplicationController
         if failed_jobs.count.positive?
           web_path += "/failures"
         elsif pipeline.status == "RUNNING"
-          running_jobs = pipeline.firstRunningJob.nodes
-          web_path = pipeline.runningJobs.count == 1 ? running_jobs.first.webPath : "#{web_path}/builds"
+          web_path = pipeline.runningJobs.count == 1 ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
           pipeline.summary = "#{helpers.pluralize(pipeline.runningJobs.count, "job")} still running"
+          pipeline.status += " (#{pipeline.finishedJobs.count.to_i * 100 / pipeline.jobs.count.to_i}%)"
         end
 
         make_full_url(web_path)
