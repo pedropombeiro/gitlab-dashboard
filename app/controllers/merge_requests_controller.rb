@@ -256,6 +256,7 @@ class MergeRequestsController < ApplicationController
                   nodes {
                     name
                     trace { htmlSummary }
+                    webPath
                   }
                 }
               }
@@ -352,13 +353,22 @@ class MergeRequestsController < ApplicationController
         web_path = pipeline.path
 
         # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
-        if failed_jobs.count.positive?
-          web_path += "/failures"
-        elsif pipeline.status == "RUNNING"
-          web_path = pipeline.runningJobs.count == 1 ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
-          pipeline.summary = "#{helpers.pluralize(pipeline.runningJobs.count, "job")} still running"
-          pipeline.status += " (#{pipeline.finishedJobs.count.to_i * 100 / pipeline.jobs.count.to_i}%)"
-        end
+        web_path =
+          if failed_jobs.count > 1
+            "#{web_path}/failures"
+          else
+            case pipeline.status
+            when "RUNNING"
+              pipeline.summary = "#{helpers.pluralize(pipeline.runningJobs.count, "job")} still running"
+              pipeline.status += " (#{pipeline.finishedJobs.count.to_i * 100 / pipeline.jobs.count.to_i}%)"
+
+              pipeline.runningJobs.count == 1 ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
+            when "FAILED"
+              failed_jobs.count == 1 ? pipeline.failedJobTraces.nodes.first.webPath : "#{web_path}/failures"
+            else
+              web_path
+            end
+          end
 
         make_full_url(web_path)
       end
