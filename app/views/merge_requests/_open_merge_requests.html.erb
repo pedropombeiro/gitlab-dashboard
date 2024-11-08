@@ -18,9 +18,9 @@
       <th scope="col">Created&nbsp;↓</th>
       <th scope="col">Updated</th>
       <th scope="col">Status</th>
-      <th scope="col"><i class="fa-solid fa-timeline"></i></th>
+      <th scope="col" class="text-center"><i class="fa-solid fa-timeline"></i></th>
       <th scope="col">Title</th>
-      <th scope="col"><%= tag.i(
+      <th scope="col" class="text-center"><%= tag.i(
           class: %w[fa-solid fa-angles-down],
           data: {
             bs_toggle: "tooltip",
@@ -31,8 +31,8 @@
       <% if any_conflicts %>
         <th scope="col">Conflicts?</th>
       <% end %>
-      <th scope="col"><%= tag.i class: %w[fa-regular fa-thumbs-up], title: "Approvals" %></th>
-      <th scope="col"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
+      <th scope="col" class="text-center"><%= tag.i class: %w[fa-regular fa-thumbs-up], title: "Approvals" %></th>
+      <th scope="col" class="text-center"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
         Reviewers</th>
       <th scope="col">Associated Issue</th>
     </tr>
