@@ -4,6 +4,8 @@ require "async"
 require "ostruct"
 
 class MergeRequestsController < ApplicationController
+  REDIS_NAMESPACE = "gitlab-dashboard"
+
   MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
   USER_CACHE_VALIDITY = 1.day
   MR_CACHE_VALIDITY = 5.minutes
@@ -125,7 +127,7 @@ class MergeRequestsController < ApplicationController
       merge_requests.request_duration = (end_t - start_t).seconds.round(1)
       merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
       merge_requests.tap do |mrs|
-        Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs)
+        Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs, expires_in: 1.week)
       end
     end
 
@@ -145,7 +147,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def fetch_user(username)
-    response = Rails.cache.fetch("user_info_v2/#{user_hash(username)}", expires_in: USER_CACHE_VALIDITY) do
+    response = Rails.cache.fetch(user_cache_key(username), expires_in: USER_CACHE_VALIDITY) do
       response = client.query <<-GRAPHQL
         query {
           user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
@@ -469,12 +471,20 @@ class MergeRequestsController < ApplicationController
     @merged_merge_requests = filter_merged_merge_requests(merged_mrs).map { |mr| convert_merged_merge_request(mr) }
   end
 
+  def user_cache_key(username)
+    "#{REDIS_NAMESPACE}/user_info/v2/#{user_hash(username)}"
+  end
+
+  def open_issues_cache_key(issue_iids)
+    "#{REDIS_NAMESPACE}/issues/v2/open/#{issue_iids.join("-")}"
+  end
+
   def authored_mr_lists_cache_key(user)
-    "merge_requests_v2/authored_list/#{user_hash(user)}"
+    "#{REDIS_NAMESPACE}/merge_requests/v2/authored_list/#{user_hash(user)}"
   end
 
   def last_authored_mr_lists_cache_key(user)
-    "merge_requests_v2/authored_list/#{user_hash(user)}/last"
+    "#{REDIS_NAMESPACE}/merge_requests/v2/last_authored_list/#{user_hash(user)}"
   end
 
   def make_full_url(path)
@@ -565,7 +575,7 @@ class MergeRequestsController < ApplicationController
     merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).values.compact.sort.uniq
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).sort.uniq
 
-    Rails.cache.fetch("issues_v2/open/#{issue_iids.join("-")}", expires_in: MR_CACHE_VALIDITY) do
+    Rails.cache.fetch(open_issues_cache_key(issue_iids), expires_in: MR_CACHE_VALIDITY) do
       fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     end&.to_h { |issue| [issue.iid, issue] }
   end
