@@ -172,9 +172,8 @@ class MergeRequestsController < ApplicationController
   def convert_open_merge_request(merge_request)
     convert_core_merge_request(merge_request, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.bootstrapClass = {
-        row: open_merge_request_row_class(mr),
         pipeline: pipeline_class(mr),
-        mergeStatus: merge_status_class(mr)
+        mergeStatus: open_merge_request_status_class(mr)
       }
 
       convert_mr_pipeline(mr.headPipeline)
@@ -199,7 +198,6 @@ class MergeRequestsController < ApplicationController
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
       mr.bootstrapClass = {
-        row: mr.contextualLabels.any? ? "primary" : "secondary",
         mergeStatus: "primary"
       }
 
@@ -271,7 +269,7 @@ class MergeRequestsController < ApplicationController
     )
   end
 
-  def open_merge_request_row_class(mr)
+  def open_merge_request_status_class(mr)
     return "warning" if mr.conflicts
     return "secondary" if mr.detailedMergeStatus == "BLOCKED_STATUS"
 
@@ -279,10 +277,6 @@ class MergeRequestsController < ApplicationController
       return "warning"
     end
 
-    merge_status_class(mr)
-  end
-
-  def merge_status_class(mr)
     MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
   end
 
