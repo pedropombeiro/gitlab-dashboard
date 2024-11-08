@@ -1,11 +1,11 @@
-  <div class="bg-gradient w-100 p-3">
-    <% mr_list_panel_class = %w[table-responsive shadow rounded p-2 bg-body bg-gradient] %>
+<div class="bg-gradient p-3 mx-auto" style="width: fit-content;">
+  <% mr_list_panel_class = %w[table-responsive shadow align-middle rounded p-2 bg-body bg-gradient] %>
 
-    <%= tag.div(class: mr_list_panel_class + %w[mb-5]) do %>
-      <%= render "open_merge_requests", merge_requests: open_merge_requests %>
-    <% end %>
+  <%= tag.div(class: mr_list_panel_class + %w[mb-5]) do %>
+    <%= render "open_merge_requests", merge_requests: open_merge_requests %>
+  <% end %>
 
-    <%= tag.div(class: mr_list_panel_class) do %>
-      <%= render "merged_merge_requests", merge_requests: merged_merge_requests %>
-    <% end %>
-  </div>
+  <%= tag.div(class: mr_list_panel_class) do %>
+    <%= render "merged_merge_requests", merge_requests: merged_merge_requests %>
+  <% end %>
+</div>
