@@ -1,7 +1,7 @@
   <div class="table-responsive-sm bg-gradient w-100 p-3">
-    <% mr_list_panel_class = %w[shadow rounded p-2 mb-5 overflow-scroll bg-body bg-gradient] %>
+    <% mr_list_panel_class = %w[shadow rounded p-2 overflow-scroll bg-body bg-gradient] %>
 
-    <%= tag.div(class: mr_list_panel_class) do %>
+    <%= tag.div(class: mr_list_panel_class + %w[mb-5]) do %>
       <%= render "open_merge_requests", merge_requests: open_merge_requests %>
     <% end %>
 
