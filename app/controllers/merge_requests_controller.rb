@@ -364,20 +364,18 @@ class MergeRequestsController < ApplicationController
       end
 
     tag = view_context.tag
-    header = "#{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:<br/><br/>"
+    header = "#{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:"
     pipeline.failureSummary =
       if failed_jobs.count == 1
         failed_job_trace = pipeline.failedJobTraces.nodes.first
 
-        <<~HTML
-          #{header}
-          #{tag.code(failed_job_trace.name, escape: false)}:
-          <br/>
-          #{failed_job_trace.trace.htmlSummary}
-        HTML
+        [
+          "#{header} #{tag.code(failed_job_trace.name, escape: false)}",
+         failed_job_trace.trace ? "#{failed_job_trace.trace&.htmlSummary}:" : nil
+        ].compact.join("<br/>")
       elsif failed_jobs.count.positive?
         <<~HTML
-          #{header}
+          #{header}<br/><br/>
           #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
         HTML
       end
