@@ -4,11 +4,9 @@ require "async"
 require "ostruct"
 
 class MergeRequestsController < ApplicationController
-  REDIS_NAMESPACE = "gitlab-dashboard"
+  include CacheConcern
 
   MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
-  USER_CACHE_VALIDITY = 1.day
-  MR_CACHE_VALIDITY = 5.minutes
 
   PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
   MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary", "MERGEABLE" => "success" }.freeze
@@ -469,22 +467,6 @@ class MergeRequestsController < ApplicationController
     @open_issues_by_iid = issues_from_merge_requests(open_mrs, merged_mrs)
     @open_merge_requests = open_mrs.map { |mr| convert_open_merge_request(mr) }
     @merged_merge_requests = filter_merged_merge_requests(merged_mrs).map { |mr| convert_merged_merge_request(mr) }
-  end
-
-  def user_cache_key(username)
-    "#{REDIS_NAMESPACE}/user_info/v2/#{user_hash(username)}"
-  end
-
-  def open_issues_cache_key(issue_iids)
-    "#{REDIS_NAMESPACE}/issues/v2/open/#{issue_iids.join("-")}"
-  end
-
-  def authored_mr_lists_cache_key(user)
-    "#{REDIS_NAMESPACE}/merge_requests/v2/authored_list/#{user_hash(user)}"
-  end
-
-  def last_authored_mr_lists_cache_key(user)
-    "#{REDIS_NAMESPACE}/merge_requests/v2/last_authored_list/#{user_hash(user)}"
   end
 
   def make_full_url(path)
