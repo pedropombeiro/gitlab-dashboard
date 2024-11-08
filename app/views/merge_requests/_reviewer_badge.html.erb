@@ -1,5 +1,5 @@
 <%= tag.span(
-  class: ["badge"] + (reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[bg-secondary]),
+  class: %w[badge shadow bg-gradient] + (reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[bg-secondary]),
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
@@ -7,10 +7,13 @@
     bs_title: reviewer_help_title(reviewer)
   }) do %>
   <%= render "user_image", user: reviewer %>
-  <%= link_to reviewer.username,
-  reviewer.webUrl,
-  target: "_blank",
-  class: reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[text-light] %>
+  <%= link_to(
+    reviewer.username,
+    reviewer.webUrl,
+    target: "_blank",
+    class:
+      reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[text-light],
+  ) %>
   <% if reviewer.status&.availability == "BUSY" %>
     <%= tag.abbr(
       "🔴",
