@@ -1,5 +1,10 @@
+$enable-gradients: true;
+$enable-shadows: true;
+
 @import 'bootstrap/scss/bootstrap';
 @import 'bootstrap-icons/font/bootstrap-icons';
+
+body { background: $gray-200 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
 
 .wide-tooltip {
   --bs-tooltip-max-width: 400px !important;
