@@ -5,35 +5,11 @@ require "async"
 class MergeRequestsController < ApplicationController
   include CacheConcern
   include GitlabApiConcern
+  include MrStatusOrnamentsConcern
+  include ReviewerOrnamentsConcern
 
   MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
 
-  PIPELINE_BS_CLASS = { "SUCCESS" => "success", "FAILED" => "danger", "RUNNING" => "primary" }.freeze
-  MERGE_STATUS_BS_CLASS = { "BLOCKED_STATUS" => "warning", "CI_STILL_RUNNING" => "primary", "MERGEABLE" => "success" }.freeze
-  REVIEW_ICON = {
-    "UNREVIEWED" => "fa-solid fa-hourglass-start",
-    "REVIEWED" => "fa-solid fa-check",
-    "REQUESTED_CHANGES" => "fa-solid fa-ban",
-    "APPROVED" => "fa-regular fa-thumbs-up",
-    "UNAPPROVED" => "fa-solid fa-arrow-rotate-left",
-    "REVIEW_STARTED" => "fa-solid fa-hourglass-half"
-  }.freeze
-  REVIEW_TEXT_BS_CLASS = {
-    "UNREVIEWED" => "light",
-    "REVIEWED" => "info",
-    "REQUESTED_CHANGES" => "danger",
-    "APPROVED" => "success",
-    "UNAPPROVED" => "info",
-    "REVIEW_STARTED" => "info"
-  }.freeze
-  WORKFLOW_LABELS_BS_CLASS = {
-    "workflow::staging-canary" => "info",
-    "workflow::canary" => "info",
-    "workflow::staging" => "info",
-    "workflow::production" => "primary",
-    "workflow::post-deploy-db-staging" => "success",
-    "workflow::post-deploy-db-production" => "success"
-  }.freeze
   DEPLOYMENT_LABELS = ["Pick into auto-deploy"].freeze
   WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys.freeze
   OPEN_MRS_CONTEXTUAL_LABELS = ["pipeline::"].freeze
@@ -172,7 +148,7 @@ class MergeRequestsController < ApplicationController
   def convert_open_merge_request(merge_request)
     convert_core_merge_request(merge_request, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.bootstrapClass = {
-        pipeline: pipeline_class(mr),
+        pipeline: pipeline_class(mr.headPipeline),
         mergeStatus: open_merge_request_status_class(mr)
       }
 
@@ -197,21 +173,9 @@ class MergeRequestsController < ApplicationController
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
-      mr.bootstrapClass = {
-        mergeStatus: "primary"
-      }
-
       mr.labels.nodes.each do |label|
-        label.bootstrapClass =
-          if label.title.start_with?("workflow::")
-            [
-              "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label.title, "secondary")}",
-              "text-light"
-            ]
-          else
-            []
-          end
-        label.title.delete_prefix!("workflow::")
+        label.bootstrapClass = workflow_label_class(label.title)
+        label.title.delete_prefix!(WORKFLOW_LABEL_NS)
       end
     end
   end
@@ -269,31 +233,8 @@ class MergeRequestsController < ApplicationController
     )
   end
 
-  def open_merge_request_status_class(mr)
-    return "warning" if mr.conflicts
-    return "secondary" if mr.detailedMergeStatus == "BLOCKED_STATUS"
-
-    if mr.reviewers.nodes.map(&:mergeRequestInteraction).any? { |mri| mri.reviewState == "REVIEWED" && !mri.approved }
-      return "warning"
-    end
-
-    MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
-  end
-
-  def pipeline_class(mr)
-    PIPELINE_BS_CLASS.fetch(mr.headPipeline&.status, "secondary")
-  end
-
   def user_activity_icon_class(user)
     %w[fa-solid fa-moon] if user.lastActivityOn < 1.day.ago
-  end
-
-  def review_icon_class(reviewer)
-    REVIEW_ICON[reviewer.mergeRequestInteraction.reviewState]
-  end
-
-  def review_text_class(reviewer)
-    REVIEW_TEXT_BS_CLASS[reviewer.mergeRequestInteraction.reviewState]
   end
 
   def issue_iid_from_mr(mr)
