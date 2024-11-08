@@ -1,6 +1,6 @@
 <span class="d-flex align-items-center">
   <i class="fa-solid fa-code-branch"></i>
-  <%= tag.span source_branch, class: %w[text-truncate mx-1] %>
+  <%= tag.span source_branch, class: %w[text-truncate mx-1 small] %>
   <%= render "clipboard_button", text: source_branch %>
 </span>
 <% if %w[master main].exclude?(target_branch) %>
