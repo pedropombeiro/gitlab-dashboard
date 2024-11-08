@@ -175,7 +175,7 @@
         <td class="text-center">
           <% if mr.squashOnMerge %>
             <%= render "abbr_with_title",
-            content: tag.i(class: %w[fa-solid fa-angles-down]),
+            content: tag.i(class: %w[align-middle fa-solid fa-angles-down]),
             title: "MR set to squash on merge",
             class: "text-success" %>
           <% end %>
@@ -186,7 +186,7 @@
             <% if mr.conflicts %>
               <%= render "abbr_with_title",
               content: tag.i(class: %w[fa-solid fa-burst]),
-              class: "text-danger",
+              class: "align-middle text-danger",
               title: "MR branch has conflicts and should be rebased" %>
             <% end %>
           </td>
@@ -196,13 +196,14 @@
           <% if mr.approved %>
             <%= render "abbr_with_title",
             content: tag.i(class: %w[fa-regular fa-thumbs-up]),
-            class: "text-success",
+            class: "align-middle text-success",
             title: "Approved" %>
           <% else %>
             <%= tag.progress(
               value: mr.approvalsRequired - mr.approvalsLeft,
               max: mr.approvalsRequired,
               style: "width: 20px",
+              class: "align-middle",
               data: {
                 bs_toggle: "tooltip",
                 bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
