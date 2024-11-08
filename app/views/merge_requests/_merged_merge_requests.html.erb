@@ -7,8 +7,8 @@
   <thead>
     <tr>
       <th scope="col">ID</th>
-      <th scope="col">Created</th>
       <th scope="col">Merged&nbsp;↓</th>
+      <th scope="col">Created</th>
       <th scope="col">Updated</th>
       <th scope="col">Workflow Labels</th>
       <th scope="col">Title</th>
@@ -27,17 +27,17 @@
             <%= render "link", title: mr.reference, web_url: mr.webUrl %>
           </div>
         </th>
-        <!-- Created at -->
-        <td>
-          <%= render "relative_timestamp",
-          timestamp: mr.createdAt,
-          most_significant_only: true %>
-        </td>
         <!-- Merged at -->
         <td>
           <%= render "relative_timestamp", timestamp: mr.mergedAt, most_significant_only: true %>
           by
           <br/><%= render "user_badge", user: mr.mergeUser %>
+        </td>
+        <!-- Created at -->
+        <td>
+          <%= render "relative_timestamp",
+          timestamp: mr.createdAt,
+          most_significant_only: true %>
         </td>
         <!-- Updated at -->
         <td>
