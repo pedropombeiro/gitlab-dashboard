@@ -1,16 +1,13 @@
 <span class="d-flex align-items-center">
   <i class="fa-solid fa-code-branch"></i>
-  <%= tag.span source_branch, class: %w[text-truncate mx-1 small] %>
-  <%= render "clipboard_button", text: source_branch %>
+  <%= tag.span(
+    branch_name,
+    class: %w[text-truncate mx-1 small],
+    data: {
+      bs_toggle: "tooltip",
+      bs_custom_class: "x-wide-tooltip",
+      bs_title: branch_name,
+    },
+  ) %>
+  <%= render "clipboard_button", text: branch_name %>
 </span>
-<% if %w[master main].exclude?(target_branch) %>
-  <br/>
-  <span class="d-flex align-items-center">
-    <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
-    <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
-      <%= render "abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
-    <% end %>
-    <%= tag.span target_branch, class: %w[text-truncate mx-1] %>
-    <%= render "clipboard_button", text: target_branch %>
-  </span>
-<% end %>

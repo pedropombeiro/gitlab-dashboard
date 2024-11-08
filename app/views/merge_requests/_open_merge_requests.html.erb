@@ -50,11 +50,7 @@
       <%= tag.tr do %>
         <!-- MR ID -->
         <th scope="row">
-          <div class="d-inline-flex align-items-center">
-            <%= tag.span class: "badge badge-circle xs text-#{mr.bootstrapClass[:row]}" %>
-            &nbsp;
-            <%= render "link", title: mr.reference, web_url: mr.webUrl %>
-          </div>
+          <%= render "link", title: mr.reference, web_url: mr.webUrl %>
         </th>
         <!-- Created at -->
         <td>
@@ -172,11 +168,11 @@
 
           <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
 
-          <br/>
-
-          <%= render "branch_ref",
-          source_branch: mr.sourceBranch,
-          target_branch: mr.targetBranch %>
+          <div style="max-width: 26em">
+            <%= render "branch_relation",
+            source_branch: mr.sourceBranch,
+            target_branch: mr.targetBranch %>
+          </div>
         </td>
         <!-- Squash on merge -->
         <td class="text-center">
