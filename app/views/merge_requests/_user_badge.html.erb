@@ -1,16 +1,12 @@
 <%= tag.span(
-  class: %w[badge bg-info text-light],
+  class: %w[badge shadow bg-gradient bg-info text-light],
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
     bs_html: "true",
     bs_title: user_help_title(user)
   }) do %>
-  <%= image_tag(
-    make_full_url(user.avatarUrl),
-    size: 16,
-    class: %w[rounded float-left],
-  ) %>
+  <%= render "user_image", user: user %>
   <%= link_to(
     user.username,
     user.webUrl,
