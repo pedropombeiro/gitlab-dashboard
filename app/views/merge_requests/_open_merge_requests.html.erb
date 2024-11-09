@@ -2,30 +2,31 @@
   <% any_conflicts = merge_requests.any?(&:conflicts) %>
 
   <caption class="ms-1">
-    <div>
-      <span class="lead">
-        <%= pluralize(merge_requests.count, "open merge request") %>, updated
-        <%= render "relative_timestamp", timestamp: @updated_at %>.
-      </span>
-      <span class="text-secondary small">
+    <div class="d-flex justify-content-between align-items-baseline">
+      <% if merge_requests.count.positive? %>
+        <div class="lead">
+          <%= pluralize(merge_requests.count, "merge request") %>, open for an average of
+          <%= distance_of_time_in_words(
+            ActiveSupport::Duration.build(
+              merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+            ),
+          ) %>.
+        </div>
+      <% end %>
+
+      <div class="text-secondary small">
         Fetched in
         <%= @request_duration -%>
-        seconds,
+        seconds
+        <%= render "relative_timestamp", timestamp: @updated_at %>.
         <% if @next_update %>
-          <span>cached until
+          <span>Cached until
             <%= @next_update.localtime.to_formatted_s(:time) -%>.</span>
         <% else %>
-          <span>not cached.</span>
+          <span>Not cached.</span>
         <% end %>
-      </span>
+      </div>
     </div>
-
-    <div>Open for an average of
-      <%= distance_of_time_in_words(
-        ActiveSupport::Duration.build(
-          merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
-        ),
-      ) %>.</div>
   </caption>
 
   <thead>
