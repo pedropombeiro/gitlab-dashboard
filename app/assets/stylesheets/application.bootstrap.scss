@@ -17,22 +17,3 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 .tooltip-inner {
   text-align: left;
 }
-
-.badge-circle {
-  padding: 0 !important;
-  width: .75rem;
-  height: .75rem;
-  border: 3px solid;
-  border-radius: 50%
-}
-
-.badge-circle:empty {
-  display: inline-block
-}
-
-.badge-circle.xs {
-  width: 0;
-  height: 0;
-  border-width: 4px;
-  vertical-align: 2px
-}
