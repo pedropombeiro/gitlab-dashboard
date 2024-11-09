@@ -6,6 +6,9 @@
   "spec/*_spec.rb": {
     "dispatch": "rspec {file}"
   },
+  "app/assets/stylesheets/*": {
+    "type": "css"
+  },
   "app/controllers/*_controller.rb": {
     "type": "controller",
     "alternate": "app/views/{}/index.html.erb"
