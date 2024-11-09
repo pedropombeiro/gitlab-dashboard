@@ -91,6 +91,7 @@ module GitlabApiConcern
               conflicts
               blockingMergeRequests {
                 visibleMergeRequests {
+                  iid
                   state
                 }
               }
