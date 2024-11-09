@@ -74,17 +74,15 @@
           ) %>
           <% if mr.blockingMergeRequests&.visibleMergeRequests %>
             <% open_blockers =
-              mr
-                .blockingMergeRequests
-                .visibleMergeRequests
-                .filter { |blocker| blocker.state == "opened" }
-                .count %>
+              mr.blockingMergeRequests.visibleMergeRequests.filter { |blocker| blocker.state == "opened" } %>
 
-            <% if open_blockers.positive? %>
+            <% if open_blockers.count.positive? %>
               <%= render "abbr_with_title",
               content: tag.i(class: %w[fa-solid fa-road-barrier]),
               class: "text-danger",
-              title: "This MR is blocked by #{pluralize(open_blockers, "merge request")}" %>
+              title:
+                "This MR is blocked by #{pluralize(open_blockers.count, "merge request")}: " \
+                  "#{open_blockers.map { |mr| "!#{mr.iid}" }.join(", ")}" %>
             <% end %>
           <% end %>
         </td>
