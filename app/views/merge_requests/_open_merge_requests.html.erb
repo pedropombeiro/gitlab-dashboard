@@ -69,7 +69,7 @@
         <td>
           <%= render(
             "label",
-            title: mr.detailedMergeStatus,
+            title: mr.mergeStatusLabel,
             class: ["bg-#{mr.bootstrapClass[:mergeStatus]}"],
           ) %>
           <% if mr.blockingMergeRequests&.visibleMergeRequests %>

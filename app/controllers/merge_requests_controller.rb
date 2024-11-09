@@ -154,7 +154,7 @@ class MergeRequestsController < ApplicationController
 
       convert_mr_pipeline(mr.headPipeline)
 
-      mr.detailedMergeStatus = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
+      mr.mergeStatusLabel = open_merge_request_status_label(mr)
       mr.labels.nodes.each { |label| label.bootstrapClass = [] } # Use label's predefined colors
       mr.reviewers.nodes.each do |reviewer|
         reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
