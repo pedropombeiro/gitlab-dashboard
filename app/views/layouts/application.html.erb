@@ -6,6 +6,8 @@
     <meta name="mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+    <%= action_cable_meta_tag %>
+    <%= hotwire_livereload_tags if Rails.env.development? %>
 
     <%= yield :head %>
 
@@ -17,7 +19,7 @@
       type: "image/png",
       sizes: "#{size}x#{size}" %>
     <% end %>
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": Rails.env.production? ? "reload" : "" %>
     <%= javascript_include_tag "application",
     "data-turbo-track": "reload",
     type: "module" %>
