@@ -20,11 +20,21 @@
 ></script>
 
 <div class="container-fluid" style="margin:0 !important; padding:0 !important;">
-  <nav id="navbar" class="navbar navbar-expand-md navbar-light fixed-top justify-content-center bg-dark">
-    <span class="navbar-brand mb-0 ms-2 h1 text-light fw-lighter">
-      Merge Requests Dashboard for
-      <%= render "user_image", user: @user, size: 24 %>
-      <%= link_to @user.username, @user.webUrl, class: "fw-light" %>
+  <nav
+    class="
+      navbar navbar-expand-sm navbar-light bg-dark fixed-top justify-content-center
+    "
+  >
+    <span class="navbar-brand d-flex mb-0 ms-2 h1 text-light fw-lighter">
+      <span class="d-flex d-sm-none me-2">
+        <%= render "user_image", user: @user, size: 24 %>
+      </span>
+      Merge Requests Dashboard
+      <span class="collapse navbar-collapse">
+        &nbsp;for&nbsp;
+        <%= render "user_image", user: @user, size: 24 %>&nbsp;
+        <%= link_to @user.username, @user.webUrl, class: "fw-light" %>
+      </span>
     </span>
   </nav>
 
