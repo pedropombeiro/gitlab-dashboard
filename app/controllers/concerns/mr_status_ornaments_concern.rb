@@ -4,8 +4,7 @@ module MrStatusOrnamentsConcern
   extend ActiveSupport::Concern
 
   MERGE_STATUS_BS_CLASS = {
-    "BLOCKED_STATUS" => "warning",
-    "REQUESTED_CHANGES" => "warning",
+    "BLOCKED_STATUS" => "secondary",
     "CI_STILL_RUNNING" => "primary",
     "MERGEABLE" => "success"
   }.freeze
@@ -28,13 +27,19 @@ module MrStatusOrnamentsConcern
 
   def open_merge_request_status_class(mr)
     return "warning" if mr.conflicts
-    return "secondary" if mr.detailedMergeStatus == "BLOCKED_STATUS"
-
-    if mr.reviewers.nodes.map(&:mergeRequestInteraction).any? { |mri| mri.reviewState == "REVIEWED" && !mri.approved }
-      return "warning"
-    end
+    return "warning" if returned_to_assignee?(mr)
+    return "secondary" if waiting_for_others?(mr)
 
     MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
+  end
+
+  def open_merge_request_status_label(mr)
+    status = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
+
+    return "Returned to you" if returned_to_assignee?(mr)
+    return "Waiting for others" if waiting_for_others?(mr)
+
+    status
   end
 
   def pipeline_class(pipeline)
@@ -48,5 +53,17 @@ module MrStatusOrnamentsConcern
       "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label_title, "secondary")}",
       "text-light"
     ]
+  end
+
+  private
+
+  def waiting_for_others?(mr)
+    %w[UNREVIEWED UNAPPROVED REVIEW_STARTED].include?(mr.detailedMergeStatus)
+  end
+
+  def returned_to_assignee?(mr)
+    mr.reviewers.nodes.map(&:mergeRequestInteraction).any? do |mri|
+      %w[REVIEWED REQUESTED_CHANGES].include?(mri.reviewState)
+    end
   end
 end
