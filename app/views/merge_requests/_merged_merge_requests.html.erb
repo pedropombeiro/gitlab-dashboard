@@ -1,9 +1,16 @@
 <table class="table table-hover table-sm mb-0" style="cursor: pointer;">
   <caption class="ms-1">
-    <span class="lead">
+    <div class="lead">
       <%= pluralize(merge_requests.count, "merged merge request") %>
       with open issues, or merged in the last 2 days.
-    </span>
+    </div>
+
+    <div>Merged on average after
+      <%= distance_of_time_in_words(
+        ActiveSupport::Duration.build(
+          merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+        ),
+      ) %>.</div>
   </caption>
 
   <thead>

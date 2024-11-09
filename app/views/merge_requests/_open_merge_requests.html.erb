@@ -2,21 +2,30 @@
   <% any_conflicts = merge_requests.any?(&:conflicts) %>
 
   <caption class="ms-1">
-    <span class="lead">
-      <%= pluralize(merge_requests.count, "open merge request") %>, updated
-      <%= render "relative_timestamp", timestamp: @updated_at %>.
-    </span>
-    <span class="text-secondary small">
-      Fetched in
-      <%= @request_duration -%>
-      seconds,
-      <% if @next_update %>
-        <span>cached until
-          <%= @next_update.localtime.to_formatted_s(:time) -%>.</span>
-      <% else %>
-        <span>not cached.</span>
-      <% end %>
-    </span>
+    <div>
+      <span class="lead">
+        <%= pluralize(merge_requests.count, "open merge request") %>, updated
+        <%= render "relative_timestamp", timestamp: @updated_at %>.
+      </span>
+      <span class="text-secondary small">
+        Fetched in
+        <%= @request_duration -%>
+        seconds,
+        <% if @next_update %>
+          <span>cached until
+            <%= @next_update.localtime.to_formatted_s(:time) -%>.</span>
+        <% else %>
+          <span>not cached.</span>
+        <% end %>
+      </span>
+    </div>
+
+    <div>Open for an average of
+      <%= distance_of_time_in_words(
+        ActiveSupport::Duration.build(
+          merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+        ),
+      ) %>.</div>
   </caption>
 
   <thead>
@@ -74,7 +83,9 @@
           ) %>
           <% if mr.blockingMergeRequests&.visibleMergeRequests %>
             <% open_blockers =
-              mr.blockingMergeRequests.visibleMergeRequests.filter { |blocker| blocker.state == "opened" } %>
+              mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
+                blocker.state == "opened"
+              end %>
 
             <% if open_blockers.count.positive? %>
               <%= render "abbr_with_title",
