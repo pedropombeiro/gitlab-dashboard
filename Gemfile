@@ -15,7 +15,6 @@ gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails"
 # Bundle and process CSS [https://github.com/rails/cssbundling-rails]
-gem "cssbundling-rails"
 
 gem "jsbundling-rails", "~> 1.3"
 
@@ -41,6 +40,7 @@ gem "bootsnap", require: false
 
 gem "async", "~> 2.19"
 gem "graphlient"
+gem "dartsass-rails", "~> 0.5.1"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

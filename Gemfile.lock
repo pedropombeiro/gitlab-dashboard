@@ -104,8 +104,9 @@ GEM
       fiber-local (~> 1.1)
       json
     crass (1.0.6)
-    cssbundling-rails (1.4.1)
+    dartsass-rails (0.5.1)
       railties (>= 6.0.0)
+      sass-embedded (~> 1.63)
     date (3.4.0)
     debug (1.9.2)
       irb (~> 1.10)
@@ -127,6 +128,15 @@ GEM
     fiber-storage (1.0.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
+    google-protobuf (4.28.3-aarch64-linux)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.28.3-arm64-darwin)
+      bigdecimal
+      rake (>= 13)
+    google-protobuf (4.28.3-x86_64-linux)
+      bigdecimal
+      rake (>= 13)
     graphlient (0.8.0)
       faraday (~> 2.0)
       graphql-client
@@ -284,6 +294,12 @@ GEM
       rubocop-rails
     ruby-progressbar (1.13.0)
     rubyzip (2.3.2)
+    sass-embedded (1.80.6-aarch64-linux-gnu)
+      google-protobuf (~> 4.28)
+    sass-embedded (1.80.6-arm64-darwin)
+      google-protobuf (~> 4.28)
+    sass-embedded (1.80.6-x86_64-linux-gnu)
+      google-protobuf (~> 4.28)
     securerandom (0.3.1)
     selenium-webdriver (4.26.0)
       base64 (~> 0.2)
@@ -338,7 +354,7 @@ DEPENDENCIES
   bootsnap
   brakeman
   capybara
-  cssbundling-rails
+  dartsass-rails (~> 0.5.1)
   debug
   graphlient
   hotwire-livereload (~> 1.4)
