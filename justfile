@@ -1,14 +1,15 @@
-default: install open server
+default: install
+  bin/setup
 
 install:
-    bundle install
+    bin/setup --skip-server
     yarn install
 
 update:
     bundle update
     yarn upgrade
 
-server:
+serve:
     bin/dev
 
 open:
