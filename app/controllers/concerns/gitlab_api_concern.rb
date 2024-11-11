@@ -226,7 +226,7 @@ module GitlabApiConcern
   end
 
   def authorization
-    "Bearer #{ENV["GITLAB_TOKEN"]}"
+    "Bearer #{Rails.application.credentials.gitlab_token}"
   end
 
   def client

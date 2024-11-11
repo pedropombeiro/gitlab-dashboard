@@ -23,7 +23,7 @@ class MergeRequestsController < ApplicationController
       fetch_user(assignee)
     end.data.user
 
-    unless params[:assignee] || ENV["GITLAB_TOKEN"]
+    unless params[:assignee] || Rails.application.credentials.gitlab_token
       return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
     end
 
