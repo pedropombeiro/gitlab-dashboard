@@ -122,7 +122,7 @@ class MergeRequestsController < ApplicationController
 
         [
           "#{header} #{tag.code(failed_job_trace.name, escape: false)}",
-          failed_job_trace.trace ? "#{failed_job_trace.trace.htmlSummary}:" : nil
+          failed_job_trace&.trace ? "#{failed_job_trace.trace.htmlSummary}:" : nil
         ].compact.join("<br/>")
       elsif failed_jobs.count.positive?
         <<~HTML
