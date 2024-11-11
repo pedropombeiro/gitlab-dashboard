@@ -73,3 +73,4 @@ end
 gem "async", "~> 2.19"
 gem "graphlient"
 gem "dartsass-rails", "~> 0.5.1"
+gem "web-push", "~> 3.0"

@@ -8,6 +8,15 @@
   link.href = "<%= make_full_url(@user.avatarUrl) %>";
 </script>
 
+<% vapid_public_key = Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
+<% if vapid_public_key.present? %>
+  <script>
+    window.vapidPublicKey = new Uint8Array(<%= Base64.urlsafe_decode64(vapid_public_key).bytes %>)
+
+    Notification.requestPermission();
+  </script>
+<% end %>
+
 <script
   src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js"
   integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB"
