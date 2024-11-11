@@ -8,9 +8,9 @@ window.Stimulus = application;
 
 export { application };
 
-// Register the serviceWorker script at /serviceworker.js from your server if supported
+// Register the serviceWorker script at /service-worker.js from your server if supported
 if (navigator.serviceWorker) {
-  navigator.serviceWorker.register("/serviceworker.js").then(function (_reg) {
+  navigator.serviceWorker.register("/service-worker.js").then(function (_reg) {
     console.log("Service worker change, registered the service worker");
   });
 }
