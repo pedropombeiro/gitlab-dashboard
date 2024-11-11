@@ -27,6 +27,6 @@ module CacheConcern
   private
 
   def user_hash(username)
-    Digest::SHA256.hexdigest(username || ENV["GITLAB_TOKEN"] || "Anonymous")[0..15]
+    Digest::SHA256.hexdigest(username || Rails.application.credentials.gitlab_token || "Anonymous")[0..15]
   end
 end
