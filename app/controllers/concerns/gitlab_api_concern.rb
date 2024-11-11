@@ -135,7 +135,7 @@ module GitlabApiConcern
                     name
                   }
                 }
-                failedJobTraces: jobs(statuses: FAILED, first: 1, retried: false) {
+                failedJobTraces: jobs(statuses: FAILED, first: 2, retried: false) {
                   nodes {
                     name
                     trace { htmlSummary }
