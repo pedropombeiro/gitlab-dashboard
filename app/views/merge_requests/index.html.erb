@@ -10,11 +10,7 @@
 
 <% vapid_public_key = Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
 <% if vapid_public_key.present? %>
-  <script>
-    window.vapidPublicKey = new Uint8Array(<%= Base64.urlsafe_decode64(vapid_public_key).bytes %>)
-
-    Notification.requestPermission();
-  </script>
+  <meta name="web_push_public_key" content="<%= Base64.urlsafe_decode64(vapid_public_key).bytes %>" />
 <% end %>
 
 <script
@@ -45,6 +41,8 @@
         <%= link_to @user.username, @user.webUrl, class: "fw-light" %>
       </span>
     </span>
+
+    <button id="enable_notifications_button" class="btn d-none text-light"><i class="fa-solid fa-bell"></i></button>
   </nav>
 
   <%= turbo_frame_tag "merge_requests", src: "/mrs/#{params[:assignee]}/list" do %>
@@ -57,18 +55,18 @@
       <div class="spinner-border me-3" role="status" aria-hidden="true"></div>
       <div>
         <span>Loading merge requests…</span>
-        <% if @updated_at %>
+        <% if @response %>
           <span>(last fetched
-            <%= render("relative_timestamp", timestamp: @updated_at) -%>)</span>
+            <%= render("relative_timestamp", timestamp: @response[:updated_at]) -%>)</span>
         <% end %>
       </div>
     </div>
 
-    <% if @updated_at %>
+    <% if @response %>
       <!-- Show last stored state, while we wait for the refreshed state -->
       <%= render "user_merge_requests",
-      open_merge_requests: @open_merge_requests,
-      merged_merge_requests: @merged_merge_requests %>
+      open_merge_requests: @response[:open_merge_requests],
+      merged_merge_requests: @response[:merged_merge_requests] %>
     <% end %>
   <% end %>
 </div>

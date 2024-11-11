@@ -18,26 +18,24 @@ class MergeRequestsController < ApplicationController
   helper_method :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
 
   def index
-    assignee = params[:assignee]
-    @user = Rails.cache.fetch(user_cache_key(assignee), expires_in: USER_CACHE_VALIDITY) do
-      fetch_user(assignee)
-    end.data.user
+    ensure_assignee
 
-    unless params[:assignee] || Rails.application.credentials.gitlab_token
-      return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
-    end
+    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(params[:assignee]))
 
-    params[:assignee] = @user.username
-
-    response = Rails.cache.read(last_authored_mr_lists_cache_key(params[:assignee]))
-
-    parse_response(response)
+    @response = parse_response(response)
     fresh_when(response)
   end
 
   def list
     assignee = params[:assignee]
-    response = Rails.cache.fetch(authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
+    ensure_assignee
+
+    return render_404 unless current_user
+
+    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(params[:assignee]))
+    previous_response = parse_response(response)
+
+    response = Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
       start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       merge_requests = nil
       merged_merge_requests = nil
@@ -53,12 +51,14 @@ class MergeRequestsController < ApplicationController
       merge_requests.request_duration = (end_t - start_t).seconds.round(1)
       merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
       merge_requests.tap do |mrs|
-        Rails.cache.write(last_authored_mr_lists_cache_key(assignee), mrs, expires_in: 1.week)
+        Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), mrs, expires_in: 1.week)
       end
     end
 
-    parse_response(response)
+    @response = parse_response(response)
     fresh_when(response)
+
+    check_changes(previous_response, @response)
 
     respond_to do |format|
       format.html
@@ -67,6 +67,23 @@ class MergeRequestsController < ApplicationController
   end
 
   private
+
+  def ensure_assignee
+    unless params[:assignee] || Rails.application.credentials.gitlab_token
+      return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
+    end
+
+    assignee = params[:assignee]
+    @user = Rails.cache.fetch(self.class.user_cache_key(assignee), expires_in: USER_CACHE_VALIDITY) do
+      fetch_user(assignee)
+    end.data.user
+
+    assignee = @user&.username
+    return if params[:assignee] == assignee
+
+    params[:assignee] = assignee
+    save_current_user(assignee)
+  end
 
   def render_404
     respond_to do |format|
@@ -134,9 +151,9 @@ class MergeRequestsController < ApplicationController
     pipeline.summary ||= pipeline.failureSummary if pipeline.status == "FAILED"
   end
 
-  def convert_core_merge_request(merge_request, contextual_labels)
+  def convert_core_merge_request(merge_request, open_issues_by_iid, contextual_labels)
     merge_request.tap do |mr|
-      mr.issue = issue_from_mr(mr)
+      mr.issue = issue_from_mr(mr, open_issues_by_iid)
       mr.createdAt = parse_graphql_time(mr.createdAt)
       mr.updatedAt = parse_graphql_time(mr.updatedAt)
 
@@ -146,8 +163,8 @@ class MergeRequestsController < ApplicationController
     end
   end
 
-  def convert_open_merge_request(merge_request)
-    convert_core_merge_request(merge_request, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
+  def convert_open_merge_request(merge_request, open_issues_by_iid)
+    convert_core_merge_request(merge_request, open_issues_by_iid, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.bootstrapClass = {
         pipeline: pipeline_class(mr.headPipeline),
         mergeStatus: open_merge_request_status_class(mr)
@@ -169,8 +186,8 @@ class MergeRequestsController < ApplicationController
     end
   end
 
-  def convert_merged_merge_request(merge_request)
-    convert_core_merge_request(merge_request, MERGED_MRS_CONTEXTUAL_LABELS).tap do |mr|
+  def convert_merged_merge_request(merge_request, open_issues_by_iid)
+    convert_core_merge_request(merge_request, open_issues_by_iid, MERGED_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
@@ -184,16 +201,25 @@ class MergeRequestsController < ApplicationController
   def parse_response(response)
     return unless response
 
-    @updated_at = response.updated_at
-    @request_duration = response.request_duration
-    @next_update =
-      Rails.application.config.action_controller.perform_caching ? MR_CACHE_VALIDITY.after(response.updated_at) : nil
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
+    open_issues_by_iid = issues_from_merge_requests(open_mrs, merged_mrs)
+    next_update =
+      if Rails.application.config.action_controller.perform_caching
+        MR_CACHE_VALIDITY.after(response.updated_at)
+      else
+        nil
+      end
 
-    @open_issues_by_iid = issues_from_merge_requests(open_mrs, merged_mrs)
-    @open_merge_requests = open_mrs.map { |mr| convert_open_merge_request(mr) }
-    @merged_merge_requests = filter_merged_merge_requests(merged_mrs).map { |mr| convert_merged_merge_request(mr) }
+    {
+      updated_at: response.updated_at,
+      request_duration: response.request_duration,
+      next_update: next_update,
+      open_merge_requests: open_mrs.map { |mr| convert_open_merge_request(mr, open_issues_by_iid) },
+      merged_merge_requests: filter_merged_merge_requests(merged_mrs, open_issues_by_iid).map do |mr|
+        convert_merged_merge_request(mr, open_issues_by_iid)
+      end
+    }
   end
 
   def make_full_url(path)
@@ -243,9 +269,9 @@ class MergeRequestsController < ApplicationController
     match_data&.named_captures&.fetch("issue_id")
   end
 
-  def issue_from_mr(mr)
+  def issue_from_mr(mr, open_issues_by_iid)
     iid = issue_iid_from_mr(mr)
-    @open_issues_by_iid[iid]
+    open_issues_by_iid[iid]
   end
 
   def merge_request_issue_iids(merge_requests)
@@ -257,20 +283,62 @@ class MergeRequestsController < ApplicationController
     merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).values.compact.sort.uniq
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).sort.uniq
 
-    Rails.cache.fetch(open_issues_cache_key(issue_iids), expires_in: MR_CACHE_VALIDITY) do
+    Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: MR_CACHE_VALIDITY) do
       fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     end&.to_h { |issue| [issue.iid, issue] }
   end
 
-  def filter_merged_merge_requests(merge_requests)
-    return unless @open_issues_by_iid
+  def filter_merged_merge_requests(merge_requests, open_issues_by_iid)
+    return unless open_issues_by_iid
 
-    open_mr_issue_iids = @open_issues_by_iid.keys
+    open_mr_issue_iids = open_issues_by_iid.keys
     merged_request_issue_iids = merge_request_issue_iids(merge_requests)
 
     merge_requests.filter do |mr|
       open_mr_issue_iids.include?(merged_request_issue_iids[mr.iid]) ||
         mr.mergedAt >= 2.days.ago
+    end
+  end
+
+  def check_changes(previous_response, response)
+    return unless previous_response
+
+    # Open MR changes
+    changed_labels(previous_response[:open_merge_requests], response[:open_merge_requests]).each do |change|
+      notify_user(
+        title: "An open MR changed",
+        body: "Labels changed to #{change[:labels].join(", ")}",
+        url: change[:mr].webUrl,
+        tag: change[:mr].iid,
+        timestamp: change[:mr].updatedAt
+      )
+    end
+
+    # Merged MR changes
+    changed_labels(previous_response[:merged_merge_requests], response[:merged_merge_requests]).each do |change|
+      notify_user(
+        title: "A merged MR changed",
+        body: "Labels changed to #{change[:labels].join(", ")}",
+        url: change[:mr].webUrl,
+        tag: change[:mr].iid,
+        timestamp: change[:mr].updatedAt
+      )
+    end
+  end
+
+  def changed_labels(previous_mrs, mrs)
+    mrs.filter_map do |mr|
+      previous_mr_version = previous_mrs.select { |prev_mr| prev_mr.iid == mr.iid }.first
+
+      previous_labels = previous_mr_version.contextualLabels.map(&:title)
+      labels = mr.contextualLabels.map(&:title)
+      next unless labels != previous_labels
+
+      {
+        mr: mr,
+        labels: labels,
+        previous_labels: previous_labels
+      }
     end
   end
 end

@@ -19,10 +19,10 @@
         Fetched in
         <%= @request_duration -%>
         seconds
-        <%= render "relative_timestamp", timestamp: @updated_at %>.
-        <% if @next_update %>
+        <%= render "relative_timestamp", timestamp: @response[:updated_at] %>.
+        <% if @response&.fetch(:next_update) %>
           <span>Cached until
-            <%= @next_update.localtime.to_formatted_s(:time) -%>.</span>
+            <%= @response[:next_update].localtime.to_formatted_s(:time) -%>.</span>
         <% else %>
           <span>Not cached.</span>
         <% end %>
