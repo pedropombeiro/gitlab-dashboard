@@ -84,6 +84,7 @@ class MergeRequestsController < ApplicationController
     return unless pipeline
 
     failed_jobs = pipeline.failedJobs
+    failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }
 
     pipeline.startedAt = parse_graphql_time(pipeline.startedAt)
     pipeline.finishedAt = parse_graphql_time(pipeline.finishedAt)
@@ -94,7 +95,7 @@ class MergeRequestsController < ApplicationController
 
         # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
         web_path =
-          if failed_jobs.count > 1
+          if failed_job_traces.count > 1
             "#{web_path}/failures"
           else
             case pipeline.status
@@ -104,7 +105,7 @@ class MergeRequestsController < ApplicationController
 
               pipeline.runningJobs.count == 1 ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
             when "FAILED"
-              failed_jobs.count == 1 ? pipeline.failedJobTraces.nodes.first.webPath : "#{web_path}/failures"
+              failed_job_traces.count == 1 ? failed_job_traces.first.webPath : "#{web_path}/failures"
             else
               web_path
             end
@@ -117,11 +118,11 @@ class MergeRequestsController < ApplicationController
     header = "#{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:"
     pipeline.failureSummary =
       if failed_jobs.count == 1
-        failed_job_trace = pipeline.failedJobTraces.nodes.first
+        failed_job_trace = failed_job_traces.first
 
         [
           "#{header} #{tag.code(failed_job_trace.name, escape: false)}",
-         failed_job_trace.trace ? "#{failed_job_trace.trace&.htmlSummary}:" : nil
+          failed_job_trace.trace ? "#{failed_job_trace.trace.htmlSummary}:" : nil
         ].compact.join("<br/>")
       elsif failed_jobs.count.positive?
         <<~HTML
