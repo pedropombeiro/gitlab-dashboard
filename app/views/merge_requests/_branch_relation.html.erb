@@ -5,7 +5,7 @@
 
   <span class="d-flex align-items-center">
     <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;<i class="fa-solid fa-code-branch"></i>
-    <% if @open_merge_requests.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
+    <% if @response[:open_merge_requests].any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
       <%= render "abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
     <% end %>
     <%= render "branch_ref", branch_name: target_branch %>

@@ -1,12 +1,12 @@
 <%= turbo_frame_tag "merge_requests" do %>
   <%= render "user_merge_requests",
-  open_merge_requests: @open_merge_requests,
-  merged_merge_requests: @merged_merge_requests %>
+  open_merge_requests: @response[:open_merge_requests],
+  merged_merge_requests: @response[:merged_merge_requests] %>
 
   <script>
     setTimeout(function(){
       window.location.reload();
-    }, <%= ([10, @next_update ? 5.seconds.after(@next_update) - Time.current : 0].max * 1000).round.to_i %>);
+    }, <%= ([10, @response[:next_update] ? 5.seconds.after(@response[:next_update]) - Time.current : 0].max * 1000).round.to_i %>);
   </script>
 
   <script>

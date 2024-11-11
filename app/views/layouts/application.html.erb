@@ -16,7 +16,7 @@
     <%= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
     <%= favicon_link_tag asset_path("favicon.png"), rel: "icon", type: "image/png" %>
     <% %w[57 72 76 114 120 144 152 180].each do |size| %>
-      <%= favicon_link_tag "/apple-touch-icon-#{size}x#{size}.png",
+      <%= favicon_link_tag asset_path("apple-touch-icon-#{size}x#{size}.png"),
       rel: "apple-touch-icon",
       type: "image/png",
       sizes: "#{size}x#{size}" %>

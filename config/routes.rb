@@ -1,5 +1,7 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+  resources :web_push_subscriptions, only: :create
+
   get "/mrs/:assignee", to: "merge_requests#index"
   get "/mrs/:assignee/list", to: "merge_requests#list"
 

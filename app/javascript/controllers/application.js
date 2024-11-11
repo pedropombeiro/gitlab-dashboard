@@ -8,41 +8,57 @@ window.Stimulus = application;
 
 export { application };
 
-// Register the serviceWorker script at /service-worker.js from your server if supported
-if (navigator.serviceWorker) {
-  navigator.serviceWorker.register("/service-worker.js").then(function (_reg) {
-    console.log("Service worker change, registered the service worker");
-  });
-}
-// Otherwise, no push notifications :(
-else {
-  console.error("Service worker is not supported in this browser");
-}
-
-navigator.serviceWorker.ready.then((serviceWorkerRegistration) => {
-  serviceWorkerRegistration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: window.vapidPublicKey,
-  });
+document.addEventListener("turbo:load", () => {
+  switch (Notification.permission) {
+    case "granted":
+      // send to server
+      return;
+    case "denied":
+      // do nothing?
+      return;
+    default:
+      promptForNotifications();
+  }
 });
 
+function promptForNotifications() {
+  const notificationsButton = document.getElementById("enable_notifications_button");
+  if (!notificationsButton) return;
 
-// Let's check if the browser supports notifications
-if (!("Notification" in window)) {
-  console.error("This browser does not support desktop notification");
+  notificationsButton.classList.remove("d-none");
+  notificationsButton.addEventListener("click", (event) => {
+    event.preventDefault();
+    Notification.requestPermission()
+      .then((permission) => {
+        if (permission === "granted") {
+          setupSubscription();
+        } else {
+          alert("Notifications declined");
+        }
+      })
+      .catch((error) => console.log("Notifications error", error))
+      .finally(() => notificationsButton.classList.add("d-none"));
+  });
 }
 
-// Let's check whether notification permissions have already been granted
-else if (Notification.permission === "granted") {
-  console.log("Permission to receive notifications has been granted");
-}
+async function setupSubscription() {
+  if (Notification.permission !== "granted") return;
+  if (!navigator.serviceWorker) return;
 
-// Otherwise, we need to ask the user for permission
-else if (Notification.permission !== 'denied') {
-  Notification.requestPermission(function (permission) {
-    // If the user accepts, let's create a notification
-    if (permission === "granted") {
-      console.log("Permission to receive notifications has been granted");
-    }
+  let vapid = new Uint8Array(JSON.parse(document.querySelector("meta[name=web_push_public_key]")?.content));
+
+  await navigator.serviceWorker.register("/service-worker.js");
+  const registration = await navigator.serviceWorker.ready;
+  const subscription = await registration.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: vapid,
+  });
+
+  await fetch("/web_push_subscriptions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(subscription),
   });
 }
