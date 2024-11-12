@@ -328,6 +328,7 @@ class MergeRequestsController < ApplicationController
   def changed_labels(previous_mrs, mrs)
     mrs.filter_map do |mr|
       previous_mr_version = previous_mrs.select { |prev_mr| prev_mr.iid == mr.iid }.first
+      next if previous_mr_version.nil?
 
       previous_labels = previous_mr_version.contextualLabels.map(&:title)
       labels = mr.contextualLabels.map(&:title)
