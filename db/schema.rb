@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_11_184150) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_12_023806) do
   create_table "gitlab_users", force: :cascade do |t|
     t.string "username", null: false
     t.datetime "created_at", null: false
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_11_184150) do
     t.text "p256dh_key", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.text "user_agent"
     t.index ["gitlab_user_id"], name: "index_web_push_subscriptions_on_gitlab_user_id"
   end
 

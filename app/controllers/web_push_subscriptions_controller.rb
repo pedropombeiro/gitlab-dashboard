@@ -10,7 +10,9 @@ class WebPushSubscriptionsController < ApplicationController
       endpoint: params[:endpoint],
       auth_key: params[:keys][:auth],
       p256dh_key: params[:keys][:p256dh]
-    )
+    ) do |sub|
+      sub.user_agent = request.user_agent
+    end
 
     head :ok
   end
