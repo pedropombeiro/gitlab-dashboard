@@ -61,7 +61,7 @@
       <%= tag.tr do %>
         <!-- MR ID -->
         <th scope="row">
-          <%= render "link", title: mr.reference, web_url: mr.webUrl %>
+          <%= render "mr_reference", merge_request: mr %>
         </th>
         <!-- Created at -->
         <td>
