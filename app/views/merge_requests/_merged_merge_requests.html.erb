@@ -5,12 +5,14 @@
       with open issues, or merged in the last 2 days.
     </div>
 
-    <div>Merged on average after
-      <%= distance_of_time_in_words(
-        ActiveSupport::Duration.build(
-          merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
-        ),
-      ) %>.</div>
+    <% if merge_requests.count.positive? %>
+      <div>Merged on average after
+        <%= distance_of_time_in_words(
+          ActiveSupport::Duration.build(
+            merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+          ),
+        ) %>.</div>
+    <% end %>
   </caption>
 
   <thead>
