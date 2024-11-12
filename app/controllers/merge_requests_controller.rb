@@ -49,13 +49,23 @@ class MergeRequestsController < ApplicationController
       end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
       merge_requests.request_duration = (end_t - start_t).seconds.round(1)
-      merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
-      merge_requests.tap do |mrs|
-        Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), mrs, expires_in: 1.week)
+      unless merge_requests.errors || merged_merge_requests.errors
+        merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
+        merge_requests.tap do |mrs|
+          Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), mrs, expires_in: 1.week)
+        end
       end
     end
 
     @response = parse_response(response)
+    if @response[:errors]
+      return respond_to do |format|
+        format.html { render file: "#{Rails.root}/public/500.html", layout: false, status: :internal_server_error }
+        format.xml { head :internal_server_error }
+        format.any { head :internal_server_error }
+      end
+    end
+
     fresh_when(response)
 
     check_changes(previous_response, @response)
@@ -203,6 +213,15 @@ class MergeRequestsController < ApplicationController
 
   def parse_response(response)
     return unless response
+
+    if response.errors
+      {
+        updated_at: response.updated_at,
+        request_duration: response.request_duration,
+        next_update: 1.minute.after(Time.now),
+        errors: response.errors
+      }
+    end
 
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
