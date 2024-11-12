@@ -32,7 +32,7 @@ class MergeRequestsController < ApplicationController
 
     return render_404 unless current_user
 
-    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(params[:assignee]))
+    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
     previous_response = parse_response(response)
 
     response = Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
@@ -79,7 +79,6 @@ class MergeRequestsController < ApplicationController
     end.data.user
 
     assignee = @user&.username
-    return if params[:assignee] == assignee
 
     params[:assignee] = assignee
     save_current_user(assignee)
