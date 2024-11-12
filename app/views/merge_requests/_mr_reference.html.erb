@@ -1,0 +1,9 @@
+<%= render "link", title: merge_request.reference, web_url: merge_request.webUrl %>
+<% if merge_request.upstreamMergeRequest %>
+  <div class="d-inline-flex align-items-center">
+    <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;
+    <%= render "link",
+    title: merge_request.upstreamMergeRequest.reference,
+    web_url: merge_request.upstreamMergeRequest.webUrl %>
+  </div>
+<% end %>

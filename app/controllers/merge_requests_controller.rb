@@ -150,7 +150,7 @@ class MergeRequestsController < ApplicationController
     pipeline.summary ||= pipeline.failureSummary if pipeline.status == "FAILED"
   end
 
-  def convert_core_merge_request(merge_request, open_issues_by_iid, contextual_labels)
+  def convert_core_merge_request(merge_request, merge_requests, open_issues_by_iid, contextual_labels)
     merge_request.tap do |mr|
       mr.issue = issue_from_mr(mr, open_issues_by_iid)
       mr.createdAt = parse_graphql_time(mr.createdAt)
@@ -159,11 +159,15 @@ class MergeRequestsController < ApplicationController
       mr.contextualLabels = mr.labels.nodes.filter do |label|
         contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
       end
+
+      mr.upstreamMergeRequest = merge_requests.select do |target_mr|
+        mr.targetBranch == target_mr.sourceBranch
+      end&.first
     end
   end
 
-  def convert_open_merge_request(merge_request, open_issues_by_iid)
-    convert_core_merge_request(merge_request, open_issues_by_iid, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
+  def convert_open_merge_request(merge_request, open_merge_requests, open_issues_by_iid)
+    convert_core_merge_request(merge_request, open_merge_requests, open_issues_by_iid, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.bootstrapClass = {
         pipeline: pipeline_class(mr.headPipeline),
         mergeStatus: open_merge_request_status_class(mr)
@@ -185,8 +189,8 @@ class MergeRequestsController < ApplicationController
     end
   end
 
-  def convert_merged_merge_request(merge_request, open_issues_by_iid)
-    convert_core_merge_request(merge_request, open_issues_by_iid, MERGED_MRS_CONTEXTUAL_LABELS).tap do |mr|
+  def convert_merged_merge_request(merge_request, merged_merge_requests, open_issues_by_iid)
+    convert_core_merge_request(merge_request, merged_merge_requests, open_issues_by_iid, MERGED_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
@@ -214,9 +218,9 @@ class MergeRequestsController < ApplicationController
       updated_at: response.updated_at,
       request_duration: response.request_duration,
       next_update: next_update,
-      open_merge_requests: open_mrs.map { |mr| convert_open_merge_request(mr, open_issues_by_iid) },
+      open_merge_requests: open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) },
       merged_merge_requests: filter_merged_merge_requests(merged_mrs, open_issues_by_iid).map do |mr|
-        convert_merged_merge_request(mr, open_issues_by_iid)
+        convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
       end
     }
   end
