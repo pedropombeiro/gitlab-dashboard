@@ -17,7 +17,7 @@
 
       <div class="text-secondary small">
         Fetched in
-        <%= @request_duration -%>
+        <%= @response[:request_duration] -%>
         seconds
         <%= render "relative_timestamp", timestamp: @response[:updated_at] %>.
         <% if @response&.fetch(:next_update) %>
