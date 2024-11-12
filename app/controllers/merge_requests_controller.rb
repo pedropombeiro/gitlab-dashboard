@@ -308,23 +308,25 @@ class MergeRequestsController < ApplicationController
 
     # Open MR changes
     changed_labels(previous_response[:open_merge_requests], response[:open_merge_requests]).each do |change|
+      mr = change[:mr]
       notify_user(
         title: "An open MR changed",
-        body: "Labels changed to #{change[:labels].join(", ")}",
-        url: change[:mr].webUrl,
-        tag: change[:mr].iid,
-        timestamp: change[:mr].updatedAt
+        body: "Labels for #{mr.reference} changed to #{change[:labels].join(", ")}",
+        url: mr.webUrl,
+        tag: mr.iid,
+        timestamp: mr.updatedAt
       )
     end
 
     # Merged MR changes
     changed_labels(previous_response[:merged_merge_requests], response[:merged_merge_requests]).each do |change|
+      mr = change[:mr]
       notify_user(
         title: "A merged MR changed",
-        body: "Labels changed to #{change[:labels].join(", ")}",
-        url: change[:mr].webUrl,
-        tag: change[:mr].iid,
-        timestamp: change[:mr].updatedAt
+        body: "Labels for #{mr.reference} changed to #{change[:labels].join(", ")}",
+        url: mr.webUrl,
+        tag: mr.iid,
+        timestamp: mr.updatedAt
       )
     end
   end
