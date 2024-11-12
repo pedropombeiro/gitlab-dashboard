@@ -1,5 +1,5 @@
 class WebPushSubscription < ApplicationRecord
-  # encrypts :auth_key, :p256dh_key
+  encrypts :auth_key, :p256dh_key
 
   belongs_to :gitlab_user
 
