@@ -3,6 +3,8 @@
 module MrStatusOrnamentsConcern
   extend ActiveSupport::Concern
 
+  include HumanizeHelper
+
   MERGE_STATUS_BS_CLASS = {
     "BLOCKED_STATUS" => "secondary",
     "CI_STILL_RUNNING" => "primary",
@@ -34,7 +36,7 @@ module MrStatusOrnamentsConcern
   end
 
   def open_merge_request_status_label(mr)
-    status = humanized_enum(mr.detailedMergeStatus.sub("STATUS", ""))
+    status = humanized_enum(mr.detailedMergeStatus.remove("STATUS"))
 
     return "Returned to you" if returned_to_assignee?(mr)
     return "Waiting for others" if waiting_for_others?(mr)

@@ -3,26 +3,22 @@
 require "async"
 
 class MergeRequestsController < ApplicationController
+  helper MergeRequestsHelper
+  helper MergeRequestsPipelineHelper
+
   include CacheConcern
   include GitlabApiConcern
-  include MrStatusOrnamentsConcern
-  include ReviewerOrnamentsConcern
+  include HumanizeHelper
+  include MergeRequestsParsingHelper
 
-  MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
-
-  DEPLOYMENT_LABELS = ["Pick into auto-deploy"].freeze
-  WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys.freeze
-  OPEN_MRS_CONTEXTUAL_LABELS = ["pipeline::"].freeze
-  MERGED_MRS_CONTEXTUAL_LABELS = (DEPLOYMENT_LABELS + WORKFLOW_LABELS).freeze
-
-  helper_method :humanized_enum, :make_full_url, :user_help_title, :reviewer_help_title
+  helper_method :make_full_url
 
   def index
     ensure_assignee
 
     response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(params[:assignee]))
 
-    @response = parse_response(response)
+    @dto = parse_dto(response)
     fresh_when(response)
   end
 
@@ -32,10 +28,10 @@ class MergeRequestsController < ApplicationController
 
     return render_404 unless current_user
 
-    previous_response = nil
+    previous_dto = nil
     if current_user.web_push_subscriptions.any?
       response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
-      previous_response = parse_response(response)
+      previous_dto = parse_dto(response)
     end
 
     response = Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
@@ -60,8 +56,8 @@ class MergeRequestsController < ApplicationController
       end
     end
 
-    @response = parse_response(response)
-    if @response[:errors]
+    @dto = parse_dto(response)
+    if @dto.errors
       return respond_to do |format|
         format.html { render file: "#{Rails.root}/public/500.html", layout: false, status: :internal_server_error }
         format.xml { head :internal_server_error }
@@ -71,7 +67,7 @@ class MergeRequestsController < ApplicationController
 
     fresh_when(response)
 
-    check_changes(previous_response, @response) if current_user.web_push_subscriptions.any?
+    check_changes(previous_dto, @dto) if current_user.web_push_subscriptions.any?
 
     respond_to do |format|
       format.html
@@ -105,202 +101,22 @@ class MergeRequestsController < ApplicationController
     end
   end
 
-  def parse_graphql_time(timestamp)
-    Time.parse(timestamp) if timestamp
-  end
-
-  def convert_mr_pipeline(pipeline)
-    return unless pipeline
-
-    failed_jobs = pipeline.failedJobs
-    failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }
-
-    pipeline.startedAt = parse_graphql_time(pipeline.startedAt)
-    pipeline.finishedAt = parse_graphql_time(pipeline.finishedAt)
-
-    pipeline.webUrl =
-      if pipeline.path
-        web_path = pipeline.path
-
-        # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
-        web_path =
-          if failed_job_traces.count > 1
-            "#{web_path}/failures"
-          else
-            case pipeline.status
-            when "RUNNING"
-              pipeline.summary = "#{helpers.pluralize(pipeline.runningJobs.count, "job")} still running"
-              pipeline.status += " (#{pipeline.finishedJobs.count.to_i * 100 / pipeline.jobs.count.to_i}%)"
-
-              pipeline.runningJobs.count == 1 ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
-            when "FAILED"
-              failed_job_traces.count == 1 ? failed_job_traces.first.webPath : "#{web_path}/failures"
-            else
-              web_path
-            end
-          end
-
-        make_full_url(web_path)
-      end
-
-    tag = view_context.tag
-    header = "#{helpers.pluralize(failed_jobs.count, "job")} #{helpers.pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:"
-    pipeline.failureSummary =
-      if failed_job_traces.count == 1
-        failed_job_trace = failed_job_traces.first
-
-        [
-          "#{header} #{tag.code(failed_job_trace.name, escape: false)}",
-          "#{failed_job_trace.trace.htmlSummary}"
-        ].join("<br/>")
-      elsif failed_jobs.count.positive?
-        <<~HTML
-          #{header}<br/><br/>
-          #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
-        HTML
-      end
-
-    pipeline.summary ||= pipeline.failureSummary if pipeline.status == "FAILED"
-  end
-
-  def convert_core_merge_request(merge_request, merge_requests, open_issues_by_iid, contextual_labels)
-    merge_request.tap do |mr|
-      mr.issue = issue_from_mr(mr, open_issues_by_iid)
-      mr.createdAt = parse_graphql_time(mr.createdAt)
-      mr.updatedAt = parse_graphql_time(mr.updatedAt)
-
-      mr.contextualLabels = mr.labels.nodes.filter do |label|
-        contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
-      end
-
-      mr.upstreamMergeRequest = merge_requests.select do |target_mr|
-        mr.targetBranch == target_mr.sourceBranch
-      end&.first
-    end
-  end
-
-  def convert_open_merge_request(merge_request, open_merge_requests, open_issues_by_iid)
-    convert_core_merge_request(merge_request, open_merge_requests, open_issues_by_iid, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
-      mr.bootstrapClass = {
-        pipeline: pipeline_class(mr.headPipeline),
-        mergeStatus: open_merge_request_status_class(mr)
-      }
-
-      convert_mr_pipeline(mr.headPipeline)
-
-      mr.mergeStatusLabel = open_merge_request_status_label(mr)
-      mr.labels.nodes.each { |label| label.bootstrapClass = [] } # Use label's predefined colors
-      mr.reviewers.nodes.each do |reviewer|
-        reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
-        reviewer.review = reviewer.mergeRequestInteraction.reviewState
-        reviewer.bootstrapClass = {
-          text: review_text_class(reviewer),
-          icon: review_icon_class(reviewer),
-          activity_icon: user_activity_icon_class(reviewer)
-        }.compact
-      end
-    end
-  end
-
-  def convert_merged_merge_request(merge_request, merged_merge_requests, open_issues_by_iid)
-    convert_core_merge_request(merge_request, merged_merge_requests, open_issues_by_iid, MERGED_MRS_CONTEXTUAL_LABELS).tap do |mr|
-      mr.mergedAt = parse_graphql_time(mr.mergedAt)
-      mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
-
-      mr.labels.nodes.each do |label|
-        label.bootstrapClass = workflow_label_class(label.title)
-        label.title.delete_prefix!(WORKFLOW_LABEL_NS)
-      end
-    end
-  end
-
-  def parse_response(response)
-    return unless response
-
-    if response.errors
-      {
-        updated_at: response.updated_at,
-        request_duration: response.request_duration,
-        next_update: 1.minute.after(Time.now),
-        errors: response.errors
-      }
+  def parse_dto(response)
+    open_issues_by_iid = []
+    if response
+      open_merge_requests = response.user.openMergeRequests.nodes
+      merged_merge_requests = response.user.mergedMergeRequests.nodes
+      open_issues_by_iid = issues_from_merge_requests(open_merge_requests, merged_merge_requests)
     end
 
-    open_mrs = response.user.openMergeRequests.nodes
-    merged_mrs = response.user.mergedMergeRequests.nodes
-    open_issues_by_iid = issues_from_merge_requests(open_mrs, merged_mrs)
-    next_update =
+    cache_validity =
       if Rails.application.config.action_controller.perform_caching
-        MR_CACHE_VALIDITY.after(response.updated_at)
+        MR_CACHE_VALIDITY
       else
         nil
       end
 
-    {
-      updated_at: response.updated_at,
-      request_duration: response.request_duration,
-      next_update: next_update,
-      open_merge_requests: open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) },
-      merged_merge_requests: filter_merged_merge_requests(merged_mrs, open_issues_by_iid).map do |mr|
-        convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
-      end
-    }
-  end
-
-  def make_full_url(path)
-    return path if path.nil? || path.start_with?("http")
-
-    "#{gitlab_instance_url}#{path}"
-  end
-
-  def humanized_enum(value)
-    value.tr("_", " ").capitalize.sub("Ci ", "CI ").strip
-  end
-
-  def tooltip_from_hash(hash)
-    tag = view_context.tag
-
-    hash
-      .filter_map { |title, value| value.present? ? tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) : nil }
-      .join
-  end
-
-  def user_help_hash(user)
-    {
-      "Location": user.location,
-      "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{helpers.time_ago_in_words(user.lastActivityOn)} ago",
-      "Message": user.status&.message
-    }
-  end
-
-  def user_help_title(user)
-    tooltip_from_hash(user_help_hash(user))
-  end
-
-  def reviewer_help_title(reviewer)
-    tooltip_from_hash(
-      "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
-      "Active reviews": reviewer.activeReviews.count,
-      **user_help_hash(reviewer)
-    )
-  end
-
-  def user_activity_icon_class(user)
-    %w[fa-solid fa-moon] if user.lastActivityOn < 1.day.ago
-  end
-
-  def issue_iid_from_mr(mr)
-    match_data = MR_ISSUE_PATTERN.match(mr.sourceBranch)
-    match_data&.named_captures&.fetch("issue_id")
-  end
-
-  def issue_from_mr(mr, open_issues_by_iid)
-    iid = issue_iid_from_mr(mr)
-    open_issues_by_iid[iid]
-  end
-
-  def merge_request_issue_iids(merge_requests)
-    merge_requests.to_h { |mr| [mr.iid, issue_iid_from_mr(mr)] }
+    ::MergeRequestsDto.new(response, open_issues_by_iid, cache_validity)
   end
 
   def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
@@ -313,23 +129,11 @@ class MergeRequestsController < ApplicationController
     end&.to_h { |issue| [issue.iid, issue] }
   end
 
-  def filter_merged_merge_requests(merge_requests, open_issues_by_iid)
-    return unless open_issues_by_iid
-
-    open_mr_issue_iids = open_issues_by_iid.keys
-    merged_request_issue_iids = merge_request_issue_iids(merge_requests)
-
-    merge_requests.filter do |mr|
-      open_mr_issue_iids.include?(merged_request_issue_iids[mr.iid]) ||
-        mr.mergedAt >= 2.days.ago
-    end
-  end
-
-  def check_changes(previous_response, response)
-    return unless previous_response
+  def check_changes(previous_dto, dto)
+    return unless previous_dto
 
     # Open MR changes
-    changed_labels(previous_response[:open_merge_requests], response[:open_merge_requests]).each do |change|
+    changed_labels(previous_dto.open_merge_requests, dto.open_merge_requests).each do |change|
       mr = change[:mr]
       notify_user(
         title: "An open MR changed",
@@ -341,7 +145,7 @@ class MergeRequestsController < ApplicationController
     end
 
     # Merged MR changes
-    changed_labels(previous_response[:merged_merge_requests], response[:merged_merge_requests]).each do |change|
+    changed_labels(previous_dto.merged_merge_requests, dto.merged_merge_requests).each do |change|
       mr = change[:mr]
       notify_user(
         title: "A merged MR changed",
@@ -354,6 +158,8 @@ class MergeRequestsController < ApplicationController
   end
 
   def changed_labels(previous_mrs, mrs)
+    return [] unless previous_mrs
+
     mrs.filter_map do |mr|
       previous_mr_version = previous_mrs.select { |prev_mr| prev_mr.iid == mr.iid }.first
       next if previous_mr_version.nil?

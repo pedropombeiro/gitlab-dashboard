@@ -61,6 +61,12 @@ module GitlabApiConcern
     @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
   end
 
+  def make_full_url(path)
+    return path if path.nil? || path.start_with?("http")
+
+    "#{gitlab_instance_url}#{path}"
+  end
+
   def fetch_user(username)
     response = client.query <<-GRAPHQL
       query {

@@ -17,12 +17,12 @@
 
       <div class="text-secondary small">
         Fetched in
-        <%= @response[:request_duration] -%>
+        <%= @dto.request_duration -%>
         seconds
-        <%= render "relative_timestamp", timestamp: @response[:updated_at] %>.
-        <% if @response&.fetch(:next_update) %>
+        <%= render "relative_timestamp", timestamp: @dto.updated_at %>.
+        <% if @dto.next_update %>
           <span>Cached until
-            <%= @response[:next_update].localtime.to_formatted_s(:time) -%>.</span>
+            <%= @dto.next_update.localtime.to_formatted_s(:time) -%>.</span>
         <% else %>
           <span>Not cached.</span>
         <% end %>
@@ -106,16 +106,18 @@
 
             <% if pipeline %>
               <% failed_jobs = pipeline.failedJobs.nodes %>
+              <% summary = pipeline_summary(pipeline) %>
+              <% web_url = pipeline_web_url(pipeline) %>
 
               <%= tag.span(class: %w[badge badge-pill] + ["bg-#{mr.bootstrapClass[:pipeline]}"]) do %>
                 <%= link_to humanized_enum(pipeline.status) || "??",
-                pipeline.webUrl,
+                web_url,
                 class: "text-light",
                 target: "_blank",
                 **(
-                  if pipeline.summary
+                  if summary
                     {
-                      title: pipeline.summary,
+                      title: summary,
                       data: {
                         bs_toggle: "tooltip",
                         bs_html: "true",
@@ -129,10 +131,10 @@
               <% end %>
 
               <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
-                <%= link_to(pipeline.webUrl, target: "_blank", style: [ "text-decoration: none" ]) do %>
+                <%= link_to(web_url, target: "_blank", style: [ "text-decoration: none" ]) do %>
                   <%= render "abbr_with_title",
                   content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
-                  title: pipeline.failureSummary,
+                  title: pipeline_failure_summary(pipeline),
                   class: "text-warning",
                   data: {
                     bs_html: "true",
