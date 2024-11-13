@@ -25,20 +25,28 @@ function promptForNotifications() {
   const notificationsButton = document.getElementById("enable_notifications_button");
   if (!notificationsButton) return;
 
-  notificationsButton.classList.remove("d-none");
-  notificationsButton.addEventListener("click", (event) => {
-    event.preventDefault();
-    Notification.requestPermission()
-      .then((permission) => {
+  // Check if the browser supports notifications
+  if ("Notification" in window) {
+    notificationsButton.classList.remove("d-none");
+    notificationsButton.addEventListener("click", async (event) => {
+      event.preventDefault();
+
+      // Request permission from the user to send notifications
+      try {
+        permission = await Notification.requestPermission()
         if (permission === "granted") {
           setupSubscription();
         } else {
           alert("Notifications declined");
         }
-      })
-      .catch((error) => console.log("Notifications error", error))
-      .finally(() => notificationsButton.classList.add("d-none"));
-  });
+      } catch (error) {
+        console.log("Notifications error", error)
+      }
+      finally {
+        notificationsButton.classList.add("d-none");
+      }
+    });
+  }
 }
 
 async function setupSubscription() {
@@ -54,11 +62,21 @@ async function setupSubscription() {
     applicationServerKey: vapid,
   });
 
-  await fetch("/web_push_subscriptions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(subscription),
-  });
+  try {
+    const response = await fetch("/web_push_subscriptions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(subscription),
+    });
+
+    if (response.ok) {
+      console.log("Subscription successfully saved on the server.");
+    } else {
+      console.error("Error saving subscription on the server.");
+    }
+  } catch (error) {
+    console.error("Error sending subscription to the server:", error);
+  }
 }
