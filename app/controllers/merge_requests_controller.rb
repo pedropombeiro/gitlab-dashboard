@@ -32,8 +32,11 @@ class MergeRequestsController < ApplicationController
 
     return render_404 unless current_user
 
-    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
-    previous_response = parse_response(response)
+    previous_response = nil
+    if current_user.web_push_subscriptions.any?
+      response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
+      previous_response = parse_response(response)
+    end
 
     response = Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
       start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -68,7 +71,7 @@ class MergeRequestsController < ApplicationController
 
     fresh_when(response)
 
-    check_changes(previous_response, @response)
+    check_changes(previous_response, @response) if current_user.web_push_subscriptions.any?
 
     respond_to do |format|
       format.html
