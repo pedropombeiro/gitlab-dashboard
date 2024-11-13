@@ -12,7 +12,7 @@
 
 ActiveRecord::Schema[8.0].define(version: 2024_11_13_170325) do
   create_table "gitlab_users", force: :cascade do |t|
-    t.string "username", null: false
+    t.text "username", limit: 256, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "contacted_at"
@@ -21,12 +21,12 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_13_170325) do
 
   create_table "web_push_subscriptions", force: :cascade do |t|
     t.integer "gitlab_user_id", null: false
-    t.text "endpoint", null: false
-    t.text "auth_key", null: false
-    t.text "p256dh_key", null: false
+    t.text "endpoint", limit: 1024, null: false
+    t.text "auth_key", limit: 256, null: false
+    t.text "p256dh_key", limit: 256, null: false
+    t.text "user_agent", limit: 512, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.text "user_agent"
     t.index ["gitlab_user_id"], name: "index_web_push_subscriptions_on_gitlab_user_id"
   end
 
