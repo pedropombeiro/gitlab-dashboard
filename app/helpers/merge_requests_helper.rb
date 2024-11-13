@@ -1,11 +1,12 @@
 module MergeRequestsHelper
+  include ActionView::Helpers::DateHelper
   include ActionView::Helpers::TagHelper
   include HumanizeHelper
 
   def user_help_hash(user)
     {
       "Location": user.location,
-      "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{helpers.time_ago_in_words(user.lastActivityOn)} ago",
+      "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
       "Message": user.status&.message
     }
   end
