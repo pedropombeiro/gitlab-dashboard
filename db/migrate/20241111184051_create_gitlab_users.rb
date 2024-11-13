@@ -1,7 +1,7 @@
 class CreateGitlabUsers < ActiveRecord::Migration[8.0]
   def change
     create_table :gitlab_users do |t|
-      t.string :username, null: false
+      t.text :username, null: false, limit: 256
 
       t.timestamps null: false
 
