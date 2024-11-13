@@ -1,7 +1,8 @@
-<nobr>
+<nobr data-controller="clipboard">
   <%= link_to title,
   web_url,
   data: {
+    clipboard_target: "source",
     bs_toggle: "tooltip",
     bs_custom_class: "x-wide-tooltip",
     bs_title: web_url,
@@ -9,5 +10,5 @@
   target: "_blank",
   **(local_assigns.except(:title, :web_url) || {}) %>
 
-  <%= render "clipboard_button", text: title %>
+  <%= render "clipboard_button" %>
 </nobr>

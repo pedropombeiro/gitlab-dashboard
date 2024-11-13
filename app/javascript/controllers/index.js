@@ -4,5 +4,8 @@
 
 import { application } from "./application"
 
+import ClipboardController from "./clipboard_controller"
+application.register("clipboard", ClipboardController)
+
 import WebPushController from "./web_push_controller"
 application.register("web-push", WebPushController)

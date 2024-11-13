@@ -1,13 +1,14 @@
-<span class="d-none d-md-flex align-items-center">
+<span data-controller="clipboard" class="d-none d-md-flex align-items-center">
   <i class="fa-solid fa-code-branch"></i>
   <%= tag.span(
     branch_name,
     class: %w[text-truncate mx-1 small],
     data: {
+      clipboard_target: "source",
       bs_toggle: "tooltip",
       bs_custom_class: "x-wide-tooltip",
       bs_title: branch_name,
     },
   ) %>
-  <%= render "clipboard_button", text: branch_name %>
+  <%= render "clipboard_button" %>
 </span>

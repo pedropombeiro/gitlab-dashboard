@@ -1,11 +1,14 @@
-<%= tag.i(
-  class: %w[fa fa-clipboard float-right d-none d-sm-inline],
+<%= tag.button(
+  class: %w[btn p-0 shadow-none float-right d-none d-sm-inline],
   aria: {
     hidden: "true",
   },
+  focusable: false,
   data: {
+    action: "clipboard#copy",
     bs_toggle: "tooltip",
     bs_title: "Click to copy",
   },
-  onclick: "navigator.clipboard.writeText('#{text}')",
-) %>
+) do %>
+  <i class="fa fa-clipboard"></i>
+<% end %>
