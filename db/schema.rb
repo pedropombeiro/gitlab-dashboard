@@ -10,11 +10,12 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_12_023806) do
+ActiveRecord::Schema[8.0].define(version: 2024_11_13_170325) do
   create_table "gitlab_users", force: :cascade do |t|
     t.string "username", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "contacted_at"
     t.index ["username"], name: "index_gitlab_users_on_username", unique: true
   end
 
