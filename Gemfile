@@ -62,6 +62,7 @@ group :development do
   gem "web-console"
 
   gem "hotwire-livereload", "~> 1.4"
+  gem "spring"
 end
 
 group :test do
