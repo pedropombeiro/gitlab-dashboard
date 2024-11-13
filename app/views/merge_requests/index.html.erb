@@ -55,18 +55,18 @@
       <div class="spinner-border me-3" role="status" aria-hidden="true"></div>
       <div>
         <span>Loading merge requests…</span>
-        <% if @response %>
+        <% if @dto.has_content? %>
           <span>(last fetched
-            <%= render("relative_timestamp", timestamp: @response[:updated_at]) -%>)</span>
+            <%= render("relative_timestamp", timestamp: @dto.updated_at) -%>)</span>
         <% end %>
       </div>
     </div>
 
-    <% if @response %>
+    <% if @dto.has_content? %>
       <!-- Show last stored state, while we wait for the refreshed state -->
       <%= render "user_merge_requests",
-      open_merge_requests: @response[:open_merge_requests],
-      merged_merge_requests: @response[:merged_merge_requests] %>
+      open_merge_requests: @dto.open_merge_requests,
+      merged_merge_requests: @dto.merged_merge_requests %>
     <% end %>
   <% end %>
 </div>
