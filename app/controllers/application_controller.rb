@@ -31,6 +31,9 @@ class ApplicationController < ActionController::Base
     rescue WebPush::ExpiredSubscription
       Rails.logger.info "Removing expired WebPush subscription"
       subscription.destroy
+    rescue ActiveRecord::Encryption::Errors::Decryption
+      Rails.logger.info "Invalid WebPush subscription"
+      subscription.destroy
     end
   end
 end
