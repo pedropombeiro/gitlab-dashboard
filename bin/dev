@@ -8,4 +8,6 @@ fi
 # Default to port 3000 if not specified
 export PORT="${PORT:-3000}"
 
+export SOLID_QUEUE_IN_PUMA=1
+
 exec foreman start -f Procfile.dev --env /dev/null "$@"
