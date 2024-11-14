@@ -5,6 +5,11 @@ $enable-shadows: true;
 @import '../../../node_modules/bootstrap-icons/font/bootstrap-icons';
 
 body { background: $gray-200 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
+@if $enable-gradients {
+  .table th, td {
+    background-color: transparent !important;
+  }
+}
 
 .wide-tooltip {
   --bs-tooltip-max-width: 400px !important;
