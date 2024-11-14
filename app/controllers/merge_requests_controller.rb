@@ -34,7 +34,7 @@ class MergeRequestsController < ApplicationController
       previous_dto = parse_dto(response)
     end
 
-    response = FetchMergeRequestsHelper.new(assignee).execute
+    response = Services::FetchMergeRequestsService.new(assignee).execute
 
     @dto = parse_dto(response)
     if @dto.errors
