@@ -109,31 +109,27 @@ class MergeRequestsController < ApplicationController
     end&.to_h { |issue| [issue.iid, issue] }
   end
 
+  def notify_label_change(mr)
+    notify_user(
+      title: "A merged MR changed",
+      body: "#{mr.titleHtml} (#{mr.reference}) changed to #{change[:labels].join(", ")}",
+      url: mr.webUrl,
+      tag: mr.iid,
+      timestamp: mr.updatedAt
+    )
+  end
+
   def check_changes(previous_dto, dto)
     return unless previous_dto
 
     # Open MR changes
     changed_labels(previous_dto.open_merge_requests, dto.open_merge_requests).each do |change|
-      mr = change[:mr]
-      notify_user(
-        title: "An open MR changed",
-        body: "Labels for #{mr.reference} changed to #{change[:labels].join(", ")}",
-        url: mr.webUrl,
-        tag: mr.iid,
-        timestamp: mr.updatedAt
-      )
+      notify_label_change("An open MR changed", change[:mr])
     end
 
     # Merged MR changes
     changed_labels(previous_dto.merged_merge_requests, dto.merged_merge_requests).each do |change|
-      mr = change[:mr]
-      notify_user(
-        title: "A merged MR changed",
-        body: "Labels for #{mr.reference} changed to #{change[:labels].join(", ")}",
-        url: mr.webUrl,
-        tag: mr.iid,
-        timestamp: mr.updatedAt
-      )
+      notify_label_change("A merged MR changed", change[:mr])
     end
   end
 
