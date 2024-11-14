@@ -1,5 +1,7 @@
+<% class_suffix = reviewer.bootstrapClass[:text] %>
+
 <%= tag.span(
-  class: %w[badge shadow bg-gradient] + (reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[bg-secondary]),
+  class: %w[badge shadow bg-gradient] + ["bg-review-#{class_suffix}", "text-review-#{class_suffix}"],
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
@@ -11,8 +13,7 @@
     reviewer.username,
     reviewer.webUrl,
     target: "_blank",
-    class:
-      reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[text-body],
+    class: ["bg-transparent", "text-review-#{class_suffix}"],
   ) %>
   <% if reviewer.status&.availability == "BUSY" %>
     <%= tag.abbr(
@@ -23,7 +24,7 @@
       },
     ) %>
   <% end %>
-  <%= tag.span(class: "text-#{reviewer.bootstrapClass[:text]}") do %>
+  <%= tag.span do %>
     <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
       <%= tag.i class: reviewer.bootstrapClass[:icon] %>
     <% end %>
