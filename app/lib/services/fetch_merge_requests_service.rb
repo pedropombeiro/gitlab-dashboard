@@ -5,7 +5,6 @@ require "async"
 module Services
   class FetchMergeRequestsService
     include CacheConcern
-    include GitlabApiConcern
 
     def initialize(assignee)
       @assignee = assignee
@@ -14,13 +13,14 @@ module Services
     def execute
       Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
         start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+        gitlab_client = GitlabClient.new
         merge_requests = nil
         merged_merge_requests = nil
 
         Sync do
           # Fetch merge requests in 2 calls to reduce query complexity
-          Async { merge_requests = fetch_open_merge_requests(assignee) }
-          Async { merged_merge_requests = fetch_merged_merge_requests(assignee) }
+          Async { merge_requests = gitlab_client.fetch_open_merge_requests(assignee) }
+          Async { merged_merge_requests = gitlab_client.fetch_merged_merge_requests(assignee) }
         end
 
         end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
