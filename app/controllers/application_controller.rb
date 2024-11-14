@@ -16,20 +16,21 @@ class ApplicationController < ActionController::Base
     @current_user ||= GitlabUser.find_by_username!(session[:user_id])
   end
 
-  def notify_user(title:, body:, icon: nil, badge: nil, **payload)
+  def notify_user(title:, body:, icon: nil, badge: nil, url: nil, **message)
     icon ||= ActionController::Base.helpers.asset_url("apple-touch-icon-180x180.png")
     badge ||= ActionController::Base.helpers.asset_url("apple-touch-icon-120x120.png")
-    merged_payload = {
+    merged_message = {
       title: title,
       options: {
         badge: badge,
         body: body,
+        data: url ? { url: url } : nil,
         icon: icon
-      }.merge(payload)
+      }.compact.merge(message)
     }
 
     current_user&.web_push_subscriptions.each do |subscription|
-      subscription.publish(merged_payload)
+      subscription.publish(merged_message)
     rescue WebPush::ExpiredSubscription
       Rails.logger.info "Removing expired WebPush subscription"
       subscription.destroy

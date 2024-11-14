@@ -6,6 +6,7 @@ class WebPushSubscription < ApplicationRecord
   def publish(data)
     WebPush.payload_send(
       message: data.to_json,
+      ttl: 8.hours.in_seconds,
       endpoint: endpoint,
       p256dh: p256dh_key,
       auth: auth_key,
