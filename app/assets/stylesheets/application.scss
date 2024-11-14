@@ -22,3 +22,21 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 .tooltip-inner {
   text-align: left;
 }
+
+.bg-review-unreviewed { background-color: $blue-500 }
+.text-review-unreviewed { color: $white }
+
+.bg-review-review-started { background-color: $indigo-200 }
+.text-review-review-started { color: $black }
+
+.bg-review-requested-changes { background-color: $red-700 }
+.text-review-requested-changes { color: $white }
+
+.bg-review-reviewed { background-color: $teal-700 }
+.text-review-reviewed { color: $white }
+
+.bg-review-approved { background-color: $green-300 }
+.text-review-approved { color: $white }
+
+.bg-review-unapproved { background-color: $orange-400 }
+.text-review-unapproved { color: $black }

@@ -12,20 +12,11 @@ module ReviewerOrnamentsConcern
     "REVIEW_STARTED" => "fa-solid fa-hourglass-half"
   }.freeze
 
-  REVIEW_TEXT_BS_CLASS = {
-    "UNREVIEWED" => "light",
-    "REVIEWED" => "info",
-    "REQUESTED_CHANGES" => "danger",
-    "APPROVED" => "success",
-    "UNAPPROVED" => "info",
-    "REVIEW_STARTED" => "info"
-  }.freeze
-
-  def review_text_class(reviewer)
-    REVIEW_TEXT_BS_CLASS[reviewer.mergeRequestInteraction.reviewState]
-  end
-
   def review_icon_class(reviewer)
     REVIEW_ICON[reviewer.mergeRequestInteraction.reviewState]
+  end
+
+  def review_text_class(reviewer)
+    reviewer.mergeRequestInteraction.reviewState.downcase.tr("_", "-")
   end
 end
