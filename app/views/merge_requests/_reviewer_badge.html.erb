@@ -12,7 +12,7 @@
     reviewer.webUrl,
     target: "_blank",
     class:
-      reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[text-light],
+      reviewer.review == "APPROVED" ? %w[bg-info text-light] : %w[text-body],
   ) %>
   <% if reviewer.status&.availability == "BUSY" %>
     <%= tag.abbr(
