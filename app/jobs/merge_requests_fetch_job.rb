@@ -4,6 +4,6 @@ class MergeRequestsFetchJob < ApplicationJob
   queue_as :default
 
   def perform(assignee)
-    FetchMergeRequestsHelper.new(assignee).execute
+    Services::FetchMergeRequestsService.new(assignee).execute
   end
 end
