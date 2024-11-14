@@ -7,10 +7,10 @@ class MergeRequestsController < ApplicationController
   helper MergeRequestsPipelineHelper
 
   include CacheConcern
-  include GitlabApiConcern
   include HumanizeHelper
   include MergeRequestsParsingHelper
 
+  delegate :make_full_url, to: :gitlab_client
   helper_method :make_full_url
 
   def index
@@ -57,6 +57,10 @@ class MergeRequestsController < ApplicationController
 
   private
 
+  def gitlab_client
+    @gitlab_client ||= GitlabClient.new
+  end
+
   def ensure_assignee
     unless params[:assignee] || Rails.application.credentials.gitlab_token
       return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
@@ -64,7 +68,7 @@ class MergeRequestsController < ApplicationController
 
     assignee = params[:assignee]
     @user = Rails.cache.fetch(self.class.user_cache_key(assignee), expires_in: USER_CACHE_VALIDITY) do
-      fetch_user(assignee)
+      gitlab_client.fetch_user(assignee)
     end.data.user
 
     assignee = @user&.username
@@ -105,7 +109,7 @@ class MergeRequestsController < ApplicationController
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).sort.uniq
 
     Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: MR_CACHE_VALIDITY) do
-      fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
+      gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     end&.to_h { |issue| [issue.iid, issue] }
   end
 
