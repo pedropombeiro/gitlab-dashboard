@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require "async"
-
 class MergeRequestsController < ApplicationController
   helper MergeRequestsHelper
   helper MergeRequestsPipelineHelper
@@ -34,7 +32,7 @@ class MergeRequestsController < ApplicationController
       previous_dto = parse_dto(response)
     end
 
-    response = Services::FetchMergeRequestsService.new(assignee).execute
+    response = MergeRequestsFetchJob.new.perform(assignee)
 
     @dto = parse_dto(response)
     if @dto.errors
