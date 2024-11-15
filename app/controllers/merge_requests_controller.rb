@@ -102,9 +102,9 @@ class MergeRequestsController < ApplicationController
   end
 
   def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
-    open_mr_issue_iids = merge_request_issue_iids(open_merge_requests).values.compact.sort.uniq
-    merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).values.compact.sort.uniq
-    issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).sort.uniq
+    open_mr_issue_iids = merge_request_issue_iids(open_merge_requests).uniq
+    merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).uniq
+    issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).map { |h| h[:issue_iid] }.compact.sort.uniq
 
     Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: MR_CACHE_VALIDITY) do
       gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
