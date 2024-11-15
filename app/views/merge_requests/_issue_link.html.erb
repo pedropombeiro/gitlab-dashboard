@@ -7,3 +7,10 @@ data: {
   bs_custom_class: "x-wide-tooltip",
   bs_title: issue.titleHtml,
 } %>
+
+<div>
+  <%= render partial: "gitlab_label",
+  spacer_template: "space",
+  collection: issue.contextualLabels,
+  as: :label %>
+</div>
