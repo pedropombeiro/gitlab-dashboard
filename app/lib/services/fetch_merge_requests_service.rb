@@ -21,17 +21,18 @@ module Services
           # Fetch merge requests in 2 calls to reduce query complexity
           Async { merge_requests = gitlab_client.fetch_open_merge_requests(assignee) }
           Async { merged_merge_requests = gitlab_client.fetch_merged_merge_requests(assignee) }
-        end
+        end.wait
 
         end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
         merge_requests.request_duration = (end_t - start_t).seconds.round(1)
-        unless merge_requests.errors || merged_merge_requests.errors
+        # merge_requests.errors ||= merged_merge_requests&.errors
+        if merge_requests.errors.nil?
           merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
-          merge_requests.tap do |mrs|
-            Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), mrs, expires_in: 1.week)
-          end
+          Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), merge_requests, expires_in: 1.week)
         end
+
+        merge_requests
       end
     end
 

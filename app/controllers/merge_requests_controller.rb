@@ -32,7 +32,7 @@ class MergeRequestsController < ApplicationController
       previous_dto = parse_dto(response)
     end
 
-    response = MergeRequestsFetchJob.new.perform(assignee)
+    response = Services::FetchMergeRequestsService.new(assignee).execute
 
     @dto = parse_dto(response)
     if @dto.errors
@@ -85,7 +85,7 @@ class MergeRequestsController < ApplicationController
 
   def parse_dto(response)
     open_issues_by_iid = []
-    if response
+    if response && response.errors.nil?
       open_merge_requests = response.user.openMergeRequests.nodes
       merged_merge_requests = response.user.mergedMergeRequests.nodes
       open_issues_by_iid = issues_from_merge_requests(open_merge_requests, merged_merge_requests)
