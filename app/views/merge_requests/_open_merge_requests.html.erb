@@ -238,17 +238,7 @@
         </td>
         <!-- Associated Issue -->
         <td scope="row">
-          <% if mr.issue %>
-            <%= render "link",
-            title: "\##{mr.issue.iid}",
-            web_url: mr.issue.webUrl,
-            data: {
-              bs_toggle: "tooltip",
-              bs_html: "true",
-              bs_custom_class: "x-wide-tooltip",
-              bs_title: mr.issue.titleHtml,
-            } %>
-          <% end %>
+          <%= render("issue_link", issue: mr.issue) if mr.issue %>
         </td>
       <% end %>
     <% end %>
