@@ -9,6 +9,7 @@ class MergeRequestsDto
   WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys.freeze
   OPEN_MRS_CONTEXTUAL_LABELS = ["pipeline::"].freeze
   MERGED_MRS_CONTEXTUAL_LABELS = (DEPLOYMENT_LABELS + WORKFLOW_LABELS).freeze
+  ISSUE_CONTEXTUAL_LABELS = ["workflow::"].freeze
 
   attr_reader :errors, :updated_at, :request_duration, :next_update
   attr_reader :open_merge_requests, :merged_merge_requests
@@ -64,6 +65,14 @@ class MergeRequestsDto
 
       mr.contextualLabels = mr.labels.nodes.filter do |label|
         contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
+      end
+
+      if mr.issue
+        mr.issue.contextualLabels = mr.issue.labels.nodes.filter do |label|
+          ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+          label.bootstrapClass = [] # Use label's predefined colors
+          label.title.delete_prefix!(WORKFLOW_LABEL_NS)
+        end
       end
 
       mr.upstreamMergeRequest = merge_requests.select do |target_mr|

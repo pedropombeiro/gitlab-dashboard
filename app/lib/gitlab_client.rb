@@ -23,11 +23,23 @@ class GitlabClient
       }
     GRAPHQL
 
+  CORE_LABEL_FRAGMENT = <<-GRAPHQL
+      fragment CoreLabelFields on Label {
+        title
+        descriptionHtml
+        color
+        textColor
+      }
+    GRAPHQL
+
   CORE_ISSUE_FRAGMENT = <<-GRAPHQL
       fragment CoreIssueFields on Issue {
         iid
         webUrl
         titleHtml
+        labels {
+          nodes { ...CoreLabelFields }
+        }
       }
     GRAPHQL
 
@@ -45,12 +57,7 @@ class GitlabClient
           nodes { ...CoreUserFields }
         }
         labels {
-          nodes {
-            title
-            descriptionHtml
-            color
-            textColor
-          }
+          nodes { ...CoreLabelFields }
         }
       }
     GRAPHQL
@@ -154,6 +161,7 @@ class GitlabClient
 
       #{CORE_USER_FRAGMENT}
       #{EXT_USER_FRAGMENT}
+      #{CORE_LABEL_FRAGMENT}
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
@@ -184,6 +192,7 @@ class GitlabClient
 
       #{CORE_USER_FRAGMENT}
       #{EXT_USER_FRAGMENT}
+      #{CORE_LABEL_FRAGMENT}
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
@@ -208,6 +217,7 @@ class GitlabClient
         }
       }
 
+      #{CORE_LABEL_FRAGMENT}
       #{CORE_ISSUE_FRAGMENT}
     GRAPHQL
 
