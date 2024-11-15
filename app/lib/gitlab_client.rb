@@ -48,6 +48,7 @@ class GitlabClient
         iid
         webUrl
         titleHtml
+        project { fullPath }
         reference
         sourceBranch
         targetBranch
@@ -204,28 +205,41 @@ class GitlabClient
     )
   end
 
+  # Fetches a list of issues given 2 lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
   def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
-    query = <<-GRAPHQL
-      query($projectPath : ID!, $issueIids: [String!]) {
-        project(fullPath: $projectPath) {
-          issues(iids: $issueIids) {
-            nodes { ...CoreIssueFields }
+    issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
+    project_full_paths = issue_iids.map { |h| h[:project_full_path] }.uniq
+
+    project_queries =
+      project_full_paths.map.each_with_index do |project_full_path, index|
+        project_issue_iids = issue_iids.filter_map do |h|
+          h[:project_full_path] == project_full_path ? quote(h[:issue_iid]) : nil
+        end.join(", ")
+
+        <<-GRAPHQL
+          project_#{index}: project(fullPath: "#{project_full_path}") {
+            issues(iids: [#{project_issue_iids}]) {
+              nodes { ...CoreIssueFields }
+            }
           }
-        }
+        GRAPHQL
+      end.join("\n")
+
+    query = <<-GRAPHQL
+      query {
+        #{project_queries}
       }
 
       #{CORE_LABEL_FRAGMENT}
       #{CORE_ISSUE_FRAGMENT}
     GRAPHQL
 
-    response = client.query(
-      query,
-      projectPath: "gitlab-org/gitlab",
-      issueIids: open_mr_issue_iids + merged_mr_issue_iids
-    )
+    response = client.query(query)
+    data = make_serializable(response.data)
 
-    project = make_serializable(response.data.project)
-    project.issues.nodes
+    project_full_paths.map.each_with_index do |_, index|
+      data.public_send("project_#{index}").issues.nodes
+    end.flatten
   end
 
   private
@@ -248,5 +262,11 @@ class GitlabClient
         write_timeout: 30
       }
     )
+  end
+
+  def quote(s)
+    return unless s
+
+    "\"#{s}\""
   end
 end

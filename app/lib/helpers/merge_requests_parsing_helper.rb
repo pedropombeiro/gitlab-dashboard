@@ -14,6 +14,11 @@ module MergeRequestsParsingHelper
   end
 
   def merge_request_issue_iids(merge_requests)
-    merge_requests.to_h { |mr| [mr.iid, issue_iid_from_mr(mr)] }
+    merge_requests.map do |mr|
+      {
+        project_full_path: mr.project.fullPath,
+        issue_iid: issue_iid_from_mr(mr)
+      }
+    end
   end
 end
