@@ -32,7 +32,7 @@ class MergeRequestsDto
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
     @open_merge_requests = open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) }
-    @merged_merge_requests = filter_merged_merge_requests(merged_mrs, open_issues_by_iid).map do |mr|
+    @merged_merge_requests = filter_merged_merge_requests(merged_mrs).map do |mr|
       convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
     end
   end
@@ -120,19 +120,7 @@ class MergeRequestsDto
     %w[fa-solid fa-moon] if user.lastActivityOn < 1.day.ago
   end
 
-  def merge_request_issue_iids(merge_requests)
-    merge_requests.to_h { |mr| [mr.iid, issue_iid_from_mr(mr)] }
-  end
-
-  def filter_merged_merge_requests(merge_requests, open_issues_by_iid)
-    return unless open_issues_by_iid
-
-    open_mr_issue_iids = open_issues_by_iid.keys
-    merged_request_issue_iids = merge_request_issue_iids(merge_requests)
-
-    merge_requests.filter do |mr|
-      open_mr_issue_iids.include?(merged_request_issue_iids[mr.iid]) ||
-        mr.mergedAt >= 2.days.ago
-    end
+  def filter_merged_merge_requests(merge_requests)
+    merge_requests.filter { |mr| mr.mergedAt >= 1.week.ago }
   end
 end

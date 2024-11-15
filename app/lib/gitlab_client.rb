@@ -206,12 +206,9 @@ class GitlabClient
 
   def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     query = <<-GRAPHQL
-      query($projectPath : ID!, $issueIids: [String!], $openIssueIids: [String!]) {
+      query($projectPath : ID!, $issueIids: [String!]) {
         project(fullPath: $projectPath) {
           issues(iids: $issueIids) {
-            nodes { ...CoreIssueFields }
-          }
-          openIssues: issues(iids: $openIssueIids, state: opened) {
             nodes { ...CoreIssueFields }
           }
         }
@@ -224,12 +221,11 @@ class GitlabClient
     response = client.query(
       query,
       projectPath: "gitlab-org/gitlab",
-      issueIids: open_mr_issue_iids,
-      openIssueIids: merged_mr_issue_iids # Only fetch open issues for merged MRs
+      issueIids: open_mr_issue_iids + merged_mr_issue_iids
     )
 
     project = make_serializable(response.data.project)
-    project.issues.nodes + project.openIssues.nodes
+    project.issues.nodes
   end
 
   private
