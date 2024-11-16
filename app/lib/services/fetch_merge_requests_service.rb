@@ -6,12 +6,20 @@ module Services
   class FetchMergeRequestsService
     include CacheConcern
 
+    def self.cache_validity
+      if Rails.application.config.action_controller.perform_caching
+        MR_CACHE_VALIDITY
+      else
+        1.minute
+      end
+    end
+
     def initialize(assignee)
       @assignee = assignee
     end
 
     def execute
-      Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MR_CACHE_VALIDITY) do
+      Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: self.class.cache_validity) do
         start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         gitlab_client = GitlabClient.new
         merge_requests = nil
@@ -25,6 +33,7 @@ module Services
 
         end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
+        merge_requests.next_update_at = self.class.cache_validity.after(merge_requests.updated_at)
         merge_requests.request_duration = (end_t - start_t).seconds.round(1)
         merge_requests.errors ||= merged_merge_requests&.errors
         if merge_requests.errors.nil?

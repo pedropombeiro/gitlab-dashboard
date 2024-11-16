@@ -21,9 +21,9 @@
         Fetched in
         <%= @dto.request_duration -%>
         seconds at <%= @dto.updated_at.localtime.to_formatted_s(:time) -%>.
-        <% if @dto.next_update %>
+        <% if @dto.next_update_at %>
           <span>Cached until
-            <%= @dto.next_update.localtime.to_formatted_s(:time) -%>.</span>
+            <%= @dto.next_update_at.localtime.to_formatted_s(:time) -%>.</span>
         <% else %>
           <span>Not cached.</span>
         <% end %>

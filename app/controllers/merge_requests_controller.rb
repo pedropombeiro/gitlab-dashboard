@@ -91,14 +91,11 @@ class MergeRequestsController < ApplicationController
       open_issues_by_iid = issues_from_merge_requests(open_merge_requests, merged_merge_requests)
     end
 
-    cache_validity =
-      if Rails.application.config.action_controller.perform_caching
-        MR_CACHE_VALIDITY
-      else
-        1.minute
-      end
+    ::UserDto.new(response, open_issues_by_iid)
+  end
 
-    ::UserDto.new(response, open_issues_by_iid, cache_validity)
+  def cache_validity
+    Services::FetchMergeRequestsService.cache_validity
   end
 
   def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
@@ -106,7 +103,7 @@ class MergeRequestsController < ApplicationController
     merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).uniq
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).map { |h| h[:issue_iid] }.compact.sort.uniq
 
-    Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: MR_CACHE_VALIDITY) do
+    Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: cache_validity) do
       gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     end&.to_h { |issue| [issue.iid, issue] }
   end

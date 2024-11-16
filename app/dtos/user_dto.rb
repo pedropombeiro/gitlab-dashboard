@@ -11,14 +11,13 @@ class UserDto
   MERGED_MRS_CONTEXTUAL_LABELS = (DEPLOYMENT_LABELS + WORKFLOW_LABELS).freeze
   ISSUE_CONTEXTUAL_LABELS = ["workflow::"].freeze
 
-  attr_reader :errors, :updated_at, :request_duration, :next_update
+  attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :open_merge_requests, :merged_merge_requests
 
-  def initialize(response, open_issues_by_iid, cache_validity)
+  def initialize(response, open_issues_by_iid)
     @has_content = response.present?
 
     unless response
-      @next_update = cache_validity.after(Time.now)
       @open_merge_requests = MergeRequestCollectionDto.new([])
       @merged_merge_requests = MergeRequestCollectionDto.new([])
       return
@@ -29,7 +28,7 @@ class UserDto
     @updated_at = response.updated_at
     return if @errors
 
-    @next_update = cache_validity.after(response.updated_at)
+    @next_update_at = response.next_update_at
 
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
