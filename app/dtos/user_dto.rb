@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class MergeRequestsDto
+class UserDto
   include MrStatusOrnamentsConcern
   include ReviewerOrnamentsConcern
   include MergeRequestsParsingHelper
@@ -15,12 +15,14 @@ class MergeRequestsDto
   attr_reader :open_merge_requests, :merged_merge_requests
 
   def initialize(response, open_issues_by_iid, cache_validity)
-    @open_merge_requests = []
-    @merged_merge_requests = []
-    @next_update = cache_validity.after(Time.now)
     @has_content = response.present?
 
-    return unless response
+    unless response
+      @next_update = cache_validity.after(Time.now)
+      @open_merge_requests = MergeRequestCollectionDto.new([])
+      @merged_merge_requests = MergeRequestCollectionDto.new([])
+      return
+    end
 
     @errors = response.errors
     @request_duration = response.request_duration
@@ -31,10 +33,14 @@ class MergeRequestsDto
 
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
-    @open_merge_requests = open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) }
-    @merged_merge_requests = filter_merged_merge_requests(merged_mrs).map do |mr|
-      convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
-    end
+    @open_merge_requests = MergeRequestCollectionDto.new(
+      open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) }
+    )
+    @merged_merge_requests = MergeRequestCollectionDto.new(
+      filter_merged_merge_requests(merged_mrs).map do |mr|
+        convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
+      end
+    )
   end
 
   def has_content?

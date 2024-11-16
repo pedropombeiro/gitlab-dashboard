@@ -98,7 +98,7 @@ class MergeRequestsController < ApplicationController
         1.minute
       end
 
-    ::MergeRequestsDto.new(response, open_issues_by_iid, cache_validity)
+    ::UserDto.new(response, open_issues_by_iid, cache_validity)
   end
 
   def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
@@ -127,12 +127,12 @@ class MergeRequestsController < ApplicationController
     return unless previous_dto
 
     # Open MR changes
-    changed_labels(previous_dto.open_merge_requests, dto.open_merge_requests).each do |change|
+    changed_labels(previous_dto.open_merge_requests.items, dto.open_merge_requests.items).each do |change|
       notify_label_change("An open MR changed", change)
     end
 
     # Merged MR changes
-    changed_labels(previous_dto.merged_merge_requests, dto.merged_merge_requests).each do |change|
+    changed_labels(previous_dto.merged_merge_requests.items, dto.merged_merge_requests.items).each do |change|
       notify_label_change("A merged MR changed", change)
     end
   end
