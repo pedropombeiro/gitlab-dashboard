@@ -17,7 +17,7 @@ class MergeRequestsDto
   def initialize(response, open_issues_by_iid, cache_validity)
     @open_merge_requests = []
     @merged_merge_requests = []
-    @next_update = 1.minute.after(Time.now)
+    @next_update = cache_validity.after(Time.now)
     @has_content = response.present?
 
     return unless response
@@ -27,7 +27,7 @@ class MergeRequestsDto
     @updated_at = response.updated_at
     return if @errors
 
-    @next_update = cache_validity&.after(response.updated_at)
+    @next_update = cache_validity.after(response.updated_at)
 
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes

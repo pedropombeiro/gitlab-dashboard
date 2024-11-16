@@ -95,7 +95,7 @@ class MergeRequestsController < ApplicationController
       if Rails.application.config.action_controller.perform_caching
         MR_CACHE_VALIDITY
       else
-        nil
+        1.minute
       end
 
     ::MergeRequestsDto.new(response, open_issues_by_iid, cache_validity)
