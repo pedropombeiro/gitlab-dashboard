@@ -1,16 +1,16 @@
-<%= turbo_frame_tag "merge_requests" do %>
+<%= turbo_frame_tag :merge_requests do %>
   <%= render "user_merge_requests",
   open_merge_requests: @dto.open_merge_requests,
   merged_merge_requests: @dto.merged_merge_requests %>
 
   <script>
     setTimeout(function(){
-      window.location.reload();
+      merge_requests.reload();
     }, <%= ([10, @dto.next_update ? 5.seconds.after(@dto.next_update) - Time.current : 0].max * 1000).round.to_i %>);
   </script>
 
   <script>
-    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
   </script>
 <% end %>
