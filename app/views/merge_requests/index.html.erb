@@ -23,7 +23,11 @@
   crossorigin="anonymous"
 ></script>
 
-<div class="container-fluid" data-controller="web-push" style="margin:0 !important; padding:0 !important;">
+<div
+  class="container-fluid"
+  data-controller="web-push"
+  style="margin:0 !important; padding:0 !important;"
+>
   <nav class="navbar navbar-light bg-dark navbar-expand-sm fixed-top px-3">
     <div class="navbar-brand text-light d-flex align-items-center m-auto">
       <span class="mb-0 ms-2 d-flex fw-lighter flex-grow-1 justify-content-center">
@@ -46,7 +50,9 @@
     </a>
   </nav>
 
-  <%= turbo_frame_tag :merge_requests, src: "/mrs/#{params[:assignee]}/list", data: { controller: "merge-requests" } do %>
+  <%= turbo_frame_tag :merge_requests,
+    src: merge_requests_list_path(assignee: params[:assignee]),
+    data: { controller: "merge-requests" } do %>
     <div
       class="
         shadow rounded p-4 mb-5 bg-body bg-gradient text-body position-absolute top-50

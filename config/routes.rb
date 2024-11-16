@@ -3,8 +3,8 @@ Rails.application.routes.draw do
   resources :web_push_subscriptions, only: :create
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
-  get "/mrs/:assignee", to: "merge_requests#index"
-  get "/mrs/:assignee/list", to: "merge_requests#list"
+  get "/mrs/:assignee", to: "merge_requests#index", as: :merge_requests
+  get "/mrs/:assignee/list", to: "merge_requests#list", as: :merge_requests_list
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
