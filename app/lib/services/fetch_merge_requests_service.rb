@@ -26,7 +26,7 @@ module Services
         end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
         merge_requests.request_duration = (end_t - start_t).seconds.round(1)
-        # merge_requests.errors ||= merged_merge_requests&.errors
+        merge_requests.errors ||= merged_merge_requests&.errors
         if merge_requests.errors.nil?
           merge_requests.user.mergedMergeRequests = merged_merge_requests.user.mergedMergeRequests
           Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), merge_requests, expires_in: 1.week)
