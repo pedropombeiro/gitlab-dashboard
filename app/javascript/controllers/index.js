@@ -7,5 +7,8 @@ import { application } from "./application"
 import ClipboardController from "./clipboard_controller"
 application.register("clipboard", ClipboardController)
 
+import PulltorefreshController from "./pulltorefresh_controller"
+application.register("pulltorefresh", PulltorefreshController)
+
 import WebPushController from "./web_push_controller"
 application.register("web-push", WebPushController)
