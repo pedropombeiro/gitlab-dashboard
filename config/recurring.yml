@@ -10,7 +10,7 @@ production:
     class: ScheduleCacheRefreshJob
     queue: background
     args: []
-    schedule: '0/30 8-18 * * *'   # 23 minutes after 00:00, 02:00, 04:00, ...
+    schedule: '0/30 * * * *'
   # periodic_command:
   #   command: "SoftDeletedRecord.due.delete_all"
   #   priority: 2
