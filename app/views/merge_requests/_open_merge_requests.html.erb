@@ -20,8 +20,7 @@
       <div class="text-secondary small">
         Fetched in
         <%= @dto.request_duration -%>
-        seconds
-        <%= render "relative_timestamp", timestamp: @dto.updated_at %>.
+        seconds at <%= @dto.updated_at.localtime.to_formatted_s(:time) -%>.
         <% if @dto.next_update %>
           <span>Cached until
             <%= @dto.next_update.localtime.to_formatted_s(:time) -%>.</span>
