@@ -6,7 +6,7 @@
   <script>
     setTimeout(function(){
       merge_requests.reload();
-    }, <%= ([10, @dto.next_update ? 5.seconds.after(@dto.next_update) - Time.current : 0].max * 1000).round.to_i %>);
+    }, <%= ([10, @dto.next_update_at ? 5.seconds.after(@dto.next_update_at) - Time.current : 0].max * 1000).round.to_i %>);
   </script>
 
   <script>
