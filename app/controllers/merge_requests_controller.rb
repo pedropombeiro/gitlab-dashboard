@@ -16,7 +16,7 @@ class MergeRequestsController < ApplicationController
 
     response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(params[:assignee]))
 
-    @dto = parse_dto(response)
+    @dto = parse_dto(response, params[:assignee])
     fresh_when(response)
   end
 
@@ -29,12 +29,12 @@ class MergeRequestsController < ApplicationController
     previous_dto = nil
     if current_user.web_push_subscriptions.any?
       response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
-      previous_dto = parse_dto(response)
+      previous_dto = parse_dto(response, params[:assignee])
     end
 
     response = Services::FetchMergeRequestsService.new(assignee).execute
 
-    @dto = parse_dto(response)
+    @dto = parse_dto(response, params[:assignee])
     if @dto.errors
       return respond_to do |format|
         format.html { render file: "#{Rails.root}/public/500.html", layout: false, status: :internal_server_error }
@@ -83,7 +83,7 @@ class MergeRequestsController < ApplicationController
     end
   end
 
-  def parse_dto(response)
+  def parse_dto(response, assignee)
     open_issues_by_iid = []
     if response && response.errors.nil?
       open_merge_requests = response.user.openMergeRequests.nodes
@@ -91,7 +91,7 @@ class MergeRequestsController < ApplicationController
       open_issues_by_iid = issues_from_merge_requests(open_merge_requests, merged_merge_requests)
     end
 
-    ::UserDto.new(response, open_issues_by_iid)
+    ::UserDto.new(response, assignee, open_issues_by_iid)
   end
 
   def cache_validity

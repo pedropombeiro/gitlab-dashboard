@@ -50,7 +50,7 @@
     </a>
   </nav>
 
-  <%= turbo_frame_tag :merge_requests,
+  <%= turbo_frame_tag @dto, :merge_requests,
     src: merge_requests_list_path(assignee: params[:assignee]),
     data: { controller: "pulltorefresh" } do %>
     <div
