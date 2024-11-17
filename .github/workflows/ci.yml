@@ -5,6 +5,11 @@ on:
   pull_request:
   push:
     branches: [main]
+    paths:
+      - 'bin/'
+      - '**.js'
+      - '**.erb'
+      - '**.rb'
 
 jobs:
   scan_ruby:
