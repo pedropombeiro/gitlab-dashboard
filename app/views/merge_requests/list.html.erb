@@ -1,11 +1,11 @@
-<%= turbo_frame_tag :merge_requests do %>
+<%= turbo_frame_tag(@dto, :merge_requests) do %>
   <%= render "user_merge_requests",
   open_merge_requests: @dto.open_merge_requests,
   merged_merge_requests: @dto.merged_merge_requests %>
 
   <script>
     setTimeout(function(){
-      merge_requests.reload();
+      document.getElementById("<%= dom_id(@dto, :merge_requests) -%>").reload();
     }, <%= ([10, @dto.next_update_at ? 5.seconds.after(@dto.next_update_at) - Time.current : 0].max * 1000).round.to_i %>);
   </script>
 

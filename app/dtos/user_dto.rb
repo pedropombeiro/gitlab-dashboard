@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class UserDto
+  extend ActiveModel::Naming
+
+  include ActiveModel::Conversion
   include MrStatusOrnamentsConcern
   include ReviewerOrnamentsConcern
   include MergeRequestsParsingHelper
@@ -14,8 +17,9 @@ class UserDto
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :open_merge_requests, :merged_merge_requests
 
-  def initialize(response, open_issues_by_iid)
+  def initialize(response, username, open_issues_by_iid)
     @has_content = response.present?
+    @username = username
 
     unless response
       @open_merge_requests = MergeRequestCollectionDto.new([])
@@ -44,6 +48,15 @@ class UserDto
 
   def has_content?
     @has_content
+  end
+
+  # https://apidock.com/rails/ActiveModel/Conversion
+  def id
+    @username
+  end
+
+  def persisted?
+    true
   end
 
   private
