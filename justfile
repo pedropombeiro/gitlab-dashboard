@@ -9,6 +9,15 @@ update:
     bundle update
     yarn upgrade
 
+alias cache := toggle-cache
+toggle-cache:
+    bin/rails dev:cache
+
+alias clobber := clean
+clean:
+    bin/rails assets:clobber dartsass:clobber javascript:clobber
+
+alias dev := serve
 serve:
     bin/dev
 
