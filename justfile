@@ -23,3 +23,6 @@ serve:
 
 open:
     open https://localhost:3000
+
+watch-ci:
+  gh run watch --repo=pedropombeiro/gitlab-dashboard
