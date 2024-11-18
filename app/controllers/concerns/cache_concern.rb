@@ -10,19 +10,19 @@ module CacheConcern
 
   class_methods do
     def user_cache_key(username)
-      "#{REDIS_NAMESPACE}/user_info/v2/#{user_hash(username)}"
+      "#{REDIS_NAMESPACE}/user_info/v3/#{user_hash(username)}"
     end
 
     def open_issues_cache_key(issue_iids)
-      "#{REDIS_NAMESPACE}/issues/v2/open/#{issue_iids.join("-")}"
+      "#{REDIS_NAMESPACE}/issues/v3/open/#{issue_iids.join("-")}"
     end
 
     def authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v2/authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v3/authored_list/#{user_hash(user)}"
     end
 
     def last_authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v2/last_authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v3/last_authored_list/#{user_hash(user)}"
     end
 
     private
