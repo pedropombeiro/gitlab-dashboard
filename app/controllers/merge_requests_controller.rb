@@ -113,7 +113,8 @@ class MergeRequestsController < ApplicationController
 
     notify_user(
       title: title,
-      body: "#{mr.titleHtml} (#{mr.reference}) changed to #{change[:labels].join(", ")}",
+      subtitle: "changed to #{change[:labels].join(", ")}",
+      body: "#{mr.reference}: #{mr.titleHtml}",
       url: mr.webUrl,
       tag: mr.iid,
       timestamp: mr.updatedAt
