@@ -113,8 +113,7 @@ class MergeRequestsController < ApplicationController
 
     notify_user(
       title: title,
-      subtitle: "changed to #{change[:labels].join(", ")}",
-      body: "#{mr.reference}: #{mr.titleHtml}",
+      body: "changed to #{change[:labels].join(", ")}\n\n#{mr.reference}: #{mr.titleHtml}",
       url: mr.webUrl,
       tag: mr.iid,
       timestamp: mr.updatedAt
@@ -126,12 +125,12 @@ class MergeRequestsController < ApplicationController
 
     # Open MR changes
     changed_labels(previous_dto.open_merge_requests.items, dto.open_merge_requests.items).each do |change|
-      notify_label_change("An open MR changed", change)
+      notify_label_change("An open merge request", change)
     end
 
     # Merged MR changes
     changed_labels(previous_dto.merged_merge_requests.items, dto.merged_merge_requests.items).each do |change|
-      notify_label_change("A merged MR changed", change)
+      notify_label_change("A merged merge request", change)
     end
   end
 
