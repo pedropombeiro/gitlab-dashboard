@@ -82,14 +82,18 @@ class UserDto
       mr.updatedAt = parse_graphql_time(mr.updatedAt)
 
       mr.contextualLabels = mr.labels.nodes.filter do |label|
+        label.webTitle = label.title
         contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
       end
 
       if mr.issue
         mr.issue.contextualLabels = mr.issue.labels.nodes.filter do |label|
-          ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+          next false unless ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+
           label.bootstrapClass = [] # Use label's predefined colors
-          label.title.delete_prefix!(WORKFLOW_LABEL_NS)
+          label.webTitle = label.title.delete_prefix(WORKFLOW_LABEL_NS)
+
+          true
         end
       end
 
@@ -129,7 +133,7 @@ class UserDto
 
       mr.labels.nodes.each do |label|
         label.bootstrapClass = workflow_label_class(label.title)
-        label.title.delete_prefix!(WORKFLOW_LABEL_NS)
+        label.webTitle = label.title.delete_prefix(WORKFLOW_LABEL_NS)
       end
     end
   end
