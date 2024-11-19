@@ -123,6 +123,20 @@ class MergeRequestsController < ApplicationController
   def check_changes(previous_dto, dto)
     return unless previous_dto
 
+    # Open MR merged
+    dto.merged_merge_requests.items.each do |mr|
+      previous_mr_version = previous_dto.open_merge_requests.items.select { |prev_mr| prev_mr.iid == mr.iid }.first
+      next if previous_mr_version.nil?
+
+      notify_user(
+        title: "A merge request was merged",
+        body: "#{mr.reference}: #{mr.titleHtml}",
+        url: mr.webUrl,
+        tag: mr.iid,
+        timestamp: mr.updatedAt
+      )
+    end
+
     # Open MR changes
     changed_labels(previous_dto.open_merge_requests.items, dto.open_merge_requests.items).each do |change|
       notify_label_change("An open merge request", change)
@@ -135,7 +149,7 @@ class MergeRequestsController < ApplicationController
   end
 
   def changed_labels(previous_mrs, mrs)
-    return [] unless previous_mrs
+    return [] if previous_mrs.blank?
 
     mrs.filter_map do |mr|
       previous_mr_version = previous_mrs.select { |prev_mr| prev_mr.iid == mr.iid }.first
