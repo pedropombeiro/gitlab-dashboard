@@ -23,7 +23,7 @@ module MrStatusOrnamentsConcern
     "#{WORKFLOW_LABEL_NS}canary" => "info",
     "#{WORKFLOW_LABEL_NS}staging" => "info",
     "#{WORKFLOW_LABEL_NS}production" => "primary",
-    "#{WORKFLOW_LABEL_NS}post-deploy-db-staging" => "success",
+    "#{WORKFLOW_LABEL_NS}post-deploy-db-staging" => "info",
     "#{WORKFLOW_LABEL_NS}post-deploy-db-production" => "success"
   }.freeze
 
