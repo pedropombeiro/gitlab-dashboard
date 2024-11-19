@@ -1,5 +1,5 @@
 <% if local_assigns[:timestamp] %>
-  <%= render "abbr_with_title",
+  <%= render "shared/abbr_with_title",
   content: "#{time_ago_in_words(timestamp)} ago",
   class: local_assigns[:age_warning] && Time.now - timestamp > 2.weeks ? "text-danger" : nil,
   title: timestamp.localtime.to_formatted_s(:long_ordinal) -%>

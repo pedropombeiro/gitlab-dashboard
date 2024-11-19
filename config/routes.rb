@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   get "/mrs/:assignee", to: "merge_requests#index", as: :merge_requests
   get "/mrs/:assignee/list", to: "merge_requests#list", as: :merge_requests_list
 
+  get "/admin/dashboard", to: "admin/dashboard#index", as: :admin_dashboard
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
