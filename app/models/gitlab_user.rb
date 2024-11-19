@@ -1,6 +1,8 @@
 class GitlabUser < ApplicationRecord
   has_many :web_push_subscriptions
 
+  scope :recent, -> { order(contacted_at: :desc).limit(10) }
+
   def self.safe_find_or_create_by(*args, &block)
     record = find_by(*args)
     return record if record.present?

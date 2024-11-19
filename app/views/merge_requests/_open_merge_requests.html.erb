@@ -66,14 +66,14 @@
         </th>
         <!-- Created at -->
         <td>
-          <%= render "relative_timestamp",
+          <%= render "shared/relative_timestamp",
           timestamp: mr.createdAt,
           age_warning: true,
           most_significant_only: true %>
         </td>
         <!-- Updated at -->
         <td>
-          <%= render "relative_timestamp",
+          <%= render "shared/relative_timestamp",
           timestamp: mr.updatedAt,
           most_significant_only: true %>
         </td>
@@ -91,7 +91,7 @@
               end %>
 
             <% if open_blockers.count.positive? %>
-              <%= render "abbr_with_title",
+              <%= render "shared/abbr_with_title",
               content: tag.i(class: %w[fa-solid fa-road-barrier]),
               class: "text-danger",
               title:
@@ -133,7 +133,7 @@
 
               <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
                 <%= link_to(web_url, target: "_blank", style: [ "text-decoration: none" ]) do %>
-                  <%= render "abbr_with_title",
+                  <%= render "shared/abbr_with_title",
                   content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
                   title: pipeline_failure_summary(pipeline),
                   class: "text-warning",
@@ -144,7 +144,7 @@
                 <% end %>
               <% end %>
               <% if pipeline.failureReason %>
-                <%= render "abbr_with_title",
+                <%= render "shared/abbr_with_title",
                 content: tag.i(class: %w[fa-solid fa-comment-dots]),
                 class: "text-warning",
                 title: pipeline.failureReason,
@@ -155,9 +155,9 @@
               <% end %>
               <% if pipeline.startedAt %>
                 <% if pipeline.finishedAt.nil? %>
-                  <%= render "relative_timestamp", timestamp: pipeline.startedAt %>
+                  <%= render "shared/relative_timestamp", timestamp: pipeline.startedAt %>
                 <% elsif pipeline.finishedAt < 8.hours.ago %>
-                  <%= render "abbr_with_title",
+                  <%= render "shared/abbr_with_title",
                   content: "🥶",
                   title: "Pipeline too old, must be re-run before being merged" %>
                 <% end %>
@@ -165,7 +165,7 @@
             <% end %>
 
             <% if mr.autoMergeEnabled %>
-              <%= render "abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
+              <%= render "shared/abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
             <% end %>
           </nobr>
 
@@ -191,7 +191,7 @@
         <!-- Squash on merge -->
         <td class="text-center">
           <% if mr.squashOnMerge %>
-            <%= render "abbr_with_title",
+            <%= render "shared/abbr_with_title",
             content: tag.i(class: %w[align-middle fa-solid fa-angles-down]),
             title: "MR set to squash on merge",
             class: "text-success" %>
@@ -201,7 +201,7 @@
         <% if any_conflicts %>
           <td class="text-center">
             <% if mr.conflicts %>
-              <%= render "abbr_with_title",
+              <%= render "shared/abbr_with_title",
               content: tag.i(class: %w[fa-solid fa-burst]),
               class: "align-middle text-danger",
               title: "MR branch has conflicts and should be rebased" %>
@@ -211,7 +211,7 @@
         <!-- Approvals -->
         <td class="text-end">
           <% if mr.approved %>
-            <%= render "abbr_with_title",
+            <%= render "shared/abbr_with_title",
             content: tag.i(class: %w[fa-regular fa-thumbs-up]),
             class: "align-middle text-success",
             title: "Approved" %>

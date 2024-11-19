@@ -1,6 +1,6 @@
 <% merge_requests = merge_requests_dto.items %>
 
-<table class="table table-hover table-sm mb-0" style="cursor: pointer;">
+<table class="table table-hover mb-0" style="cursor: pointer;">
   <caption class="ms-1">
     <div class="lead">
       <%= pluralize(merge_requests.count, "merge request") %>
@@ -38,19 +38,19 @@
         </th>
         <!-- Created at -->
         <td>
-          <%= render "relative_timestamp",
+          <%= render "shared/relative_timestamp",
           timestamp: mr.createdAt,
           most_significant_only: true %>
         </td>
         <!-- Merged at -->
         <td>
-          <%= render "relative_timestamp", timestamp: mr.mergedAt, most_significant_only: true %>
+          <%= render "shared/relative_timestamp", timestamp: mr.mergedAt, most_significant_only: true %>
           by
           <br/><%= render "user_badge", user: mr.mergeUser %>
         </td>
         <!-- Updated at -->
         <td>
-          <%= render "relative_timestamp",
+          <%= render "shared/relative_timestamp",
           timestamp: mr.updatedAt,
           most_significant_only: true %>
         </td>
