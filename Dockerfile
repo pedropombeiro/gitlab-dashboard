@@ -34,9 +34,11 @@ RUN apt-get update -qq && \
   rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Install JavaScript dependencies
+ARG GIT_REPO_COMMIT_SHA
 ARG NODE_VERSION=23.1.0
 ARG YARN_VERSION=1.22.22
 ENV PATH=/usr/local/node/bin:$PATH
+ENV GIT_REPO_COMMIT_SHA=$GIT_REPO_COMMIT_SHA
 RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
   /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
   npm install -g yarn@$YARN_VERSION && \
@@ -54,6 +56,7 @@ RUN yarn install --frozen-lockfile
 
 # Copy application code
 COPY . .
+RUN echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
 
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
