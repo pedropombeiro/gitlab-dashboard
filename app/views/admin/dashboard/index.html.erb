@@ -1,7 +1,7 @@
 <% content_for(:title) { "Admin Dashboard" } %>
 
 <div class="container my-3 shadow rounded p-4 bg-body bg-gradient text-body">
-  <table class="table table-hover" style="cursor: pointer;">
+  <table class="table table-hover">
     <caption class="caption-top">Active Users</caption>
 
     <thead class="thead-dark">
@@ -13,7 +13,7 @@
     </thead>
     <tbody>
       <% @recent_users.each do |user| %>
-        <tr>
+        <tr style="cursor: pointer;">
           <%= tag.th user.username, scope: "row" %>
           <td>
             <%= render "shared/relative_timestamp", timestamp: user.created_at %>
@@ -25,7 +25,7 @@
         <% if user.web_push_subscriptions.any? %>
           <tr>
             <td colspan="4" class="px-5">
-              <table class="table table-hover" style="cursor: pointer;">
+              <table class="table table-hover">
                 <caption class="caption-top">Web Push Subscriptions</caption>
 
                 <thead class="thead-dark">
@@ -36,7 +36,7 @@
                 </thead>
                 <tbody>
                   <% user.web_push_subscriptions.each do |subscription| %>
-                    <tr>
+                    <tr style="cursor: pointer;">
                       <td>
                         <%= render "shared/relative_timestamp", timestamp: subscription.created_at %>
                       </td>
