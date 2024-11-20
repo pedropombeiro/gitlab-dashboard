@@ -26,3 +26,6 @@ open:
 
 watch-ci:
   gh run watch --repo=pedropombeiro/gitlab-dashboard
+
+build-docker:
+  docker build -t $(basename $(pwd)) .
