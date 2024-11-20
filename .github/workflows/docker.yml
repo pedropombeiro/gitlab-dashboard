@@ -14,6 +14,8 @@ on:
       - 'public/'
       - 'vendor/'
       - '**.rb'
+      - 'Gemfile.lock'
+      - 'yarn.lock'
 
 jobs:
   build-and-push-image:
