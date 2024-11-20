@@ -10,6 +10,7 @@ on:
       - '**.js'
       - '**.erb'
       - '**.rb'
+      - '**.yml'
 
 jobs:
   scan_ruby:
