@@ -39,9 +39,7 @@
       <button id="enable_notifications_button" class="btn d-none mx-2 text-light"><%= tag.i class: %w[fa-solid fa-bell] %></button>
     </div>
 
-    <a href="https://github.com/pedropombeiro/gitlab-dashboard" class="text-light">
-      <%= tag.i class: %w[fa-brands fa-github] %>
-    </a>
+    <%= link_to tag.i(class: %w[fa-brands fa-github]), git_repo_url, class: "text-light" %>
   </nav>
 
   <%= turbo_frame_tag @dto, :merge_requests,

@@ -39,5 +39,7 @@ jobs:
           context: .
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/gitlab-dashboard:latest
+          build-args: |
+            "GIT_REPO_COMMIT_SHA=${{ github.sha }}"
           cache-from: type=registry,ref=ghcr.io/${{ github.repository_owner }}/gitlab-dashboard:latest
           cache-to: type=inline
