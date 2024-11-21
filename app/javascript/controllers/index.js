@@ -4,6 +4,9 @@
 
 import { application } from "./application"
 
+import BootstrapTooltipController from "./bootstrap_tooltip_controller"
+application.register("bootstrap-tooltip", BootstrapTooltipController)
+
 import ClipboardController from "./clipboard_controller"
 application.register("clipboard", ClipboardController)
 
