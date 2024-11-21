@@ -16,7 +16,7 @@ module ReviewerOrnamentsConcern
     REVIEW_ICON[reviewer.mergeRequestInteraction.reviewState]
   end
 
-  def review_text_class(reviewer)
+  def review_badge_class(reviewer)
     # Maps to class in app/assets/stylesheets/application.scss
     reviewer.mergeRequestInteraction.reviewState.downcase.tr("_", "-")
   end
