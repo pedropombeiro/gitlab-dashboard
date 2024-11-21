@@ -118,7 +118,7 @@ class UserDto
         reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
         reviewer.review = reviewer.mergeRequestInteraction.reviewState
         reviewer.bootstrapClass = {
-          text: review_text_class(reviewer),
+          badge: review_badge_class(reviewer),
           icon: review_icon_class(reviewer),
           activity_icon: user_activity_icon_class(reviewer)
         }.compact
