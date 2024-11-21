@@ -17,13 +17,15 @@
         </div>
       <% end %>
 
+      <% bs_data = { bs_toggle: "tooltip", bs_custom_class: "wide-tooltip" } %>
+
       <div class="text-secondary small">
         Fetched in
         <%= @dto.request_duration -%>
-        seconds at <%= @dto.updated_at.localtime.to_formatted_s(:time) -%>.
+        seconds at <%= local_relative_time(@dto.updated_at, type: 'time-or-date', data: bs_data) -%>.
         <% if @dto.next_update_at %>
           <span>Cached until
-            <%= @dto.next_update_at.localtime.to_formatted_s(:time) -%>.</span>
+            <%= local_relative_time(@dto.next_update_at, type: 'time-or-date', data: bs_data) -%>.
         <% else %>
           <span>Not cached.</span>
         <% end %>
