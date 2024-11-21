@@ -1,8 +1,18 @@
 <% if local_assigns[:timestamp] %>
-  <%= render "shared/abbr_with_title",
-  content: "#{time_ago_in_words(timestamp)} ago",
-  class: local_assigns[:age_warning] && Time.now - timestamp > 2.weeks ? "text-danger" : nil,
-  title: timestamp.localtime.to_formatted_s(:long_ordinal) -%>
+  <%= local_relative_time(
+    local_assigns[:timestamp],
+    type: 'time-ago',
+    data: {
+      bs_toggle: "tooltip",
+      bs_custom_class: "wide-tooltip",
+    },
+    class:
+      (
+        if local_assigns[:age_warning] && Time.now - timestamp > 2.weeks
+          "text-danger"
+        end
+      ),
+  ) -%>
 <% else %>
   N/A
 <% end %>

@@ -7,3 +7,4 @@ pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
 pin "popper", to: "bootstrap.bundle.min.js", preload: true
 pin "bootstrap", to: "bootstrap.bundle.min.js", preload: true
+pin "local-time" # @3.0.2
