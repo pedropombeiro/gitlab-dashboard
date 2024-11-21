@@ -1,6 +1,9 @@
 <% content_for(:title) { "Admin Dashboard" } %>
 
-<div class="container my-3 shadow rounded p-4 bg-body bg-gradient text-body">
+<div
+  data-controller="bootstrap-tooltip"
+  class="container my-3 shadow rounded p-4 bg-body bg-gradient text-body"
+>
   <table class="table table-hover">
     <caption class="caption-top">Active Users</caption>
 
@@ -55,7 +58,12 @@
   </table>
 </div>
 
-<div class="container my-3 d-flex flex-row-reverse column-gap-3 align-items-baseline">
+<div
+  data-controller="bootstrap-tooltip"
+  class="
+    container my-3 d-flex flex-row-reverse column-gap-3 align-items-baseline
+  "
+>
   <p class="lead">
     Booted
     <%= render "shared/relative_timestamp", timestamp: boot_timestamp %>
@@ -65,8 +73,3 @@
     <%= link_to "Jobs", mission_control_jobs_path, class: "text-white" %>
   </div>
 </div>
-
-<script>
-    var tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
-    tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
-</script>
