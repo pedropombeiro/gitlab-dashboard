@@ -17,6 +17,7 @@ module ReviewerOrnamentsConcern
   end
 
   def review_text_class(reviewer)
+    # Maps to class in app/assets/stylesheets/application.scss
     reviewer.mergeRequestInteraction.reviewState.downcase.tr("_", "-")
   end
 end
