@@ -157,7 +157,7 @@ class MergeRequestsController < ApplicationController
 
       previous_labels = previous_mr_version.contextualLabels.map(&:title)
       labels = mr.contextualLabels.map(&:title)
-      next unless labels != previous_labels
+      next if previous_labels.empty? || labels == previous_labels
 
       {
         mr: mr,
