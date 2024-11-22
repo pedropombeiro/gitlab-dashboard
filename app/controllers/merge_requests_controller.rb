@@ -160,8 +160,8 @@ class MergeRequestsController < ApplicationController
       previous_mr_version = previous_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
       next if previous_mr_version.nil?
 
-      previous_labels = previous_mr_version.contextualLabels.map(&:title)
-      labels = mr.contextualLabels.map(&:title)
+      previous_labels = previous_mr_version.contextualLabels.map(&:webTitle)
+      labels = mr.contextualLabels.map(&:webTitle)
       next if previous_labels.empty? || labels == previous_labels
 
       {
