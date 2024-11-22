@@ -1,3 +1,3 @@
 Timezone::Lookup.config(:geonames) do |c|
   c.username = ENV["GEONAMES_USERNAME"]
-end
+end if ENV["GEONAMES_USERNAME"].present?
