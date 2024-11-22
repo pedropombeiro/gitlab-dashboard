@@ -37,7 +37,7 @@ class MergeRequestsController < ApplicationController
     @dto = parse_dto(response, params[:assignee])
     if @dto.errors
       return respond_to do |format|
-        format.html { render file: "#{Rails.root}/public/500.html", layout: false, status: :internal_server_error }
+        format.html { render file: Rails.public_path.join("500.html").to_s, layout: false, status: :internal_server_error }
         format.xml { head :internal_server_error }
         format.any { head :internal_server_error }
       end
@@ -77,7 +77,7 @@ class MergeRequestsController < ApplicationController
 
   def render_404
     respond_to do |format|
-      format.html { render file: "#{Rails.root}/public/404.html", layout: false, status: :not_found }
+      format.html { render file: Rails.public_path.join("404.html").to_s, layout: false, status: :not_found }
       format.xml { head :not_found }
       format.any { head :not_found }
     end
@@ -101,7 +101,7 @@ class MergeRequestsController < ApplicationController
   def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
     open_mr_issue_iids = merge_request_issue_iids(open_merge_requests).uniq
     merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).uniq
-    issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).map { |h| h[:issue_iid] }.compact.sort.uniq
+    issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).pluck(:issue_iid).compact.sort.uniq
 
     Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: cache_validity) do
       gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)

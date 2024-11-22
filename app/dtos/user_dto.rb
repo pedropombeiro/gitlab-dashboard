@@ -62,7 +62,7 @@ class UserDto
   private
 
   def parse_graphql_time(timestamp)
-    Time.parse(timestamp) if timestamp
+    Time.zone.parse(timestamp) if timestamp
   end
 
   def convert_mr_pipeline(pipeline)

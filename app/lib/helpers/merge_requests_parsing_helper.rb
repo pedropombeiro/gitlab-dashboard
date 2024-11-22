@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MergeRequestsParsingHelper
-  MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i.freeze
+  MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i
 
   def issue_from_mr(mr, open_issues_by_iid)
     iid = issue_iid_from_mr(mr)

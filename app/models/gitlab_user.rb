@@ -19,7 +19,7 @@ class GitlabUser < ApplicationRecord
 
   def self.safe_find_or_create_by!(*args, &block)
     safe_find_or_create_by(*args, &block).tap do |record|
-      raise ActiveRecord::RecordNotFound unless record.present?
+      raise ActiveRecord::RecordNotFound if record.blank?
 
       record.validate! unless record.persisted?
     end

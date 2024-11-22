@@ -12,18 +12,17 @@ module MergeRequestsPipelineHelper
 
       [
         "#{header} #{tag.code(failed_job_trace.name, escape: false)}",
-        "#{failed_job_trace.trace.htmlSummary}"
+        failed_job_trace.trace.htmlSummary
       ].join("<br/>")
     elsif failed_jobs.count.positive?
       <<~HTML
-          #{header}<br/><br/>
-          #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
+        #{header}<br/><br/>
+        #{tag.ul(failed_jobs.nodes.map { |j| tag.li(tag.code(j.name)) }.join, escape: false)}
       HTML
     end
   end
 
   def pipeline_summary(pipeline)
-    failed_jobs = pipeline.failedJobs
     failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }
 
     summary = nil
@@ -48,9 +47,9 @@ module MergeRequestsPipelineHelper
     else
       case pipeline.status
       when "RUNNING"
-        web_path = pipeline.runningJobs.count == 1 ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
+        web_path = (pipeline.runningJobs.count == 1) ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
       when "FAILED"
-        web_path = failed_job_traces.count == 1 ? failed_job_traces.first.webPath : "#{web_path}/failures"
+        web_path = (failed_job_traces.count == 1) ? failed_job_traces.first.webPath : "#{web_path}/failures"
       end
     end
 

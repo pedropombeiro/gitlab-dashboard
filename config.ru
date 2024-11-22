@@ -2,7 +2,7 @@
 
 require_relative "config/environment"
 
-map GitlabDashboard::Application.config.relative_url_root || '/' do
+map GitlabDashboard::Application.config.relative_url_root || "/" do
   run Rails.application
   Rails.application.load_server
 end
