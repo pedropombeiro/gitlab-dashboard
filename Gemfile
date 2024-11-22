@@ -71,7 +71,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "async", "~> 2.19"
+gem "async", "~> 2.21"
 gem "graphlient"
 gem "dartsass-rails", "~> 0.5.1"
 gem "web-push", "~> 3.0"
