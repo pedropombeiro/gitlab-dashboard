@@ -8,11 +8,11 @@ class UserDto
   include ReviewerOrnamentsConcern
   include MergeRequestsParsingHelper
 
-  DEPLOYMENT_LABELS = [ "Pick into auto-deploy" ].freeze
+  DEPLOYMENT_LABELS = ["Pick into auto-deploy"].freeze
   WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys.freeze
-  OPEN_MRS_CONTEXTUAL_LABELS = [ "pipeline::" ].freeze
+  OPEN_MRS_CONTEXTUAL_LABELS = ["pipeline::"].freeze
   MERGED_MRS_CONTEXTUAL_LABELS = (DEPLOYMENT_LABELS + WORKFLOW_LABELS).freeze
-  ISSUE_CONTEXTUAL_LABELS = [ "workflow::" ].freeze
+  ISSUE_CONTEXTUAL_LABELS = ["workflow::"].freeze
 
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :open_merge_requests, :merged_merge_requests

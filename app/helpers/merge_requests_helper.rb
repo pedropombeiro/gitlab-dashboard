@@ -9,7 +9,7 @@ module MergeRequestsHelper
     {
       Location: user.location,
       "Last activity": (user.lastActivityOn > 1.day.ago) ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
-      "Local time": timezone&.time_with_offset(Time.now.utc)&.to_formatted_s,
+      "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
       Message: user.status&.message
     }.compact
   end
