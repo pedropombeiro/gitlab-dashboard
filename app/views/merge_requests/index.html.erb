@@ -17,11 +17,7 @@
   />
 <% end %>
 
-<div
-  class="container-fluid"
-  data-controller="web-push"
-  style="margin:0 !important; padding:0 !important;"
->
+<div class="container-fluid m-0 p-0" data-controller="web-push">
   <nav class="navbar navbar-light bg-dark navbar-expand-sm fixed-top px-3">
     <div class="navbar-brand text-light d-flex align-items-center m-auto">
       <span class="mb-0 ms-2 d-flex fw-lighter flex-grow-1 justify-content-center">
@@ -39,7 +35,10 @@
       <button id="enable_notifications_button" class="btn d-none mx-2 text-light"><%= tag.i class: %w[fa-solid fa-bell] %></button>
     </div>
 
-    <%= link_to tag.i(class: %w[fa-brands fa-github]), git_repo_url, class: "text-light" %>
+    <%= link_to tag.i(class: %w[fa-brands fa-github]),
+    git_repo_url,
+    class: "text-light",
+    target: "_blank" %>
   </nav>
 
   <%= turbo_frame_tag @dto, :merge_requests,
