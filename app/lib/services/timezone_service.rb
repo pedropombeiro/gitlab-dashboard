@@ -14,7 +14,7 @@ module Services
 
     def fetch_from_locations(locations)
       locations.map do |l|
-        Async { [ l, fetch_from_location(l) ] }
+        Async { [l, fetch_from_location(l)] }
       end.map(&:wait).to_h
     end
 
