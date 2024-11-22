@@ -2,7 +2,11 @@ import { Controller } from "@hotwired/stimulus"
 
 // Connects to data-controller="web-push"
 export default class extends Controller {
-  connect() {
+  static targets = ["subscribe"];
+
+  subscribeTargetConnected(subscribeButton) {
+    // Check if the browser supports notifications
+    subscribeButton.classList.add("d-none");
     if ("Notification" in window) {
       switch (Notification.permission) {
         case "granted":
@@ -12,36 +16,30 @@ export default class extends Controller {
           // do nothing?
           return;
         default:
-          promptForNotifications();
+          // show button
+          subscribeButton.classList.remove("d-none");
       }
     } else {
       console.warn("Push notifications not supported.");
     }
+  }
 
-    function promptForNotifications() {
-      const notificationsButton = document.getElementById("enable_notifications_button");
-      if (!notificationsButton) return;
+  async subscribe(event) {
+    event.preventDefault();
 
-      // Check if the browser supports notifications
-      notificationsButton.classList.remove("d-none");
-      notificationsButton.addEventListener("click", async (event) => {
-        event.preventDefault();
-
-        // Request permission from the user to send notifications
-        try {
-          const permission = await Notification.requestPermission()
-          if (permission === "granted") {
-            setupSubscription();
-          } else {
-            alert("Notifications declined");
-          }
-        } catch (error) {
-          console.log("Notifications error", error)
-        }
-        finally {
-          notificationsButton.classList.add("d-none");
-        }
-      });
+    // Request permission from the user to send notifications
+    try {
+      const permission = await Notification.requestPermission()
+      if (permission === "granted") {
+        setupSubscription();
+      } else {
+        alert("Notifications declined");
+      }
+    } catch (error) {
+      console.log("Notifications error", error)
+    }
+    finally {
+      this.subscribeTarget.classList.add("d-none");
     }
 
     async function setupSubscription() {

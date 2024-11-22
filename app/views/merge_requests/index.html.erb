@@ -32,7 +32,13 @@
         </span>
       </span>
 
-      <button id="enable_notifications_button" class="btn d-none mx-2 text-light"><%= tag.i class: %w[fa-solid fa-bell] %></button>
+      <button
+        class="btn mx-2 text-light"
+        data-web-push-target="subscribe"
+        data-action="web-push#subscribe"
+      >
+        <%= tag.i class: %w[fa-solid fa-bell] %>
+      </button>
     </div>
 
     <%= link_to tag.i(class: %w[fa-brands fa-github]),
