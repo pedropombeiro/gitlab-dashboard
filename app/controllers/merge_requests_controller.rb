@@ -123,9 +123,14 @@ class MergeRequestsController < ApplicationController
   def check_changes(previous_dto, dto)
     return unless previous_dto
 
+    previous_open_mrs = previous_dto.open_merge_requests.items
+    previous_merged_mrs = previous_dto.merged_merge_requests.items
+    open_mrs = dto.open_merge_requests.items
+    merged_mrs = dto.merged_merge_requests.items
+
     # Open MR merged
-    dto.merged_merge_requests.items.each do |mr|
-      previous_mr_version = previous_dto.open_merge_requests.items.select { |prev_mr| prev_mr.iid == mr.iid }.first
+    merged_mrs.each do |mr|
+      previous_mr_version = previous_open_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
       next if previous_mr_version.nil?
 
       notify_user(
@@ -138,12 +143,12 @@ class MergeRequestsController < ApplicationController
     end
 
     # Open MR changes
-    changed_labels(previous_dto.open_merge_requests.items, dto.open_merge_requests.items).each do |change|
+    changed_labels(previous_open_mrs, open_mrs).each do |change|
       notify_label_change("An open merge request", change)
     end
 
     # Merged MR changes
-    changed_labels(previous_dto.merged_merge_requests.items, dto.merged_merge_requests.items).each do |change|
+    changed_labels(previous_merged_mrs, merged_mrs).each do |change|
       notify_label_change("A merged merge request", change)
     end
   end
@@ -152,7 +157,7 @@ class MergeRequestsController < ApplicationController
     return [] if previous_mrs.blank?
 
     mrs.filter_map do |mr|
-      previous_mr_version = previous_mrs.select { |prev_mr| prev_mr.iid == mr.iid }.first
+      previous_mr_version = previous_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
       next if previous_mr_version.nil?
 
       previous_labels = previous_mr_version.contextualLabels.map(&:title)
