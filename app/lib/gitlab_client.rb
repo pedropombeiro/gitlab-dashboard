@@ -9,7 +9,7 @@ class GitlabClient
         avatarUrl
         webUrl
       }
-    GRAPHQL
+  GRAPHQL
 
   EXT_USER_FRAGMENT = <<-GRAPHQL
       fragment ExtendedUserFields on User {
@@ -21,7 +21,7 @@ class GitlabClient
           message
         }
       }
-    GRAPHQL
+  GRAPHQL
 
   CORE_LABEL_FRAGMENT = <<-GRAPHQL
       fragment CoreLabelFields on Label {
@@ -30,7 +30,7 @@ class GitlabClient
         color
         textColor
       }
-    GRAPHQL
+  GRAPHQL
 
   CORE_ISSUE_FRAGMENT = <<-GRAPHQL
       fragment CoreIssueFields on Issue {
@@ -41,7 +41,7 @@ class GitlabClient
           nodes { ...CoreLabelFields }
         }
       }
-    GRAPHQL
+  GRAPHQL
 
   CORE_MERGE_REQUEST_FRAGMENT = <<-GRAPHQL
       fragment CoreMergeRequestFields on MergeRequest {
@@ -61,7 +61,7 @@ class GitlabClient
           nodes { ...CoreLabelFields }
         }
       }
-    GRAPHQL
+  GRAPHQL
 
   def gitlab_instance_url
     @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
@@ -208,12 +208,12 @@ class GitlabClient
   # Fetches a list of issues given 2 lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
   def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
-    project_full_paths = issue_iids.map { |h| h[:project_full_path] }.uniq
+    project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
     project_queries =
       project_full_paths.map.each_with_index do |project_full_path, index|
         project_issue_iids = issue_iids.filter_map do |h|
-          h[:project_full_path] == project_full_path ? quote(h[:issue_iid]) : nil
+          (h[:project_full_path] == project_full_path) ? quote(h[:issue_iid]) : nil
         end.join(", ")
 
         <<-GRAPHQL
@@ -238,7 +238,7 @@ class GitlabClient
     data = make_serializable(response.data)
 
     project_full_paths.map.each_with_index do |_, index|
-      data.public_send("project_#{index}").issues.nodes
+      data.public_send(:"project_#{index}").issues.nodes
     end.flatten
   end
 
@@ -256,7 +256,7 @@ class GitlabClient
   def client
     ::Graphlient::Client.new(
       "#{gitlab_instance_url}/api/graphql",
-      headers: { "Authorization" => authorization },
+      headers: {"Authorization" => authorization},
       http_options: {
         read_timeout: 20,
         write_timeout: 30

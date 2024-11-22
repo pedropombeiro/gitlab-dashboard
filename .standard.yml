@@ -1,0 +1,11 @@
+extend_config:
+  - .rubocop.yml
+
+parallel: true
+plugins:
+  - standard-rails
+
+ignore:
+  - 'config/initializers/permissions_policy.rb'
+  - 'db/*schema.rb'
+  - 'vendor/**/*'

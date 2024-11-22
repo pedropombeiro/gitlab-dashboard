@@ -1,1 +1,1 @@
-GitlabDashboard::Application::BOOTED_AT = Time.now
+GitlabDashboard::Application::BOOTED_AT = Time.zone.now

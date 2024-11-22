@@ -1,6 +1,6 @@
 class ScheduleCacheRefreshJob < ApplicationJob
   self.queue_adapter = :solid_queue
-  limits_concurrency to: 1, key: ->(*_args) { }
+  limits_concurrency to: 1, key: ->(*_args) {}
   queue_as :default
 
   ACTIVE_USER_TIME_WINDOW = 4.hours

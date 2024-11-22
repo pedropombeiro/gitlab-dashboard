@@ -25,7 +25,7 @@ module Services
         mr_changes << merge_request_change(
           mr,
           title: "A merge request was merged",
-          body: "#{mr.reference}: #{mr.titleHtml}",
+          body: "#{mr.reference}: #{mr.titleHtml}"
         )
       end
 

@@ -5,9 +5,9 @@ module MergeRequestsHelper
 
   def user_help_hash(user)
     {
-      "Location": user.location,
-      "Last activity": user.lastActivityOn > 1.day.ago ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
-      "Message": user.status&.message
+      Location: user.location,
+      "Last activity": (user.lastActivityOn > 1.day.ago) ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
+      Message: user.status&.message
     }
   end
 
@@ -17,7 +17,7 @@ module MergeRequestsHelper
 
   def reviewer_help_title(reviewer)
     tooltip_from_hash(
-      "State": humanized_enum(reviewer.mergeRequestInteraction.reviewState),
+      State: humanized_enum(reviewer.mergeRequestInteraction.reviewState),
       "Active reviews": reviewer.activeReviews.count,
       **user_help_hash(reviewer)
     )

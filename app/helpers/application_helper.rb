@@ -9,6 +9,6 @@ module ApplicationHelper
   end
 
   def pluralize_without_count(count, noun, plural_noun = nil)
-    count == 1 ? "#{noun}" : "#{plural_noun || noun.pluralize}"
+    (count == 1) ? noun.to_s : (plural_noun || noun.pluralize).to_s
   end
 end

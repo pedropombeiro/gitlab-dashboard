@@ -29,3 +29,6 @@ watch-ci:
 
 build-docker:
   docker build -t $(basename $(pwd)) .
+
+lint:
+  rake standard:fix

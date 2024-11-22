@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
     session[:user_id] = username
     @current_user = username.present? ? GitlabUser.safe_find_or_create_by!(username: username) : nil
 
-    @current_user.update_column(:contacted_at, Time.current) if @current_user
+    @current_user&.update_column(:contacted_at, Time.current)
   end
 
   def current_user
@@ -24,12 +24,12 @@ class ApplicationController < ActionController::Base
       options: {
         badge: badge,
         body: body,
-        data: url ? { url: url } : nil,
+        data: url ? {url: url} : nil,
         icon: icon
       }.compact.merge(message)
     }
 
-    current_user&.web_push_subscriptions.each do |subscription|
+    current_user&.web_push_subscriptions&.each do |subscription|
       subscription.publish(merged_message)
     rescue WebPush::ExpiredSubscription
       Rails.logger.info "Removing expired WebPush subscription"
