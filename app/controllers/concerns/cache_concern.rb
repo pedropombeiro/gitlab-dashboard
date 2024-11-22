@@ -25,6 +25,10 @@ module CacheConcern
       "#{REDIS_NAMESPACE}/merge_requests/v3/last_authored_list/#{user_hash(user)}"
     end
 
+    def location_timezone_name_cache_key(location)
+      "#{REDIS_NAMESPACE}/location_timezone_name/v1/#{Digest::SHA256.hexdigest(location)}"
+    end
+
     private
 
     def user_hash(username)

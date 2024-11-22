@@ -8,11 +8,11 @@ class UserDto
   include ReviewerOrnamentsConcern
   include MergeRequestsParsingHelper
 
-  DEPLOYMENT_LABELS = ["Pick into auto-deploy"].freeze
+  DEPLOYMENT_LABELS = [ "Pick into auto-deploy" ].freeze
   WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys.freeze
-  OPEN_MRS_CONTEXTUAL_LABELS = ["pipeline::"].freeze
+  OPEN_MRS_CONTEXTUAL_LABELS = [ "pipeline::" ].freeze
   MERGED_MRS_CONTEXTUAL_LABELS = (DEPLOYMENT_LABELS + WORKFLOW_LABELS).freeze
-  ISSUE_CONTEXTUAL_LABELS = ["workflow::"].freeze
+  ISSUE_CONTEXTUAL_LABELS = [ "workflow::" ].freeze
 
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :open_merge_requests, :merged_merge_requests
@@ -36,6 +36,9 @@ class UserDto
 
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
+
+    warmup_timezone_cache(open_mrs)
+
     @open_merge_requests = MergeRequestCollectionDto.new(
       open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) }
     )
@@ -63,6 +66,12 @@ class UserDto
 
   def parse_graphql_time(timestamp)
     Time.zone.parse(timestamp) if timestamp
+  end
+
+  def warmup_timezone_cache(mrs)
+    locations = mrs.filter_map { |mr| mr.reviewers.nodes.map(&:location).map(&:presence) }.flatten.compact.uniq
+
+    Services::TimezoneService.new.fetch_from_locations(locations)
   end
 
   def convert_mr_pipeline(pipeline)

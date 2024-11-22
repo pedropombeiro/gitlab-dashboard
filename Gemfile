@@ -80,3 +80,6 @@ gem "graphlient"
 gem "local_time", "~> 3.0"
 gem "mission_control-jobs"
 gem "web-push", "~> 3.0"
+
+gem "geokit", "~> 1.14"
+gem "timezone", "~> 1.3"
