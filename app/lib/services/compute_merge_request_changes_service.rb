@@ -60,7 +60,7 @@ module Services
       merge_request_change(
         mr,
         title: title,
-        body: "changed to #{change[:labels].join(", ")}\n\n#{mr.reference}: #{mr.titleHtml}"
+        body: "changed to #{changes[:labels].join(", ")}\n\n#{mr.reference}: #{mr.titleHtml}"
       )
     end
 
