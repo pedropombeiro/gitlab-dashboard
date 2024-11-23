@@ -13,6 +13,8 @@ module Services
     end
 
     def fetch_from_locations(locations)
+      return unless timezone_configured?
+
       locations.map do |l|
         Async { [l, fetch_from_location(l)] }
       end.map(&:wait).to_h
@@ -20,6 +22,7 @@ module Services
 
     def fetch_from_location(location)
       return if location.blank?
+      return unless timezone_configured?
 
       tzname =
         Rails.cache.fetch(self.class.location_timezone_name_cache_key(location), expires_in: self.class.cache_validity) do
@@ -33,6 +36,16 @@ module Services
         end
 
       Timezone[tzname] if tzname
+    end
+
+    private
+
+    def timezone_configured?
+      Timezone::Lookup.lookup
+
+      true
+    rescue ::Timezone::Error::InvalidConfig
+      false
     end
   end
 end
