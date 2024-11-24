@@ -3,14 +3,14 @@ development:
     class: ScheduleCacheRefreshJob
     queue: background
     args: []
-    schedule: every 5 minutes
+    schedule: '* * * * *'
 
 production:
   periodic_cache_refresh:
     class: ScheduleCacheRefreshJob
     queue: background
     args: []
-    schedule: '0/30 * * * *'
+    schedule: '* * * * *'
   # periodic_command:
   #   command: "SoftDeletedRecord.due.delete_all"
   #   priority: 2
