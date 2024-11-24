@@ -26,6 +26,7 @@
         <% if @dto.next_update_at %>
           <span>Cached until
             <%= local_relative_time(@dto.next_update_at, type: 'time-or-date', data: bs_data) -%>.
+          </span>
         <% else %>
           <span>Not cached.</span>
         <% end %>
