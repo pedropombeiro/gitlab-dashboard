@@ -18,6 +18,13 @@ module Services
       @assignee = assignee
     end
 
+    def needs_scheduled_update?
+      response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
+      return true if response&.next_scheduled_update_at&.nil?
+
+      response.next_scheduled_update_at.past?
+    end
+
     def execute
       Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: self.class.cache_validity) do
         start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
@@ -34,6 +41,12 @@ module Services
         end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
         merge_requests.next_update_at = self.class.cache_validity.after(merge_requests.updated_at)
+        merge_requests.next_scheduled_update_at =
+          if any_running_pipelines?(merge_requests.user.openMergeRequests.nodes)
+            5.minutes.from_now
+          else
+            30.minutes.from_now
+          end
         merge_requests.request_duration = (end_t - start_t).seconds.round(1)
         merge_requests.errors ||= merged_merge_requests&.errors
         if merge_requests.errors.nil?
@@ -48,5 +61,9 @@ module Services
     private
 
     attr_reader :assignee
+
+    def any_running_pipelines?(merge_requests)
+      merge_requests.any? { |mr| mr.headPipeline.startedAt.present? && mr.headPipeline.finishedAt.nil? }
+    end
   end
 end
