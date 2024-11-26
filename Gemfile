@@ -55,6 +55,13 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+
+  gem "standard"
+  gem "standard-rails"
+
+  gem "rspec-rails", "~> 7.0.0"
+  gem "factory_bot", "~> 6.5"
+  gem "factory_bot_rails", "~> 6.4"
 end
 
 group :development do
@@ -70,9 +77,6 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
-
-gem "standard", group: [:development, :test]
-gem "standard-rails", group: [:development, :test]
 
 gem "async", "~> 2.21"
 gem "dartsass-rails", "~> 0.5.1"
