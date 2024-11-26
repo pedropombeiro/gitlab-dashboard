@@ -7,6 +7,7 @@ install:
 
 update:
     bundle update --bundler
+    bundle update
     yarn upgrade
 
 alias cache := toggle-cache
