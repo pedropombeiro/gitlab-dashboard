@@ -5,6 +5,8 @@ class WebPushSubscriptionsController < ApplicationController
   before_action :require_user
 
   def create
+    params.expect(:endpoint, keys: [:auth, :p256dh])
+
     @subscription = WebPushSubscription.create!(
       gitlab_user: current_user,
       endpoint: params[:endpoint],
