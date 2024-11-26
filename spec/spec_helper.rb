@@ -37,6 +37,10 @@ RSpec.configure do |config|
     mocks.verify_partial_doubles = true
   end
 
+  def session
+    last_request.env["rack.session"]
+  end
+
   config.around(:each, :freeze_time) do |example|
     config.include ActiveSupport::Testing::TimeHelpers
 
