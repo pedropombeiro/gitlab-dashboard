@@ -15,5 +15,7 @@ class WebPushSubscription < ApplicationRecord
         private_key: Rails.application.credentials.dig(:webpush, :vapid_private_key)
       }
     )
+
+    update_column(:notified_at, Time.current)
   end
 end

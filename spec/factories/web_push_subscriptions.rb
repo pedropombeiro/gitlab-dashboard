@@ -7,5 +7,6 @@ FactoryBot.define do
     user_agent { "user_agent" }
     created_at { "2024-11-26 22:06:23" }
     updated_at { "2024-11-26 22:06:23" }
+    notified_at { "2024-11-26 22:06:23" }
   end
 end
