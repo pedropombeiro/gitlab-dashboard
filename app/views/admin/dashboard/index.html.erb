@@ -34,6 +34,7 @@
                 <thead class="thead-dark">
                   <tr>
                     <th scope="col">Created ↓</th>
+                    <th scope="col">Notified</th>
                     <th scope="col">User Agent</th>
                   </tr>
                 </thead>
@@ -42,6 +43,9 @@
                     <tr style="cursor: pointer;">
                       <td>
                         <%= render "shared/relative_timestamp", timestamp: subscription.created_at %>
+                      </td>
+                      <td>
+                        <%= render "shared/relative_timestamp", timestamp: subscription.notified_at %>
                       </td>
                       <td>
                         <%= tag.code subscription.user_agent %>
