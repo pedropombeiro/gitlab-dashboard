@@ -6,8 +6,10 @@
   </div>
 
   <script>
+    <% next_update_remaining_secs = @dto.next_update_at ? 5.seconds.after(@dto.next_update_at) - Time.current : 0 %>
+
     setTimeout(function(){
       document.getElementById("<%= dom_id(@dto, :merge_requests) -%>").reload();
-    }, <%= ([10, @dto.next_update_at ? 5.seconds.after(@dto.next_update_at) - Time.current : 0].max * 1000).round.to_i %>);
+    }, <%= (next_update_remaining_secs.clamp(10, 60) * 1000).round.to_i %>);
   </script>
 <% end %>
