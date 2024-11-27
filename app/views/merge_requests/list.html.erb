@@ -1,6 +1,9 @@
 <%= turbo_frame_tag(@dto, :merge_requests) do %>
   <div data-controller="bootstrap-tooltip">
     <%= render "user_merge_requests",
+    updated_at: @dto.updated_at,
+    next_update_at: @dto.next_update_at,
+    request_duration: @dto.request_duration,
     open_merge_requests: @dto.open_merge_requests,
     merged_merge_requests: @dto.merged_merge_requests %>
   </div>
