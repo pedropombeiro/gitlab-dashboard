@@ -4,63 +4,63 @@ require "ostruct"
 
 class GitlabClient
   CORE_USER_FRAGMENT = <<-GRAPHQL
-      fragment CoreUserFields on User {
-        username
-        avatarUrl
-        webUrl
-      }
+    fragment CoreUserFields on User {
+      username
+      avatarUrl
+      webUrl
+    }
   GRAPHQL
 
   EXT_USER_FRAGMENT = <<-GRAPHQL
-      fragment ExtendedUserFields on User {
-        ...CoreUserFields
-        lastActivityOn
-        location
-        status {
-          availability
-          message
-        }
+    fragment ExtendedUserFields on User {
+      ...CoreUserFields
+      lastActivityOn
+      location
+      status {
+        availability
+        message
       }
+    }
   GRAPHQL
 
   CORE_LABEL_FRAGMENT = <<-GRAPHQL
-      fragment CoreLabelFields on Label {
-        title
-        descriptionHtml
-        color
-        textColor
-      }
+    fragment CoreLabelFields on Label {
+      title
+      descriptionHtml
+      color
+      textColor
+    }
   GRAPHQL
 
   CORE_ISSUE_FRAGMENT = <<-GRAPHQL
-      fragment CoreIssueFields on Issue {
-        iid
-        webUrl
-        titleHtml
-        labels {
-          nodes { ...CoreLabelFields }
-        }
+    fragment CoreIssueFields on Issue {
+      iid
+      webUrl
+      titleHtml
+      labels {
+        nodes { ...CoreLabelFields }
       }
+    }
   GRAPHQL
 
   CORE_MERGE_REQUEST_FRAGMENT = <<-GRAPHQL
-      fragment CoreMergeRequestFields on MergeRequest {
-        iid
-        webUrl
-        titleHtml
-        project { fullPath }
-        reference
-        sourceBranch
-        targetBranch
-        createdAt
-        updatedAt
-        assignees {
-          nodes { ...CoreUserFields }
-        }
-        labels {
-          nodes { ...CoreLabelFields }
-        }
+    fragment CoreMergeRequestFields on MergeRequest {
+      iid
+      webUrl
+      titleHtml
+      project { fullPath }
+      reference
+      sourceBranch
+      targetBranch
+      createdAt
+      updatedAt
+      assignees {
+        nodes { ...CoreUserFields }
       }
+      labels {
+        nodes { ...CoreLabelFields }
+      }
+    }
   GRAPHQL
 
   def gitlab_instance_url
