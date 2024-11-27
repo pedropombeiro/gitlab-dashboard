@@ -242,23 +242,6 @@ class GitlabClient
     end.flatten
   end
 
-  private
-
-  def make_serializable(obj)
-    # GraphQL types cannot be serialized, so we work around that by reparsing from JSON into anonymous objects
-    JSON.parse!(obj.to_json, object_class: OpenStruct)
-  end
-
-  def quote(s)
-    return unless s
-
-    "\"#{s}\""
-  end
-
-  private_class_method def self.authorization
-    "Bearer #{Rails.application.credentials.gitlab_token}"
-  end
-
   def self.client
     @client ||= ::Graphlient::Client.new(
       "#{gitlab_instance_url}/api/graphql",
@@ -268,5 +251,20 @@ class GitlabClient
         write_timeout: 30
       }
     )
+  end
+
+  private
+
+  def make_serializable(obj)
+    # GraphQL types cannot be serialized, so we work around that by reparsing from JSON into anonymous objects
+    JSON.parse!(obj.to_json, object_class: OpenStruct)
+  end
+
+  def quote(s)
+    %("#{s}") if s
+  end
+
+  private_class_method def self.authorization
+    "Bearer #{Rails.application.credentials.gitlab_token}"
   end
 end
