@@ -117,15 +117,17 @@ RSpec.describe GitlabClient do
         user: {
           openMergeRequests: {
             nodes: [
-              a_hash_including(iid: "173913", **common_mr_attrs),
-              a_hash_including(iid: "173874", **common_mr_attrs),
               a_hash_including(iid: "173741", **common_mr_attrs),
+              a_hash_including(iid: "174004", **common_mr_attrs),
               a_hash_including(iid: "173789", **common_mr_attrs),
+              a_hash_including(iid: "173874", **common_mr_attrs),
               a_hash_including(iid: "173916", **common_mr_attrs),
               a_hash_including(iid: "173886", **common_mr_attrs),
-              a_hash_including(iid: "173885", **common_mr_attrs),
+              a_hash_including(iid: "173885", **common_mr_attrs,
+                blockingMergeRequests: {visibleMergeRequests: [iid: "173886", state: "opened"]}),
               a_hash_including(iid: "173639", **common_mr_attrs),
-              a_hash_including(iid: "171848", **common_mr_attrs),
+              a_hash_including(iid: "171848", **common_mr_attrs,
+                blockingMergeRequests: {visibleMergeRequests: [{iid: "172422", state: "merged"}, {iid: "172698", state: "closed"}]}),
               a_hash_including(iid: "173007", **common_mr_attrs)
             ]
           }
