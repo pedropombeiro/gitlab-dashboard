@@ -1,0 +1,15 @@
+pedropombeiro:
+  data:
+    user:
+      __typename: UserCore
+      username: pedropombeiro
+      avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+      webUrl: https://gitlab.com/pedropombeiro
+
+mrincon:
+  data:
+    user:
+      __typename: UserCore
+      username: mrincon
+      avatarUrl: "/uploads/-/system/user/avatar/1607849/avatar.png"
+      webUrl: https://gitlab.com/mrincon
