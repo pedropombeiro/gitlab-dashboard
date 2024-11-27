@@ -64,7 +64,9 @@ module Services
     attr_reader :assignee
 
     def any_running_pipelines?(merge_requests)
-      merge_requests.any? { |mr| mr.headPipeline.startedAt.present? && mr.headPipeline.finishedAt.nil? }
+      merge_requests.any? do |mr|
+        mr.headPipeline && mr.headPipeline.startedAt.present? && mr.headPipeline.finishedAt.nil?
+      end
     end
   end
 end
