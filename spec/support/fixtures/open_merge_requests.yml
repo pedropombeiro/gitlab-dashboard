@@ -1,0 +1,1357 @@
+one:
+  data:
+    user:
+      openMergeRequests:
+        nodes:
+          - iid: "173913"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173913
+            titleHtml: "GraphQL: Expose user timezone"
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173913"
+            sourceBranch: pedropombeiro/506404/expose-user-timezone
+            targetBranch: master
+            createdAt: "2024-11-26T17:16:04Z"
+            updatedAt: "2024-11-27T10:40:33Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: Category:User Profile
+                  descriptionHtml:
+                    Issues related to the User Profile category. See <a href="https://about.gitlab.com/direction/core_platform/tenant-scale/user-profile/"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/direction/core_platform/tenant-scale/user-profile/</a>.
+                  color: "#428bca"
+                  textColor: "#FFFFFF"
+                - title: GraphQL
+                  descriptionHtml: Issues &amp; Merge Requests related to the new GraphQL
+                    API
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+                - title: Stretch
+                  descriptionHtml: Issues that are a stretch goal for delivering in the
+                    current milestone. If these issues are not done in the current release,
+                    they will strongly be considered for the next release.
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: pipeline::tier-2
+                  descriptionHtml: Tier 2 pipelines are run when a merge request has at
+                    at least one approval, but still requires more approvals.&#x000A;&#x000A;See
+                    <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:mr-approved
+                  descriptionHtml: Indicates that associated merge request pipelines will
+                    be forced to run non-minimal sets of RSpec and Jest tests. More info
+                    at <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs</a>
+                    and <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs</a>
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 1
+            approvalsLeft: 1
+            autoMergeEnabled: false
+            detailedMergeStatus: NOT_APPROVED
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: mhamda
+                  avatarUrl: "/uploads/-/system/user/avatar/12697370/avatar.png"
+                  webUrl: https://gitlab.com/mhamda
+                  lastActivityOn: "2024-11-27"
+                  location: ""
+                  status:
+                    availability: NOT_SET
+                    message: ""
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 1
+                - __typename: MergeRequestReviewer
+                  username: freinink
+                  avatarUrl: "/uploads/-/system/user/avatar/21751328/avatar.png"
+                  webUrl: https://gitlab.com/freinink
+                  lastActivityOn: "2024-11-27"
+                  location: ""
+                  status:
+                    availability: NOT_SET
+                    message: ":two:"
+                  mergeRequestInteraction:
+                    approved: true
+                    reviewState: APPROVED
+                  activeReviews:
+                    count: 2
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1561391522"
+              startedAt: "2024-11-26T17:16:53Z"
+              finishedAt: "2024-11-26T17:39:33Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 71
+              finishedJobs:
+                count: 64
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173874"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173874
+            titleHtml: Fix flaky test on set_runner_associated_projects_service_spec.rb
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173874"
+            sourceBranch: pedropombeiro/481411/fix-flaky-test
+            targetBranch: master
+            createdAt: "2024-11-26T14:13:10Z"
+            updatedAt: "2024-11-27T10:14:10Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: Category:Runner Core
+                  descriptionHtml: <a href="https://about.gitlab.com/direction/verify/runner_core/"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/direction/verify/runner_core/</a>
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+                - title: automation:bot-authored
+                  descriptionHtml: Identifies merge requests that are authored by bot tooling
+                  color: "#FFECDB"
+                  textColor: "#1F1E24"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: failure::flaky-test
+                  descriptionHtml: Tests that fail intermittently including those that cause
+                    "broken master"
+                  color: "#FF0000"
+                  textColor: "#FFFFFF"
+                - title: flakiness::2
+                  descriptionHtml: Unhealthy test issues with between 37 and 398 flakiness
+                    reports.
+                  color: "#ff8800"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: maintenance::refactor
+                  descriptionHtml: Issues related to things that need improvement and that
+                    have been left behind due to high velocity of development
+                  color: "#7f8c8d"
+                  textColor: "#FFFFFF"
+                - title: pipeline::expedited
+                  descriptionHtml: Set this label on "master fixing" or urgent revert MRs
+                    to skip Review Apps and QA related jobs
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: priority::3
+                  descriptionHtml: We want to address this but may have other higher priority
+                    items. See <a href="https://handbook.gitlab.com/handbook/engineering/infrastructure/engineering-productivity/issue-triage/#priority"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/engineering/infrastructure/engineering-productivity/issue-triage/#priority</a>
+                  color: "#fff600"
+                  textColor: "#1F1E24"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: severity::3
+                  descriptionHtml: Major - applies to bugs and bug categories of availability,
+                    performance, security and ux. See <a href="https://handbook.gitlab.com/handbook/engineering/infrastructure/engineering-productivity/issue-triage/#severity"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/engineering/infrastructure/engineering-productivity/issue-triage/#severity</a>
+                  color: "#fff600"
+                  textColor: "#1F1E24"
+                - title: test
+                  descriptionHtml: Issues related to our test suite
+                  color: "#69D100"
+                  textColor: "#1F1E24"
+                - title: test-health:pass-after-retry
+                  descriptionHtml: A test that first failed, and then passed when retried
+                    in the same CI/CD job.
+                  color: "#cd5b45"
+                  textColor: "#FFFFFF"
+                - title: type::maintenance
+                  descriptionHtml: Upkeeping efforts and catch-up corrective improvements
+                    that are not Feature nor Bugs. Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#330066"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 1
+            approvalsLeft: 1
+            autoMergeEnabled: false
+            detailedMergeStatus: UNCHECKED
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: hmehra
+                  avatarUrl: "/uploads/-/system/user/avatar/10761376/avatar.png"
+                  webUrl: https://gitlab.com/hmehra
+                  lastActivityOn: "2024-11-27"
+                  location: ""
+                  status:
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 4
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1562376596"
+              startedAt: "2024-11-27T10:12:13Z"
+              finishedAt: "2024-11-27T10:27:07Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 32
+              finishedJobs:
+                count: 28
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173741"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173741
+            titleHtml: Clean up runner audit log code
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173741"
+            sourceBranch: pedropombeiro/503315/cleanup-code
+            targetBranch: master
+            createdAt: "2024-11-25T16:11:04Z"
+            updatedAt: "2024-11-27T10:12:48Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: GitLab Ultimate
+                  descriptionHtml: Features or changes limited or intended as part of GitLab
+                    Ultimate.
+                  color: "#8E44AD"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: maintenance::refactor
+                  descriptionHtml: Issues related to things that need improvement and that
+                    have been left behind due to high velocity of development
+                  color: "#7f8c8d"
+                  textColor: "#FFFFFF"
+                - title: pipeline::tier-2
+                  descriptionHtml: Tier 2 pipelines are run when a merge request has at
+                    at least one approval, but still requires more approvals.&#x000A;&#x000A;See
+                    <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:mr-approved
+                  descriptionHtml: Indicates that associated merge request pipelines will
+                    be forced to run non-minimal sets of RSpec and Jest tests. More info
+                    at <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs</a>
+                    and <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs</a>
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::maintenance
+                  descriptionHtml: Upkeeping efforts and catch-up corrective improvements
+                    that are not Feature nor Bugs. Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#330066"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 1
+            approvalsLeft: 1
+            autoMergeEnabled: false
+            detailedMergeStatus: UNCHECKED
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: dmeshcharakou
+                  avatarUrl: "/uploads/-/system/user/avatar/12459192/avatar.png"
+                  webUrl: https://gitlab.com/dmeshcharakou
+                  lastActivityOn: "2024-11-27"
+                  location: Switzerland
+                  status:
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 2
+                - __typename: MergeRequestReviewer
+                  username: bucoleary
+                  avatarUrl: "/uploads/-/system/user/avatar/21563091/avatar.png"
+                  webUrl: https://gitlab.com/bucoleary
+                  lastActivityOn: "2024-11-27"
+                  location: NYC, US
+                  status:
+                    availability: NOT_SET
+                    message: ""
+                  mergeRequestInteraction:
+                    approved: true
+                    reviewState: APPROVED
+                  activeReviews:
+                    count: 1
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1559540872"
+              startedAt: "2024-11-25T16:19:12Z"
+              finishedAt: "2024-11-25T16:44:34Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 64
+              finishedJobs:
+                count: 59
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173789"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173789
+            titleHtml: Generate audit event per project association from runner
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173789"
+            sourceBranch: pedropombeiro/506226/create-audit-event-per-project
+            targetBranch: master
+            createdAt: "2024-11-25T21:54:46Z"
+            updatedAt: "2024-11-27T09:58:03Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: GitLab Ultimate
+                  descriptionHtml: Features or changes limited or intended as part of GitLab
+                    Ultimate.
+                  color: "#8E44AD"
+                  textColor: "#FFFFFF"
+                - title: Stretch
+                  descriptionHtml: Issues that are a stretch goal for delivering in the
+                    current milestone. If these issues are not done in the current release,
+                    they will strongly be considered for the next release.
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: pipeline::tier-2
+                  descriptionHtml: Tier 2 pipelines are run when a merge request has at
+                    at least one approval, but still requires more approvals.&#x000A;&#x000A;See
+                    <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:mr-approved
+                  descriptionHtml: Indicates that associated merge request pipelines will
+                    be forced to run non-minimal sets of RSpec and Jest tests. More info
+                    at <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs</a>
+                    and <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs</a>
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 1
+            approvalsLeft: 1
+            autoMergeEnabled: false
+            detailedMergeStatus: NOT_APPROVED
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: halilcoban
+                  avatarUrl: "/uploads/-/system/user/avatar/13172759/avatar.png"
+                  webUrl: https://gitlab.com/halilcoban
+                  lastActivityOn: "2024-11-27"
+                  location: ""
+                  status:
+                    availability: NOT_SET
+                    message: ""
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 1
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1562345814"
+              startedAt: "2024-11-27T09:56:09Z"
+              finishedAt:
+              status: RUNNING
+              failureReason:
+              jobs:
+                count: 291
+              finishedJobs:
+                count: 280
+              runningJobs:
+                count: 4
+              firstRunningJob:
+                nodes:
+                  - webPath: "/gitlab-org/gitlab/-/jobs/8482434590"
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173916"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173916
+            titleHtml: Include last contacted time on audit log when runner is deleted
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173916"
+            sourceBranch: pedropombeiro/503315/log-last-contacted-time
+            targetBranch: master
+            createdAt: "2024-11-26T17:43:27Z"
+            updatedAt: "2024-11-27T09:25:43Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Audit Events
+                  descriptionHtml:
+                    'Issues related to the Audit Events feature: <a href="http://doc.gitlab.com/ee/administration/audit_events.html"
+                    rel="nofollow noreferrer noopener" target="_blank">http://doc.gitlab.com/ee/administration/audit_events.html</a>'
+                  color: "#428bca"
+                  textColor: "#FFFFFF"
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: GitLab Ultimate
+                  descriptionHtml: Features or changes limited or intended as part of GitLab
+                    Ultimate.
+                  color: "#8E44AD"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: pipeline::tier-2
+                  descriptionHtml: Tier 2 pipelines are run when a merge request has at
+                    at least one approval, but still requires more approvals.&#x000A;&#x000A;See
+                    <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:mr-approved
+                  descriptionHtml: Indicates that associated merge request pipelines will
+                    be forced to run non-minimal sets of RSpec and Jest tests. More info
+                    at <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs</a>
+                    and <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs</a>
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 1
+            approvalsLeft: 1
+            autoMergeEnabled: false
+            detailedMergeStatus: UNCHECKED
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: vshushlin
+                  avatarUrl: "/uploads/-/system/user/avatar/3379682/avatar.png"
+                  webUrl: https://gitlab.com/vshushlin
+                  lastActivityOn: "2024-11-26"
+                  location: Amsterdam (UTC+1)
+                  status:
+                    availability: NOT_SET
+                    message: Mention @vshushlin, if you need my reply or action! I only
+                      use todos!
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 2
+                - __typename: MergeRequestReviewer
+                  username: cwiesner
+                  avatarUrl: "/uploads/-/system/user/avatar/4799322/avatar.png"
+                  webUrl: https://gitlab.com/cwiesner
+                  lastActivityOn: "2024-11-27"
+                  location: Germany
+                  status:
+                    availability: NOT_SET
+                    message: ""
+                  mergeRequestInteraction:
+                    approved: true
+                    reviewState: APPROVED
+                  activeReviews:
+                    count: 2
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1561551217"
+              startedAt: "2024-11-26T19:37:05Z"
+              finishedAt: "2024-11-26T20:01:34Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 64
+              finishedJobs:
+                count: 59
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173886"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173886
+            titleHtml: Add audit event to BulkDeleteRunnersService
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173886"
+            sourceBranch: pedropombeiro/503315/1-add-bulk-delete-runner-audit-event
+            targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
+            createdAt: "2024-11-26T15:11:55Z"
+            updatedAt: "2024-11-26T18:00:34Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Audit Events
+                  descriptionHtml:
+                    'Issues related to the Audit Events feature: <a href="http://doc.gitlab.com/ee/administration/audit_events.html"
+                    rel="nofollow noreferrer noopener" target="_blank">http://doc.gitlab.com/ee/administration/audit_events.html</a>'
+                  color: "#428bca"
+                  textColor: "#FFFFFF"
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: GitLab Ultimate
+                  descriptionHtml: Features or changes limited or intended as part of GitLab
+                    Ultimate.
+                  color: "#8E44AD"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: documentation
+                  descriptionHtml: Epics, issues, and merge requests related to product
+                    documentation.
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: pipeline::tier-3
+                  descriptionHtml: Tier 3 pipelines are run when a merge request has all
+                    the approvals it needs.&#x000A;&#x000A;See <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:run-e2e-omnibus-once
+                  descriptionHtml: "Automation-only label: no need to apply it manually.&#x000A;&#x000A;Indicates
+                    that the next merged results pipeline should run E2E Omnibus tests once
+                    (if applicable for the type of changes)."
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+            approved: true
+            approvalsRequired: 0
+            approvalsLeft: 0
+            autoMergeEnabled: false
+            detailedMergeStatus: MERGEABLE
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: aish.sub
+                  avatarUrl: "/uploads/-/system/user/avatar/11167007/avatar.png"
+                  webUrl: https://gitlab.com/aish.sub
+                  lastActivityOn: "2024-11-27"
+                  location: ""
+                  status:
+                    availability: NOT_SET
+                    message: ""
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 1
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1561352489"
+              startedAt: "2024-11-26T16:52:02Z"
+              finishedAt: "2024-11-26T18:00:48Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 84
+              finishedJobs:
+                count: 75
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173885"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173885
+            titleHtml: Add audit event to CreateRunnerService
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173885"
+            sourceBranch: pedropombeiro/506385/add-create-runner-audit-event
+            targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
+            createdAt: "2024-11-26T15:06:52Z"
+            updatedAt: "2024-11-26T17:15:33Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Audit Events
+                  descriptionHtml:
+                    'Issues related to the Audit Events feature: <a href="http://doc.gitlab.com/ee/administration/audit_events.html"
+                    rel="nofollow noreferrer noopener" target="_blank">http://doc.gitlab.com/ee/administration/audit_events.html</a>'
+                  color: "#428bca"
+                  textColor: "#FFFFFF"
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: GitLab Ultimate
+                  descriptionHtml: Features or changes limited or intended as part of GitLab
+                    Ultimate.
+                  color: "#8E44AD"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: documentation
+                  descriptionHtml: Epics, issues, and merge requests related to product
+                    documentation.
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: pipeline::tier-3
+                  descriptionHtml: Tier 3 pipelines are run when a merge request has all
+                    the approvals it needs.&#x000A;&#x000A;See <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:run-e2e-omnibus-once
+                  descriptionHtml: "Automation-only label: no need to apply it manually.&#x000A;&#x000A;Indicates
+                    that the next merged results pipeline should run E2E Omnibus tests once
+                    (if applicable for the type of changes)."
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+            approved: true
+            approvalsRequired: 0
+            approvalsLeft: 0
+            autoMergeEnabled: false
+            detailedMergeStatus: BLOCKED_STATUS
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests:
+                - iid: "173886"
+                  state: opened
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: akotte
+                  avatarUrl: "/uploads/-/system/user/avatar/12515238/avatar.png"
+                  webUrl: https://gitlab.com/akotte
+                  lastActivityOn: "2024-11-27"
+                  location: Hyderabad, India
+                  status:
+                    availability: NOT_SET
+                    message: ""
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 2
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1561290040"
+              startedAt: "2024-11-26T16:11:36Z"
+              finishedAt: "2024-11-26T17:17:31Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 84
+              finishedJobs:
+                count: 75
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173639"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173639
+            titleHtml: Fix runner audit events
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173639"
+            sourceBranch: pedropombeiro/503315/0-fix-runner-audit-events
+            targetBranch: master
+            createdAt: "2024-11-24T23:30:47Z"
+            updatedAt: "2024-11-26T15:50:51Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: GitLab Ultimate
+                  descriptionHtml: Features or changes limited or intended as part of GitLab
+                    Ultimate.
+                  color: "#8E44AD"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: pipeline::tier-2
+                  descriptionHtml: Tier 2 pipelines are run when a merge request has at
+                    at least one approval, but still requires more approvals.&#x000A;&#x000A;See
+                    <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:mr-approved
+                  descriptionHtml: Indicates that associated merge request pipelines will
+                    be forced to run non-minimal sets of RSpec and Jest tests. More info
+                    at <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs</a>
+                    and <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs</a>
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 1
+            approvalsLeft: 1
+            autoMergeEnabled: false
+            detailedMergeStatus: NOT_APPROVED
+            squashOnMerge: false
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: eugielimpin
+                  avatarUrl: "/uploads/-/system/user/avatar/9670031/avatar.png"
+                  webUrl: https://gitlab.com/eugielimpin
+                  lastActivityOn: "2024-11-27"
+                  location: ""
+                  status:
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: UNREVIEWED
+                  activeReviews:
+                    count: 3
+                - __typename: MergeRequestReviewer
+                  username: emmaspark
+                  avatarUrl: "/uploads/-/system/user/avatar/21572755/avatar.png"
+                  webUrl: https://gitlab.com/emmaspark
+                  lastActivityOn: "2024-11-27"
+                  location: ""
+                  status:
+                  mergeRequestInteraction:
+                    approved: true
+                    reviewState: APPROVED
+                  activeReviews:
+                    count: 1
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1561176021"
+              startedAt: "2024-11-26T15:09:07Z"
+              finishedAt: "2024-11-26T16:16:20Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 291
+              finishedJobs:
+                count: 285
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "171848"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/171848
+            titleHtml: Add foreign key constraint to partitions of ci_runner_machines_687967fa8a
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!171848"
+            sourceBranch: pedropombeiro/502403/recreate-fk-from-partitioned-ci_runner_managers-to-ci_runners
+            targetBranch: master
+            createdAt: "2024-11-06T16:55:06Z"
+            updatedAt: "2024-11-26T14:16:29Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: database
+                  descriptionHtml: Issues related to GitLab's (ab)use of its database
+                  color: "#428bca"
+                  textColor: "#FFFFFF"
+                - title: database-testing-automation
+                  descriptionHtml: Verified by automated database-testing pipeline
+                  color: "#00b140"
+                  textColor: "#FFFFFF"
+                - title: database::review pending
+                  descriptionHtml: Database changes require a review from Database Reviewer/Maintainer
+                  color: "#336791"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: maintenance::scalability
+                  descriptionHtml: Modification to improve the scalability of GitLab that
+                    is not a user facing change or performance improvement
+                  color: "#330066"
+                  textColor: "#FFFFFF"
+                - title: pipeline::tier-3
+                  descriptionHtml: Tier 3 pipelines are run when a merge request has all
+                    the approvals it needs.&#x000A;&#x000A;See <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:mr-approved
+                  descriptionHtml: Indicates that associated merge request pipelines will
+                    be forced to run non-minimal sets of RSpec and Jest tests. More info
+                    at <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs</a>
+                    and <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs</a>
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:skip-undercoverage
+                  descriptionHtml: " Indicates that the undercoverage job for the merge
+                    request will be allowed to fail"
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: rspec:slow test detected
+                  descriptionHtml: Slow test detected related with the changes in this MR
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::maintenance
+                  descriptionHtml: Upkeeping efforts and catch-up corrective improvements
+                    that are not Feature nor Bugs. Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#330066"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 7
+            approvalsLeft: 7
+            autoMergeEnabled: false
+            detailedMergeStatus: UNCHECKED
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests:
+                - iid: "172422"
+                  state: merged
+                - iid: "172698"
+                  state: closed
+            reviewers:
+              nodes: []
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1555923460"
+              startedAt: "2024-11-22T08:56:49Z"
+              finishedAt: "2024-11-22T09:51:57Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 762
+              finishedJobs:
+                count: 755
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 0
+                nodes: []
+              failedJobTraces:
+                nodes: []
+          - iid: "173007"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173007
+            titleHtml: Save runner taggings to shard table
+            project:
+              fullPath: gitlab-org/gitlab
+            reference: "!173007"
+            sourceBranch: pedropombeiro/472974/save-taggings-to-ci_runner_taggings
+            targetBranch: master
+            createdAt: "2024-11-18T14:47:09Z"
+            updatedAt: "2024-11-22T14:44:47Z"
+            assignees:
+              nodes:
+                - __typename: MergeRequestAssignee
+                  username: pedropombeiro
+                  avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+                  webUrl: https://gitlab.com/pedropombeiro
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: Stretch
+                  descriptionHtml: Issues that are a stretch goal for delivering in the
+                    current milestone. If these issues are not done in the current release,
+                    they will strongly be considered for the next release.
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: database
+                  descriptionHtml: Issues related to GitLab's (ab)use of its database
+                  color: "#428bca"
+                  textColor: "#FFFFFF"
+                - title: database::reviewed
+                  descriptionHtml: Database changes are reviewed and ready to be approved
+                    by Database Maintainer
+                  color: "#336791"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: feature flag
+                  descriptionHtml: New changes that can be disabled using a feature flag,
+                    or existing feature flags that are being removed.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: feature flag::exists
+                  descriptionHtml: This label ensures a developer is aware that the feature
+                    being worked on is using an existing feature flag.
+                  color: "#3cb371"
+                  textColor: "#FFFFFF"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: maintenance::scalability
+                  descriptionHtml: Modification to improve the scalability of GitLab that
+                    is not a user facing change or performance improvement
+                  color: "#330066"
+                  textColor: "#FFFFFF"
+                - title: pipeline::tier-3
+                  descriptionHtml: Tier 3 pipelines are run when a merge request has all
+                    the approvals it needs.&#x000A;&#x000A;See <a href="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-reference-type="epic" data-original="https://gitlab.com/groups/gitlab-org/quality/engineering-productivity/-/epics/58"
+                    data-link="false" data-link-reference="true" data-group="16947798" data-group-path="gitlab-org/quality/engineering-productivity"
+                    data-iid="58" data-epic="2174530" data-container="body" data-placement="top"
+                    title='Proposal - Introduce "tiers" in MR pipelines' class="gfm gfm-epic">gitlab-org/quality/engineering-productivity&amp;58</a>
+                    for more info.
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:mr-approved
+                  descriptionHtml: Indicates that associated merge request pipelines will
+                    be forced to run non-minimal sets of RSpec and Jest tests. More info
+                    at <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#rspec-minimal-jobs</a>
+                    and <a href="https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs"
+                    rel="nofollow noreferrer noopener" target="_blank">https://docs.gitlab.com/ee/development/pipelines/index.html#jest-minimal-jobs</a>
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: pipeline:run-e2e-omnibus-once
+                  descriptionHtml: "Automation-only label: no need to apply it manually.&#x000A;&#x000A;Indicates
+                    that the next merged results pipeline should run E2E Omnibus tests once
+                    (if applicable for the type of changes)."
+                  color: "#cc338b"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::maintenance
+                  descriptionHtml: Upkeeping efforts and catch-up corrective improvements
+                    that are not Feature nor Bugs. Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#330066"
+                  textColor: "#FFFFFF"
+            approved: false
+            approvalsRequired: 3
+            approvalsLeft: 3
+            autoMergeEnabled: false
+            detailedMergeStatus: UNCHECKED
+            squashOnMerge: true
+            conflicts: false
+            blockingMergeRequests:
+              visibleMergeRequests: []
+            reviewers:
+              nodes:
+                - __typename: MergeRequestReviewer
+                  username: mbobin
+                  avatarUrl: https://secure.gravatar.com/avatar/130da6066ec37628a1d76ab60715b7acb7f04f7efe9a42a768d877a48c480ac2?s=80&d=identicon
+                  webUrl: https://gitlab.com/mbobin
+                  lastActivityOn: "2024-11-27"
+                  location: Bucharest
+                  status:
+                    availability: NOT_SET
+                    message: ""
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: REVIEWED
+                  activeReviews:
+                    count: 3
+            headPipeline:
+              path: "/gitlab-org/gitlab/-/pipelines/1555447534"
+              startedAt: "2024-11-21T23:37:11Z"
+              finishedAt: "2024-11-22T00:42:25Z"
+              status: SUCCESS
+              failureReason:
+              jobs:
+                count: 888
+              finishedJobs:
+                count: 881
+              runningJobs:
+                count: 0
+              firstRunningJob:
+                nodes: []
+              failedJobs:
+                count: 1
+                nodes:
+                  - name: e2e:test-product-analytics
+              failedJobTraces:
+                nodes:
+                  - name: e2e:test-product-analytics
+                    trace:
+                    webPath: "/gitlab-org/gitlab/-/jobs/8441980329"

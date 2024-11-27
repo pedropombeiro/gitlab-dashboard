@@ -83,4 +83,69 @@ RSpec.describe GitlabClient do
       ]))
     end
   end
+
+  describe "#fetch_open_merge_requests" do
+    let(:username) { "pedropombeiro" }
+    let(:result_as_hash) { openstruct_to_hash(fetch_open_merge_requests) }
+
+    subject(:fetch_open_merge_requests) do
+      client.fetch_open_merge_requests(username)
+    end
+
+    before do
+      allow(client).to receive(:client).and_return(graphql_client)
+
+      response = YAML.load_file(fixtures_path.join("open_merge_requests.yml"))
+      stub_request(:post, "#{gitlab_instance_url}/api/graphql").to_return(
+        status: 200,
+        body: response["one"].to_json
+      )
+    end
+
+    it "returns the merge request data", :freeze_time do
+      common_mr_attrs = {
+        project: a_hash_including(fullPath: "gitlab-org/gitlab"),
+        reviewers: {nodes: an_instance_of(Array)},
+        assignees: {nodes: an_instance_of(Array)},
+        labels: {nodes: an_instance_of(Array)},
+        blockingMergeRequests: {visibleMergeRequests: an_instance_of(Array)}
+      }
+
+      expect(fetch_open_merge_requests).to be_truthy
+      expect(result_as_hash).to match(
+        updated_at: Time.current,
+        user: {
+          openMergeRequests: {
+            nodes: [
+              a_hash_including(iid: "173913", **common_mr_attrs),
+              a_hash_including(iid: "173874", **common_mr_attrs),
+              a_hash_including(iid: "173741", **common_mr_attrs),
+              a_hash_including(iid: "173789", **common_mr_attrs),
+              a_hash_including(iid: "173916", **common_mr_attrs),
+              a_hash_including(iid: "173886", **common_mr_attrs),
+              a_hash_including(iid: "173885", **common_mr_attrs),
+              a_hash_including(iid: "173639", **common_mr_attrs),
+              a_hash_including(iid: "171848", **common_mr_attrs),
+              a_hash_including(iid: "173007", **common_mr_attrs)
+            ]
+          }
+        }
+      )
+    end
+  end
+
+  private
+
+  def openstruct_to_hash(object, hash = {})
+    case object
+    when OpenStruct
+      object.each_pair do |key, value|
+        hash[key] = openstruct_to_hash(value)
+      end
+      hash
+    when Array
+      object.map { |v| openstruct_to_hash(v) }
+    else object
+    end
+  end
 end
