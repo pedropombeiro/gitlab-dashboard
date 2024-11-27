@@ -20,7 +20,7 @@ module Services
 
     def needs_scheduled_update?
       response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
-      return true if response&.next_scheduled_update_at&.nil?
+      return true unless response&.next_scheduled_update_at
 
       response.next_scheduled_update_at.past?
     end
