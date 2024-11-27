@@ -5,5 +5,5 @@ import * as bootstrap from "bootstrap";
 import "@fortawesome/fontawesome-free/js/all";
 
 import LocalTime from "local-time";
-LocalTime.start();
 LocalTime.config.useFormat24 = true
+LocalTime.start();
