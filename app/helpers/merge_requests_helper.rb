@@ -4,11 +4,9 @@ module MergeRequestsHelper
   include HumanizeHelper
 
   def user_help_hash(user)
-    timezone = Services::TimezoneService.new.fetch_from_location(user.location)
-
     {
       Location: user.location,
-      "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
+      "Local time": Timezone[user.preferences.timezone]&.time_with_offset(Time.now.utc)&.to_fs,
       "Last activity": (user.lastActivityOn > 1.day.ago) ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
       Message: user.status&.message
     }.compact

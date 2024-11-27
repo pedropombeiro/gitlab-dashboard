@@ -16,6 +16,9 @@ class GitlabClient
       ...CoreUserFields
       lastActivityOn
       location
+      userPreferences {
+        timezone
+      }
       status {
         availability
         message

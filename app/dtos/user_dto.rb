@@ -37,8 +37,6 @@ class UserDto
     open_mrs = response.user.openMergeRequests.nodes
     merged_mrs = response.user.mergedMergeRequests.nodes
 
-    warmup_timezone_cache(open_mrs)
-
     @open_merge_requests = MergeRequestCollectionDto.new(
       open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) }
     )
@@ -66,12 +64,6 @@ class UserDto
 
   def parse_graphql_time(timestamp)
     Time.zone.parse(timestamp) if timestamp
-  end
-
-  def warmup_timezone_cache(mrs)
-    locations = mrs.filter_map { |mr| mr.reviewers.nodes.map(&:location).map(&:presence) }.flatten.compact.uniq
-
-    Services::TimezoneService.new.fetch_from_locations(locations)
   end
 
   def convert_mr_pipeline(pipeline)

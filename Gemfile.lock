@@ -152,7 +152,6 @@ GEM
     fugit (1.11.1)
       et-orbi (~> 1, >= 1.2.11)
       raabro (~> 1.4)
-    geokit (1.14.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
     google-protobuf (4.28.3)
@@ -533,7 +532,6 @@ DEPENDENCIES
   debug
   factory_bot (~> 6.5)
   factory_bot_rails (~> 6.4)
-  geokit (~> 1.14)
   graphlient
   hotwire-livereload (~> 1.4)
   importmap-rails
