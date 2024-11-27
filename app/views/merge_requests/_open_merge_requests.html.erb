@@ -21,11 +21,11 @@
 
       <div class="text-secondary small">
         Fetched in
-        <%= @dto.request_duration -%>
-        seconds at <%= local_relative_time(@dto.updated_at, type: 'time-or-date', data: bs_data) -%>.
-        <% if @dto.next_update_at %>
+        <%= request_duration -%>
+        seconds at <%= local_relative_time(updated_at, type: 'time-or-date', data: bs_data) -%>.
+        <% if next_update_at %>
           <span>Cached until
-            <%= local_relative_time(@dto.next_update_at, type: 'time-or-date', data: bs_data) -%>.
+            <%= local_relative_time(next_update_at, type: 'time-or-date', data: bs_data) -%>.
           </span>
         <% else %>
           <span>Not cached.</span>

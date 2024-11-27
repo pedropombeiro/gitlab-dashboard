@@ -2,7 +2,7 @@
   <% mr_list_panel_class = %w[table-responsive shadow align-middle rounded bg-body bg-gradient p-2] %>
 
   <%= tag.div(class: mr_list_panel_class + %w[mt-5]) do %>
-    <%= render "open_merge_requests", merge_requests_dto: open_merge_requests %>
+    <%= render "open_merge_requests", merge_requests_dto: open_merge_requests, updated_at: updated_at, next_update_at: next_update_at, request_duration: request_duration %>
   <% end %>
 
   <%= tag.div(class: mr_list_panel_class + %w[mt-3 mt-sm-5]) do %>
