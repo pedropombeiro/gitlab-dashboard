@@ -15,28 +15,28 @@ module Services
       open_mrs = dto.open_merge_requests.items
       merged_mrs = dto.merged_merge_requests.items
 
-      mr_changes = []
+      [].tap do |mr_changes|
+        # Open MR merged
+        merged_mrs.each do |mr|
+          previous_mr_version = previous_open_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
+          next if previous_mr_version.nil?
 
-      # Open MR merged
-      merged_mrs.each do |mr|
-        previous_mr_version = previous_open_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
-        next if previous_mr_version.nil?
+          mr_changes << merge_request_change(
+            mr,
+            title: "A merge request was merged",
+            body: "#{mr.reference}: #{mr.titleHtml}"
+          )
+        end
 
-        mr_changes << merge_request_change(
-          mr,
-          title: "A merge request was merged",
-          body: "#{mr.reference}: #{mr.titleHtml}"
-        )
-      end
+        # Open MR changes
+        changed_labels(previous_open_mrs, open_mrs).each do |change|
+          mr_changes << merge_request_labels_change("An open merge request", change)
+        end
 
-      # Open MR changes
-      changed_labels(previous_open_mrs, open_mrs).each do |change|
-        mr_changes << merge_request_labels_change("An open merge request", change)
-      end
-
-      # Merged MR changes
-      changed_labels(previous_merged_mrs, merged_mrs).each do |change|
-        mr_changes << merge_request_labels_change("A merged merge request", change)
+        # Merged MR changes
+        changed_labels(previous_merged_mrs, merged_mrs).each do |change|
+          mr_changes << merge_request_labels_change("A merged merge request", change)
+        end
       end
     end
 
