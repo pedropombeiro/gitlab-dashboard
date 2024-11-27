@@ -20,7 +20,7 @@ RSpec.describe GitlabClient do
     end
 
     before do
-      allow(client).to receive(:client).and_return(graphql_client)
+      allow(described_class).to receive(:client).and_return(graphql_client)
 
       user_requests = YAML.load_file(fixtures_path.join("user_requests.yml"))
       stub_request(:post, "#{gitlab_instance_url}/api/graphql").to_return(
@@ -57,7 +57,7 @@ RSpec.describe GitlabClient do
     end
 
     before do
-      allow(client).to receive(:client).and_return(graphql_client)
+      allow(described_class).to receive(:client).and_return(graphql_client)
 
       issues = YAML.load_file(fixtures_path.join("issues.yml"))
       stub_request(:post, "#{gitlab_instance_url}/api/graphql").to_return(
@@ -93,7 +93,7 @@ RSpec.describe GitlabClient do
     end
 
     before do
-      allow(client).to receive(:client).and_return(graphql_client)
+      allow(described_class).to receive(:client).and_return(graphql_client)
 
       response = YAML.load_file(fixtures_path.join("open_merge_requests.yml"))
       stub_request(:post, "#{gitlab_instance_url}/api/graphql").to_return(

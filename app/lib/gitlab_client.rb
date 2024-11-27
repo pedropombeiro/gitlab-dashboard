@@ -63,18 +63,18 @@ class GitlabClient
     }
   GRAPHQL
 
-  def gitlab_instance_url
+  def self.gitlab_instance_url
     @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
   end
 
   def make_full_url(path)
     return path if path.nil? || path.start_with?("http")
 
-    "#{gitlab_instance_url}#{path}"
+    "#{self.class.gitlab_instance_url}#{path}"
   end
 
   def fetch_user(username)
-    response = client.query <<-GRAPHQL
+    response = self.class.client.query <<-GRAPHQL
       query {
         user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
           ...CoreUserFields
@@ -166,7 +166,7 @@ class GitlabClient
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
-    response = client.query(merge_requests_graphql_query, username: username, activeReviewsAfter: 7.days.ago)
+    response = self.class.client.query(merge_requests_graphql_query, username: username, activeReviewsAfter: 7.days.ago)
 
     OpenStruct.new(
       user: make_serializable(response.data.user),
@@ -197,7 +197,7 @@ class GitlabClient
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
-    response = client.query(merge_requests_graphql_query, username: username)
+    response = self.class.client.query(merge_requests_graphql_query, username: username)
 
     OpenStruct.new(
       user: make_serializable(response.data.user),
@@ -234,7 +234,7 @@ class GitlabClient
       #{CORE_ISSUE_FRAGMENT}
     GRAPHQL
 
-    response = client.query(query)
+    response = self.class.client.query(query)
     data = make_serializable(response.data)
 
     project_full_paths.map.each_with_index do |_, index|
@@ -249,12 +249,18 @@ class GitlabClient
     JSON.parse!(obj.to_json, object_class: OpenStruct)
   end
 
-  def authorization
+  def quote(s)
+    return unless s
+
+    "\"#{s}\""
+  end
+
+  private_class_method def self.authorization
     "Bearer #{Rails.application.credentials.gitlab_token}"
   end
 
-  def client
-    ::Graphlient::Client.new(
+  def self.client
+    @client ||= ::Graphlient::Client.new(
       "#{gitlab_instance_url}/api/graphql",
       headers: {"Authorization" => authorization},
       http_options: {
@@ -262,11 +268,5 @@ class GitlabClient
         write_timeout: 30
       }
     )
-  end
-
-  def quote(s)
-    return unless s
-
-    "\"#{s}\""
   end
 end
