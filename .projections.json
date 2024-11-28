@@ -9,19 +9,39 @@
   "app/assets/stylesheets/*": {
     "type": "css"
   },
-  "app/controllers/*_controller.rb": {
+  "app/controllers/*.rb": {
     "type": "controller",
-    "alternate": "app/views/{}/index.html.erb"
+    "alternate": "spec/controllers/{}_spec.rb"
+  },
+  "app/dtos/*.rb": {
+    "type": "dto",
+    "alternate": "spec/dtos/{}_spec.rb"
   },
   "app/models/*.rb": {
     "type": "model",
     "alternate": "app/controllers/{}_controller.rb"
   },
-  "app/views/*/index.html.erb": {
+  "specs/models/*.rb": {
+    "type": "model",
+    "alternate": "app/models/{}.rb"
+  },
+  "app/views/*/*.html.erb": {
     "type": "view",
     "alternate": "app/controllers/{}_controller.rb"
   },
   "app/views/**/_*.html.erb": {
     "type": "partial"
+  },
+  "spec/controllers/*_spec.rb": {
+    "type": "controller",
+    "alternate": "app/controllers/{}.rb"
+  },
+  "spec/dtos/*_dto_spec.rb": {
+    "type": "spec",
+    "alternate": "app/dtos/{}_dto.rb"
+  },
+  "spec/models/*_spec.rb": {
+    "type": "spec",
+    "alternate": "app/models/{}.rb"
   }
 }
