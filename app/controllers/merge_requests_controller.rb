@@ -19,6 +19,8 @@ class MergeRequestsController < ApplicationController
     end.data.user
 
     render_404 and return unless @user
+
+    save_current_user(safe_params[:assignee])
     if @user.username != safe_params[:assignee]
       redirect_to merge_requests_path(assignee: @user.username) and return
     end
@@ -34,6 +36,7 @@ class MergeRequestsController < ApplicationController
     render_404 and return unless current_user
 
     assignee = safe_params[:assignee]
+    save_current_user(assignee)
     previous_dto = nil
     if current_user.web_push_subscriptions.any?
       response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
@@ -74,8 +77,6 @@ class MergeRequestsController < ApplicationController
     unless safe_params[:assignee] || Rails.application.credentials.gitlab_token
       return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
     end
-
-    save_current_user(safe_params[:assignee])
   end
 
   def render_404
