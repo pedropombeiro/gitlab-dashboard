@@ -28,5 +28,35 @@ RSpec.describe MergeRequestsController, type: :controller do
         expect(GitlabUser.find_by_username("non-existent")).to be_nil
       end
     end
+
+    context "when user is known" do
+      let(:username) { "user1" }
+
+      before do
+        stub_request(:post, graphql_url).to_return(status: 200, body: {data: {user: {username: username}}}.to_json)
+      end
+
+      context "when assignee is not specified" do
+        it "returns network_authentication_required" do
+          get :index
+
+          expect(response).to have_http_status(:network_authentication_required)
+          expect(GitlabUser.find_by_username(username)).to be_nil
+        end
+
+        context "when GITLAB_TOKEN is specified" do
+          before do
+            allow(Rails.application.credentials).to receive(:gitlab_token).and_return("secret-token")
+          end
+
+          it "redirects to assignee specified in GITLAB_TOKEN" do
+            get :index
+
+            expect(response).to redirect_to action: :index, assignee: username
+            expect(GitlabUser.find_by_username(username)).to be_nil
+          end
+        end
+      end
+    end
   end
 end
