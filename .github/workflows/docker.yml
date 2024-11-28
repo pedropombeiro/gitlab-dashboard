@@ -6,13 +6,13 @@ on:
     branches:
       - main
     paths:
-      - 'app/'
-      - 'bin/'
-      - 'config/'
-      - 'db/'
-      - 'lib/'
-      - 'public/'
-      - 'vendor/'
+      - 'app/**'
+      - 'bin/**'
+      - 'config/**'
+      - 'db/**'
+      - 'lib/**'
+      - 'public/**'
+      - 'vendor/**'
       - '**.rb'
       - 'Gemfile.lock'
       - 'yarn.lock'
