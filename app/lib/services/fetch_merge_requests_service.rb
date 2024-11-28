@@ -52,6 +52,8 @@ module Services
         response.errors ||= merged_mrs_response&.errors
         if response.errors.nil?
           response.user.mergedMergeRequests = merged_mrs_response.user.mergedMergeRequests
+          response.user.allMergedMergeRequests = merged_mrs_response.user.allMergedMergeRequests
+          response.user.firstCreatedMergedMergeRequests = merged_mrs_response.user.firstCreatedMergedMergeRequests
           Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), response, expires_in: 1.week)
         end
 

@@ -1,11 +1,29 @@
-<div class="bg-gradient p-1 p-sm-3 mx-auto mt-1 mt-sm-4" style="width: fit-content;">
-  <% mr_list_panel_class = %w[table-responsive shadow align-middle rounded bg-body bg-gradient p-2] %>
+<div
+  class="bg-gradient p-1 p-sm-3 mx-auto mt-1 mt-sm-4"
+  style="width: fit-content;"
+>
+  <% mr_list_panel_class = %w[
+    table-responsive
+    shadow
+    align-middle
+    rounded
+    bg-body
+    bg-gradient
+    p-2
+  ] %>
 
   <%= tag.div(class: mr_list_panel_class + %w[mt-5]) do %>
-    <%= render "open_merge_requests", merge_requests_dto: open_merge_requests, updated_at: updated_at, next_update_at: next_update_at, request_duration: request_duration %>
+    <%= render "open_merge_requests",
+    merge_requests_dto: open_merge_requests,
+    updated_at: updated_at,
+    next_update_at: next_update_at,
+    request_duration: request_duration %>
   <% end %>
 
   <%= tag.div(class: mr_list_panel_class + %w[mt-3 mt-sm-5]) do %>
-    <%= render "merged_merge_requests", merge_requests_dto: merged_merge_requests %>
+    <%= render "merged_merge_requests",
+    merge_requests_dto: merged_merge_requests,
+    merged_merge_requests_count: merged_merge_requests_count,
+    first_merged_merge_requests_timestamp: first_merged_merge_requests_timestamp %>
   <% end %>
 </div>
