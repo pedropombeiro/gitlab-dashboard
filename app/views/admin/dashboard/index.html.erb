@@ -17,7 +17,9 @@
     <tbody>
       <% @recent_users.each do |user| %>
         <tr style="cursor: pointer;">
-          <%= tag.th user.username, scope: "row" %>
+          <%= tag.th scope: "row" do %>
+            <%= link_to user.username, merge_requests_path(assignee: user.username) %>
+          <% end %>
           <td>
             <%= render "shared/relative_timestamp", timestamp: user.created_at %>
           </td>
