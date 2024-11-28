@@ -185,6 +185,7 @@ class GitlabClient
           }
           allMergedMergeRequests: authoredMergeRequests(state: merged) {
             count
+            totalTimeToMerge
           }
           mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
             nodes {

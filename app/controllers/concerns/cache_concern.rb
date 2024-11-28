@@ -18,11 +18,11 @@ module CacheConcern
     end
 
     def authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v6/authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v9/authored_list/#{user_hash(user)}"
     end
 
     def last_authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v6/last_authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v9/last_authored_list/#{user_hash(user)}"
     end
 
     def location_timezone_name_cache_key(location)
