@@ -1,13 +1,3 @@
-<script>
-  var link = document.querySelector("link[rel~='icon']");
-  if (!link) {
-    link = document.createElement('link');
-    link.rel = 'icon';
-    document.head.appendChild(link);
-  }
-  link.href = "<%= make_full_url(@user.avatarUrl) %>";
-</script>
-
 <% vapid_public_key =
   Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
 <% if vapid_public_key.present? %>

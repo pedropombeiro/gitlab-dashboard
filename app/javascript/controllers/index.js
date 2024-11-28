@@ -10,6 +10,9 @@ application.register("bootstrap-tooltip", BootstrapTooltipController)
 import ClipboardController from "./clipboard_controller"
 application.register("clipboard", ClipboardController)
 
+import UnreadBadgeController from "./unread_badge_controller"
+application.register("unread-badge", UnreadBadgeController)
+
 import PulltorefreshController from "./pulltorefresh_controller"
 application.register("pulltorefresh", PulltorefreshController)
 
