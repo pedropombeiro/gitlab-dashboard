@@ -15,16 +15,30 @@
               ActiveSupport::Duration.build(
                 merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
               ),
-            ) %>.</div>
+            ) %>.
+          </div>
         <% end %>
       </div>
 
       <% if merged_merge_requests_count.positive? %>
         <div class="flex-row-reverse">
-          A total of
-          <%= pluralize(merged_merge_requests_count, "merge request") %>
-          merged since
-          <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>.
+          <div>
+            A total of
+            <%= pluralize(merged_merge_requests_count, "merge request") %>
+            merged since
+            <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>.
+          </div>
+          <% if merged_merge_requests_tttm %>
+            <div class="text-end">
+              <div>Merged on average after
+                <%= distance_of_time_in_words(
+                  ActiveSupport::Duration.build(
+                    merged_merge_requests_tttm / merged_merge_requests_count,
+                  ),
+                ) %>.
+              </div>
+            </div>
+          <% end %>
         </div>
       <% end %>
     </div>
