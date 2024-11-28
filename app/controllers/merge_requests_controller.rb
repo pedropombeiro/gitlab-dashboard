@@ -33,19 +33,19 @@ class MergeRequestsController < ApplicationController
     ensure_assignee
     render_404 and return unless current_user
 
+    assignee = safe_params[:assignee]
     previous_dto = nil
     if current_user.web_push_subscriptions.any?
-      response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(safe_params[:assignee]))
-      previous_dto = parse_dto(response, safe_params[:assignee])
+      response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
+      previous_dto = parse_dto(response, assignee)
     end
 
-    response = Services::FetchMergeRequestsService.new(safe_params[:assignee]).execute
+    response = Services::FetchMergeRequestsService.new(assignee).execute
 
-    @dto = parse_dto(response, safe_params[:assignee])
+    @dto = parse_dto(response, assignee)
     if @dto.errors
       return respond_to do |format|
         format.html { render file: Rails.public_path.join("500.html").to_s, layout: false, status: :internal_server_error }
-        format.xml { head :internal_server_error }
         format.any { head :internal_server_error }
       end
     end
@@ -55,7 +55,7 @@ class MergeRequestsController < ApplicationController
     check_changes(previous_dto, @dto) if current_user.web_push_subscriptions.any?
 
     respond_to do |format|
-      format.html
+      format.html { redirect_to merge_requests_path(assignee: assignee) unless params[:turbo] }
       format.json { render json: response }
     end
   end
