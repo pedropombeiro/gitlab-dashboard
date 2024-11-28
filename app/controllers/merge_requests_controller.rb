@@ -14,27 +14,34 @@ class MergeRequestsController < ApplicationController
   def index
     ensure_assignee
 
-    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(params[:assignee]))
+    @user = Rails.cache.fetch(self.class.user_cache_key(safe_params[:assignee]), expires_in: USER_CACHE_VALIDITY) do
+      gitlab_client.fetch_user(safe_params[:assignee])
+    end.data.user
 
-    @dto = parse_dto(response, params[:assignee])
+    render_404 and return unless @user
+    if @user.username != safe_params[:assignee]
+      redirect_to merge_requests_path(assignee: @user.username) and return
+    end
+
+    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(safe_params[:assignee]))
+
+    @dto = parse_dto(response, safe_params[:assignee])
     fresh_when(response)
   end
 
   def list
-    assignee = params[:assignee]
     ensure_assignee
-
-    return render_404 unless current_user
+    render_404 and return unless current_user
 
     previous_dto = nil
     if current_user.web_push_subscriptions.any?
-      response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
-      previous_dto = parse_dto(response, params[:assignee])
+      response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(safe_params[:assignee]))
+      previous_dto = parse_dto(response, safe_params[:assignee])
     end
 
-    response = Services::FetchMergeRequestsService.new(assignee).execute
+    response = Services::FetchMergeRequestsService.new(safe_params[:assignee]).execute
 
-    @dto = parse_dto(response, params[:assignee])
+    @dto = parse_dto(response, safe_params[:assignee])
     if @dto.errors
       return respond_to do |format|
         format.html { render file: Rails.public_path.join("500.html").to_s, layout: false, status: :internal_server_error }
@@ -59,20 +66,16 @@ class MergeRequestsController < ApplicationController
     @gitlab_client ||= GitlabClient.new
   end
 
+  def safe_params
+    params.permit(:assignee)
+  end
+
   def ensure_assignee
-    unless params[:assignee] || Rails.application.credentials.gitlab_token
+    unless safe_params[:assignee] || Rails.application.credentials.gitlab_token
       return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
     end
 
-    assignee = params[:assignee]
-    @user = Rails.cache.fetch(self.class.user_cache_key(assignee), expires_in: USER_CACHE_VALIDITY) do
-      gitlab_client.fetch_user(assignee)
-    end.data.user
-
-    assignee = @user&.username
-
-    params[:assignee] = assignee
-    save_current_user(assignee)
+    save_current_user(safe_params[:assignee])
   end
 
   def render_404
