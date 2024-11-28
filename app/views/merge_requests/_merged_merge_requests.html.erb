@@ -2,19 +2,32 @@
 
 <table class="table table-hover mb-0">
   <caption class="ms-1">
-    <div class="lead">
-      <%= pluralize(merge_requests.count, "merge request") %>
-      merged in the last week.
-    </div>
+    <div class="d-flex justify-content-between align-items-end">
+      <div>
+        <div class="lead">
+          <%= pluralize(merge_requests.count, "merge request") %>
+          merged in the last week.
+        </div>
 
-    <% if merge_requests.count.positive? %>
-      <div>Merged on average after
-        <%= distance_of_time_in_words(
-          ActiveSupport::Duration.build(
-            merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
-          ),
-        ) %>.</div>
-    <% end %>
+        <% if merge_requests.count.positive? %>
+          <div>Merged on average after
+            <%= distance_of_time_in_words(
+              ActiveSupport::Duration.build(
+                merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+              ),
+            ) %>.</div>
+        <% end %>
+      </div>
+
+      <% if merged_merge_requests_count.positive? %>
+        <div class="flex-row-reverse">
+          A total of
+          <%= pluralize(merged_merge_requests_count, "merge request") %>
+          merged since
+          <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>.
+        </div>
+      <% end %>
+    </div>
   </caption>
 
   <thead>
@@ -44,7 +57,9 @@
         </td>
         <!-- Merged at -->
         <td>
-          <%= render "shared/relative_timestamp", timestamp: mr.mergedAt, most_significant_only: true %>
+          <%= render "shared/relative_timestamp",
+          timestamp: mr.mergedAt,
+          most_significant_only: true %>
           by
           <br/><%= render "user_badge", user: mr.mergeUser %>
         </td>

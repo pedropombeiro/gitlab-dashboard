@@ -178,6 +178,14 @@ class GitlabClient
     merge_requests_graphql_query = <<-GRAPHQL
       query($username: String!) {
         user(username: $username) {
+          firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
+            nodes {
+              createdAt
+            }
+          }
+          allMergedMergeRequests: authoredMergeRequests(state: merged) {
+            count
+          }
           mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
             nodes {
               iid
