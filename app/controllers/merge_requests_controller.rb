@@ -12,7 +12,7 @@ class MergeRequestsController < ApplicationController
   helper_method :make_full_url
 
   def index
-    ensure_assignee
+    return unless ensure_assignee
 
     @user = Rails.cache.fetch(self.class.user_cache_key(safe_params[:assignee]), expires_in: USER_CACHE_VALIDITY) do
       gitlab_client.fetch_user(safe_params[:assignee])
@@ -32,7 +32,8 @@ class MergeRequestsController < ApplicationController
   end
 
   def list
-    ensure_assignee
+    return unless ensure_assignee
+
     render_404 and return unless current_user
 
     assignee = safe_params[:assignee]
@@ -75,8 +76,11 @@ class MergeRequestsController < ApplicationController
 
   def ensure_assignee
     unless safe_params[:assignee] || Rails.application.credentials.gitlab_token
-      return render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
+      render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
+      return false
     end
+
+    true
   end
 
   def render_404
