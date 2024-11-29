@@ -1,6 +1,11 @@
 one:
   data:
     user:
+      allMergedMergeRequests:
+        count: 1311
+      firstCreatedMergedMergeRequests:
+        nodes:
+          - createdAt: "2019-11-10T17:16:04Z"
       mergedMergeRequests:
         nodes:
           - iid: "173913"
