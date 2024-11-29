@@ -1,14 +1,20 @@
 require "rails_helper"
 
 RSpec.describe GitlabClient do
-  let_it_be(:graphql_url) { "https://gitlab.com/api/graphql" }
+  let_it_be(:graphql_url) { "https://example.gitlab.com/api/graphql" }
   let_it_be(:graphql_client) do
     ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
   end
 
   let(:client) { described_class.new }
 
+  before do
+    allow(described_class).to receive(:client).and_return(graphql_client)
+  end
+
   describe "#fetch_user" do
+    let_it_be(:user_requests_response_body) { YAML.load_file(file_fixture("user_requests.yml")) }
+
     let(:username) { "pedropombeiro" }
 
     subject(:fetch_user) do
@@ -16,13 +22,12 @@ RSpec.describe GitlabClient do
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(graphql_client)
-
-      user_requests = YAML.load_file(file_fixture("user_requests.yml"))
-      stub_request(:post, graphql_url).to_return(
-        status: 200,
-        body: user_requests[username].to_json
-      )
+      stub_request(:post, graphql_url)
+        .with(body: /user: /)
+        .to_return(
+          status: 200,
+          body: user_requests_response_body[username].to_json
+        )
     end
 
     it "returns the user data" do
@@ -37,6 +42,8 @@ RSpec.describe GitlabClient do
   end
 
   describe "#fetch_issues" do
+    let_it_be(:issues_response_body) { YAML.load_file(file_fixture("issues.yml")) }
+
     let(:merged_mr_issues) do
       [{project_full_path: "gitlab-org/gitlab", issue_iid: "505810"}]
     end
@@ -53,13 +60,12 @@ RSpec.describe GitlabClient do
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(graphql_client)
-
-      issues = YAML.load_file(file_fixture("issues.yml"))
-      stub_request(:post, graphql_url).to_return(
-        status: 200,
-        body: issues["one"].to_json
-      )
+      stub_request(:post, graphql_url)
+        .with(body: hash_including("query" => a_string_matching(/project_\d:/)))
+        .to_return(
+          status: 200,
+          body: issues_response_body["one"].to_json
+        )
     end
 
     it "returns an array with the processed issue data" do
@@ -81,6 +87,8 @@ RSpec.describe GitlabClient do
   end
 
   describe "#fetch_open_merge_requests" do
+    let_it_be(:open_mrs_response_body) { YAML.load_file(file_fixture("open_merge_requests.yml")) }
+
     let(:username) { "pedropombeiro" }
     let(:result_as_hash) { openstruct_to_hash(fetch_open_merge_requests) }
 
@@ -89,13 +97,12 @@ RSpec.describe GitlabClient do
     end
 
     before do
-      allow(described_class).to receive(:client).and_return(graphql_client)
-
-      response = YAML.load_file(file_fixture("open_merge_requests.yml"))
-      stub_request(:post, graphql_url).to_return(
-        status: 200,
-        body: response["one"].to_json
-      )
+      stub_request(:post, graphql_url)
+        .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+        .to_return(
+          status: 200,
+          body: open_mrs_response_body["one"].to_json
+        )
     end
 
     it "returns the merge request data", :freeze_time do

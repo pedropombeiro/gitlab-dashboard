@@ -1,7 +1,7 @@
 require "rails_helper"
 
 RSpec.describe MergeRequestsController, type: :controller do
-  let_it_be(:graphql_url) { "https://gitlab.com/api/graphql" }
+  let_it_be(:graphql_url) { "https://gitlab.example.com/api/graphql" }
   let_it_be(:graphql_client) do
     ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
   end
@@ -35,12 +35,10 @@ RSpec.describe MergeRequestsController, type: :controller do
     context "when user is known" do
       let(:username) { "user1" }
       let(:params) { {assignee: username} }
-
-      before do
+      let!(:user_request_stub) do
         stub_request(:post, graphql_url)
-          .with(body: /user: /)
+          .with(body: hash_including("query" => a_string_matching(/user: /)))
           .to_return(status: 200, body: {data: {user: {username: username}}}.to_json)
-          .times(1)
       end
 
       it "returns http success and creates user with correct timestamp", :freeze_time do
@@ -65,7 +63,7 @@ RSpec.describe MergeRequestsController, type: :controller do
           # A second request is generates a second API call
           2.times { perform_request }
 
-          expect(a_request(:post, graphql_url).with(body: /user: /)).to have_been_made.twice
+          expect(user_request_stub).to have_been_requested.twice
         end
 
         context "with cache enabled", :with_cache do
@@ -74,8 +72,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             2.times { perform_request }
 
             expect(response).to have_http_status :success
-
-            expect(a_request(:post, graphql_url).with(body: /user: /)).to have_been_made.once
+            expect(user_request_stub).to have_been_requested.once
           end
         end
       end
@@ -137,19 +134,22 @@ RSpec.describe MergeRequestsController, type: :controller do
         let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
         let(:params) { {assignee: username, turbo: true} }
 
-        before do
+        let!(:open_mrs_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: /openMergeRequests: /)
+            .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
             .to_return(status: 200, body: open_mrs_body)
-            .times(1)
+        end
+
+        let!(:merged_mrs_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: /state: merged/)
+            .with(body: hash_including("query" => a_string_matching(/state: merged/)))
             .to_return(status: 200, body: merged_mrs_body)
-            .times(1)
+        end
+
+        let!(:issues_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: /project_\d:/)
+            .with(body: hash_including("query" => a_string_matching(/project_\d:/)))
             .to_return(status: 200, body: issues_body)
-            .times(1)
         end
 
         it "returns http not_found" do
@@ -180,9 +180,9 @@ RSpec.describe MergeRequestsController, type: :controller do
               # A second request is generates a second API call
               2.times { perform_request }
 
-              expect(a_request(:post, graphql_url).with(body: /openMergeRequests: /)).to have_been_made.twice
-              expect(a_request(:post, graphql_url).with(body: /state: merged/)).to have_been_made.twice
-              expect(a_request(:post, graphql_url).with(body: /project_\d:/)).to have_been_made.twice
+              expect(open_mrs_request_stub).to have_been_requested.twice
+              expect(merged_mrs_request_stub).to have_been_requested.twice
+              expect(issues_request_stub).to have_been_requested.twice
             end
 
             context "with cache enabled", :with_cache do
@@ -192,9 +192,9 @@ RSpec.describe MergeRequestsController, type: :controller do
 
                 expect(response).to have_http_status :success
 
-                expect(a_request(:post, graphql_url).with(body: /openMergeRequests: /)).to have_been_made.once
-                expect(a_request(:post, graphql_url).with(body: /state: merged/)).to have_been_made.once
-                expect(a_request(:post, graphql_url).with(body: /project_\d:/)).to have_been_made.once
+                expect(open_mrs_request_stub).to have_been_requested.once
+                expect(merged_mrs_request_stub).to have_been_requested.once
+                expect(issues_request_stub).to have_been_requested.once
               end
             end
           end
