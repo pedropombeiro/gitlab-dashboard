@@ -1,13 +1,9 @@
 require "rails_helper"
 
 RSpec.describe GitlabClient do
-  let_it_be(:fixtures_path) { Rails.root.join("spec/support/fixtures") }
-  let_it_be(:gitlab_instance_url) { "https://gitlab.com" }
+  let_it_be(:graphql_url) { "https://gitlab.com/api/graphql" }
   let_it_be(:graphql_client) do
-    ::Graphlient::Client.new(
-      "#{gitlab_instance_url}/api/graphql",
-      schema_path: fixtures_path.join("gitlab_graphql_schema.json")
-    )
+    ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
   end
 
   let(:client) { described_class.new }
@@ -22,8 +18,8 @@ RSpec.describe GitlabClient do
     before do
       allow(described_class).to receive(:client).and_return(graphql_client)
 
-      user_requests = YAML.load_file(fixtures_path.join("user_requests.yml"))
-      stub_request(:post, "#{gitlab_instance_url}/api/graphql").to_return(
+      user_requests = YAML.load_file(file_fixture("user_requests.yml"))
+      stub_request(:post, graphql_url).to_return(
         status: 200,
         body: user_requests[username].to_json
       )
@@ -59,8 +55,8 @@ RSpec.describe GitlabClient do
     before do
       allow(described_class).to receive(:client).and_return(graphql_client)
 
-      issues = YAML.load_file(fixtures_path.join("issues.yml"))
-      stub_request(:post, "#{gitlab_instance_url}/api/graphql").to_return(
+      issues = YAML.load_file(file_fixture("issues.yml"))
+      stub_request(:post, graphql_url).to_return(
         status: 200,
         body: issues["one"].to_json
       )
@@ -95,8 +91,8 @@ RSpec.describe GitlabClient do
     before do
       allow(described_class).to receive(:client).and_return(graphql_client)
 
-      response = YAML.load_file(fixtures_path.join("open_merge_requests.yml"))
-      stub_request(:post, "#{gitlab_instance_url}/api/graphql").to_return(
+      response = YAML.load_file(file_fixture("open_merge_requests.yml"))
+      stub_request(:post, graphql_url).to_return(
         status: 200,
         body: response["one"].to_json
       )

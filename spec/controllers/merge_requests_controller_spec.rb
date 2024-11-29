@@ -1,14 +1,9 @@
 require "rails_helper"
 
 RSpec.describe MergeRequestsController, type: :controller do
-  let_it_be(:fixtures_path) { Rails.root.join("spec/support/fixtures") }
-  let_it_be(:gitlab_instance_url) { "https://gitlab.com" }
-  let_it_be(:graphql_url) { "#{gitlab_instance_url}/api/graphql" }
+  let_it_be(:graphql_url) { "https://gitlab.com/api/graphql" }
   let_it_be(:graphql_client) do
-    ::Graphlient::Client.new(
-      "#{gitlab_instance_url}/api/graphql",
-      schema_path: fixtures_path.join("gitlab_graphql_schema.json")
-    )
+    ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
   end
 
   before do
@@ -55,6 +50,12 @@ RSpec.describe MergeRequestsController, type: :controller do
         )
       end
 
+      it "responds to html by default" do
+        request
+
+        expect(response.content_type).to eq "text/html; charset=utf-8"
+      end
+
       context "when assignee is not specified" do
         let(:params) { nil }
 
@@ -82,12 +83,14 @@ RSpec.describe MergeRequestsController, type: :controller do
   end
 
   describe "GET /list" do
-    subject(:request) { get :list, params: params }
+    subject(:request) { get :list, params: params, format: format }
+
+    let(:format) { nil }
 
     context "when user is known" do
-      let_it_be(:open_mrs_body) { YAML.load_file(fixtures_path.join("open_merge_requests.yml"))["one"].to_json }
-      let_it_be(:merged_mrs_body) { YAML.load_file(fixtures_path.join("merged_merge_requests.yml"))["one"].to_json }
-      let_it_be(:issues_body) { YAML.load_file(fixtures_path.join("issues.yml"))["one"].to_json }
+      let_it_be(:open_mrs_body) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"].to_json }
+      let_it_be(:merged_mrs_body) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"].to_json }
+      let_it_be(:issues_body) { YAML.load_file(file_fixture("issues.yml"))["one"].to_json }
 
       let(:username) { "pedropombeiro" }
 
@@ -136,6 +139,32 @@ RSpec.describe MergeRequestsController, type: :controller do
             request
 
             expect(response).to have_http_status :success
+          end
+
+          it "responds to html by default" do
+            request
+
+            expect(response.content_type).to eq "text/html; charset=utf-8"
+          end
+
+          context "when json format provided in the params" do
+            let(:format) { :json }
+
+            it "responds to custom format" do
+              request
+
+              expect(response.content_type).to eq "application/json; charset=utf-8"
+            end
+          end
+
+          context "with render_views" do
+            render_views
+
+            it "renders the actual template" do
+              request
+
+              expect(response.body).to include(%(<turbo-frame id="merge_requests_user_dto_#{username}">))
+            end
           end
 
           context "when turbo param is missing" do
