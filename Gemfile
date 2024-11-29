@@ -70,6 +70,8 @@ group :development do
 
   gem "hotwire-livereload", "~> 1.4"
   gem "spring"
+
+  gem "dockerfile-rails", ">= 1.6"
 end
 
 group :test do

@@ -37,5 +37,11 @@ watch-ci:
 build-docker:
     docker buildx build --platform linux/amd64 -t $(basename $(pwd)) .
 
+create-dockerfile:
+    bin/rails generate dockerfile \
+      --alpine --cache --ci --jemalloc --parallel --sqlite3 --thruster --yjit \
+      --add-build linux-headers openssl-dev \
+      --add-deploy git
+
 lint:
     rake standard:fix
