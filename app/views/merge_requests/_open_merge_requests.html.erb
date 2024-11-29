@@ -236,7 +236,7 @@
           <%= render(
             partial: "reviewer_badge",
             spacer_template: "space",
-            collection: mr.reviewers.nodes,
+            collection: mr.reviewers.nodes.sort_by { |r| r.mergeRequestInteraction.reviewState }.reverse,
             as: :reviewer,
           ) || "Not assigned" %>
         </td>
