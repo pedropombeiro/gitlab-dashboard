@@ -130,7 +130,7 @@ class GitlabClient
                 jobs(retried: false) {
                   count
                 }
-                finishedJobs: jobs(statuses: [SUCCESS, FAILED, CANCELED, SKIPPED], retried: false) {
+                finishedJobs: jobs(statuses: [SUCCESS, FAILED, CANCELED, SKIPPED, MANUAL], retried: false) {
                   count
                 }
                 runningJobs: jobs(statuses: RUNNING, retried: false) {
