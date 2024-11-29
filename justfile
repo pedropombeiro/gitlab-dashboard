@@ -35,7 +35,7 @@ watch-ci:
     gh run watch --repo=pedropombeiro/gitlab-dashboard
 
 build-docker:
-    docker build -t $(basename $(pwd)) .
+    docker buildx build --platform linux/amd64 -t $(basename $(pwd)) .
 
 lint:
     rake standard:fix
