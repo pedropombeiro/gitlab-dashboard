@@ -6,6 +6,7 @@ options:
   cache: true
   ci: true
   jemalloc: true
+  link: true
   parallel: true
   sqlite3: true
   thruster: true
