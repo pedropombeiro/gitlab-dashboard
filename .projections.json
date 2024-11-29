@@ -19,7 +19,7 @@
   },
   "app/models/*.rb": {
     "type": "model",
-    "alternate": "app/controllers/{}_controller.rb"
+    "alternate": "spec/models/{}_spec.rb"
   },
   "specs/models/*.rb": {
     "type": "model",
