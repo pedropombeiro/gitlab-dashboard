@@ -9,11 +9,8 @@ options:
   link: true
   parallel: true
   sqlite3: true
-  thruster: true
   yjit: true
   packages:
     build:
-    - openssl-dev
     - linux-headers
-    deploy:
-    - git
+    - openssl-dev

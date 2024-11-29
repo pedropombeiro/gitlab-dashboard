@@ -85,7 +85,7 @@ FROM base
 # Install packages needed for deployment
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add curl git jemalloc sqlite-dev sqlite-libs
+  apk add curl jemalloc sqlite-dev sqlite-libs
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
@@ -110,4 +110,4 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 80
 VOLUME /data
-CMD ["bundle", "exec", "thrust", "./bin/rails", "server"]
+CMD ["bundle", "exec", "./bin/rails", "server"]
