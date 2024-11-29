@@ -3,6 +3,7 @@
 # Ignore git directory.
 /.git/
 /.gitignore
+/.gitattributes
 
 # Ignore bundler config.
 /.bundle
@@ -36,6 +37,10 @@
 !/app/assets/builds/.keep
 /public/assets
 
+# Ignore specs.
+/spec/
+/test/
+
 # Ignore CI service files.
 /.github
 
@@ -45,3 +50,9 @@
 # Ignore Docker-related files
 /.dockerignore
 /Dockerfile*
+
+# Ignore other files
+.DS_Store
+/.git-sha
+/.ruby-lsp
+/.projections.json

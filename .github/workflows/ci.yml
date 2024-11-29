@@ -17,6 +17,7 @@ on:
       - "**.erb"
       - "**.rb"
       - "**.yml"
+      - "Dockerfile"
       - "Gemfile.lock"
       - "yarn.lock"
 
