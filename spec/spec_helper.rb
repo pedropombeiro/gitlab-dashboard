@@ -52,6 +52,18 @@ RSpec.configure do |config|
     end
   end
 
+  RSpec.shared_context("with cache", :with_cache) do
+    # Inclusion of this context enables and mocks cache.
+    # Allows Rails.cache to behave just like it would on dev and prod!
+
+    let(:memory_store) { ActiveSupport::Cache.lookup_store(:memory_store) }
+
+    before do
+      allow(Rails).to receive(:cache).and_return(memory_store)
+      Rails.cache.clear
+    end
+  end
+
   # This option will default to `:apply_to_host_groups` in RSpec 4 (and will
   # have no way to turn it off -- the option exists only for backwards
   # compatibility in RSpec 3). It causes shared context metadata to be

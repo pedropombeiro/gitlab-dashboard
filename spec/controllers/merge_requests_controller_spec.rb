@@ -11,7 +11,11 @@ RSpec.describe MergeRequestsController, type: :controller do
   end
 
   describe "GET /index" do
-    subject(:request) { get :index, params: params }
+    def perform_request
+      get :index, params: params
+    end
+
+    subject(:request) { perform_request }
 
     context "when user is unknown" do
       before do
@@ -56,6 +60,26 @@ RSpec.describe MergeRequestsController, type: :controller do
         expect(response.content_type).to eq "text/html; charset=utf-8"
       end
 
+      context "when called twice" do
+        it "calls api twice" do
+          # A second request is generates a second API call
+          2.times { perform_request }
+
+          expect(a_request(:post, graphql_url).with(body: /user: /)).to have_been_made.twice
+        end
+
+        context "with cache enabled", :with_cache do
+          it "only calls api once" do
+            # A second request is served from the cache, and doesn't generate more API calls
+            2.times { perform_request }
+
+            expect(response).to have_http_status :success
+
+            expect(a_request(:post, graphql_url).with(body: /user: /)).to have_been_made.once
+          end
+        end
+      end
+
       context "when assignee is not specified" do
         let(:params) { nil }
 
@@ -83,7 +107,11 @@ RSpec.describe MergeRequestsController, type: :controller do
   end
 
   describe "GET /list" do
-    subject(:request) { get :list, params: params, format: format }
+    def perform_request
+      get :list, params: params, format: format
+    end
+
+    subject(:request) { perform_request }
 
     let(:format) { nil }
 
@@ -145,6 +173,30 @@ RSpec.describe MergeRequestsController, type: :controller do
             request
 
             expect(response.content_type).to eq "text/html; charset=utf-8"
+          end
+
+          context "when called twice" do
+            it "calls api twice" do
+              # A second request is generates a second API call
+              2.times { perform_request }
+
+              expect(a_request(:post, graphql_url).with(body: /openMergeRequests: /)).to have_been_made.twice
+              expect(a_request(:post, graphql_url).with(body: /state: merged/)).to have_been_made.twice
+              expect(a_request(:post, graphql_url).with(body: /project_\d:/)).to have_been_made.twice
+            end
+
+            context "with cache enabled", :with_cache do
+              it "only calls api once" do
+                # A second request is served from the cache, and doesn't generate more API calls
+                2.times { perform_request }
+
+                expect(response).to have_http_status :success
+
+                expect(a_request(:post, graphql_url).with(body: /openMergeRequests: /)).to have_been_made.once
+                expect(a_request(:post, graphql_url).with(body: /state: merged/)).to have_been_made.once
+                expect(a_request(:post, graphql_url).with(body: /project_\d:/)).to have_been_made.once
+              end
+            end
           end
 
           context "when json format provided in the params" do
