@@ -3,6 +3,7 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
 ARG RUBY_VERSION=3.3.6
 FROM ruby:$RUBY_VERSION-alpine AS base
+ARG GIT_REPO_COMMIT_SHA
 
 # Rails app lives here
 WORKDIR /rails
@@ -21,6 +22,8 @@ RUN gem update --system --no-document && \
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
   apk add tzdata
+
+RUN echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
 
 
 # Throw-away build stages to reduce size of final image
@@ -45,7 +48,7 @@ RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSI
   rm -rf /tmp/node-v${NODE_VERSION}-linux-x64-musl
 
 # Install node modules
-COPY --link package.json yarn.lock ./
+COPY package.json yarn.lock ./
 RUN --mount=type=cache,id=bld-yarn-cache,target=/root/.yarn \
   YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
 
