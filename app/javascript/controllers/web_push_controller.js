@@ -1,4 +1,4 @@
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from "@hotwired/stimulus";
 
 // Connects to data-controller="web-push"
 export default class extends Controller {
@@ -29,16 +29,15 @@ export default class extends Controller {
 
     // Request permission from the user to send notifications
     try {
-      const permission = await Notification.requestPermission()
+      const permission = await Notification.requestPermission();
       if (permission === "granted") {
         setupSubscription();
       } else {
         alert("Notifications declined");
       }
     } catch (error) {
-      console.log("Notifications error", error)
-    }
-    finally {
+      console.log("Notifications error", error);
+    } finally {
       this.subscribeTarget.classList.add("d-none");
     }
 
@@ -59,7 +58,7 @@ export default class extends Controller {
         const response = await fetch("/web_push_subscriptions", {
           method: "POST",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(subscription),
         });

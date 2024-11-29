@@ -1,23 +1,24 @@
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from "@hotwired/stimulus";
 
 /**
-* Add notification badge (pill) to favicon in browser tab
-* @url stackoverflow.com/questions/65719387/
-*/
+ * Add notification badge (pill) to favicon in browser tab
+ * @url stackoverflow.com/questions/65719387/
+ */
 class Badger {
   constructor(options) {
     Object.assign(
-      this, {
-      backgroundColor: "#198754",
-      color: "#fff",
-      size: 0.7,      // 0..1 (Scale in respect to the favicon image size)
-      position: "se", // Position inside favicon "n", "e", "s", "w", "ne", "nw", "se", "sw"
-      radius: 0.10,      // Border radius, better used as % value + 4px base
-      src: "",        // Favicon source (dafaults to the <link> icon href),
-      srcs: false,
-      onChange() { },
-    },
-      options
+      this,
+      {
+        backgroundColor: "#198754",
+        color: "#fff",
+        size: 0.7, // 0..1 (Scale in respect to the favicon image size)
+        position: "se", // Position inside favicon "n", "e", "s", "w", "ne", "nw", "se", "sw"
+        radius: 0.1, // Border radius, better used as % value + 4px base
+        src: "", // Favicon source (dafaults to the <link> icon href),
+        srcs: false,
+        onChange() { },
+      },
+      options,
     );
     this.canvas = document.createElement("canvas");
     this.ctx = this.canvas.getContext("2d");
@@ -108,7 +109,7 @@ class Badger {
         self._setup(img);
         self._draw();
         self._drawFavicon();
-      })
+      });
       if (this.onChange) this.onChange.call(this);
     } else {
       // load all
@@ -124,7 +125,7 @@ class Badger {
         img.src = src;
         img.img.src = src.getAttribute("href");
         self.imgs.push(img);
-      })
+      });
     }
   }
 
@@ -148,8 +149,8 @@ var badger = new Badger(badgerOptions);
 // Connects to data-controller="unread-badge"
 export default class extends Controller {
   static values = {
-    count: Number
-  }
+    count: Number,
+  };
 
   connect() {
     badger.value = this.countValue;

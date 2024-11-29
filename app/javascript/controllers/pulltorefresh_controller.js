@@ -1,5 +1,5 @@
-import { Controller } from "@hotwired/stimulus"
-import PullToRefresh from 'pulltorefreshjs/dist';
+import { Controller } from "@hotwired/stimulus";
+import PullToRefresh from "pulltorefreshjs/dist";
 
 // Connects to data-controller="pulltorefresh"
 export default class extends Controller {
@@ -8,7 +8,7 @@ export default class extends Controller {
       mainElement: this.element,
       onRefresh() {
         this.element.reload();
-      }
+      },
     });
   }
 }
