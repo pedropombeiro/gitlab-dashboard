@@ -6,11 +6,19 @@ on:
   push:
     branches: [main]
     paths:
-      - 'bin/'
-      - '**.js'
-      - '**.erb'
-      - '**.rb'
-      - '**.yml'
+      - "app/**"
+      - "bin/**"
+      - "config/**"
+      - "db/**"
+      - "lib/**"
+      - "public/**"
+      - "vendor/**"
+      - "**.js"
+      - "**.erb"
+      - "**.rb"
+      - "**.yml"
+      - "Gemfile.lock"
+      - "yarn.lock"
 
 jobs:
   scan_ruby:
