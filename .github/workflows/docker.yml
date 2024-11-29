@@ -19,6 +19,7 @@ on:
 
 jobs:
   build-and-push-image:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
