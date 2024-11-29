@@ -1,10 +1,14 @@
 require "rails_helper"
 
 RSpec.describe WebPushSubscription, type: :model do
-  let!(:user) { create(:gitlab_user) }
-  let!(:subscription) { create(:web_push_subscription, gitlab_user: user) }
+  describe "associations" do
+    it { is_expected.to belong_to(:gitlab_user) }
+  end
 
   describe "#publish" do
+    let!(:user) { create(:gitlab_user) }
+    let!(:subscription) { create(:web_push_subscription, gitlab_user: user) }
+
     let(:data) { {data: "test-data"} }
 
     subject(:publish) { subscription.publish(data) }
