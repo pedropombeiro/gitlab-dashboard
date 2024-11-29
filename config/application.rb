@@ -16,6 +16,11 @@ module GitlabDashboard
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 
+    # Development and test environment tend to reload code and
+    # redefine methods (e.g. mocking), hence YJIT isn't generally
+    # faster in these environments. Remove once in Rails 8.1, as that will be the default.
+    config.yjit = !Rails.env.local?
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
