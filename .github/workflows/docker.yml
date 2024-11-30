@@ -46,7 +46,7 @@ jobs:
           labels: |
             maintainer=Pedro Pombeiro
             org.opencontainers.image.title=GitLab MR Dashboard
-            org.opencontainers.image.description=A productivity-focused MR dashboard for GitLab.com
+            org.opencontainers.image.description=A productivity-focused MR dashboard for GitLab
             org.opencontainers.image.vendor=Pedro Pombeiro
 
       - name: Set up Docker Buildx
