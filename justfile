@@ -40,7 +40,8 @@ build-docker:
 create-dockerfile:
     bin/rails generate dockerfile \
       --alpine --cache --compose --jemalloc --link --no-ci --parallel --sqlite3 --yjit \
-      --add-build linux-headers openssl-dev
+      --add-build linux-headers openssl-dev \
+      --arg-base=GIT_REPO_COMMIT_SHA:null
 
 lint:
     rake standard:fix
