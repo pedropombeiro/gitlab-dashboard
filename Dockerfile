@@ -52,7 +52,7 @@ RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSI
   rm -rf /tmp/node-v${NODE_VERSION}-linux-x64-musl
 
 # Install node modules
-COPY package.json yarn.lock ./
+COPY --link package.json yarn.lock ./
 RUN --mount=type=cache,id=bld-yarn-cache,target=/root/.yarn \
   YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
 
