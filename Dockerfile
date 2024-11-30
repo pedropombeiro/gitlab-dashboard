@@ -3,10 +3,12 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
 ARG RUBY_VERSION=3.3.6
 FROM ruby:$RUBY_VERSION-alpine AS base
-ARG GIT_REPO_COMMIT_SHA
 
 # Rails app lives here
 WORKDIR /rails
+
+# Base build arguments
+ARG GIT_REPO_COMMIT_SHA="null"
 
 # Set production environment
 ENV BUNDLE_DEPLOYMENT="1" \
