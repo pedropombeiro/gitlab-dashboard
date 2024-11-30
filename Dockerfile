@@ -19,6 +19,20 @@ RUN apt-get update -qq && \
   apt-get install --no-install-recommends -y curl libjemalloc2 libvips sqlite3 && \
   rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
+# Install packages needed to build gems and node modules
+RUN apt-get update -qq && \
+  apt-get install --no-install-recommends -y build-essential git node-gyp pkg-config python-is-python3 && \
+  rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install JavaScript dependencies
+ARG NODE_VERSION=23.1.0
+ARG YARN_VERSION=1.22.22
+ENV PATH=/usr/local/node/bin:$PATH
+RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+  /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+  npm install -g yarn@$YARN_VERSION && \
+  rm -rf /tmp/node-build-master
+
 # Set production environment
 ENV RAILS_ENV="production" \
   BUNDLE_DEPLOYMENT="1" \
@@ -27,21 +41,7 @@ ENV RAILS_ENV="production" \
 
 # Throw-away build stage to reduce size of final image
 FROM base AS build
-
-# Install packages needed to build gems and node modules
-RUN apt-get update -qq && \
-  apt-get install --no-install-recommends -y build-essential git node-gyp pkg-config python-is-python3 && \
-  rm -rf /var/lib/apt/lists /var/cache/apt/archives
-
-# Install JavaScript dependencies
 ARG GIT_REPO_COMMIT_SHA
-ARG NODE_VERSION=23.1.0
-ARG YARN_VERSION=1.22.22
-ENV PATH=/usr/local/node/bin:$PATH
-RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
-  /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
-  npm install -g yarn@$YARN_VERSION && \
-  rm -rf /tmp/node-build-master
 
 # Install application gems
 COPY Gemfile Gemfile.lock ./
