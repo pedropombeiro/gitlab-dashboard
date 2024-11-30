@@ -42,7 +42,7 @@ RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
 FROM prebuild AS node
 
 # Install JavaScript dependencies
-ARG NODE_VERSION=23.1.0
+ARG NODE_VERSION=23.3.0
 ARG YARN_VERSION=1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447
 ENV PATH=/usr/local/node/bin:$PATH
 RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.gz | tar xz -C /tmp/ && \
