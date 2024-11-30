@@ -341,8 +341,8 @@ GEM
       redis-client (>= 0.22.0)
     redis-client (0.22.2)
       connection_pool
-    regexp_parser (2.9.2)
-    reline (0.5.11)
+    regexp_parser (2.9.3)
+    reline (0.5.12)
       io-console (~> 0.5)
     rexml (3.3.9)
     rspec-core (3.13.2)
