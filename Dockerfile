@@ -97,12 +97,11 @@ COPY --from=build /rails /rails
 # Run and own only the runtime files as a non-root user for security
 RUN addgroup --system --gid 1000 rails && \
   adduser --system rails --uid 1000 --ingroup rails --home /home/rails --shell /bin/sh rails && \
-  mkdir /data && \
-  chown -R 1000:1000 db log storage tmp /data
+  chown -R 1000:1000 db log storage tmp
 USER 1000:1000
 
 # Deployment options
-ENV DATABASE_URL="sqlite3:///data/production.sqlite3" \
+ENV DATABASE_URL="sqlite3:///rails/storage/production.sqlite3" \
   LD_PRELOAD="libjemalloc.so.2" \
   MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
   RUBY_YJIT_ENABLE="1"
@@ -112,5 +111,5 @@ ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 80
-VOLUME /data
+VOLUME /rails/storage
 CMD ["bundle", "exec", "./bin/rails", "server"]
