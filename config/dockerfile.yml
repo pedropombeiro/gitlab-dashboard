@@ -4,6 +4,7 @@
 options:
   alpine: true
   cache: true
+  compose: true
   jemalloc: true
   link: true
   parallel: true

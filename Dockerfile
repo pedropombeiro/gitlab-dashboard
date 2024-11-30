@@ -102,10 +102,12 @@ COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 
 # Run and own only the runtime files as a non-root user for security
-RUN addgroup --system --gid 1000 rails && \
-  adduser --system rails --uid 1000 --ingroup rails --home /home/rails --shell /bin/sh rails && \
-  chown -R 1000:1000 db log storage tmp
-USER 1000:1000
+ARG UID=1000 \
+  GID=1000
+RUN addgroup --system --gid $GID rails && \
+  adduser --system rails --uid $UID --ingroup rails --home /home/rails --shell /bin/sh rails && \
+  chown -R rails:rails db log storage tmp
+USER rails:rails
 
 # Deployment options
 ENV LD_PRELOAD="libjemalloc.so.2" \
