@@ -38,6 +38,7 @@
 /public/assets
 
 # Ignore specs.
+/.rspec
 /spec/
 /test/
 
@@ -53,6 +54,8 @@
 
 # Ignore other files
 .DS_Store
+/.editorconfig
 /.git-sha
-/.ruby-lsp
 /.projections.json
+/.ruby-lsp
+/Procfile.dev
