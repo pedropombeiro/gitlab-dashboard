@@ -1,7 +1,7 @@
 # Add your own tasks in files placed in lib/tasks ending in .rake,
 # for example lib/tasks/capistrano.rake, and they will automatically be available to Rake.
 
-require "standard/rake"
+require "standard/rake" unless ENV["RAILS_ENV"] == "production"
 require_relative "config/application"
 
 Rails.application.load_tasks
