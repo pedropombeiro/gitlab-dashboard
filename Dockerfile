@@ -11,7 +11,7 @@ WORKDIR /rails
 # Set production environment
 ENV BUNDLE_DEPLOYMENT="1" \
   BUNDLE_PATH="/usr/local/bundle" \
-  BUNDLE_WITHOUT="development" \
+  BUNDLE_WITHOUT="development:test" \
   RAILS_ENV="production"
 
 # Update gems and bundler

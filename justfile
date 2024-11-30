@@ -39,7 +39,7 @@ build-docker:
 
 create-dockerfile:
     bin/rails generate dockerfile \
-      --alpine --cache --ci --jemalloc --link --parallel --sqlite3 --yjit \
+      --alpine --cache --jemalloc --link --no-ci --parallel --sqlite3 --yjit \
       --add-build linux-headers openssl-dev
 
 lint:
