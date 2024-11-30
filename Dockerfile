@@ -26,6 +26,8 @@ RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
 RUN echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
 
 
+############################################################################
+
 # Throw-away build stages to reduce size of final image
 FROM base AS prebuild
 
@@ -34,6 +36,8 @@ RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
   apk add build-base curl gyp linux-headers openssl-dev pkgconfig python3
 
+
+############################################################################
 
 FROM prebuild AS node
 
@@ -52,6 +56,8 @@ COPY package.json yarn.lock ./
 RUN --mount=type=cache,id=bld-yarn-cache,target=/root/.yarn \
   YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
 
+
+############################################################################
 
 FROM prebuild AS build
 
@@ -81,6 +87,7 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
+############################################################################
 
 # Final stage for app image
 FROM base
