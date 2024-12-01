@@ -28,14 +28,14 @@ serve:
 open:
     open https://localhost:3000
 
-test:
-    bundle exec rspec
+test *args:
+    bundle exec rspec {{args}}
 
 watch-ci:
     gh run watch --repo=pedropombeiro/gitlab-dashboard
 
-build-docker:
-    docker buildx build --platform linux/amd64 -t $(basename $(pwd)) .
+build-docker *args:
+    docker buildx build --platform linux/amd64 -t $(basename $(pwd)) {{args}} .
 
 create-dockerfile:
     bin/rails generate dockerfile \
