@@ -2,6 +2,7 @@ default: install
     bin/setup
 
 install:
+    mise install
     bin/setup --skip-server
     yarn install
 
