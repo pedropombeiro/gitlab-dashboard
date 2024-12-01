@@ -1,8 +1,8 @@
 FactoryBot.define do
   factory :gitlab_user do
     sequence(:username) { |n| "User #{n}" }
-    created_at { "2024-11-26 22:06:06" }
-    updated_at { "2024-11-26 22:06:06" }
-    contacted_at { "2024-11-26 22:06:06" }
+    created_at { 1.month.ago }
+    updated_at { 3.weeks.ago }
+    contacted_at { 5.minutes.ago }
   end
 end
