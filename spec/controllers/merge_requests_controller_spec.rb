@@ -39,10 +39,18 @@ RSpec.describe MergeRequestsController, type: :controller do
       let!(:user_request_stub) do
         stub_request(:post, graphql_url)
           .with(body: hash_including("query" => a_string_matching(/user: /)))
-          .to_return(status: 200, body: {data: {user: {username: username, avatarUrl: "/images/avatar.png"}}}.to_json)
+          .to_return(status: 200, body: {
+            data: {user: {
+              username: username,
+              avatarUrl: "/images/avatar.png",
+              webUrl: "https://gitlab.example.com/#{username}"
+            }}
+          }.to_json)
       end
 
       it "returns http success and creates user with correct timestamp", :freeze_time do
+        expect(GitlabUser.find_by_username(username)).to be_nil
+
         request
 
         expect(response).to have_http_status :success
@@ -84,11 +92,21 @@ RSpec.describe MergeRequestsController, type: :controller do
         it "renders the actual template" do
           request
 
-          expect(response.body).to include(%(<a class="fw-light" href="#{merge_requests_path(username)}">#{username}</a>))
+          # Includes header with link to user's merge requests
+          expect(response.body).to include(
+            %(<a class="fw-light" href="https://gitlab.example.com/#{username}">#{username}</a>)
+          )
+          # and user's avatar
           expect(response.body).to include(
             %(<img class="rounded float-left" src="https://gitlab.example.com/images/avatar.png" width="24" height="24" />)
           )
+          # Includes turbo frame with merge requests list
           expect(response.body).to include(%(src="#{merge_requests_list_path(username, turbo: true)}"))
+
+          # Includes refresh button on x-small views
+          expect(response.body).to include(
+            %(<form class="button_to" method="get" action="#{merge_requests_path(username)}">)
+          )
         end
       end
 
