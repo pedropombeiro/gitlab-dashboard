@@ -8,6 +8,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
   before do
     allow(GitlabClient).to receive(:client).and_return(graphql_client)
+    stub_env("GITLAB_URL", "https://gitlab.example.com")
   end
 
   describe "GET /index" do
@@ -38,7 +39,7 @@ RSpec.describe MergeRequestsController, type: :controller do
       let!(:user_request_stub) do
         stub_request(:post, graphql_url)
           .with(body: hash_including("query" => a_string_matching(/user: /)))
-          .to_return(status: 200, body: {data: {user: {username: username}}}.to_json)
+          .to_return(status: 200, body: {data: {user: {username: username, avatarUrl: "/images/avatar.png"}}}.to_json)
       end
 
       it "returns http success and creates user with correct timestamp", :freeze_time do
@@ -74,6 +75,20 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response).to have_http_status :success
             expect(user_request_stub).to have_been_requested.once
           end
+        end
+      end
+
+      context "with render_views" do
+        render_views
+
+        it "renders the actual template" do
+          request
+
+          expect(response.body).to include(%(<a class="fw-light" href="#{merge_requests_path(username)}">#{username}</a>))
+          expect(response.body).to include(
+            %(<img class="rounded float-left" src="https://gitlab.example.com/images/avatar.png" width="24" height="24" />)
+          )
+          expect(response.body).to include(%(src="#{merge_requests_list_path(username, turbo: true)}"))
         end
       end
 

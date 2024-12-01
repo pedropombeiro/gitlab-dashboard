@@ -81,6 +81,7 @@ group :test do
   gem "webmock"
   gem "shoulda-matchers", "~> 6.0"
   gem "test-prof", "~> 1.0"
+  gem "stub_env"
 end
 
 gem "async", "~> 2.21"
