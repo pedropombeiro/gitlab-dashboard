@@ -5,8 +5,8 @@ FactoryBot.define do
     auth_key { "authkey" }
     p256dh_key { "p256dh_key" }
     user_agent { "user_agent" }
-    created_at { "2024-11-26 22:06:23" }
-    updated_at { "2024-11-26 22:06:23" }
-    notified_at { "2024-11-26 22:06:23" }
+    created_at { 10.days.ago }
+    updated_at { 9.days.ago }
+    notified_at { 30.minutes.ago }
   end
 end
