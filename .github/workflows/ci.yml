@@ -1,7 +1,7 @@
 ---
 name: CI
 
-on:
+on: # yamllint disable-line rule:truthy
   pull_request:
   push:
     paths:
@@ -11,16 +11,47 @@ on:
       - "db/**"
       - "lib/**"
       - "public/**"
+      - "spec/**"
       - "vendor/**"
-      - "**.js"
-      - "**.erb"
-      - "**.rb"
       - "**.yml"
       - "Dockerfile"
       - "Gemfile.lock"
       - "yarn.lock"
 
 jobs:
+  # JOB to run change detection
+  changes:
+    runs-on: ubuntu-latest
+    # Required permissions
+    permissions:
+      pull-requests: read
+    # Set job outputs to values from filter step
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # For pull requests it's not necessary to checkout the code
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            deployment:
+              - "app/**"
+              - "bin/docker-entrypoint"
+              - "config/**"
+              - "db/**"
+              - "lib/**"
+              - "public/**"
+              - "vendor/**"
+              - ".node-version"
+              - "config.ru"
+              - "Dockerfile"
+              - "Gemfile.lock"
+              - "yarn.lock"
+
   scan_ruby:
     runs-on: ubuntu-latest
 
@@ -107,6 +138,7 @@ jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
+    if: ${{ needs.changes.outputs.deployment == 'true' }}
     needs: [test]
     permissions:
       contents: read
