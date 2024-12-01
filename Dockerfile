@@ -56,7 +56,7 @@ RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSI
 # Install node modules
 COPY --link package.json yarn.lock ./
 RUN --mount=type=cache,id=bld-yarn-cache,target=/root/.yarn \
-  YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile
+  YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile --production=true
 
 
 ############################################################################
@@ -68,7 +68,7 @@ COPY --link Gemfile Gemfile.lock ./
 RUN --mount=type=cache,id=bld-gem-cache,sharing=locked,target=/srv/vendor \
   bundle config set app_config .bundle && \
   bundle config set path /srv/vendor && \
-  bundle install && \
+  bundle install --jobs 4 --retry 3 && \
   bundle exec bootsnap precompile --gemfile && \
   bundle clean && \
   mkdir -p vendor && \
