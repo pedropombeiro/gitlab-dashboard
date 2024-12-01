@@ -7,9 +7,6 @@ FROM ruby:$RUBY_VERSION-alpine AS base
 # Rails app lives here
 WORKDIR /rails
 
-# Base build arguments
-ARG GIT_REPO_COMMIT_SHA="null"
-
 # Set production environment
 ENV BUNDLE_DEPLOYMENT="1" \
   BUNDLE_PATH="/usr/local/bundle" \
@@ -24,8 +21,6 @@ RUN gem update --system --no-document && \
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
   apk add tzdata
-
-RUN echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
 
 
 ############################################################################
@@ -94,6 +89,9 @@ RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 # Final stage for app image
 FROM base
 
+# Deployment build arguments
+ARG GIT_REPO_COMMIT_SHA="null"
+
 # Install packages needed for deployment
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
@@ -108,7 +106,8 @@ ARG UID=1000 \
   GID=1000
 RUN addgroup --system --gid $GID rails && \
   adduser --system rails --uid $UID --ingroup rails --home /home/rails --shell /bin/sh rails && \
-  chown -R rails:rails db log storage tmp
+  chown -R rails:rails db log storage tmp && \
+  echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
 USER rails:rails
 
 # Deployment options
