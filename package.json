@@ -12,7 +12,6 @@
     "bootstrap-icons": "^1.11.3",
     "local-time": "^3.0.2",
     "nodemon": "^3.1.7",
-    "pulltorefreshjs": "^0.1.22",
     "sass": "^1.80.6"
   },
   "scripts": {
