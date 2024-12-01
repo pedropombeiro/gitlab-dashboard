@@ -19,6 +19,10 @@ on: # yamllint disable-line rule:truthy
       - "Gemfile.lock"
       - "yarn.lock"
 
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
 jobs:
   # JOB to run change detection
   changes:
@@ -43,9 +47,9 @@ jobs:
               - "*.js"
               - "*.yml"
             ruby:
-              - "*.rb"
-              - "*.erb"
-              - "*.yml"
+              - "**.rb"
+              - "**.erb"
+              - "**.yml"
             deployment:
               - ".github/workflows/ci.yml"
               - "app/**"
@@ -157,11 +161,13 @@ jobs:
 
   build-and-push-image:
     runs-on: ubuntu-latest
-    if: ${{ needs.changes.outputs.deployment == 'true' }}
     needs: [changes, test]
+    if: ${{ needs.changes.outputs.deployment == 'true' }}
     permissions:
       contents: read
       packages: write
+      id-token: write
+      attestations: write
 
     steps:
       - name: Checkout repository
@@ -173,7 +179,7 @@ jobs:
         with:
           # list of Docker images to use as base name for tags
           images: |
-            ghcr.io/${{ github.repository_owner }}/gitlab-dashboard
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
@@ -198,6 +204,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and push Docker image
+        id: push
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -208,3 +215,10 @@ jobs:
             "GIT_REPO_COMMIT_SHA=${{ github.sha }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
