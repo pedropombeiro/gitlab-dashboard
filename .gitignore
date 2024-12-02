@@ -39,6 +39,7 @@ storage
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
+/coverage
 /node_modules
 config/secrets.yml
 config/environments/development/ssl/localhost.crt
