@@ -82,6 +82,7 @@ group :test do
   gem "shoulda-matchers", "~> 6.0"
   gem "test-prof", "~> 1.0"
   gem "stub_env"
+  gem "simplecov"
 end
 
 gem "async", "~> 2.21"
