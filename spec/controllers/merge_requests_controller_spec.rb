@@ -229,52 +229,78 @@ RSpec.describe MergeRequestsController, type: :controller do
                 expect(merged_mrs_request_stub).to have_been_requested.once
                 expect(issues_request_stub).to have_been_requested.once
               end
-            end
 
-            context "and merge request has been merged in between", :with_cache do
-              let!(:subscriptions) { create_list(:web_push_subscription, 2, gitlab_user: user) }
+              context "and merge request has been opened in between" do
+                let!(:subscription) { create(:web_push_subscription, gitlab_user: user) }
 
-              def payload_of_merged_mr_notification(mr)
-                satisfy do |data|
-                  message = JSON.parse(data[:message])
-                  message["title"] == "A merge request was merged" &&
-                    message["options"]["body"] == "#{mr["reference"]}: #{mr["titleHtml"]}" &&
-                    message["options"]["data"]["url"] == mr["webUrl"]
+                it "does not send web push notification" do
+                  open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
+                  opened_mr = open_mr_nodes.delete_at(0)
+
+                  stub_request(:post, graphql_url)
+                    .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                    .to_return(status: 200, body: open_mrs.to_json)
+
+                  perform_request
+
+                  Rails.cache.delete(described_class.authored_mr_lists_cache_key(username))
+                  open_mr_nodes << opened_mr
+
+                  stub_request(:post, graphql_url)
+                    .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                    .to_return(status: 200, body: open_mrs.to_json)
+
+                  expect(WebPush).not_to receive(:payload_send)
+
+                  perform_request
                 end
               end
 
-              it "sends web push notification" do
-                perform_request
+              context "and merge request has been merged in between" do
+                let!(:subscriptions) { create_list(:web_push_subscription, 2, gitlab_user: user) }
 
-                Rails.cache.delete(described_class.authored_mr_lists_cache_key(username))
+                def payload_of_merged_mr_notification(mr)
+                  satisfy do |data|
+                    message = JSON.parse(data[:message])
+                    message["title"] == "A merge request was merged" &&
+                      message["options"]["body"] == "#{mr["reference"]}: #{mr["titleHtml"]}" &&
+                      message["options"]["data"]["url"] == mr["webUrl"]
+                  end
+                end
 
-                open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
-                merged_mr_nodes = merged_mrs.dig(*%w[data user mergedMergeRequests nodes])
-                merged_mr = open_mr_nodes.delete_at(0)
-                merged_mr["mergedAt"] = Time.current
-                merged_mr["mergeUser"] = {
-                  "__typename" => "UserCore",
-                  "username" => "rsarangadharan",
-                  "avatarUrl" => "/uploads/-/system/user/avatar/21979359/avatar.png",
-                  "webUrl" => "https://gitlab.com/rsarangadharan",
-                  "lastActivityOn" => "2024-11-27",
-                  "location" => "",
-                  "status" => {"availability" => "NOT_SET", "message" => "Please @mention me so I see your message."}
-                }
-                merged_mr_nodes << merged_mr
+                it "sends web push notification" do
+                  perform_request
 
-                stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
-                  .to_return(status: 200, body: open_mrs.to_json)
-                stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_matching(/state: merged/)))
-                  .to_return(status: 200, body: merged_mrs.to_json)
+                  Rails.cache.delete(described_class.authored_mr_lists_cache_key(username))
 
-                expect(WebPush).to receive(:payload_send)
-                  .with(payload_of_merged_mr_notification(merged_mr))
-                  .exactly(subscriptions.count)
+                  open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
+                  merged_mr_nodes = merged_mrs.dig(*%w[data user mergedMergeRequests nodes])
+                  merged_mr = open_mr_nodes.delete_at(0)
+                  merged_mr["mergedAt"] = Time.current
+                  merged_mr["mergeUser"] = {
+                    "__typename" => "UserCore",
+                    "username" => "rsarangadharan",
+                    "avatarUrl" => "/uploads/-/system/user/avatar/21979359/avatar.png",
+                    "webUrl" => "https://gitlab.com/rsarangadharan",
+                    "lastActivityOn" => "2024-11-27",
+                    "location" => "",
+                    "status" => {"availability" => "NOT_SET", "message" => "Please @mention me so I see your message."}
+                  }
+                  merged_mr_nodes << merged_mr
 
-                perform_request
+                  stub_request(:post, graphql_url)
+                    .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                    .to_return(status: 200, body: open_mrs.to_json)
+                  stub_request(:post, graphql_url)
+                    .with(body: hash_including("query" => a_string_matching(/state: merged/)))
+                    .to_return(status: 200, body: merged_mrs.to_json)
+
+                  expect(WebPush).to receive(:payload_send)
+                    .with(payload_of_merged_mr_notification(merged_mr))
+                    .exactly(subscriptions.count)
+
+                  perform_request
+                end
               end
             end
           end
