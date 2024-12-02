@@ -220,8 +220,8 @@
             title: "Approved" %>
           <% else %>
             <%= tag.progress(
-              value: mr.approvalsRequired,
-              max: mr.approvalsRequired + mr.approvalsLeft,
+              value: mr.approvalsRequired - mr.approvalsLeft,
+              max: mr.approvalsRequired,
               style: "width: 20px",
               class: "align-middle",
               data: {

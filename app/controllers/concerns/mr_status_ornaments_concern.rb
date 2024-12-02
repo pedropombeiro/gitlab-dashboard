@@ -67,7 +67,7 @@ module MrStatusOrnamentsConcern
     mr_interactions = mr.reviewers.nodes.map(&:mergeRequestInteraction)
 
     # Signal that a reviewer forgot to pass on the review to the follow-up reviewer
-    return true if mr.approvalsLeft&.positive? && mr_interactions.all? { |mri| mri.approved }
+    return true if mr.approvalsLeft&.positive? && mr_interactions.all?(&:approved)
 
     mr_interactions.any? do |mri|
       %w[REVIEWED REQUESTED_CHANGES].include?(mri.reviewState)
