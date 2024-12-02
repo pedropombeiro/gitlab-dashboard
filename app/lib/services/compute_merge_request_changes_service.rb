@@ -73,7 +73,7 @@ module Services
 
         previous_labels = previous_mr_version.contextualLabels.map(&:webTitle)
         labels = mr.contextualLabels.map(&:webTitle)
-        next if previous_labels.empty? || labels == previous_labels
+        next if labels.blank? || labels == previous_labels
 
         {
           mr: mr,
