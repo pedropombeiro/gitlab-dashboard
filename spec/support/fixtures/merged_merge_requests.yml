@@ -530,7 +530,7 @@ one:
             project:
               fullPath: gitlab-org/gitlab-runner
             reference: "!5166"
-            sourceBranch: pedropombeiro/change-unregister-runner-manager-log-output
+            sourceBranch: pedropombeiro/32804/change-unregister-runner-manager-log-output
             targetBranch: main
             createdAt: "2024-11-19T09:09:49Z"
             updatedAt: "2024-11-26T20:23:00Z"
