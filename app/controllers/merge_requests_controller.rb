@@ -32,11 +32,9 @@ class MergeRequestsController < ApplicationController
   end
 
   def list
-    return unless ensure_assignee
-
     render_404 and return unless current_user
 
-    assignee = safe_params[:assignee]
+    assignee = safe_params.expect(:assignee)
     save_current_user(assignee)
     previous_dto = nil
     if current_user.web_push_subscriptions.any?
