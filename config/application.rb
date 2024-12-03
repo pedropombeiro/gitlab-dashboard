@@ -1,8 +1,3 @@
-# Support _FILE Docker secrets
-ENV.select { |k, v| k.match(/.+_FILE/) }.each do |secret_env_var, file_path|
-  ENV[secret_env_var.delete_suffix("_FILE")] = File.read(file_path)
-end
-
 require_relative "boot"
 
 require "rails/all"
