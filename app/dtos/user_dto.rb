@@ -126,6 +126,14 @@ class UserDto
 
       convert_mr_pipeline(mr.headPipeline)
 
+      if mr.headPipeline
+        mr.headPipeline[:outdated?] =
+          mr.headPipeline.startedAt &&
+          mr.headPipeline.finishedAt &&
+          mr.headPipeline.finishedAt < 8.hours.ago &&
+          mr.contextualLabels.any? { |label| label.title == "pipeline::tier-3" }
+      end
+
       mr.mergeStatusLabel = open_merge_request_status_label(mr)
       mr.labels.nodes.each { |label| label.bootstrapClass = [] } # Use label's predefined colors
       mr.reviewers.nodes.each do |reviewer|
