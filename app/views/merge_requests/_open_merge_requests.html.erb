@@ -22,10 +22,11 @@
       <div class="text-secondary small">
         Fetched in
         <%= request_duration -%>
-        seconds at <%= local_relative_time(updated_at, type: 'time-or-date', data: bs_data) -%>.
+        seconds at
+        <%= local_relative_time(updated_at, type: "time-or-date", data: bs_data) -%>.
         <% if next_update_at %>
           <span>Cached until
-            <%= local_relative_time(next_update_at, type: 'time-or-date', data: bs_data) -%>.
+            <%= local_relative_time(next_update_at, type: "time-or-date", data: bs_data) -%>.
           </span>
         <% else %>
           <span>Not cached.</span>
@@ -159,7 +160,7 @@
               <% if pipeline.startedAt %>
                 <% if pipeline.finishedAt.nil? %>
                   <%= render "shared/relative_timestamp", timestamp: pipeline.startedAt %>
-                <% elsif pipeline.finishedAt < 8.hours.ago %>
+                <% elsif pipeline.outdated? %>
                   <%= render "shared/abbr_with_title",
                   content: "🥶",
                   title: "Pipeline too old, must be re-run before being merged" %>
@@ -236,7 +237,12 @@
           <%= render(
             partial: "reviewer_badge",
             spacer_template: "space",
-            collection: mr.reviewers.nodes.sort_by { |r| r.mergeRequestInteraction.reviewState }.reverse,
+            collection:
+              mr
+                .reviewers
+                .nodes
+                .sort_by { |r| r.mergeRequestInteraction.reviewState }
+                .reverse,
             as: :reviewer,
           ) || "Not assigned" %>
         </td>
