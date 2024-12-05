@@ -109,3 +109,12 @@
     <% end %>
   </tbody>
 </table>
+
+<%= column_chart(
+  monthly_merged_merge_request_stats_path(params[:assignee]),
+  ytitle: "Merged MRs",
+  download: {
+    filename: "merged stats",
+  },
+) %>
+

@@ -7,6 +7,7 @@ module CacheConcern
 
   USER_CACHE_VALIDITY = 1.day
   MR_CACHE_VALIDITY = 5.minutes
+  MONTHLY_GRAPH_CACHE_VALIDITY = 1.day
 
   class_methods do
     def user_cache_key(username)
@@ -19,6 +20,10 @@ module CacheConcern
 
     def authored_mr_lists_cache_key(user)
       "#{REDIS_NAMESPACE}/merge_requests/v9/authored_list/#{user_hash(user)}"
+    end
+
+    def monthly_merged_mr_lists_cache_key(user)
+      "#{REDIS_NAMESPACE}/merge_requests/v1/monthly_merged/#{user_hash(user)}"
     end
 
     def last_authored_mr_lists_cache_key(user)

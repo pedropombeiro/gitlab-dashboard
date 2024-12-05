@@ -1,0 +1,2 @@
+module UserMergeRequestChartsHelper
+end

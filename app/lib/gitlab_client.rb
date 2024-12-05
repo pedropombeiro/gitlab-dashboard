@@ -63,6 +63,13 @@ class GitlabClient
     }
   GRAPHQL
 
+  MONTHLY_MERGE_REQUEST_STATS_FRAGMENT = <<-GRAPHQL
+    fragment MonthlyMergeRequestStatsFields on MergeRequestConnection {
+      count
+      totalTimeToMerge
+    }
+  GRAPHQL
+
   def self.gitlab_instance_url
     @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
   end
@@ -204,6 +211,39 @@ class GitlabClient
       #{EXT_USER_FRAGMENT}
       #{CORE_LABEL_FRAGMENT}
       #{CORE_MERGE_REQUEST_FRAGMENT}
+    GRAPHQL
+
+    response = self.class.client.query(merge_requests_graphql_query, username: username)
+
+    OpenStruct.new(
+      user: make_serializable(response.data.user),
+      updated_at: Time.current
+    )
+  end
+
+  def fetch_monthly_merged_merge_requests(username)
+    monthly_merge_requests_graphql_query = 12.times.map do |offset|
+      bom = Time.current.beginning_of_month - offset.months
+      eom = 1.month.after(bom)
+
+      <<-GRAPHQL
+        monthlyMergedMergeRequests#{offset}: authoredMergeRequests(
+          state: merged,
+          mergedAfter: "#{bom.to_fs}",
+          mergedBefore: "#{eom.to_fs}") {
+          ...MonthlyMergeRequestStatsFields
+        }
+      GRAPHQL
+    end.join("\n")
+
+    merge_requests_graphql_query = <<-GRAPHQL
+      query($username: String!) {
+        user(username: $username) {
+          #{monthly_merge_requests_graphql_query}
+        }
+      }
+
+      #{MONTHLY_MERGE_REQUEST_STATS_FRAGMENT}
     GRAPHQL
 
     response = self.class.client.query(merge_requests_graphql_query, username: username)
