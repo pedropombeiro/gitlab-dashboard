@@ -220,16 +220,12 @@
             class: "align-middle text-success",
             title: "Approved" %>
           <% else %>
-            <%= tag.progress(
-              value: mr.approvalsRequired - mr.approvalsLeft,
-              max: mr.approvalsRequired,
-              style: "width: 20px",
-              class: "align-middle",
-              data: {
-                bs_toggle: "tooltip",
-                bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
-              },
-            ) %>
+            <%= tag.span "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired}",
+                     class: mr.approvalsRequired.present? && mr.approvalsRequired > 3 ? "text-danger" : nil,
+                     data: {
+                       bs_toggle: "tooltip",
+                       bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
+                     } %>
           <% end %>
         </td>
         <!-- Reviewers -->
