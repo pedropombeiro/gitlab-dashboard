@@ -11,23 +11,23 @@ module CacheConcern
 
   class_methods do
     def user_cache_key(username)
-      "#{REDIS_NAMESPACE}/user_info/v3/#{user_hash(username)}"
+      "#{REDIS_NAMESPACE}/user_info/v5/#{user_hash(username)}"
     end
 
     def open_issues_cache_key(issue_iids)
-      "#{REDIS_NAMESPACE}/issues/v4/open/#{issue_iids.join("-")}"
+      "#{REDIS_NAMESPACE}/issues/v5/open/#{issue_iids.join("-")}"
     end
 
     def authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v9/authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v10/authored_list/#{user_hash(user)}"
     end
 
     def monthly_merged_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v1/monthly_merged/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v2/monthly_merged/#{user_hash(user)}"
     end
 
     def last_authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v9/last_authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v10/last_authored_list/#{user_hash(user)}"
     end
 
     def location_timezone_name_cache_key(location)

@@ -27,7 +27,6 @@ module Services
 
     def execute
       Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: self.class.cache_validity) do
-        start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
         gitlab_client = GitlabClient.new
         open_mrs_response = nil
         merged_mrs_response = nil
@@ -38,22 +37,29 @@ module Services
           Async { merged_mrs_response = gitlab_client.fetch_merged_merge_requests(assignee) }
         end.wait
 
-        end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
-        response = open_mrs_response
+        response = open_mrs_response.response.data
         response.next_update_at = self.class.cache_validity.after(open_mrs_response.updated_at)
         response.next_scheduled_update_at =
-          if any_running_pipelines?(open_mrs_response.user.openMergeRequests.nodes)
+          if any_running_pipelines?(response.user.openMergeRequests.nodes)
             5.minutes.from_now
           else
             30.minutes.from_now
           end
-        response.request_duration = (end_t - start_t).seconds.round(1)
-        response.errors ||= merged_mrs_response&.errors
+        response.errors = open_mrs_response&.response&.errors || merged_mrs_response&.response&.errors
+        response.updated_at = [
+          open_mrs_response&.updated_at || Time.current,
+          merged_mrs_response&.updated_at || Time.current
+        ].min
+        response.request_duration = [
+          open_mrs_response&.request_duration || 0,
+          merged_mrs_response&.request_duration || 0
+        ].max
+
         if response.errors.nil?
-          response.user.mergedMergeRequests = merged_mrs_response.user.mergedMergeRequests
-          response.user.allMergedMergeRequests = merged_mrs_response.user.allMergedMergeRequests
-          response.user.firstCreatedMergedMergeRequests = merged_mrs_response.user.firstCreatedMergedMergeRequests
+          user2 = merged_mrs_response.response.data.user
+          response.user.mergedMergeRequests = user2.mergedMergeRequests
+          response.user.allMergedMergeRequests = user2.allMergedMergeRequests
+          response.user.firstCreatedMergedMergeRequests = user2.firstCreatedMergedMergeRequests
           Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), response, expires_in: 1.week)
         end
 

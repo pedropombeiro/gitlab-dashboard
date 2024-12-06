@@ -81,7 +81,7 @@ class GitlabClient
   end
 
   def fetch_user(username, format: :open_struct)
-    response = self.class.client.query <<-GRAPHQL
+    query = <<-GRAPHQL
       query {
         user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
           ...CoreUserFields
@@ -91,7 +91,9 @@ class GitlabClient
       #{CORE_USER_FRAGMENT}
     GRAPHQL
 
-    format_response(:data, response.data, format)
+    format_response(format) do
+      self.class.client.query(query)
+    end
   end
 
   def fetch_open_merge_requests(username, format: :open_struct)
@@ -173,8 +175,13 @@ class GitlabClient
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
-    response = self.class.client.query(merge_requests_graphql_query, username: username, activeReviewsAfter: 7.days.ago)
-    format_response(:user, response.data.user, format)
+    format_response(format) do
+      self.class.client.query(
+        merge_requests_graphql_query,
+        username: username,
+        activeReviewsAfter: 7.days.ago
+      )
+    end
   end
 
   def fetch_merged_merge_requests(username, format: :open_struct)
@@ -209,8 +216,9 @@ class GitlabClient
       #{CORE_MERGE_REQUEST_FRAGMENT}
     GRAPHQL
 
-    response = self.class.client.query(merge_requests_graphql_query, username: username)
-    format_response(:user, response.data.user, format)
+    format_response(format) do
+      self.class.client.query(merge_requests_graphql_query, username: username)
+    end
   end
 
   def fetch_monthly_merged_merge_requests(username, format: :open_struct)
@@ -238,8 +246,9 @@ class GitlabClient
       #{MONTHLY_MERGE_REQUEST_STATS_FRAGMENT}
     GRAPHQL
 
-    response = self.class.client.query(merge_requests_graphql_query, username: username)
-    format_response(:user, response.data.user, format)
+    format_response(format) do
+      self.class.client.query(merge_requests_graphql_query, username: username)
+    end
   end
 
   # Fetches a list of issues given 2 lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
@@ -299,14 +308,21 @@ class GitlabClient
 
   private
 
-  def format_response(key, value, format)
+  def format_response(format)
+    start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
+    response = yield
+
+    end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+
     case format
     when :yaml_fixture
-      JSON.parse(value.to_json).to_yaml
+      JSON.parse(response.to_json).to_yaml
     else
       OpenStruct.new(
-        key => make_serializable(value),
-        :updated_at => Time.current
+        response: make_serializable(response),
+        updated_at: Time.current,
+        request_duration: (end_t - start_t).seconds.round(1)
       )
     end
   end

@@ -30,13 +30,20 @@ RSpec.describe GitlabClient do
         )
     end
 
-    it "returns the user data" do
-      expect(fetch_user.data).to be_truthy
-      expect(fetch_user.data.user).to have_attributes(
-        "__typename" => "UserCore",
-        "username" => "pedropombeiro",
-        "avatarUrl" => "/uploads/-/system/user/avatar/1388762/avatar.png",
-        "webUrl" => "https://gitlab.com/pedropombeiro"
+    it "returns the user data", :freeze_time do
+      expect(fetch_user).to be_truthy
+      expect(fetch_user).to have_attributes(
+        updated_at: Time.current,
+        response: an_object_having_attributes(
+          data: an_object_having_attributes(
+            user: an_object_having_attributes(
+              "__typename" => "UserCore",
+              "username" => "pedropombeiro",
+              "avatarUrl" => "/uploads/-/system/user/avatar/1388762/avatar.png",
+              "webUrl" => "https://gitlab.com/pedropombeiro"
+            )
+          )
+        )
       )
     end
   end
@@ -117,22 +124,27 @@ RSpec.describe GitlabClient do
       expect(fetch_open_merge_requests).to be_truthy
       expect(result_as_hash).to match(
         updated_at: Time.current,
-        user: {
-          openMergeRequests: {
-            nodes: [
-              a_hash_including(iid: "173741", **common_mr_attrs),
-              a_hash_including(iid: "174004", **common_mr_attrs),
-              a_hash_including(iid: "173789", **common_mr_attrs),
-              a_hash_including(iid: "173874", **common_mr_attrs),
-              a_hash_including(iid: "173916", **common_mr_attrs),
-              a_hash_including(iid: "173886", **common_mr_attrs),
-              a_hash_including(iid: "173885", **common_mr_attrs,
-                blockingMergeRequests: {visibleMergeRequests: [iid: "173886", state: "opened"]}),
-              a_hash_including(iid: "173639", **common_mr_attrs),
-              a_hash_including(iid: "171848", **common_mr_attrs,
-                blockingMergeRequests: {visibleMergeRequests: [{iid: "172422", state: "merged"}, {iid: "172698", state: "closed"}]}),
-              a_hash_including(iid: "173007", **common_mr_attrs)
-            ]
+        request_duration: 0.0,
+        response: {
+          data: {
+            user: {
+              openMergeRequests: {
+                nodes: [
+                  a_hash_including(iid: "173741", **common_mr_attrs),
+                  a_hash_including(iid: "174004", **common_mr_attrs),
+                  a_hash_including(iid: "173789", **common_mr_attrs),
+                  a_hash_including(iid: "173874", **common_mr_attrs),
+                  a_hash_including(iid: "173916", **common_mr_attrs),
+                  a_hash_including(iid: "173886", **common_mr_attrs),
+                  a_hash_including(iid: "173885", **common_mr_attrs,
+                    blockingMergeRequests: {visibleMergeRequests: [iid: "173886", state: "opened"]}),
+                  a_hash_including(iid: "173639", **common_mr_attrs),
+                  a_hash_including(iid: "171848", **common_mr_attrs,
+                    blockingMergeRequests: {visibleMergeRequests: [{iid: "172422", state: "merged"}, {iid: "172698", state: "closed"}]}),
+                  a_hash_including(iid: "173007", **common_mr_attrs)
+                ]
+              }
+            }
           }
         }
       )
