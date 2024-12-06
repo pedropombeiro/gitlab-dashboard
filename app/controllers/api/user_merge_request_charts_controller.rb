@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UserMergeRequestChartsController < MergeRequestsControllerBase
+class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
   def monthly_merged_merge_request_stats
     return unless ensure_assignee
 

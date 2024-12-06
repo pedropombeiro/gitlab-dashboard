@@ -6,8 +6,8 @@ Rails.application.routes.draw do
   get "/mrs/:assignee", to: "merge_requests#index", as: :merge_requests
   get "/mrs/:assignee/list", to: "merge_requests#list", as: :merge_requests_list
 
-  get "/graph/:assignee/monthly_merged_mrs",
-    to: "user_merge_request_charts#monthly_merged_merge_request_stats",
+  get "/api/graph/monthly_merged_mrs",
+    to: "api/user_merge_request_charts#monthly_merged_merge_request_stats",
     as: :monthly_merged_merge_request_stats, defaults: {format: :json}
 
   get "/admin/dashboard", to: "admin/dashboard#index", as: :admin_dashboard
