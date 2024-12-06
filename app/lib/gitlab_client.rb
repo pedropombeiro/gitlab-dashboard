@@ -239,7 +239,6 @@ class GitlabClient
     GRAPHQL
 
     response = self.class.client.query(merge_requests_graphql_query, username: username)
-
     format_response(:user, response.data.user, format)
   end
 
