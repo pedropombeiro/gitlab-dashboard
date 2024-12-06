@@ -12,7 +12,9 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
     end
 
     fresh_when(response)
-    expires_in(MONTHLY_GRAPH_CACHE_VALIDITY.after(response.updated_at) - Time.current)
+    if Rails.env.production?
+      expires_in(MONTHLY_GRAPH_CACHE_VALIDITY.after(response.updated_at) - Time.current)
+    end
 
     render json: monthly_mrs_graph(response.user).map { |name, stats| {name: name, data: stats} }.chart_json
   end
