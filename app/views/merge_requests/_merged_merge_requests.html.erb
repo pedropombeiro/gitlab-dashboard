@@ -110,11 +110,13 @@
   </tbody>
 </table>
 
-<%= column_chart(
-  monthly_merged_merge_request_stats_path(params[:assignee]),
-  ytitle: "Merged MRs",
-  download: {
-    filename: "merged stats",
-  },
-) %>
-
+<div class="h-100 d-flex align-items-center justify-content-center">
+  <%= column_chart(
+    monthly_merged_merge_request_stats_path(assignee: params[:assignee]),
+    title: "MRs merged in last 12 months",
+    width: "800px",
+    download: {
+      filename: "merged stats",
+    },
+  ) %>
+</div>
