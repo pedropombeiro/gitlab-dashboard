@@ -16,7 +16,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
       expires_in(MONTHLY_GRAPH_CACHE_VALIDITY.after(response.updated_at) - Time.current)
     end
 
-    render json: monthly_mrs_graph(response.user).map { |name, stats| {name: name, data: stats} }.chart_json
+    render json: monthly_mrs_graph(response.response.data.user).map { |name, stats| {name: name, data: stats} }.chart_json
   end
 
   private

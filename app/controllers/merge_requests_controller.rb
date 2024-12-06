@@ -15,7 +15,7 @@ class MergeRequestsController < MergeRequestsControllerBase
 
     @user = Rails.cache.fetch(self.class.user_cache_key(safe_params[:assignee]), expires_in: USER_CACHE_VALIDITY) do
       gitlab_client.fetch_user(safe_params[:assignee])
-    end.data.user
+    end.response.data.user
 
     render_404 and return unless @user
 
@@ -88,7 +88,7 @@ class MergeRequestsController < MergeRequestsControllerBase
 
     Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: cache_validity) do
       gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
-    end&.data.to_h { |issue| [issue.iid, issue] }
+    end.response&.data.to_h { |issue| [issue.iid, issue] }
   end
 
   def check_changes(previous_dto, dto)
