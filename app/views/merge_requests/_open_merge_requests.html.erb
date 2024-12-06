@@ -220,7 +220,7 @@
             class: "align-middle text-success",
             title: "Approved" %>
           <% else %>
-            <%= tag.span "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired}",
+            <%= tag.nobr "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired}",
                      class: mr.approvalsRequired.present? && mr.approvalsRequired > 3 ? "text-danger" : nil,
                      data: {
                        bs_toggle: "tooltip",
