@@ -92,6 +92,8 @@ RSpec.describe MergeRequestsController, type: :controller do
         it "renders the actual template" do
           request
 
+          expect(response).to have_http_status(:ok)
+
           # Includes header with link to user's merge requests
           expect(response.body).to include(
             %(<a class="fw-light" href="https://gitlab.example.com/#{username}">#{username}</a>)
