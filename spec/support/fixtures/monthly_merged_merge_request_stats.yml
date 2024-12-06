@@ -1,0 +1,39 @@
+one:
+  data:
+    user:
+      monthlyMergedMergeRequests0:
+        count: 7
+        totalTimeToMerge: 3531350.87013
+      monthlyMergedMergeRequests1:
+        count: 24
+        totalTimeToMerge: 9494092.998331
+      monthlyMergedMergeRequests2:
+        count: 25
+        totalTimeToMerge: 11293356.205686
+      monthlyMergedMergeRequests3:
+        count: 32
+        totalTimeToMerge: 20139423.628572
+      monthlyMergedMergeRequests4:
+        count: 13
+        totalTimeToMerge: 3584486.907436
+      monthlyMergedMergeRequests5:
+        count: 22
+        totalTimeToMerge: 6703126.342184
+      monthlyMergedMergeRequests6:
+        count: 48
+        totalTimeToMerge: 14064594.753656
+      monthlyMergedMergeRequests7:
+        count: 26
+        totalTimeToMerge: 13098223.109905
+      monthlyMergedMergeRequests8:
+        count: 27
+        totalTimeToMerge: 18323430.139684
+      monthlyMergedMergeRequests9:
+        count: 12
+        totalTimeToMerge: 2253649.15363
+      monthlyMergedMergeRequests10:
+        count: 16
+        totalTimeToMerge: 6502253.099736
+      monthlyMergedMergeRequests11:
+        count: 22
+        totalTimeToMerge: 8489274.43657

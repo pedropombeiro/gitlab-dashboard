@@ -69,7 +69,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
       context "when called twice" do
         it "calls api twice" do
-          # A second request is generates a second API call
+          # A second request generates a second API call
           2.times { perform_request }
 
           expect(user_request_stub).to have_been_requested.twice
@@ -210,7 +210,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
           context "when called twice" do
             it "calls api twice" do
-              # A second request is generates a second API call
+              # A second request generates a second API call
               2.times { perform_request }
 
               expect(open_mrs_request_stub).to have_been_requested.twice
