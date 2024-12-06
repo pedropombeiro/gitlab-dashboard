@@ -15,7 +15,7 @@ module CacheConcern
     end
 
     def open_issues_cache_key(issue_iids)
-      "#{REDIS_NAMESPACE}/issues/v3/open/#{issue_iids.join("-")}"
+      "#{REDIS_NAMESPACE}/issues/v4/open/#{issue_iids.join("-")}"
     end
 
     def authored_mr_lists_cache_key(user)

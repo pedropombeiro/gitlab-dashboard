@@ -85,7 +85,7 @@ class MergeRequestsController < MergeRequestsControllerBase
 
     Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: cache_validity) do
       gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
-    end&.to_h { |issue| [issue.iid, issue] }
+    end&.data.to_h { |issue| [issue.iid, issue] }
   end
 
   def check_changes(previous_dto, dto)

@@ -1,5 +1,9 @@
+# frozen_string_literal: true
+
 class UserMergeRequestChartsController < MergeRequestsControllerBase
   def monthly_merged_merge_request_stats
+    return unless ensure_assignee
+
     user = Rails.cache.fetch(
       self.class.monthly_merged_mr_lists_cache_key(safe_params[:assignee]),
       expires_in: MONTHLY_GRAPH_CACHE_VALIDITY

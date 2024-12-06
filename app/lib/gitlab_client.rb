@@ -80,7 +80,7 @@ class GitlabClient
     "#{self.class.gitlab_instance_url}#{path}"
   end
 
-  def fetch_user(username)
+  def fetch_user(username, format: :open_struct)
     response = self.class.client.query <<-GRAPHQL
       query {
         user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
@@ -91,10 +91,10 @@ class GitlabClient
       #{CORE_USER_FRAGMENT}
     GRAPHQL
 
-    make_serializable(response)
+    format_response(:data, response.data, format)
   end
 
-  def fetch_open_merge_requests(username)
+  def fetch_open_merge_requests(username, format: :open_struct)
     merge_requests_graphql_query = <<-GRAPHQL
       query($username: String!, $activeReviewsAfter: Time) {
         user(username: $username) {
@@ -174,14 +174,10 @@ class GitlabClient
     GRAPHQL
 
     response = self.class.client.query(merge_requests_graphql_query, username: username, activeReviewsAfter: 7.days.ago)
-
-    OpenStruct.new(
-      user: make_serializable(response.data.user),
-      updated_at: Time.current
-    )
+    format_response(:user, response.data.user, format)
   end
 
-  def fetch_merged_merge_requests(username)
+  def fetch_merged_merge_requests(username, format: :open_struct)
     merge_requests_graphql_query = <<-GRAPHQL
       query($username: String!) {
         user(username: $username) {
@@ -214,14 +210,10 @@ class GitlabClient
     GRAPHQL
 
     response = self.class.client.query(merge_requests_graphql_query, username: username)
-
-    OpenStruct.new(
-      user: make_serializable(response.data.user),
-      updated_at: Time.current
-    )
+    format_response(:user, response.data.user, format)
   end
 
-  def fetch_monthly_merged_merge_requests(username)
+  def fetch_monthly_merged_merge_requests(username, format: :open_struct)
     monthly_merge_requests_graphql_query = 12.times.map do |offset|
       bom = Time.current.beginning_of_month - offset.months
       eom = 1.month.after(bom)
@@ -248,14 +240,11 @@ class GitlabClient
 
     response = self.class.client.query(merge_requests_graphql_query, username: username)
 
-    OpenStruct.new(
-      user: make_serializable(response.data.user),
-      updated_at: Time.current
-    )
+    format_response(:user, response.data.user, format)
   end
 
   # Fetches a list of issues given 2 lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
-  def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
+  def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids, format: :open_struct)
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
@@ -286,9 +275,16 @@ class GitlabClient
     response = self.class.client.query(query)
     data = make_serializable(response.data)
 
-    project_full_paths.map.each_with_index do |_, index|
+    response = project_full_paths.map.each_with_index do |_, index|
       data.public_send(:"project_#{index}").issues.nodes
     end.flatten
+
+    return response unless format == :open_struct
+
+    OpenStruct.new(
+      data: response,
+      updated_at: Time.current
+    )
   end
 
   def self.client
@@ -303,6 +299,18 @@ class GitlabClient
   end
 
   private
+
+  def format_response(key, value, format)
+    case format
+    when :yaml_fixture
+      JSON.parse(value.to_json).to_yaml
+    else
+      OpenStruct.new(
+        key => make_serializable(value),
+        :updated_at => Time.current
+      )
+    end
+  end
 
   def make_serializable(obj)
     # GraphQL types cannot be serialized, so we work around that by reparsing from JSON into anonymous objects
