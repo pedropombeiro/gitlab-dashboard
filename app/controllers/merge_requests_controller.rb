@@ -51,9 +51,8 @@ class MergeRequestsController < MergeRequestsControllerBase
       end
     end
 
-    fresh_when(response)
     if Rails.env.production?
-      expires_in(Services::FetchMergeRequestsService::MR_CACHE_VALIDITY.after(response.updated_at) - Time.current)
+      expires_in Services::FetchMergeRequestsService::MR_CACHE_VALIDITY.after(response.updated_at) - Time.current
     end
 
     check_changes(previous_dto, @dto) if current_user.web_push_subscriptions.any?
