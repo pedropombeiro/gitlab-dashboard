@@ -1,7 +1,7 @@
 <%= render "branch_ref", branch_name: source_branch %>
 
 <% if %w[master main].exclude?(target_branch) %>
-  <div class="d-flex align-items-center">
+  <div class="d-flex d-none d-md-flex align-items-center">
     <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;
     <% if @dto.open_merge_requests.items.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
       <%= render "shared/abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
