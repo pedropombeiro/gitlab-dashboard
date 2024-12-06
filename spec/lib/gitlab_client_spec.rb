@@ -69,7 +69,7 @@ RSpec.describe GitlabClient do
     end
 
     it "returns an array with the processed issue data" do
-      expect(fetch_issues).to match(an_array_matching([
+      expect(fetch_issues.data).to match([
         an_object_having_attributes(
           "iid" => "32804",
           "webUrl" => "https://gitlab.com/gitlab-org/gitlab-runner/-/issues/32804"
@@ -82,7 +82,7 @@ RSpec.describe GitlabClient do
           "iid" => "505810",
           "webUrl" => "https://gitlab.com/gitlab-org/gitlab/-/issues/505810"
         )
-      ]))
+      ])
     end
   end
 
