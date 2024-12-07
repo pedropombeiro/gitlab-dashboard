@@ -1,9 +1,20 @@
-<%= render "link", title: merge_request.reference, web_url: merge_request.webUrl %>
-<% if merge_request.upstreamMergeRequest %>
-  <div class="d-flex align-items-center">
-    <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;
-    <%= render "link",
-    title: merge_request.upstreamMergeRequest.reference,
-    web_url: merge_request.upstreamMergeRequest.webUrl %>
-  </div>
-<% end %>
+<nobr>
+  <!-- Project avatar -->
+  <%= link_to make_full_url(merge_request.project.webUrl), target: "_blank", style: [ "text-decoration: none" ] do %>
+    <% if merge_request.project.avatarUrl.present? %>
+      <%= image_tag(make_full_url(merge_request.project.avatarUrl), size: 16, class: %w[rounded float-left]) %>
+    <% else %>
+      <%= image_tag("", size: 16, class: %w[invisible float-left]) %>
+    <% end %>
+  <% end %>
+
+  <%= render "link", title: merge_request.reference, web_url: merge_request.webUrl %>
+  <% if merge_request.upstreamMergeRequest %>
+    <div class="d-flex align-items-center">
+      <i class="fa-solid fa-arrow-right text-success"></i>&nbsp;
+      <%= render "link",
+      title: merge_request.upstreamMergeRequest.reference,
+      web_url: merge_request.upstreamMergeRequest.webUrl %>
+    </div>
+  <% end %>
+</nobr>

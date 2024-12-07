@@ -48,7 +48,11 @@ class GitlabClient
       iid
       webUrl
       titleHtml
-      project { fullPath }
+      project {
+        fullPath
+        webUrl
+        avatarUrl
+      }
       reference
       sourceBranch
       targetBranch

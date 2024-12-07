@@ -9,6 +9,8 @@ module CacheConcern
   MR_CACHE_VALIDITY = 5.minutes
   MONTHLY_GRAPH_CACHE_VALIDITY = 1.day
 
+  MR_VERSION = 11
+
   class_methods do
     def user_cache_key(username)
       "#{REDIS_NAMESPACE}/user_info/v5/#{user_hash(username)}"
@@ -19,7 +21,7 @@ module CacheConcern
     end
 
     def authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v10/authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v#{MR_VERSION}/authored_list/#{user_hash(user)}"
     end
 
     def monthly_merged_mr_lists_cache_key(user)
@@ -27,7 +29,7 @@ module CacheConcern
     end
 
     def last_authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v10/last_authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/v#{MR_VERSION}/last_authored_list/#{user_hash(user)}"
     end
 
     def location_timezone_name_cache_key(location)
