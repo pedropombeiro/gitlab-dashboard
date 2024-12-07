@@ -16,4 +16,7 @@
   <% if user.status&.availability == "BUSY" %>
     <%= render "shared/abbr_with_title", content: "🔴", title: user.status&.availability %>
   <% end %>
+
+  <% country_flag_classes = user_country_flag_classes(user) %>
+  <%= tag.span(class: country_flag_classes) if country_flag_classes %>
 <% end %>

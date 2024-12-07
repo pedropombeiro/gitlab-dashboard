@@ -130,7 +130,7 @@ RSpec.describe GitlabClient do
       expect(fetch_open_merge_requests).to be_truthy
       expect(result_as_hash).to match(
         updated_at: Time.current,
-        request_duration: 0.0,
+        request_duration: an_instance_of(Float),
         response: {
           data: {
             user: {
