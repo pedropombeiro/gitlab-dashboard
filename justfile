@@ -4,6 +4,7 @@ default: install
 install:
     mise install
     bin/setup --skip-server
+    lefthook install
     yarn install
 
 update:

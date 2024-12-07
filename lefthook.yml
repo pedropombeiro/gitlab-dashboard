@@ -1,0 +1,8 @@
+pre-push:
+  parallel: true
+
+pre-commit:
+  commands:
+    backend-linter:
+      glob: "*.rb" # glob filter
+      run: rake standard {all_files}
