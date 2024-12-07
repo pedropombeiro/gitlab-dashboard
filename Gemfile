@@ -72,6 +72,8 @@ group :development do
   gem "spring"
 
   gem "dockerfile-rails", ">= 1.6"
+
+  gem "lefthook"
 end
 
 group :test do
