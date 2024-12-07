@@ -95,6 +95,8 @@ RSpec.describe MergeRequestsController, type: :controller do
           request
 
           expect(response).to have_http_status(:ok)
+          expect(response).to render_template("layouts/application")
+          expect(response).to render_template("merge_requests/_user_image")
 
           # Includes header with link to user's merge requests
           expect(response.body).to include(
@@ -326,6 +328,9 @@ RSpec.describe MergeRequestsController, type: :controller do
               travel_to Time.utc(2024, 11, 20) do
                 request
               end
+
+              expect(response).to render_template("layouts/application")
+              expect(response).to render_template("merge_requests/_user_merge_requests")
 
               expect(response.body).to include(%(<turbo-frame id="merge_requests_user_dto_#{username}">))
               # Project link

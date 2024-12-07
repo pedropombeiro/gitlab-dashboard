@@ -83,6 +83,7 @@ group :test do
   gem "test-prof", "~> 1.0"
   gem "stub_env"
   gem "simplecov"
+  gem "rails-controller-testing"
 end
 
 gem "async", "~> 2.21"

@@ -28,6 +28,9 @@ RSpec.describe Admin::DashboardController, type: :controller do
       it "renders the actual template" do
         request
 
+        expect(response).to render_template("layouts/application")
+        expect(response).to render_template("admin/dashboard/index")
+
         users.each do |user|
           expect(response.body).to include(
             %(<a href="#{merge_requests_path(assignee: user.username)}">#{user.username}</a>)
@@ -44,6 +47,9 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
         it "renders the actual template" do
           request
+
+          expect(response).to render_template("layouts/application")
+          expect(response).to render_template("admin/dashboard/index")
 
           users.each do |user|
             expect(response.body).to include(
