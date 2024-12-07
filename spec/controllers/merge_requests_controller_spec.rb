@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe MergeRequestsController, type: :controller do
+  include ActiveSupport::Testing::TimeHelpers
+
   let_it_be(:graphql_url) { "https://gitlab.example.com/api/graphql" }
   let_it_be(:graphql_client) do
     ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
@@ -165,7 +167,7 @@ RSpec.describe MergeRequestsController, type: :controller do
         end
       end
 
-      context "when user exists", :freeze_time do
+      context "when user exists" do
         let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
         let(:params) { {assignee: username, turbo: true} }
 
@@ -321,13 +323,36 @@ RSpec.describe MergeRequestsController, type: :controller do
             render_views
 
             it "renders the actual template" do
-              request
+              travel_to Time.utc(2024, 11, 20) do
+                request
+              end
 
               expect(response.body).to include(%(<turbo-frame id="merge_requests_user_dto_#{username}">))
+              # Project link
+              expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab">})
+              expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
+              # Project avatar
+              expect(response.body).to include(
+                %r{<img [^>]+src="https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png"}
+              )
+              expect(response.body).to include(%(https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png))
+              # Issues
+              expect(response.body).to include(%(>#32804</a>))
+              # MR links
+              expect(response.body).to include(%(>!5166</a>))
+            end
+
+            it "renders the merged MRs from the last week" do
+              travel_to Time.utc(2024, 11, 27) do
+                request
+              end
+
+              expect(response.body).not_to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
+              expect(response.body).not_to include(%(>#32804</a>))
             end
           end
 
-          context "when turbo param is missing" do
+          context "when turbo param is missing", :freeze_time do
             let(:params) { {assignee: username} }
 
             it "redirects to index with the specified assignee" do

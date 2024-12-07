@@ -284,19 +284,15 @@ class GitlabClient
       #{CORE_ISSUE_FRAGMENT}
     GRAPHQL
 
-    response = self.class.client.query(query)
-    data = make_serializable(response.data)
+    response = format_response(format) { self.class.client.query(query) }
+    return response unless format == :open_struct
 
-    response = project_full_paths.map.each_with_index do |_, index|
+    data = response.response.data
+    response.response.data = project_full_paths.map.each_with_index do |_, index|
       data.public_send(:"project_#{index}").issues.nodes
     end.flatten
 
-    return response unless format == :open_struct
-
-    OpenStruct.new(
-      data: response,
-      updated_at: Time.current
-    )
+    response
   end
 
   def self.client
