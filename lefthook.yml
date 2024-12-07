@@ -1,8 +1,12 @@
 pre-push:
   parallel: true
+  commands:
+    backend-specs:
+      glob: "{app,spec}/**/*.rb"
+      run: bin/rails spec
 
 pre-commit:
   commands:
     backend-linter:
-      glob: "*.rb" # glob filter
-      run: rake standard {all_files}
+      glob: "*.rb"
+      run: bin/rake standard {all_files}
