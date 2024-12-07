@@ -8,6 +8,8 @@ one:
             titleHtml: Clean up runner audit log code
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173741"
             sourceBranch: pedropombeiro/503315/cleanup-code
             targetBranch: master
@@ -146,6 +148,8 @@ one:
             titleHtml: Fix flaky BulkDeleteRunnersService spec
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!174004"
             sourceBranch: pedropombeiro/446287/fix-flaky-test
             targetBranch: master
@@ -281,6 +285,8 @@ one:
             titleHtml: Generate audit event per project association from runner
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173789"
             sourceBranch: pedropombeiro/506226/create-audit-event-per-project
             targetBranch: master
@@ -413,6 +419,8 @@ one:
             titleHtml: Fix flaky test on set_runner_associated_projects_service_spec.rb
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173874"
             sourceBranch: pedropombeiro/481411/fix-flaky-test
             targetBranch: master
@@ -551,6 +559,8 @@ one:
             titleHtml: Include last contacted time on audit log when runner is deleted
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173916"
             sourceBranch: pedropombeiro/503315/log-last-contacted-time
             targetBranch: master
@@ -694,6 +704,8 @@ one:
             titleHtml: Add audit event to BulkDeleteRunnersService
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173886"
             sourceBranch: pedropombeiro/503315/1-add-bulk-delete-runner-audit-event
             targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
@@ -823,6 +835,8 @@ one:
             titleHtml: Add audit event to CreateRunnerService
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173885"
             sourceBranch: pedropombeiro/506385/add-create-runner-audit-event
             targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
@@ -954,6 +968,8 @@ one:
             titleHtml: Fix runner audit events
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173639"
             sourceBranch: pedropombeiro/503315/0-fix-runner-audit-events
             targetBranch: master
@@ -1086,6 +1102,8 @@ one:
             titleHtml: Add foreign key constraint to partitions of ci_runner_machines_687967fa8a
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!171848"
             sourceBranch: pedropombeiro/502403/recreate-fk-from-partitioned-ci_runner_managers-to-ci_runners
             targetBranch: master
@@ -1211,6 +1229,8 @@ one:
             titleHtml: Save runner taggings to shard table
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173007"
             sourceBranch: pedropombeiro/472974/save-taggings-to-ci_runner_taggings
             targetBranch: master

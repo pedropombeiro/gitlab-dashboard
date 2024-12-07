@@ -13,6 +13,8 @@ one:
             titleHtml: "GraphQL: Expose user timezone"
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173913"
             sourceBranch: pedropombeiro/506404/expose-user-timezone
             targetBranch: master
@@ -124,6 +126,8 @@ one:
             titleHtml: Deprecate RunnersRegistrationTokenReset GraphQL mutation
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173450"
             sourceBranch: pedropombeiro/505703/add-deprecation
             targetBranch: master
@@ -257,6 +261,8 @@ one:
             titleHtml: Deduplicate project IDs in RunnerOwnerProjectResolver
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173852"
             sourceBranch: pedropombeiro/deduplicate-project-ids
             targetBranch: master
@@ -346,6 +352,8 @@ one:
             titleHtml: Improve error message for runner creation with invalid scope
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173862"
             sourceBranch: pedropombeiro/457221/improve-message
             targetBranch: master
@@ -439,6 +447,8 @@ one:
             titleHtml: Pass runner_manager to destroy_conditionally! call
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173548"
             sourceBranch: pedropombeiro/505810/pass-runner_manager
             targetBranch: master
@@ -529,6 +539,8 @@ one:
             titleHtml: Note in logs when runner manager is being unregistered
             project:
               fullPath: gitlab-org/gitlab-runner
+              webUrl: https://gitlab.com/gitlab-org/gitlab-runner
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png
             reference: "!5166"
             sourceBranch: pedropombeiro/32804/change-unregister-runner-manager-log-output
             targetBranch: main
@@ -585,6 +597,8 @@ one:
             titleHtml: Update milestone to reflect release milestone
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!172965"
             sourceBranch: pedropombeiro/503748/update-milestone
             targetBranch: master
@@ -707,6 +721,8 @@ one:
               .com
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!172422"
             sourceBranch: pedropombeiro/503748/delete-orphaned-records
             targetBranch: master
@@ -838,6 +854,8 @@ one:
             titleHtml: Create ci_runner_taggings table
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!170778"
             sourceBranch: pedropombeiro/472974/create_ci_runner_tags
             targetBranch: master
@@ -954,6 +972,8 @@ one:
             titleHtml: Add missing YAML file for BackfillCiRunnersPartitionedTable
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!172684"
             sourceBranch: pedropombeiro/442395/add-missing-yml-dictionary-file
             targetBranch: master
@@ -1063,6 +1083,8 @@ one:
             titleHtml: Move creator_id LFKs to routing table ci_runners_e59bb2812d
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!172377"
             sourceBranch: pedropombeiro/500447/remove-lfk
             targetBranch: master
@@ -1171,6 +1193,8 @@ one:
             titleHtml: Backfill ci_runner_machines_687967fa8a partitioned table
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!171901"
             sourceBranch: pedropombeiro/502934/backfill-ci_runner_machines_687967fa8a
             targetBranch: master
@@ -1285,6 +1309,8 @@ one:
             titleHtml: Avoid updating or creating runner managers when deleting runner
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!171575"
             sourceBranch: pedropombeiro/502431/avoid-creating-runner-managers
             targetBranch: master
@@ -1387,6 +1413,8 @@ one:
             titleHtml: Backfill ci_runners_e59bb2812d table
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!166520"
             sourceBranch: pedropombeiro/442395/3-backfill-p_ci_runners
             targetBranch: master
@@ -1499,6 +1527,8 @@ one:
             titleHtml: Remove FKs from partitioned tables of ci_runner_machines_687967fa8a
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!171308"
             sourceBranch: pedropombeiro/497562/drop-fk-from-partitioned-ci_runner_machines
             targetBranch: master
@@ -1623,6 +1653,8 @@ one:
             titleHtml: Use sharding_key_id to replace Ci::Runner.owner_project implementation
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!171172"
             sourceBranch: pedropombeiro/442395/use-sharding_key_id-for-runner-owner
             targetBranch: master
@@ -1727,6 +1759,8 @@ one:
             titleHtml: Add service ping to support tracking runner maintenance notes
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!170483"
             sourceBranch: pedropombeiro/354756/add-service-ping
             targetBranch: master
@@ -1833,6 +1867,8 @@ one:
             titleHtml: Revert AddFkFromPartitionedCiRunnerManagersToPartitionedCiRunners
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!171246"
             sourceBranch: pedropombeiro/497562/drop-fk-from-partitioned-ci_runner_machines
             targetBranch: master
@@ -1947,6 +1983,8 @@ one:
             titleHtml: Create ci_runner_machines_687967fa8a partitioned table
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!168131"
             sourceBranch: pedropombeiro/497562/create-partitioned-table
             targetBranch: master
@@ -2057,6 +2095,8 @@ one:
             titleHtml: Add missing fields to deprecations
             project:
               fullPath: gitlab-org/gitlab
+              webUrl: https://gitlab.com/gitlab-org/gitlab
+              avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!170915"
             sourceBranch: pedropombeiro/update-deprecations
             targetBranch: master
