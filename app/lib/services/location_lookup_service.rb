@@ -5,28 +5,28 @@ require "geokit"
 require "timezone"
 
 module Services
-  class TimezoneService
+  class LocationLookupService
     include CacheConcern
 
     def self.cache_validity
       1.week
     end
 
-    def fetch_from_locations(locations)
+    def fetch_timezones(locations)
       return unless timezone_configured?
 
       locations.map do |l|
-        Async { [l, fetch_from_location(l)] }
+        Async { [l, fetch_timezone(l)] }
       end.map(&:wait).to_h
     end
 
-    def fetch_from_location(location)
+    def fetch_timezone(location)
       return if location.blank?
       return unless timezone_configured?
 
       tzname =
         Rails.cache.fetch(self.class.location_timezone_name_cache_key(location), expires_in: self.class.cache_validity) do
-          res = Geokit::Geocoders::OSMGeocoder.geocode(location)
+          res = fetch_location_info(location)
           return unless res.valid?
 
           timezone = Timezone.lookup(res.latitude, res.longitude)
@@ -38,7 +38,21 @@ module Services
       Timezone[tzname] if tzname
     end
 
+    def fetch_country_code(location)
+      return if location.blank?
+
+      fetch_location_info(location)&.country_code
+    end
+
     private
+
+    def fetch_location_info(location)
+      return if location.blank?
+
+      Rails.cache.fetch(self.class.location_info_cache_key(location), expires_in: self.class.cache_validity) do
+        Geokit::Geocoders::OSMGeocoder.geocode(location)
+      end
+    end
 
     def timezone_configured?
       Timezone::Lookup.lookup

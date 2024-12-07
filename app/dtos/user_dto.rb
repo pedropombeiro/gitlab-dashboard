@@ -76,7 +76,7 @@ class UserDto
   def warmup_timezone_cache(mrs)
     locations = mrs.filter_map { |mr| mr.reviewers.nodes.map(&:location).map(&:presence) }.flatten.compact.uniq
 
-    Services::TimezoneService.new.fetch_from_locations(locations)
+    Services::LocationLookupService.new.fetch_timezones(locations)
   end
 
   def convert_mr_pipeline(pipeline)

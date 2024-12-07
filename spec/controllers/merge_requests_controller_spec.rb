@@ -151,23 +151,23 @@ RSpec.describe MergeRequestsController, type: :controller do
 
     let(:format) { nil }
 
-    context "when user is known" do
+    context "when assignee is unknown" do
+      let(:params) { {assignee: "non-existent"} }
+
+      it "returns not_found" do
+        request
+
+        expect(response).to have_http_status(:not_found)
+        expect(GitlabUser.find_by_username("non-existent")).to be_nil
+      end
+    end
+
+    context "when assignee is known" do
       let_it_be(:issues_body) { YAML.load_file(file_fixture("issues.yml"))["one"].to_json }
 
       let(:open_mrs) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
       let(:merged_mrs) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
       let(:username) { "pedropombeiro" }
-
-      context "when assignee is unknown" do
-        let(:params) { {assignee: "non-existent"} }
-
-        it "returns not_found" do
-          request
-
-          expect(response).to have_http_status(:not_found)
-          expect(GitlabUser.find_by_username("non-existent")).to be_nil
-        end
-      end
 
       context "when user exists" do
         let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
@@ -323,6 +323,10 @@ RSpec.describe MergeRequestsController, type: :controller do
 
           context "with render_views" do
             render_views
+
+            before do
+              stub_request(:get, %r{https://nominatim.openstreetmap.org/search\?addressdetails=1}).to_return(status: 404)
+            end
 
             it "renders the actual template" do
               travel_to Time.utc(2024, 11, 20) do

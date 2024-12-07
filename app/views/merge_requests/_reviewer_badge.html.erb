@@ -25,6 +25,9 @@
     ) %>
   <% end %>
   <%= tag.span do %>
+    <% country_flag_classes = user_country_flag_classes(reviewer) %>
+    <%= tag.span(class: country_flag_classes) if country_flag_classes %>
+
     <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
       <%= tag.i class: reviewer.bootstrapClass[:icon] %>
     <% end %>
