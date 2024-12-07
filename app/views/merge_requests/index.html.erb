@@ -9,7 +9,10 @@
 
 <div class="container-fluid m-0 p-0" data-controller="web-push">
   <nav class="navbar navbar-light bg-dark navbar-expand-sm fixed-top px-3">
-    <div class="navbar-brand text-light d-flex align-items-center m-auto">
+    <div
+      class="navbar-brand text-light d-flex align-items-center m-auto"
+      data-controller="bootstrap-tooltip"
+    >
       <%= button_to tag.i(class: %w[fa-solid fa-rotate]),
       merge_requests_path(assignee: @user.username),
       method: :get,
@@ -27,13 +30,17 @@
         </span>
       </span>
 
-      <button
-        class="btn mx-2 text-light"
-        data-web-push-target="subscribe"
-        data-action="web-push#subscribe"
-      >
+      <%= tag.button(
+        class: %w[btn mx-2 text-light],
+        data: {
+          bs_toggle: "tooltip",
+          bs_title: "Subscribe to web push notifications for MR events, such as MR merged, or workflow label changes",
+          web_push_target: "subscribe",
+          action: "web-push#subscribe"
+        },
+      ) do %>
         <%= tag.i class: %w[fa-solid fa-bell] %>
-      </button>
+      <% end %>
     </div>
 
     <%= link_to tag.i(class: %w[fa-brands fa-github]),
