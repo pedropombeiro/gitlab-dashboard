@@ -13,7 +13,7 @@ module MergeRequestsHelper
     timezone = Services::LocationLookupService.new.fetch_timezone(user.location)
 
     {
-      Location: user.location,
+      Location: format_location(user),
       "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
       "Last activity": (user.lastActivityOn > 1.day.ago) ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
       Message: user.status&.message
@@ -33,6 +33,12 @@ module MergeRequestsHelper
   end
 
   private
+
+  def format_location(user)
+    return if user.location.blank?
+
+    tag.i(class: user_country_flag_classes(user)) + " " + user.location
+  end
 
   def tooltip_from_hash(hash)
     hash
