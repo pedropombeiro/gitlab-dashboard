@@ -1234,7 +1234,7 @@ one:
             reference: "!173007"
             sourceBranch: pedropombeiro/472974/save-taggings-to-ci_runner_taggings
             targetBranch: master
-            createdAt: "2024-11-18T14:47:09Z"
+            createdAt: "2024-10-18T14:47:09Z"
             updatedAt: "2024-11-22T14:44:47Z"
             assignees:
               nodes:
