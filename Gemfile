@@ -90,7 +90,7 @@ gem "async", "~> 2.21"
 gem "dartsass-rails", "~> 0.5.1"
 gem "graphlient"
 gem "local_time", "~> 3.0"
-gem "mission_control-jobs", "~> 0.5.0"
+gem "mission_control-jobs"
 gem "web-push", "~> 3.0"
 
 gem "geokit", "~> 1.14"
