@@ -129,8 +129,7 @@ class UserDto
       if mr.headPipeline
         mr.headPipeline[:outdated?] =
           mr.headPipeline.startedAt &&
-          mr.headPipeline.finishedAt &&
-          mr.headPipeline.finishedAt < 8.hours.ago &&
+          mr.headPipeline.finishedAt&.before?(8.hours.ago) &&
           mr.contextualLabels.any? { |label| label.title == "pipeline::tier-3" }
       end
 
@@ -161,10 +160,10 @@ class UserDto
   end
 
   def user_activity_icon_class(user)
-    %w[fa-solid fa-moon] if user.lastActivityOn < 1.day.ago
+    %w[fa-solid fa-moon] if user.lastActivityOn.before?(1.day.ago)
   end
 
   def filter_merged_merge_requests(merge_requests)
-    merge_requests.filter { |mr| mr.mergedAt >= 1.week.ago }
+    merge_requests.filter { |mr| parse_graphql_time(mr.mergedAt).after?(1.week.ago) }
   end
 end
