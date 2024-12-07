@@ -349,6 +349,19 @@ RSpec.describe MergeRequestsController, type: :controller do
               expect(response.body).to include(%(>#32804</a>))
               # MR links
               expect(response.body).to include(%(>!5166</a>))
+
+              # Captions
+              expect(response.body).to include(%r{10 merge requests, open for an average of\s+about 12 hours})
+              expect(response.body).to include(%r{A total of\s+1311 merge requests})
+
+              # Squash MR
+              expect(response.body).to include(%(fa-solid fa-angles-down))
+              # Unreviewed icon
+              expect(response.body).to include(%(fa-solid fa-hourglass-start))
+              # Reviewed icon
+              expect(response.body).to include(%(fa-solid fa-check))
+              # Old MRs
+              expect(response.body).to include(%(text-danger))
             end
 
             it "renders the merged MRs from the last week" do
