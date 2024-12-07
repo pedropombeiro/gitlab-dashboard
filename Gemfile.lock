@@ -180,7 +180,7 @@ GEM
     graphlient (0.8.0)
       faraday (~> 2.0)
       graphql-client
-    graphql (2.4.6)
+    graphql (2.4.7)
       base64
       fiber-storage
     graphql-client (0.24.0)
@@ -241,7 +241,7 @@ GEM
     matrix (0.4.2)
     mini_mime (1.1.5)
     minitest (5.25.4)
-    mission_control-jobs (0.5.0)
+    mission_control-jobs (1.0.1)
       actioncable (>= 7.1)
       actionpack (>= 7.1)
       activejob (>= 7.1)
@@ -441,7 +441,7 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.1)
     simplecov_json_formatter (0.1.4)
-    solid_cable (3.0.3)
+    solid_cable (3.0.4)
       actioncable (>= 7.2)
       activejob (>= 7.2)
       activerecord (>= 7.2)
