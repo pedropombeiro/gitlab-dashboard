@@ -16,6 +16,14 @@ module CacheConcern
       "#{REDIS_NAMESPACE}/user_info/v5/#{user_hash(username)}"
     end
 
+    def location_info_cache_key(location)
+      "#{REDIS_NAMESPACE}/location/v2/#{Digest::SHA256.hexdigest(location)}"
+    end
+
+    def location_timezone_name_cache_key(location)
+      "#{REDIS_NAMESPACE}/location/v2/#{Digest::SHA256.hexdigest(location)}/timezone_name"
+    end
+
     def open_issues_cache_key(issue_iids)
       "#{REDIS_NAMESPACE}/issues/v5/open/#{issue_iids.join("-")}"
     end
@@ -30,10 +38,6 @@ module CacheConcern
 
     def last_authored_mr_lists_cache_key(user)
       "#{REDIS_NAMESPACE}/merge_requests/v#{MR_VERSION}/last_authored_list/#{user_hash(user)}"
-    end
-
-    def location_timezone_name_cache_key(location)
-      "#{REDIS_NAMESPACE}/location_timezone_name/v1/#{Digest::SHA256.hexdigest(location)}"
     end
 
     private

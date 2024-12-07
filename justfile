@@ -19,6 +19,7 @@ toggle-cache:
 alias clobber := clean
 
 clean:
+    rm -rf app/assets/builds/*
     bin/rails assets:clobber dartsass:clobber javascript:clobber
 
 alias dev := serve
