@@ -268,9 +268,10 @@ RSpec.describe MergeRequestsController, type: :controller do
                 def payload_of_merged_mr_notification(mr)
                   satisfy do |data|
                     message = JSON.parse(data[:message])
-                    message["title"] == "A merge request was merged" &&
-                      message["options"]["body"] == "#{mr["reference"]}: #{mr["titleHtml"]}" &&
-                      message["options"]["data"]["url"] == mr["webUrl"]
+                    message["type"] == "push_notification" &&
+                      message.dig(*%w[payload title]) == "A merge request was merged" &&
+                      message.dig(*%w[payload options body]) == "#{mr["reference"]}: #{mr["titleHtml"]}" &&
+                      message.dig(*%w[payload options data url]) == mr["webUrl"]
                   end
                 end
 
