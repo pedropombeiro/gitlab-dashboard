@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
+  include WebPushConcern
+
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -19,24 +21,18 @@ class ApplicationController < ActionController::Base
   def notify_user(title:, body:, icon: nil, badge: nil, url: nil, **message)
     icon ||= ActionController::Base.helpers.asset_url("apple-touch-icon-180x180.png")
     badge ||= ActionController::Base.helpers.asset_url("apple-touch-icon-120x120.png")
-    merged_message = {
-      title: title,
-      options: {
-        badge: badge,
-        body: body,
-        data: url ? {url: url} : nil,
-        icon: icon
-      }.compact.merge(message)
-    }
 
-    current_user&.web_push_subscriptions&.each do |subscription|
-      subscription.publish(merged_message)
-    rescue WebPush::ExpiredSubscription
-      Rails.logger.info "Removing expired WebPush subscription"
-      subscription.destroy
-    rescue ActiveRecord::Encryption::Errors::Decryption
-      Rails.logger.info "Invalid WebPush subscription"
-      subscription.destroy
-    end
+    publish(current_user, {
+      type: "push_notification",
+      payload: {
+        title: title,
+        options: {
+          badge: badge,
+          body: body,
+          data: url ? {url: url} : nil,
+          icon: icon
+        }.compact.merge(message)
+      }
+    })
   end
 end

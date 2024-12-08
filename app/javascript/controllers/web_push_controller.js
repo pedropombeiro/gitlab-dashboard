@@ -29,6 +29,8 @@ export default class extends Controller {
 
     // Request permission from the user to send notifications
     try {
+      console.log("Requesting permission for notifications");
+
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         setupSubscription();
