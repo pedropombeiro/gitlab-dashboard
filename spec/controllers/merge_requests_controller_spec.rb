@@ -325,7 +325,8 @@ RSpec.describe MergeRequestsController, type: :controller do
             render_views
 
             before do
-              stub_request(:get, %r{https://nominatim.openstreetmap.org/search\?addressdetails=1}).to_return(status: 404)
+              stub_request(:get, %r{https://nominatim\.openstreetmap\.org/search\?addressdetails=1})
+                .to_return(status: 404)
             end
 
             it "renders the actual template" do
