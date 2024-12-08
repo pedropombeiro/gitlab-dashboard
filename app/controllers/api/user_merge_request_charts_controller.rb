@@ -15,7 +15,9 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
       expires_in MONTHLY_GRAPH_CACHE_VALIDITY.after(response.updated_at) - Time.current
     end
 
-    render json: monthly_mrs_graph(response.response.data.user).map { |name, stats| {name: name, data: stats} }.chart_json
+    render json: monthly_mrs_graph(response.response.data.user)
+      .map { |name, stats| {name: name, data: stats} }
+      .chart_json
   end
 
   private
@@ -29,17 +31,17 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
         month.strftime("%Y-%m"),
         {
           "Count" => stats.count,
-          :"Average days to merge" =>
+          "Average days to merge" =>
             stats.totalTimeToMerge ? (stats.totalTimeToMerge.seconds.in_days / stats.count).round(1) : nil
         }
       ]
     end.reverse
 
     pass1.each_with_object({}) do |(month, stats), acc|
-      stats.each { |key, value|
+      stats.each do |key, value|
         acc[key] ||= []
         acc[key] << [month, value]
-      }
+      end
     end
   end
 end
