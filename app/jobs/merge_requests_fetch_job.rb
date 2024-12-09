@@ -5,13 +5,8 @@ class MergeRequestsFetchJob < ApplicationJob
   limits_concurrency to: 1, key: ->(assignee) { assignee }
   queue_as :background
 
-  attr_reader :service
-
-  def initialize
-    @service = Services::FetchMergeRequestsService.new(assignee)
-  end
-
   def perform(assignee)
+    service = Services::FetchMergeRequestsService.new(assignee)
     return unless service.needs_scheduled_update?
 
     response = service.execute
