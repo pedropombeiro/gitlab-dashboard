@@ -3,23 +3,11 @@
 self.addEventListener("push", async (event) => {
   const { type, payload } = await event.data.json();
   switch (type) {
-    case "push_notification":
-      {
-        const { title, options } = payload;
-        event.waitUntil(self.registration.showNotification(title, options));
-        break;
-      }
-
-    case "badge":
-      if (navigator.setAppBadge) {
-        const { value } = payload;
-        if (value > 0) {
-          event.waitUntil(navigator.setAppBadge(value));
-        } else {
-          event.waitUntil(navigator.clearAppBadge());
-        }
-      }
+    case "push_notification": {
+      const { title, options } = payload;
+      event.waitUntil(self.registration.showNotification(title, options));
       break;
+    }
   }
 });
 
