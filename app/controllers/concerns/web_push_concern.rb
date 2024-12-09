@@ -4,6 +4,8 @@ module WebPushConcern
   extend ActiveSupport::Concern
 
   def publish(user, message)
+    Rails.logger.debug { "Publishing web push: #{message}" }
+
     user&.web_push_subscriptions&.each do |subscription|
       subscription.publish(message)
     rescue WebPush::ExpiredSubscription
