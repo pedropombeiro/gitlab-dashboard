@@ -7,7 +7,7 @@ module CacheConcern
 
   USER_CACHE_VALIDITY = 1.day
   MR_CACHE_VALIDITY = 5.minutes
-  MONTHLY_GRAPH_CACHE_VALIDITY = 1.day
+  MONTHLY_GRAPH_CACHE_VALIDITY = 3.hours
 
   MR_VERSION = 11
 
