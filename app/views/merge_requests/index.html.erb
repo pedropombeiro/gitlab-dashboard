@@ -1,5 +1,4 @@
-<% vapid_public_key =
-  Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
+<% vapid_public_key = Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
 <% if vapid_public_key.present? %>
   <meta
     name="web_push_public_key"
