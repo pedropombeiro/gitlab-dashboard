@@ -7,7 +7,9 @@
 <% end %>
 
 <div class="container-fluid m-0 p-0" data-controller="web-push">
-  <nav class="navbar navbar-light bg-dark navbar-expand-sm fixed-top px-3">
+  <% nav_bg_class = Rails.env.production? ? %w[bg-dark] : %w[bg-danger] %>
+
+  <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
     <div
       class="navbar-brand text-light d-flex align-items-center m-auto"
       data-controller="bootstrap-tooltip"
@@ -46,7 +48,7 @@
     git_repo_url,
     class: "text-light",
     target: "_blank" %>
-  </nav>
+  <% end %>
 
   <%= turbo_frame_tag @dto, :merge_requests,
     src: merge_requests_list_path(assignee: params[:assignee], turbo: true) do %>
