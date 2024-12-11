@@ -101,7 +101,7 @@ one:
                   username: dmeshcharakou
                   avatarUrl: "/uploads/-/system/user/avatar/12459192/avatar.png"
                   webUrl: https://gitlab.com/dmeshcharakou
-                  lastActivityOn: "2024-11-27"
+                  lastActivityOn:
                   location: Switzerland
                   status:
                   mergeRequestInteraction:

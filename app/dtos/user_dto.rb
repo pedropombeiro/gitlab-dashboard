@@ -160,7 +160,7 @@ class UserDto
   end
 
   def user_activity_icon_class(user)
-    %w[fa-solid fa-moon] if user.lastActivityOn.before?(1.day.ago)
+    %w[fa-solid fa-moon] if user.lastActivityOn&.before?(1.day.ago)
   end
 
   def filter_merged_merge_requests(merge_requests)
