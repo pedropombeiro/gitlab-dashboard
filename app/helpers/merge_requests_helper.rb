@@ -15,7 +15,7 @@ module MergeRequestsHelper
     {
       Location: format_location(user),
       "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
-      "Last activity": user.lastActivityOn.after?(1.day.ago) ? "today" : "#{time_ago_in_words(user.lastActivityOn)} ago",
+      "Last activity": format_last_activity(user.lastActivityOn),
       Message: user.status&.message
     }.compact
   end
@@ -33,6 +33,13 @@ module MergeRequestsHelper
   end
 
   private
+
+  def format_last_activity(last_activity_on)
+    return "N/A" if last_activity_on.nil?
+    return "today" if last_activity_on.after?(1.day.ago)
+
+    "#{time_ago_in_words(user.lastActivityOn)} ago"
+  end
 
   def format_location(user)
     return if user.location.blank?
