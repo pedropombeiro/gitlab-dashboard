@@ -1,9 +1,9 @@
 <%= turbo_frame_tag(@dto, :merge_requests) do %>
   <div data-controller="bootstrap-tooltip">
-    <div
-      data-controller="unread-badge"
-      data-unread-badge-count-value="<%= @dto.open_merge_requests.items.count %>"
-    >
+    <%= tag.div data: {
+      controller: "unread-badge",
+      unread_badge_count_value: @dto.open_merge_requests.items.count
+    } do %>
       <%= render "user_merge_requests",
       updated_at: @dto.updated_at,
       next_update_at: @dto.next_update_at,
@@ -14,7 +14,7 @@
       merged_merge_requests_tttm: @dto.merged_merge_requests_tttm,
       first_merged_merge_requests_timestamp:
         @dto.first_merged_merge_requests_timestamp %>
-    </div>
+    <% end %>
   </div>
 
   <script>
