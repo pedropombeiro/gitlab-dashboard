@@ -5,6 +5,9 @@
 
 import { application } from "./application";
 
+import AutoRefreshController from "./auto_refresh_controller";
+application.register("auto-refresh", AutoRefreshController);
+
 import BootstrapTooltipController from "./bootstrap_tooltip_controller";
 application.register("bootstrap-tooltip", BootstrapTooltipController);
 
