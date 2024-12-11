@@ -3,10 +3,11 @@ import { Controller } from "@hotwired/stimulus";
 // Connects to data-controller="web-push"
 export default class extends Controller {
   static targets = ["subscribe"];
+  static classes = ["subscribed", "unsubscribed"];
 
   subscribeTargetConnected(subscribeButton) {
     // Check if the browser supports notifications
-    subscribeButton.classList.add("d-none");
+    subscribeButton.classList.add(this.subscribedClass);
     if ("Notification" in window) {
       switch (Notification.permission) {
         case "granted":
@@ -17,7 +18,8 @@ export default class extends Controller {
           return;
         default:
           // show button
-          subscribeButton.classList.remove("d-none");
+          subscribeButton.classList.remove(this.subscribedClass);
+          subscribeButton.classList.add(this.unsubscribedClass);
       }
     } else {
       console.warn("Push notifications not supported.");
@@ -40,7 +42,7 @@ export default class extends Controller {
     } catch (error) {
       console.log("Notifications error", error);
     } finally {
-      this.subscribeTarget.classList.add("d-none");
+      this.subscribeTarget.classList.add(this.subscribedClass);
     }
 
     async function setupSubscription() {

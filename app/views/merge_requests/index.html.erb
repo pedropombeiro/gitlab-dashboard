@@ -1,4 +1,5 @@
-<% vapid_public_key = Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
+<% vapid_public_key =
+  Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
 <% if vapid_public_key.present? %>
   <meta
     name="web_push_public_key"
@@ -6,7 +7,11 @@
   />
 <% end %>
 
-<div class="container-fluid m-0 p-0" data-controller="web-push">
+<%= tag.div class: "container-fluid m-0 p-0", data: {
+    controller: "web-push",
+    web_push_unsubscribed_class: "d-initial",
+    web_push_subscribed_class: "d-none"
+  } do %>
   <% nav_bg_class = Rails.env.production? ? %w[bg-dark] : %w[bg-danger] %>
 
   <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
@@ -82,4 +87,4 @@
         @dto.first_merged_merge_requests_timestamp %>
     <% end %>
   <% end %>
-</div>
+<% end %>
