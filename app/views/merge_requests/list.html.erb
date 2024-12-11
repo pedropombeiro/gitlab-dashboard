@@ -20,6 +20,14 @@
   <script>
     <% next_update_remaining_secs = @dto.next_update_at ? 5.seconds.after(@dto.next_update_at) - Time.current : 0 %>
 
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        document.getElementById("<%= dom_id(@dto, :merge_requests) -%>").reload();
+      }
+    };
+
+    document.addEventListener('visibilitychange', onVisibilityChange, false);
+
     setTimeout(function(){
       document.getElementById("<%= dom_id(@dto, :merge_requests) -%>").reload();
     }, <%= (next_update_remaining_secs.clamp(10, 60) * 1000).round.to_i %>);
