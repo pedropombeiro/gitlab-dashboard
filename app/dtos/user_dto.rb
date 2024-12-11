@@ -160,7 +160,12 @@ class UserDto
   end
 
   def user_activity_icon_class(user)
-    %w[fa-solid fa-moon] if user.lastActivityOn&.before?(1.day.ago)
+    return if user.lastActivityOn.nil?
+
+    user_tzname = Services::LocationLookupService.new.fetch_timezone(user.location)&.name || Time.now.getlocal.zone
+    user_bod = Time.current.in_time_zone(user_tzname).beginning_of_day
+
+    %w[fa-solid fa-moon] if user.lastActivityOn.before?(user_bod)
   end
 
   def filter_merged_merge_requests(merge_requests)
