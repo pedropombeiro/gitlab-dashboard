@@ -99,3 +99,5 @@ gem "geokit", "~> 1.14"
 gem "timezone", "~> 1.3"
 
 gem "chartkick", "~> 5.1"
+
+gem "honeybadger", "~> 5.26"
