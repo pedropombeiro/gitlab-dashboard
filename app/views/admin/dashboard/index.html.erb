@@ -12,6 +12,7 @@
         <th scope="col">User Handle</th>
         <th scope="col">Created</th>
         <th scope="col">Last Contacted ↓</th>
+        <th scope="col">Next Scheduled Update</th>
       </tr>
     </thead>
     <tbody>
@@ -25,6 +26,9 @@
           </td>
           <td>
             <%= render "shared/relative_timestamp", timestamp: user.contacted_at %>
+          </td>
+          <td>
+            <%= render "shared/relative_timestamp", timestamp: user_cache_validity(user.username) %>
           </td>
         </tr>
         <% if user.web_push_subscriptions.any? %>
