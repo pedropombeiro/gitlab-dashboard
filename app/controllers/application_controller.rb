@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
-  include WebPushConcern
-
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -16,23 +14,5 @@ class ApplicationController < ActionController::Base
   def current_user
     return unless session[:user_id]
     @current_user ||= GitlabUser.find_by_username!(session[:user_id])
-  end
-
-  def notify_user(title:, body:, icon: nil, badge: nil, url: nil, **message)
-    icon ||= ActionController::Base.helpers.asset_url("apple-touch-icon-180x180.png")
-    badge ||= ActionController::Base.helpers.asset_url("apple-touch-icon-120x120.png")
-
-    publish(current_user, {
-      type: "push_notification",
-      payload: {
-        title: title,
-        options: {
-          badge: badge,
-          body: body,
-          data: url ? {url: url} : nil,
-          icon: icon
-        }.compact.merge(message)
-      }
-    })
   end
 end

@@ -22,7 +22,9 @@ RSpec.describe MergeRequestsController, type: :controller do
 
     context "when user is unknown" do
       before do
-        stub_request(:post, graphql_url).to_return(status: 200, body: {data: {user: nil}}.to_json)
+        stub_request(:post, graphql_url)
+          .with(body: hash_including("query" => a_string_matching(/user: /)))
+          .to_return(status: 200, body: {data: {user: nil}}.to_json)
       end
 
       let(:params) { {assignee: "non-existent"} }
@@ -152,9 +154,15 @@ RSpec.describe MergeRequestsController, type: :controller do
     let(:format) { nil }
 
     context "when assignee is unknown" do
+      before do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including("query" => a_string_matching(/user: /)))
+          .to_return(status: 200, body: {data: {user: nil}}.to_json)
+      end
+
       let(:params) { {assignee: "non-existent"} }
 
-      it "returns not_found" do
+      it "returns http not_found" do
         request
 
         expect(response).to have_http_status(:not_found)
@@ -172,6 +180,12 @@ RSpec.describe MergeRequestsController, type: :controller do
       context "when user exists" do
         let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
         let(:params) { {assignee: username, turbo: true} }
+
+        let!(:user_request_stub) do
+          stub_request(:post, graphql_url)
+            .with(body: hash_including("query" => a_string_matching(/user: /)))
+            .to_return(status: 200, body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}}.to_json)
+        end
 
         let!(:open_mrs_request_stub) do
           stub_request(:post, graphql_url)
@@ -191,202 +205,190 @@ RSpec.describe MergeRequestsController, type: :controller do
             .to_return(status: 200, body: issues_body)
         end
 
-        it "returns http not_found" do
+        it "returns http success" do
           request
 
-          expect(response).to have_http_status(:not_found)
+          expect(response).to have_http_status :success
         end
 
-        context "when session has user_id" do
-          before do
-            session[:user_id] = username
+        it "responds to html by default" do
+          request
+
+          expect(response.content_type).to eq "text/html; charset=utf-8"
+        end
+
+        context "when called twice" do
+          it "calls api twice" do
+            # A second request generates a second API call
+            2.times { perform_request }
+
+            expect(open_mrs_request_stub).to have_been_requested.twice
+            expect(merged_mrs_request_stub).to have_been_requested.twice
+            expect(issues_request_stub).to have_been_requested.twice
           end
 
-          it "returns http success" do
-            request
-
-            expect(response).to have_http_status :success
-          end
-
-          it "responds to html by default" do
-            request
-
-            expect(response.content_type).to eq "text/html; charset=utf-8"
-          end
-
-          context "when called twice" do
-            it "calls api twice" do
-              # A second request generates a second API call
+          context "with cache enabled", :with_cache do
+            it "only calls api once" do
+              # A second request is served from the cache, and doesn't generate more API calls
               2.times { perform_request }
 
-              expect(open_mrs_request_stub).to have_been_requested.twice
-              expect(merged_mrs_request_stub).to have_been_requested.twice
-              expect(issues_request_stub).to have_been_requested.twice
+              expect(response).to have_http_status :success
+
+              expect(open_mrs_request_stub).to have_been_requested.once
+              expect(merged_mrs_request_stub).to have_been_requested.once
+              expect(issues_request_stub).to have_been_requested.once
             end
 
-            context "with cache enabled", :with_cache do
-              it "only calls api once" do
-                # A second request is served from the cache, and doesn't generate more API calls
-                2.times { perform_request }
+            context "and merge request has been opened in between" do
+              let!(:subscription) { create(:web_push_subscription, gitlab_user: user) }
 
-                expect(response).to have_http_status :success
+              it "does not send web push notification" do
+                open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
+                opened_mr = open_mr_nodes.delete_at(0)
 
-                expect(open_mrs_request_stub).to have_been_requested.once
-                expect(merged_mrs_request_stub).to have_been_requested.once
-                expect(issues_request_stub).to have_been_requested.once
+                stub_request(:post, graphql_url)
+                  .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                  .to_return(status: 200, body: open_mrs.to_json)
+
+                perform_request
+
+                Rails.cache.delete(described_class.authored_mr_lists_cache_key(username))
+                open_mr_nodes << opened_mr
+
+                stub_request(:post, graphql_url)
+                  .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                  .to_return(status: 200, body: open_mrs.to_json)
+
+                expect(WebPush).not_to receive(:payload_send)
+
+                perform_request
+              end
+            end
+
+            context "and merge request has been merged in between" do
+              let!(:subscriptions) { create_list(:web_push_subscription, 2, gitlab_user: user) }
+
+              def payload_of_merged_mr_notification(mr)
+                satisfy do |data|
+                  message = JSON.parse(data[:message])
+                  message["type"] == "push_notification" &&
+                    message.dig(*%w[payload title]) == "A merge request was merged" &&
+                    message.dig(*%w[payload options body]) == "#{mr["reference"]}: #{mr["titleHtml"]}" &&
+                    message.dig(*%w[payload options data url]) == mr["webUrl"]
+                end
               end
 
-              context "and merge request has been opened in between" do
-                let!(:subscription) { create(:web_push_subscription, gitlab_user: user) }
+              it "sends web push notification" do
+                perform_request
 
-                it "does not send web push notification" do
-                  open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
-                  opened_mr = open_mr_nodes.delete_at(0)
+                Rails.cache.delete(described_class.authored_mr_lists_cache_key(username))
 
-                  stub_request(:post, graphql_url)
-                    .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
-                    .to_return(status: 200, body: open_mrs.to_json)
+                open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
+                merged_mr_nodes = merged_mrs.dig(*%w[data user mergedMergeRequests nodes])
+                merged_mr = open_mr_nodes.delete_at(0)
+                merged_mr["mergedAt"] = Time.current
+                merged_mr["mergeUser"] = {
+                  "__typename" => "UserCore",
+                  "username" => "rsarangadharan",
+                  "avatarUrl" => "/uploads/-/system/user/avatar/21979359/avatar.png",
+                  "webUrl" => "https://gitlab.com/rsarangadharan",
+                  "lastActivityOn" => "2024-11-27",
+                  "location" => "",
+                  "status" => {"availability" => "NOT_SET", "message" => "Please @mention me so I see your message."}
+                }
+                merged_mr_nodes << merged_mr
 
-                  perform_request
+                stub_request(:post, graphql_url)
+                  .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                  .to_return(status: 200, body: open_mrs.to_json)
+                stub_request(:post, graphql_url)
+                  .with(body: hash_including("query" => a_string_matching(/state: merged/)))
+                  .to_return(status: 200, body: merged_mrs.to_json)
 
-                  Rails.cache.delete(described_class.authored_mr_lists_cache_key(username))
-                  open_mr_nodes << opened_mr
+                expect(WebPush).to receive(:payload_send)
+                  .with(payload_of_merged_mr_notification(merged_mr))
+                  .exactly(subscriptions.count)
 
-                  stub_request(:post, graphql_url)
-                    .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
-                    .to_return(status: 200, body: open_mrs.to_json)
-
-                  expect(WebPush).not_to receive(:payload_send)
-
-                  perform_request
-                end
-              end
-
-              context "and merge request has been merged in between" do
-                let!(:subscriptions) { create_list(:web_push_subscription, 2, gitlab_user: user) }
-
-                def payload_of_merged_mr_notification(mr)
-                  satisfy do |data|
-                    message = JSON.parse(data[:message])
-                    message["type"] == "push_notification" &&
-                      message.dig(*%w[payload title]) == "A merge request was merged" &&
-                      message.dig(*%w[payload options body]) == "#{mr["reference"]}: #{mr["titleHtml"]}" &&
-                      message.dig(*%w[payload options data url]) == mr["webUrl"]
-                  end
-                end
-
-                it "sends web push notification" do
-                  perform_request
-
-                  Rails.cache.delete(described_class.authored_mr_lists_cache_key(username))
-
-                  open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
-                  merged_mr_nodes = merged_mrs.dig(*%w[data user mergedMergeRequests nodes])
-                  merged_mr = open_mr_nodes.delete_at(0)
-                  merged_mr["mergedAt"] = Time.current
-                  merged_mr["mergeUser"] = {
-                    "__typename" => "UserCore",
-                    "username" => "rsarangadharan",
-                    "avatarUrl" => "/uploads/-/system/user/avatar/21979359/avatar.png",
-                    "webUrl" => "https://gitlab.com/rsarangadharan",
-                    "lastActivityOn" => "2024-11-27",
-                    "location" => "",
-                    "status" => {"availability" => "NOT_SET", "message" => "Please @mention me so I see your message."}
-                  }
-                  merged_mr_nodes << merged_mr
-
-                  stub_request(:post, graphql_url)
-                    .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
-                    .to_return(status: 200, body: open_mrs.to_json)
-                  stub_request(:post, graphql_url)
-                    .with(body: hash_including("query" => a_string_matching(/state: merged/)))
-                    .to_return(status: 200, body: merged_mrs.to_json)
-
-                  expect(WebPush).to receive(:payload_send)
-                    .with(payload_of_merged_mr_notification(merged_mr))
-                    .exactly(subscriptions.count)
-
-                  perform_request
-                end
+                perform_request
               end
             end
           end
+        end
 
-          context "when json format provided in the params" do
-            let(:format) { :json }
+        context "when json format provided in the params" do
+          let(:format) { :json }
 
-            it "responds to custom format" do
+          it "responds to custom format" do
+            request
+
+            expect(response.content_type).to eq "application/json; charset=utf-8"
+          end
+        end
+
+        context "with render_views" do
+          render_views
+
+          before do
+            stub_request(:get, %r{https://nominatim\.openstreetmap\.org/search\?addressdetails=1})
+              .to_return(status: 404)
+          end
+
+          it "renders the actual template" do
+            travel_to Time.utc(2024, 11, 20) do
               request
-
-              expect(response.content_type).to eq "application/json; charset=utf-8"
             end
+
+            expect(response).to render_template("layouts/application")
+            expect(response).to render_template("merge_requests/_user_merge_requests")
+
+            expect(response.body).to include(%(<turbo-frame id="merge_requests_user_dto_#{username}">))
+            # Project link
+            expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab">})
+            expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
+            # Project avatar
+            expect(response.body).to include(
+              %r{<img [^>]+src="https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png"}
+            )
+            expect(response.body).to include(%(https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png))
+            # Issues
+            expect(response.body).to include(%(>#32804</a>))
+            # MR links
+            expect(response.body).to include(%(>!5166</a>))
+
+            # Captions
+            expect(response.body).to include(%r{10 merge requests, open for an average of\s+about 12 hours})
+            expect(response.body).to include(%r{A total of\s+1311 merge requests})
+
+            # Squash MR
+            expect(response.body).to include(%(fa-solid fa-angles-down))
+            # Unreviewed icon
+            expect(response.body).to include(%(fa-solid fa-hourglass-start))
+            # Reviewed icon
+            expect(response.body).to include(%(fa-solid fa-check))
+            # Old MRs
+            expect(response.body).to include(%(text-danger))
           end
 
-          context "with render_views" do
-            render_views
-
-            before do
-              stub_request(:get, %r{https://nominatim\.openstreetmap\.org/search\?addressdetails=1})
-                .to_return(status: 404)
-            end
-
-            it "renders the actual template" do
-              travel_to Time.utc(2024, 11, 20) do
-                request
-              end
-
-              expect(response).to render_template("layouts/application")
-              expect(response).to render_template("merge_requests/_user_merge_requests")
-
-              expect(response.body).to include(%(<turbo-frame id="merge_requests_user_dto_#{username}">))
-              # Project link
-              expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab">})
-              expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
-              # Project avatar
-              expect(response.body).to include(
-                %r{<img [^>]+src="https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png"}
-              )
-              expect(response.body).to include(%(https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png))
-              # Issues
-              expect(response.body).to include(%(>#32804</a>))
-              # MR links
-              expect(response.body).to include(%(>!5166</a>))
-
-              # Captions
-              expect(response.body).to include(%r{10 merge requests, open for an average of\s+about 12 hours})
-              expect(response.body).to include(%r{A total of\s+1311 merge requests})
-
-              # Squash MR
-              expect(response.body).to include(%(fa-solid fa-angles-down))
-              # Unreviewed icon
-              expect(response.body).to include(%(fa-solid fa-hourglass-start))
-              # Reviewed icon
-              expect(response.body).to include(%(fa-solid fa-check))
-              # Old MRs
-              expect(response.body).to include(%(text-danger))
-            end
-
-            it "renders the merged MRs from the last week" do
-              travel_to Time.utc(2024, 11, 27) do
-                request
-              end
-
-              expect(response.body).not_to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
-              expect(response.body).not_to include(%(>#32804</a>))
-            end
-          end
-
-          context "when turbo param is missing", :freeze_time do
-            let(:params) { {assignee: username} }
-
-            it "redirects to index with the specified assignee" do
+          it "renders the merged MRs from the last week" do
+            travel_to Time.utc(2024, 11, 27) do
               request
-
-              expect(response).to redirect_to action: :index, assignee: username
-              expect(GitlabUser.find_by_username(username)).to have_attributes(
-                contacted_at: Time.current
-              )
             end
+
+            expect(response.body).not_to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
+            expect(response.body).not_to include(%(>#32804</a>))
+          end
+        end
+
+        context "when turbo param is missing", :freeze_time do
+          let(:params) { {assignee: username} }
+
+          it "redirects to index with the specified assignee" do
+            request
+
+            expect(response).to redirect_to action: :index, assignee: username
+            expect(GitlabUser.find_by_username(username)).to have_attributes(
+              contacted_at: Time.current
+            )
           end
         end
       end
