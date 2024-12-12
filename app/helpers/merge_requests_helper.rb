@@ -38,7 +38,7 @@ module MergeRequestsHelper
     return "N/A" if last_activity_on.nil?
     return "today" if last_activity_on.after?(1.day.ago)
 
-    "#{time_ago_in_words(user.lastActivityOn)} ago"
+    "#{time_ago_in_words(last_activity_on)} ago"
   end
 
   def format_location(user)
