@@ -11,6 +11,7 @@ module Services
     include MergeRequestsPipelineHelper
     include WebPushConcern
 
+    attr_reader :assignee
     delegate :make_full_url, to: :gitlab_client
 
     def self.cache_validity
@@ -22,8 +23,8 @@ module Services
     end
 
     def initialize(assignee)
-      @assignee = assignee
-      @current_user = GitlabUser.find_by!(username: assignee)
+      @current_user = assignee.is_a?(String) ? GitlabUser.find_by_username!(assignee) : assignee
+      @assignee = @current_user.username
     end
 
     def needs_scheduled_update?
@@ -101,7 +102,7 @@ module Services
 
     private
 
-    attr_reader :assignee, :current_user
+    attr_reader :current_user
 
     def gitlab_client
       @gitlab_client ||= GitlabClient.new

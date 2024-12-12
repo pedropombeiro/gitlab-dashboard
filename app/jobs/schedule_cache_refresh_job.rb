@@ -6,9 +6,10 @@ class ScheduleCacheRefreshJob < ApplicationJob
   ACTIVE_USER_TIME_WINDOW = 4.hours
 
   def perform(*_args)
-    scope.each do |user|
-      MergeRequestsFetchJob.perform_later(user.username)
-    end
+    scope
+      .map { |user| Services::FetchMergeRequestsService.new(user) }
+      .select(&:needs_scheduled_update?)
+      .each { |service| MergeRequestsFetchJob.perform_later(service.assignee) }
   end
 
   private
