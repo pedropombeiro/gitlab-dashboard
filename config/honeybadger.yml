@@ -28,3 +28,13 @@ debug: false
 # Enable Honeybadger Insights
 insights:
   enabled: true
+
+rails:
+  insights:
+    metrics: true
+solid_queue:
+  insights:
+    metrics: false
+puma:
+  insights:
+    metrics: true
