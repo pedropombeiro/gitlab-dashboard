@@ -15,7 +15,7 @@ class ScheduleCacheRefreshJob < ApplicationJob
 
   def scope
     GitlabUser
-      .where(GitlabUser.arel_table[:contacted_at].gteq(ACTIVE_USER_TIME_WINDOW.ago))
+      .where(contacted_at: ACTIVE_USER_TIME_WINDOW.ago..)
       .order(contacted_at: :desc)
       .limit(10) # Limit to 10 users for the time being, to avoid any DoS attacks
   end
