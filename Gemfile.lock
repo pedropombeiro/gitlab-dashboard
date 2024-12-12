@@ -187,6 +187,8 @@ GEM
       activesupport (>= 3.0)
       graphql (>= 1.13.0)
     hashdiff (1.1.2)
+    honeybadger (5.26.0)
+      logger
     hotwire-livereload (1.4.1)
       actioncable (>= 6.0.0)
       listen (>= 3.0.0)
@@ -563,6 +565,7 @@ DEPENDENCIES
   factory_bot_rails (~> 6.4)
   geokit (~> 1.14)
   graphlient
+  honeybadger (~> 5.26)
   hotwire-livereload (~> 1.4)
   importmap-rails
   jbuilder
