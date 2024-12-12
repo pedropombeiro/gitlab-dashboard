@@ -23,21 +23,14 @@ module Services
     end
 
     def initialize(assignee)
-      @current_user = assignee.is_a?(String) ? GitlabUser.find_by_username!(assignee) : assignee
+      @current_user = GitlabUser.find_by_username!(assignee)
       @assignee = @current_user.username
-    end
-
-    def needs_scheduled_update?
-      response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
-      return true unless response&.next_scheduled_update_at
-
-      response.next_scheduled_update_at.past?
     end
 
     def execute
       previous_dto = nil
       if current_user.web_push_subscriptions.any?
-        response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
+        response = cache_service.read(assignee)
         previous_dto = parse_dto(response)
       end
 
@@ -77,7 +70,8 @@ module Services
           response.user.mergedMergeRequests = user2.mergedMergeRequests
           response.user.allMergedMergeRequests = user2.allMergedMergeRequests
           response.user.firstCreatedMergedMergeRequests = user2.firstCreatedMergedMergeRequests
-          Rails.cache.write(self.class.last_authored_mr_lists_cache_key(assignee), response, expires_in: 1.week)
+
+          cache_service.write(assignee, response)
         end
 
         response
@@ -103,6 +97,10 @@ module Services
     private
 
     attr_reader :current_user
+
+    def cache_service
+      @cache_service ||= MergeRequestsCacheService.new
+    end
 
     def gitlab_client
       @gitlab_client ||= GitlabClient.new

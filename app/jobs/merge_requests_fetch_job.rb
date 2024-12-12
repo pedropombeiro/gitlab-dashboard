@@ -4,7 +4,6 @@ class MergeRequestsFetchJob < ApplicationJob
   queue_as :background
 
   def perform(assignee)
-    service = Services::FetchMergeRequestsService.new(assignee)
-    service.execute if service.needs_scheduled_update?
+    Services::FetchMergeRequestsService.new(assignee).execute
   end
 end

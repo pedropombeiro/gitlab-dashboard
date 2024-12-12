@@ -7,10 +7,7 @@ class MergeRequestsController < MergeRequestsControllerBase
   def index
     return unless ensure_assignee
 
-    @user = Rails.cache.fetch(self.class.user_cache_key(safe_params[:assignee]), expires_in: USER_CACHE_VALIDITY) do
-      gitlab_client.fetch_user(safe_params[:assignee])
-    end.response.data.user
-
+    @user = graphql_user(safe_params[:assignee])
     render_404 and return unless @user
 
     save_current_user(safe_params[:assignee])
@@ -18,7 +15,7 @@ class MergeRequestsController < MergeRequestsControllerBase
       redirect_to merge_requests_path(assignee: @user.username) and return
     end
 
-    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(safe_params[:assignee]))
+    response = Services::MergeRequestsCacheService.new.read(safe_params[:assignee])
     @dto = Services::FetchMergeRequestsService.new(safe_params[:assignee]).parse_dto(response)
 
     fresh_when(response)
@@ -26,10 +23,7 @@ class MergeRequestsController < MergeRequestsControllerBase
 
   def list
     assignee = safe_params.expect(:assignee)
-    user = Rails.cache.fetch(self.class.user_cache_key(safe_params[:assignee]), expires_in: USER_CACHE_VALIDITY) do
-      gitlab_client.fetch_user(assignee)
-    end.response.data.user
-
+    user = graphql_user(assignee)
     render_404 and return unless user
 
     save_current_user(assignee)
@@ -50,5 +44,13 @@ class MergeRequestsController < MergeRequestsControllerBase
       format.html { redirect_to merge_requests_path(assignee: assignee) unless params[:turbo] }
       format.json { render json: response }
     end
+  end
+
+  private
+
+  def graphql_user(assignee)
+    Rails.cache.fetch(self.class.user_cache_key(assignee), expires_in: USER_CACHE_VALIDITY) do
+      gitlab_client.fetch_user(assignee)
+    end.response.data.user
   end
 end
