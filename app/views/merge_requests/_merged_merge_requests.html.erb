@@ -13,7 +13,7 @@
           <div>Merged on average after
             <%= distance_of_time_in_words(
               ActiveSupport::Duration.build(
-                merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+                merge_requests.sum { |mr| Time.current - mr.createdAt } / merge_requests.count,
               ),
             ) %>.
           </div>
@@ -21,12 +21,15 @@
       </div>
 
       <% if merged_merge_requests_count.positive? %>
+        <% weekly_merge_rate = (merged_merge_requests_count / ActiveSupport::Duration.build(Time.current - first_merged_merge_requests_timestamp).in_weeks).round %>
+
         <div class="flex-row-reverse">
           <div>
             A total of
             <%= pluralize(merged_merge_requests_count, "merge request") %>
             merged since
-            <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>.
+            <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
+            <%= weekly_merge_rate.round %> per week.
           </div>
           <% if merged_merge_requests_tttm %>
             <div class="text-end">
