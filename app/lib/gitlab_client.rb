@@ -96,9 +96,7 @@ class GitlabClient
       #{CORE_USER_FRAGMENT}
     GRAPHQL
 
-    format_response(format) do
-      self.class.client.query(query)
-    end
+    format_response(format) { execute_query(query) }
   end
 
   def fetch_open_merge_requests(username, format: :open_struct)
@@ -181,7 +179,7 @@ class GitlabClient
     GRAPHQL
 
     format_response(format) do
-      self.class.client.query(
+      execute_query(
         merge_requests_graphql_query,
         username: username,
         activeReviewsAfter: 7.days.ago
@@ -222,7 +220,7 @@ class GitlabClient
     GRAPHQL
 
     format_response(format) do
-      self.class.client.query(merge_requests_graphql_query, username: username)
+      execute_query(merge_requests_graphql_query, username: username)
     end
   end
 
@@ -251,7 +249,7 @@ class GitlabClient
       results = Async do
         monthly_merge_requests_graphql_queries.map do |query|
           Async do
-            make_serializable(self.class.client.query(query, username: username))
+            make_serializable(execute_query(query, username: username))
           end
         end.map(&:wait)
       end.wait
@@ -297,7 +295,7 @@ class GitlabClient
       #{CORE_ISSUE_FRAGMENT}
     GRAPHQL
 
-    response = format_response(format) { self.class.client.query(query) }
+    response = format_response(format) { execute_query(query) }
     return response unless format == :open_struct
 
     data = response.response.data
@@ -320,6 +318,12 @@ class GitlabClient
   end
 
   private
+
+  def execute_query(query, *args)
+    ActiveSupport::Notifications.instrument "gitlab.client.query"
+
+    self.class.client.query(query, *args)
+  end
 
   def format_response(format)
     start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
