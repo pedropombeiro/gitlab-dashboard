@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "async"
 require "ostruct"
 
 class GitlabClient
@@ -226,32 +227,45 @@ class GitlabClient
   end
 
   def fetch_monthly_merged_merge_requests(username, format: :open_struct)
-    monthly_merge_requests_graphql_query = 12.times.map do |offset|
+    monthly_merge_requests_graphql_queries = 12.times.map do |offset|
       bom = Time.current.beginning_of_month - offset.months
       eom = 1.month.after(bom)
 
       <<-GRAPHQL
-        monthlyMergedMergeRequests#{offset}: authoredMergeRequests(
-          state: merged,
-          mergedAfter: "#{bom.to_fs}",
-          mergedBefore: "#{eom.to_fs}") {
-          ...MonthlyMergeRequestStatsFields
+        query($username: String!) {
+          user(username: $username) {
+            monthlyMergedMergeRequests#{offset}: authoredMergeRequests(
+              state: merged,
+              mergedAfter: "#{bom.to_fs}",
+              mergedBefore: "#{eom.to_fs}") {
+              ...MonthlyMergeRequestStatsFields
+            }
+          }
         }
+
+        #{MONTHLY_MERGE_REQUEST_STATS_FRAGMENT}
       GRAPHQL
-    end.join("\n")
-
-    merge_requests_graphql_query = <<-GRAPHQL
-      query($username: String!) {
-        user(username: $username) {
-          #{monthly_merge_requests_graphql_query}
-        }
-      }
-
-      #{MONTHLY_MERGE_REQUEST_STATS_FRAGMENT}
-    GRAPHQL
+    end
 
     format_response(format) do
-      self.class.client.query(merge_requests_graphql_query, username: username)
+      results = nil
+      Async do
+        results = monthly_merge_requests_graphql_queries.map do |query|
+          Async do
+            make_serializable(self.class.client.query(query, username: username))
+          end
+        end.map(&:wait)
+      end.wait
+
+      final_result = results.first
+      final_result.request_duration = results.map(&:request_duration).max
+      results[1..].each do |monthly_result|
+        monthly_result.data.user.table.keys.each do |k|
+          final_result.data.user[k] = monthly_result.data.user[k]
+        end
+      end
+
+      final_result
     end
   end
 
@@ -328,6 +342,8 @@ class GitlabClient
   end
 
   def make_serializable(obj)
+    return obj if obj.is_a?(OpenStruct)
+
     # GraphQL types cannot be serialized, so we work around that by reparsing from JSON into anonymous objects
     JSON.parse!(obj.to_json, object_class: OpenStruct)
   end

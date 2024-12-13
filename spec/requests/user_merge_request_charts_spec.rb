@@ -52,7 +52,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
           # A second request generates a second API call
           2.times { perform_request }
 
-          expect(merged_mrs_request_stub).to have_been_requested.twice
+          expect(merged_mrs_request_stub).to have_been_requested.times(24)
         end
 
         context "with cache enabled", :with_cache do
@@ -62,7 +62,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
 
             expect(response).to have_http_status :success
 
-            expect(merged_mrs_request_stub).to have_been_requested.once
+            expect(merged_mrs_request_stub).to have_been_requested.times(12)
           end
         end
       end
