@@ -16,7 +16,7 @@ class MergeRequestsController < MergeRequestsControllerBase
     end
 
     response = Services::MergeRequestsCacheService.new.read(safe_params[:assignee])
-    @dto = Services::FetchMergeRequestsService.new(safe_params[:assignee]).parse_dto(response)
+    @dto = fetch_service.parse_dto(response)
 
     fresh_when(response)
   end
@@ -28,7 +28,7 @@ class MergeRequestsController < MergeRequestsControllerBase
 
     save_current_user(assignee)
 
-    response, @dto = Services::FetchMergeRequestsService.new(assignee).execute
+    response, @dto = Services::GenerateNotificationsService.new(assignee, fetch_service).execute
     if @dto.errors
       return respond_to do |format|
         format.html { render file: Rails.public_path.join("500.html").to_s, layout: false, status: :internal_server_error }
@@ -37,7 +37,7 @@ class MergeRequestsController < MergeRequestsControllerBase
     end
 
     if Rails.env.production?
-      expires_in Services::FetchMergeRequestsService::MR_CACHE_VALIDITY.after(response.updated_at) - Time.current
+      expires_in Services::MergeRequestsCacheService.cache_validity.after(response.updated_at) - Time.current
     end
 
     respond_to do |format|
@@ -52,5 +52,9 @@ class MergeRequestsController < MergeRequestsControllerBase
     Rails.cache.fetch(self.class.user_cache_key(assignee), expires_in: USER_CACHE_VALIDITY) do
       gitlab_client.fetch_user(assignee)
     end.response.data.user
+  end
+
+  def fetch_service
+    @fetch_service ||= Services::FetchMergeRequestsService.new(safe_params.expect(:assignee))
   end
 end

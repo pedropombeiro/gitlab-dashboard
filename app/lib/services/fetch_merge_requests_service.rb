@@ -6,38 +6,19 @@ module Services
   class FetchMergeRequestsService
     include CacheConcern
     include HumanizeHelper
-    include MergeRequestsParsingHelper
     include MergeRequestsHelper
+    include MergeRequestsParsingHelper
     include MergeRequestsPipelineHelper
-    include WebPushConcern
 
     attr_reader :assignee
     delegate :make_full_url, to: :gitlab_client
 
-    def self.cache_validity
-      if Rails.application.config.action_controller.perform_caching
-        MR_CACHE_VALIDITY
-      else
-        1.minute
-      end
-    end
-
     def initialize(assignee)
-      @current_user = GitlabUser.find_by_username!(assignee)
-      @assignee = @current_user.username
+      @assignee = assignee
     end
 
     def execute
-      previous_dto = nil
-      if current_user.web_push_subscriptions.any?
-        response = cache_service.read(assignee)
-        previous_dto = parse_dto(response)
-      end
-
-      response = Rails.cache.fetch(
-        self.class.authored_mr_lists_cache_key(assignee),
-        expires_in: self.class.cache_validity
-      ) do
+      Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MergeRequestsCacheService.cache_validity) do
         open_mrs_response = nil
         merged_mrs_response = nil
 
@@ -48,7 +29,7 @@ module Services
         end.wait
 
         response = open_mrs_response.response.data
-        response.next_update_at = self.class.cache_validity.after(open_mrs_response.updated_at)
+        response.next_update_at = MergeRequestsCacheService.cache_validity.after(open_mrs_response.updated_at)
         response.next_scheduled_update_at =
           if any_running_pipelines?(response.user.openMergeRequests.nodes)
             5.minutes.from_now
@@ -70,17 +51,10 @@ module Services
           response.user.mergedMergeRequests = user2.mergedMergeRequests
           response.user.allMergedMergeRequests = user2.allMergedMergeRequests
           response.user.firstCreatedMergedMergeRequests = user2.firstCreatedMergedMergeRequests
-
-          cache_service.write(assignee, response)
         end
 
         response
       end
-
-      dto = parse_dto(response)
-      check_changes(previous_dto, dto) if dto.errors.blank? && current_user.web_push_subscriptions.any?
-
-      [response, dto]
     end
 
     def parse_dto(response)
@@ -95,12 +69,6 @@ module Services
     end
 
     private
-
-    attr_reader :current_user
-
-    def cache_service
-      @cache_service ||= MergeRequestsCacheService.new
-    end
 
     def gitlab_client
       @gitlab_client ||= GitlabClient.new
@@ -117,33 +85,9 @@ module Services
       merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).uniq
       issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).pluck(:issue_iid).compact.sort.uniq
 
-      Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: self.class.cache_validity) do
+      Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: MergeRequestsCacheService.cache_validity) do
         gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
       end.response&.data.to_h { |issue| [issue.iid, issue] }
-    end
-
-    def check_changes(previous_dto, dto)
-      notifications = Services::ComputeMergeRequestChangesService.new(previous_dto, dto).execute
-
-      notifications.each { |notification| notify_user(**notification) }
-    end
-
-    def notify_user(title:, body:, icon: nil, badge: nil, url: nil, **message)
-      icon ||= ActionController::Base.helpers.asset_url("apple-touch-icon-180x180.png")
-      badge ||= ActionController::Base.helpers.asset_url("apple-touch-icon-120x120.png")
-
-      publish(current_user, {
-        type: "push_notification",
-        payload: {
-          title: title,
-          options: {
-            badge: badge,
-            body: body,
-            data: url ? {url: url} : nil,
-            icon: icon
-          }.compact.merge(message)
-        }
-      })
     end
   end
 end

@@ -1,6 +1,4 @@
 class Admin::DashboardController < ApplicationController
-  include CacheConcern
-
   helper_method :user_cache_validity
 
   def index
@@ -10,7 +8,7 @@ class Admin::DashboardController < ApplicationController
   private
 
   def user_cache_validity(assignee)
-    response = Rails.cache.read(self.class.last_authored_mr_lists_cache_key(assignee))
+    response = Services::MergeRequestsCacheService.new.read(assignee)
     return unless response&.next_scheduled_update_at
 
     response.next_scheduled_update_at

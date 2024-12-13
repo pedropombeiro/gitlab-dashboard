@@ -4,6 +4,7 @@ class MergeRequestsFetchJob < ApplicationJob
   queue_as :background
 
   def perform(assignee)
-    Services::FetchMergeRequestsService.new(assignee).execute
+    fetch_service = Services::FetchMergeRequestsService.new(assignee)
+    Services::GenerateNotificationsService.new(assignee, fetch_service).execute
   end
 end
