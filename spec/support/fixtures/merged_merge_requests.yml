@@ -535,11 +535,11 @@ one:
               location: San Francisco, CA
               status:
           - iid: "5166"
-            webUrl: https://gitlab.com/gitlab-org/gitlab-runner/-/merge_requests/5166
+            webUrl: https://gitlab.com/gitlab-org/security/gitlab-runner/-/merge_requests/5166
             titleHtml: Note in logs when runner manager is being unregistered
             project:
-              fullPath: gitlab-org/gitlab-runner
-              webUrl: https://gitlab.com/gitlab-org/gitlab-runner
+              fullPath: gitlab-org/security/gitlab-runner
+              webUrl: https://gitlab.com/gitlab-org/security/gitlab-runner
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png
             reference: "!5166"
             sourceBranch: pedropombeiro/32804/change-unregister-runner-manager-log-output
