@@ -36,6 +36,11 @@ module Services
         end
 
       Timezone[tzname] if tzname
+    rescue Timezone::Error::GeoNames => exception
+      Honeybadger.notify(exception, {
+        tags: "warning, timezone"
+      })
+      nil
     end
 
     def fetch_country_code(location)
