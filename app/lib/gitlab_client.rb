@@ -320,7 +320,7 @@ class GitlabClient
   private
 
   def execute_query(query, *args)
-    ActiveSupport::Notifications.instrument "gitlab.client.query"
+    Rails.logger.debug "Executing GraphQL query..."
 
     self.class.client.query(query, *args)
   end
