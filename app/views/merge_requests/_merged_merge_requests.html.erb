@@ -113,7 +113,7 @@
   </tbody>
 </table>
 
-<div class="h-100 d-flex align-items-center justify-content-center">
+<div id="graphs", class="h-100 d-flex align-items-center justify-content-center">
   <%= column_chart(
     monthly_merged_merge_request_stats_path(assignee: params[:assignee]),
     title: "MRs merged in last 12 months",
