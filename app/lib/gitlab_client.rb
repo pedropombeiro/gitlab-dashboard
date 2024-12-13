@@ -248,24 +248,23 @@ class GitlabClient
     end
 
     format_response(format) do
-      results = nil
-      Async do
-        results = monthly_merge_requests_graphql_queries.map do |query|
+      results = Async do
+        monthly_merge_requests_graphql_queries.map do |query|
           Async do
             make_serializable(self.class.client.query(query, username: username))
           end
         end.map(&:wait)
       end.wait
 
-      final_result = results.first
-      final_result.request_duration = results.map(&:request_duration).max
-      results[1..].each do |monthly_result|
-        monthly_result.data.user.table.keys.each do |k|
-          final_result.data.user[k] = monthly_result.data.user[k]
+      results.first.tap do |final_result|
+        final_result.request_duration = results.map(&:request_duration).max
+
+        results[1..].each do |monthly_result|
+          monthly_result.data.user.table.keys.each do |k|
+            final_result.data.user[k] = monthly_result.data.user[k]
+          end
         end
       end
-
-      final_result
     end
   end
 
