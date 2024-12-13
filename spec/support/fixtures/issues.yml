@@ -144,3 +144,153 @@ one:
                     verified if necessary
                   color: "#428BCA"
                   textColor: "#FFFFFF"
+
+two:
+  data:
+    project_0:
+      issues:
+        nodes:
+          - iid: "506226"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/issues/506226
+            titleHtml: Generate one audit event per project associated/dissociated from
+              runner
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: GitLab Ultimate
+                  descriptionHtml: Features or changes limited or intended as part of GitLab
+                    Ultimate.
+                  color: "#8E44AD"
+                  textColor: "#FFFFFF"
+                - title: Stretch
+                  descriptionHtml: Issues that are a stretch goal for delivering in the
+                    current milestone. If these issues are not done in the current release,
+                    they will strongly be considered for the next release.
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+                - title: backend
+                  descriptionHtml: Issues that require backend work
+                  color: "#D10069"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+                - title: workflow::in review
+                  descriptionHtml: Issues that are undergoing code review by the development
+                    team and/or undergoing design review by the UX team
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+          - iid: "505810"
+            webUrl: https://gitlab.com/gitlab-org/gitlab/-/issues/505810
+            titleHtml: Pass current_runner_manager to destroy_conditionally
+            labels:
+              nodes:
+                - title: Category:Fleet Visibility
+                  descriptionHtml: ""
+                  color: "#6699cc"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: maintenance::refactor
+                  descriptionHtml: Issues related to things that need improvement and that
+                    have been left behind due to high velocity of development
+                  color: "#7f8c8d"
+                  textColor: "#FFFFFF"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::maintenance
+                  descriptionHtml: Upkeeping efforts and catch-up corrective improvements
+                    that are not Feature nor Bugs. Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#330066"
+                  textColor: "#FFFFFF"
+                - title: workflow::complete
+                  descriptionHtml: Applied after all MRs have merged and the issue has been
+                    verified if necessary
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
+    project_1:
+      issues:
+        nodes: []
+    project_2:
+      issues:
+        nodes:
+          - iid: "32804"
+            webUrl: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/32804
+            titleHtml: Ignore forbidden arguments to register if using --registration-token
+            labels:
+              nodes:
+                - title: "[Deprecated] Category:Runner Fleet"
+                  descriptionHtml: Deprecated as of 2023-11-30. Please use Category:Fleet
+                    Visibility
+                  color: "#428bca"
+                  textColor: "#FFFFFF"
+                - title: devops::verify
+                  descriptionHtml: Issues for the Verify stage of the DevOps lifecycle (e.g.
+                    CI, Code Quality, Usability Testing)
+                  color: "#E44D2A"
+                  textColor: "#FFFFFF"
+                - title: feature::enhancement
+                  descriptionHtml: User-facing improvements that refine the initial MVC
+                    to make it more useful and usable. Read more at <a href="https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://about.gitlab.com/handbook/engineering/metrics/#work-type-classification</a>
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: group::runner
+                  descriptionHtml: Issues belonging to the Runner group of the Verify stage
+                    of the DevOps lifecycle.
+                  color: "#A8D695"
+                  textColor: "#1F1E24"
+                - title: section::ci
+                  descriptionHtml: ""
+                  color: "#f0ad4e"
+                  textColor: "#1F1E24"
+                - title: type::feature
+                  descriptionHtml: Any issue/MR that contains work to support the implementation
+                    of a feature and/or results in an improvement in the user experience.
+                    Read more at <a href="https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification"
+                    rel="nofollow noreferrer noopener" target="_blank">https://handbook.gitlab.com/handbook/product/groups/product-analysis/engineering/metrics/#work-type-classification</a>
+                  color: "#009966"
+                  textColor: "#FFFFFF"
+                - title: workflow::in review
+                  descriptionHtml: Issues that are undergoing code review by the development
+                    team and/or undergoing design review by the UX team
+                  color: "#428BCA"
+                  textColor: "#FFFFFF"
