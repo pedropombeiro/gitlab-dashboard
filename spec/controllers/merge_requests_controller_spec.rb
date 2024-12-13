@@ -23,7 +23,7 @@ RSpec.describe MergeRequestsController, type: :controller do
     context "when user is unknown" do
       before do
         stub_request(:post, graphql_url)
-          .with(body: hash_including("query" => a_string_matching(/user: /)))
+          .with(body: hash_including("query" => a_string_matching(/user: /), "variables" => {}))
           .to_return(status: 200, body: {data: {user: nil}}.to_json)
       end
 
@@ -42,7 +42,7 @@ RSpec.describe MergeRequestsController, type: :controller do
       let(:params) { {assignee: username} }
       let!(:user_request_stub) do
         stub_request(:post, graphql_url)
-          .with(body: hash_including("query" => a_string_matching(/user: /)))
+          .with(body: hash_including("query" => a_string_including("user: "), "variables" => {}))
           .to_return(status: 200, body: {
             data: {user: {
               username: username,
@@ -156,7 +156,7 @@ RSpec.describe MergeRequestsController, type: :controller do
     context "when assignee is unknown" do
       before do
         stub_request(:post, graphql_url)
-          .with(body: hash_including("query" => a_string_matching(/user: /)))
+          .with(body: hash_including("query" => a_string_including("user: "), "variables" => {}))
           .to_return(status: 200, body: {data: {user: nil}}.to_json)
       end
 
@@ -183,25 +183,39 @@ RSpec.describe MergeRequestsController, type: :controller do
 
         let!(:user_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: hash_including("query" => a_string_matching(/user: /)))
+            .with(body: hash_including("query" => a_string_including("user: "), "variables" => {}))
             .to_return(status: 200, body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}}.to_json)
         end
 
         let!(:open_mrs_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+            .with(body: hash_including(
+              "query" => a_string_including("openMergeRequests: "),
+              "variables" => hash_including(
+                "username" => username,
+                "activeReviewsAfter" => an_instance_of(String)
+              )
+            ))
             .to_return(status: 200, body: open_mrs.to_json)
         end
 
         let!(:merged_mrs_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: hash_including("query" => a_string_matching(/state: merged/)))
+            .with(body: hash_including(
+              "query" => a_string_including("mergedMergeRequests: authoredMergeRequests"),
+              "variables" => {"username" => username}
+            ))
             .to_return(status: 200, body: merged_mrs.to_json)
         end
 
         let!(:issues_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: hash_including("query" => a_string_matching(/project_\d:/)))
+            .with(body: hash_including(
+              "query" => include(%[project_0: project(fullPath: "gitlab-org/gitlab")])
+                .and(include(%[project_1: project(fullPath: "gitlab-org/security/gitlab-runner")]))
+                .and(include(%[project_2: project(fullPath: "gitlab-org/gitlab-runner")])),
+              "variables" => {}
+            ))
             .to_return(status: 200, body: issues_body)
         end
 
@@ -247,7 +261,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 opened_mr = open_mr_nodes.delete_at(0)
 
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                  .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
                   .to_return(status: 200, body: open_mrs.to_json)
 
                 perform_request
@@ -256,7 +270,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 open_mr_nodes << opened_mr
 
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                  .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
                   .to_return(status: 200, body: open_mrs.to_json)
 
                 expect(WebPush).not_to receive(:payload_send)
@@ -299,10 +313,10 @@ RSpec.describe MergeRequestsController, type: :controller do
                 merged_mr_nodes << merged_mr
 
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+                  .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
                   .to_return(status: 200, body: open_mrs.to_json)
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_matching(/state: merged/)))
+                  .with(body: hash_including("query" => a_string_including("mergedMergeRequests: ")))
                   .to_return(status: 200, body: merged_mrs.to_json)
 
                 expect(WebPush).to receive(:payload_send)
@@ -329,7 +343,7 @@ RSpec.describe MergeRequestsController, type: :controller do
           render_views
 
           before do
-            stub_request(:get, %r{https://nominatim\.openstreetmap\.org/search\?addressdetails=1})
+            stub_request(:get, %r{^https://nominatim\.openstreetmap\.org/search\?addressdetails=1})
               .to_return(status: 404)
           end
 

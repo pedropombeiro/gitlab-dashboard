@@ -31,7 +31,7 @@ module MergeRequestsParsingHelper
     if mr.project.fullPath.include?(SECURITY_SUBGROUP)
       refs << {
         # Take into account MRs in security projects which refer to issues in the canonical project
-        project_full_path: mr.project.fullPath.delete(SECURITY_SUBGROUP),
+        project_full_path: mr.project.fullPath.sub(SECURITY_SUBGROUP, ""),
         issue_iid: issue_iid_from_mr(mr)
       }
     end
