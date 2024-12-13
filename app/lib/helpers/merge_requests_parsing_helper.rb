@@ -16,7 +16,7 @@ module MergeRequestsParsingHelper
   def merge_request_issue_iids(merge_requests)
     merge_requests.map do |mr|
       {
-        project_full_path: mr.project.fullPath,
+        project_full_path: mr.project.fullPath.sub("gitlab-runner/security", "gitlab-runner"), # TODO: add mapping support
         issue_iid: issue_iid_from_mr(mr)
       }
     end
