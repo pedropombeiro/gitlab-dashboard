@@ -2,7 +2,7 @@
 
 export HONEYBADGER_ENV="$RAILS_ENV"
 export HONEYBADGER_REVISION="$(cat ./.git-sha)"
-curl -g "https://eu-api.honeybadger.io/v1/deploys?deploy[environment]=${HONEYBADGER_ENV}&deploy[local_username]=${USER}&deploy[revision]=${HONEYBADGER_REVISION}&api_key=${HONEYBADGER_API_KEY}"
+curl -g "https://eu-api.honeybadger.io/v1/deploys?deploy[environment]=${HONEYBADGER_ENV}&deploy[local_username]=${HONEYBADGER_USERNAME}&deploy[revision]=${HONEYBADGER_REVISION}&api_key=${HONEYBADGER_API_KEY}"
 
 # If running the rails server then create or migrate existing database
 if [ "${*}" == "bundle exec thrust ./bin/rails server" ]; then
