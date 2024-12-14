@@ -326,14 +326,9 @@ class GitlabClient
   end
 
   def format_response(format)
-    start_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    request_duration, response = monotonic_timer { yield }
 
-    response = yield
-
-    end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-    request_duration = (end_t - start_t).seconds
-
-    Honeybadger.histogram("graphql.query", duration: request_duration)
+    Honeybadger.histogram("graphql.query", duration: (request_duration.to_f * 1000).round(2))
 
     case format
     when :yaml_fixture
@@ -356,6 +351,15 @@ class GitlabClient
 
   def quote(s)
     %("#{s}") if s
+  end
+
+  # returns two parameters, the first is the duration of the execution, and the second is
+  # the return value of the passed block
+  def monotonic_timer
+    start_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
+    result = yield
+    finish_time = ::Process.clock_gettime(::Process::CLOCK_MONOTONIC)
+    [(finish_time - start_time).seconds, result]
   end
 
   private_class_method def self.authorization
