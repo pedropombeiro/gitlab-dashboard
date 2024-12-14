@@ -27,7 +27,8 @@ debug: false
 
 # Enable Honeybadger Insights
 insights:
-  enabled: false
+  enabled: true
+  registry_flush_interval: 600
 
 rails:
   insights:
@@ -35,6 +36,8 @@ rails:
 solid_queue:
   insights:
     metrics: false
+    collection_interval: 15
 puma:
   insights:
     metrics: true
+    collection_interval: 60
