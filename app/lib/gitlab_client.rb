@@ -331,6 +331,9 @@ class GitlabClient
     response = yield
 
     end_t = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    request_duration = (end_t - start_t).seconds
+
+    Honeybadger.histogram("graphql.query", duration: request_duration)
 
     case format
     when :yaml_fixture
@@ -339,7 +342,7 @@ class GitlabClient
       OpenStruct.new(
         response: make_serializable(response),
         updated_at: Time.current,
-        request_duration: (end_t - start_t).seconds.round(1)
+        request_duration: request_duration.round(1)
       )
     end
   end
