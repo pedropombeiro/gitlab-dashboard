@@ -4,6 +4,8 @@ require "async"
 require "ostruct"
 
 class GitlabClient
+  include Honeybadger::InstrumentationHelper
+
   CORE_USER_FRAGMENT = <<-GRAPHQL
     fragment CoreUserFields on User {
       username
@@ -325,13 +327,21 @@ class GitlabClient
   def execute_query(query, name, *args)
     Rails.logger.debug { %(Executing "#{name}" GraphQL query (args: #{args})...) }
 
-    self.class.client.query(query, *args)
+    metric_source "graphql_metrics"
+    metric_attributes(name: name)
+
+    increment_counter "graphql.query.count"
+
+    result = nil
+    histogram "graphql.query.duration" do
+      result = self.class.client.query(query, *args)
+    end
+
+    result
   end
 
   def format_response(format)
     request_duration, response = monotonic_timer { yield }
-
-    Honeybadger.histogram("graphql.query", duration: (request_duration.to_f * 1000).round(2))
 
     case format
     when :yaml_fixture
