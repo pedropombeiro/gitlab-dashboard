@@ -33,6 +33,7 @@ jobs:
     # Set job outputs to values from filter step
     outputs:
       deployment: ${{ steps.filter.outputs.deployment }}
+      test: ${{ steps.filter.outputs.test }}
       js: ${{ steps.filter.outputs.js }}
       ruby: ${{ steps.filter.outputs.ruby }}
     steps:
@@ -50,6 +51,8 @@ jobs:
               - "**.rb"
               - "**.erb"
               - "**.yml"
+            test:
+              - "spec/**"
             deployment:
               - ".github/workflows/ci.yml"
               - "app/**"
@@ -121,7 +124,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: [changes]
-    if: ${{ needs.changes.outputs.deployment == 'true' }}
+    if: ${{ needs.changes.outputs.deployment == 'true' || needs.changes.outputs.test == 'true' }}
 
     services:
       redis:
