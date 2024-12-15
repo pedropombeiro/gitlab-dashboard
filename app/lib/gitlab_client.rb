@@ -96,7 +96,7 @@ class GitlabClient
       #{CORE_USER_FRAGMENT}
     GRAPHQL
 
-    format_response(format) { execute_query(query) }
+    format_response(format) { execute_query(query, "user") }
   end
 
   def fetch_open_merge_requests(username, format: :open_struct)
@@ -181,6 +181,7 @@ class GitlabClient
     format_response(format) do
       execute_query(
         merge_requests_graphql_query,
+        "open_merge_requests",
         username: username,
         activeReviewsAfter: 7.days.ago
       )
@@ -220,7 +221,7 @@ class GitlabClient
     GRAPHQL
 
     format_response(format) do
-      execute_query(merge_requests_graphql_query, username: username)
+      execute_query(merge_requests_graphql_query, "merged_merge_requests", username: username)
     end
   end
 
@@ -249,7 +250,7 @@ class GitlabClient
       results = Async do
         monthly_merge_requests_graphql_queries.map do |query|
           Async do
-            make_serializable(execute_query(query, username: username))
+            make_serializable(execute_query(query, "monthly_merged_merge_requests", username: username))
           end
         end.map(&:wait)
       end.wait
@@ -268,6 +269,7 @@ class GitlabClient
 
   # Fetches a list of issues given 2 lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
   def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids, format: :open_struct)
+    # TODO: Send one request per project in parallel
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
@@ -295,7 +297,7 @@ class GitlabClient
       #{CORE_ISSUE_FRAGMENT}
     GRAPHQL
 
-    response = format_response(format) { execute_query(query) }
+    response = format_response(format) { execute_query(query, "issues") }
     return response unless format == :open_struct
 
     data = response.response.data
@@ -319,8 +321,8 @@ class GitlabClient
 
   private
 
-  def execute_query(query, *args)
-    Rails.logger.debug "Executing GraphQL query..."
+  def execute_query(query, name, *args)
+    Rails.logger.debug { %(Executing "#{name}" GraphQL query (args: #{args})...) }
 
     self.class.client.query(query, *args)
   end
