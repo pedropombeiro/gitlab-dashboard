@@ -78,7 +78,8 @@
           timestamp: mr.mergedAt,
           most_significant_only: true %>
           by
-          <br/><%= render "user_badge", user: mr.mergeUser %>
+          <br/>
+          <%= render "user_badge", user: mr.mergeUser, title: user_help_title(mr.mergeUser), class_suffix: "approved" %>
         </td>
         <!-- Updated at -->
         <td>
