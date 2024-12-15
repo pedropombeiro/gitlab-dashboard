@@ -23,7 +23,7 @@ module MergeRequestsHelper
       "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
       "Last activity": format_last_activity(user.lastActivityOn),
       Message: [user_emoji_character(user.status&.emoji), user.status&.message].compact.join(" ")
-    }.transform_values(&:presence).compact
+    }
   end
 
   def user_help_title(user)
@@ -55,7 +55,9 @@ module MergeRequestsHelper
 
   def tooltip_from_hash(hash)
     hash
-      .filter_map { |title, value| value.present? ? tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) : nil }
+      .transform_values(&:presence)
+      .compact
+      .map { |title, value| tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) }
       .join
   end
 end
