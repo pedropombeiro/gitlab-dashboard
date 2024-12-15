@@ -74,9 +74,9 @@ class UserDto
   end
 
   def warmup_timezone_cache(mrs)
-    locations = mrs.filter_map { |mr| mr.reviewers.nodes.map(&:location).map(&:presence) }.flatten.compact.uniq
+    locations = mrs.flat_map { |mr| mr.reviewers.nodes.map(&:location).map(&:presence) }.compact.uniq
 
-    Services::LocationLookupService.new.fetch_timezones(locations)
+    location_lookup_service.fetch_timezones(locations)
   end
 
   def convert_mr_pipeline(pipeline)
@@ -102,7 +102,7 @@ class UserDto
 
       if mr.issue
         mr.issue.contextualLabels = mr.issue.labels.nodes.filter do |label|
-          next false unless ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+          next unless ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
 
           label.bootstrapClass = [] # Use label's predefined colors
           label.webTitle = label.title.delete_prefix(WORKFLOW_LABEL_NS)
@@ -148,7 +148,12 @@ class UserDto
   end
 
   def convert_merged_merge_request(merge_request, merged_merge_requests, open_issues_by_iid)
-    convert_core_merge_request(merge_request, merged_merge_requests, open_issues_by_iid, MERGED_MRS_CONTEXTUAL_LABELS).tap do |mr|
+    convert_core_merge_request(
+      merge_request,
+      merged_merge_requests,
+      open_issues_by_iid,
+      MERGED_MRS_CONTEXTUAL_LABELS
+    ).tap do |mr|
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
@@ -162,7 +167,7 @@ class UserDto
   def user_activity_icon_class(user)
     return if user.lastActivityOn.nil?
 
-    user_tzname = Services::LocationLookupService.new.fetch_timezone(user.location)&.name || Time.now.getlocal.zone
+    user_tzname = location_lookup_service.fetch_timezone(user.location)&.name || Time.now.getlocal.zone
     user_bod = Time.current.in_time_zone(user_tzname).beginning_of_day
 
     %w[fa-solid fa-moon] if user.lastActivityOn.before?(user_bod)
@@ -170,5 +175,9 @@ class UserDto
 
   def filter_merged_merge_requests(merge_requests)
     merge_requests.filter { |mr| parse_graphql_time(mr.mergedAt).after?(1.week.ago) }
+  end
+
+  def location_lookup_service
+    @location_lookup_service ||= Services::LocationLookupService.new
   end
 end

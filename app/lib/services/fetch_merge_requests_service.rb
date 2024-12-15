@@ -76,7 +76,9 @@ module Services
 
     def any_running_pipelines?(merge_requests)
       merge_requests.any? do |mr|
-        mr.headPipeline && mr.headPipeline.startedAt.present? && mr.headPipeline.finishedAt.nil?
+        mr.headPipeline &&
+          mr.headPipeline.startedAt.present? &&
+          mr.headPipeline.finishedAt.nil?
       end
     end
 

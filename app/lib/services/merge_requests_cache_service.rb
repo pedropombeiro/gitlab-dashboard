@@ -16,6 +16,7 @@ module Services
 
     def needs_scheduled_update?(assignee)
       response = read(assignee)
+
       return true unless response&.next_scheduled_update_at
 
       response.next_scheduled_update_at.past?
