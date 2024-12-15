@@ -13,6 +13,7 @@
     target: "_blank",
     class: %w[bg-transparent text-review-approved],
   ) %>
+  <%= user_emoji_character(user.status&.emoji) %>
   <% if user.status&.availability == "BUSY" %>
     <%= render "shared/abbr_with_title", content: "🔴", title: user.status&.availability %>
   <% end %>

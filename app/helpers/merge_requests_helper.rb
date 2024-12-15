@@ -1,7 +1,13 @@
+require "tanuki_emoji"
+
 module MergeRequestsHelper
   include ActionView::Helpers::DateHelper
   include ActionView::Helpers::TagHelper
   include HumanizeHelper
+
+  def user_emoji_character(emoji_name)
+    TanukiEmoji.find_by_alpha_code(emoji_name).codepoints if emoji_name
+  end
 
   def user_country_flag_classes(user)
     country_code = Services::LocationLookupService.new.fetch_country_code(user.location)

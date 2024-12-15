@@ -19,6 +19,7 @@ class GitlabClient
       location
       status {
         availability
+        emoji
         message
       }
     }

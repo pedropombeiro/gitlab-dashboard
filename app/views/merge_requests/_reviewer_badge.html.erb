@@ -15,6 +15,7 @@
     target: "_blank",
     class: ["bg-transparent", "text-review-#{class_suffix}"],
   ) %>
+  <%= user_emoji_character(reviewer.status&.emoji) %>
   <% if reviewer.status&.availability == "BUSY" %>
     <%= tag.abbr(
       "🔴",
