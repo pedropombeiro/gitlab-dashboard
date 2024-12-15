@@ -1,12 +1,10 @@
-<% class_suffix = "approved" %>
-
 <%= tag.span(
   class: %w[badge shadow bg-gradient] + ["bg-review-#{class_suffix}", "text-review-#{class_suffix}"],
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
     bs_html: "true",
-    bs_title: user_help_title(user)
+    bs_title: title
   }) do %>
   <%= render "user_image", user: user %>
   <%= link_to(
@@ -22,4 +20,6 @@
 
   <% country_flag_classes = user_country_flag_classes(user) %>
   <%= tag.span(class: country_flag_classes) if country_flag_classes %>
+
+  <%= yield %>
 <% end %>
