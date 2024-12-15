@@ -22,7 +22,7 @@ module MergeRequestsHelper
       Location: format_location(user),
       "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
       "Last activity": format_last_activity(user.lastActivityOn),
-      Message: user.status&.message
+      Message: [user_emoji_character(user.status&.emoji), user.status&.message].compact.join(" ")
     }.compact
   end
 
