@@ -17,23 +17,15 @@
   ) %>
   <%= user_emoji_character(reviewer.status&.emoji) %>
   <% if reviewer.status&.availability == "BUSY" %>
-    <%= tag.abbr(
-      "🔴",
-      data: {
-        bs_toggle: "tooltip",
-        bs_title: reviewer.status&.availability,
-      },
-    ) %>
+    <%= render "shared/abbr_with_title", content: "🔴", title: user.status&.availability %>
   <% end %>
-  <%= tag.span do %>
-    <% country_flag_classes = user_country_flag_classes(reviewer) %>
-    <%= tag.span(class: country_flag_classes) if country_flag_classes %>
+  <% country_flag_classes = user_country_flag_classes(reviewer) %>
+  <%= tag.span(class: country_flag_classes) if country_flag_classes %>
 
-    <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
-      <%= tag.i class: reviewer.bootstrapClass[:icon] %>
-    <% end %>
-    <% if reviewer.bootstrapClass[:activity_icon] %>
-      <%= tag.i class: reviewer.bootstrapClass[:activity_icon] %>
-    <% end %>
+  <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
+    <%= tag.i class: reviewer.bootstrapClass[:icon] %>
+  <% end %>
+  <% if reviewer.bootstrapClass[:activity_icon] %>
+    <%= tag.i class: reviewer.bootstrapClass[:activity_icon] %>
   <% end %>
 <% end %>
