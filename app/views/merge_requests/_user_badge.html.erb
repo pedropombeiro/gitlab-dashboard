@@ -1,5 +1,7 @@
+<% class_suffix = "approved" %>
+
 <%= tag.span(
-  class: %w[badge shadow bg-gradient bg-review-approved text-review-approved],
+  class: %w[badge shadow bg-gradient] + ["bg-review-#{class_suffix}", "text-review-#{class_suffix}"],
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
@@ -11,7 +13,7 @@
     user.username,
     user.webUrl,
     target: "_blank",
-    class: %w[bg-transparent text-review-approved],
+    class: ["bg-transparent", "text-review-#{class_suffix}"],
   ) %>
   <%= user_emoji_character(user.status&.emoji) %>
   <% if user.status&.availability == "BUSY" %>
