@@ -23,7 +23,7 @@ module MergeRequestsHelper
       "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
       "Last activity": format_last_activity(user.lastActivityOn),
       Message: [user_emoji_character(user.status&.emoji), user.status&.message].compact.join(" ")
-    }.compact
+    }.transform_values(&:presence).compact
   end
 
   def user_help_title(user)
