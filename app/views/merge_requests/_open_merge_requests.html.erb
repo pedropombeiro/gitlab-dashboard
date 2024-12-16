@@ -90,11 +90,9 @@
           ) %>
           <% if mr.blockingMergeRequests&.visibleMergeRequests %>
             <% open_blockers =
-              mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
-                blocker.state == "opened"
-              end %>
+              mr.blockingMergeRequests.visibleMergeRequests.filter { |blocker| blocker.state == "opened" } %>
 
-            <% if open_blockers.count.positive? %>
+            <% if open_blockers.any? %>
               <%= render "shared/abbr_with_title",
               content: tag.i(class: %w[fa-solid fa-road-barrier]),
               class: "text-danger",
