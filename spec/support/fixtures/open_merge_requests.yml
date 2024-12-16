@@ -1353,15 +1353,15 @@ one:
                   activeReviews:
                     count: 3
             headPipeline:
-              path: "/gitlab-org/gitlab/-/pipelines/1555447534"
+              path: "/gitlab-org/gitlab/-/pipelines/1590358850"
               startedAt: "2024-11-21T23:37:11Z"
               finishedAt: "2024-11-22T00:42:25Z"
-              status: SUCCESS
+              status: FAILED
               failureReason:
               jobs:
-                count: 888
+                count: 305
               finishedJobs:
-                count: 881
+                count: 295
               runningJobs:
                 count: 0
               firstRunningJob:
@@ -1374,4 +1374,8 @@ one:
                 nodes:
                   - name: e2e:test-product-analytics
                     trace:
-                    webPath: "/gitlab-org/gitlab/-/jobs/8441980329"
+                    webPath: "/gitlab-org/gitlab/-/jobs/8651090111"
+                    downstreamPipeline:
+                      jobs:
+                        nodes:
+                          - webPath: "/gitlab-org/analytics-section/product-analytics/product-analytics-devkit-mirror/-/jobs/8651198918"
