@@ -9,7 +9,7 @@ module CacheConcern
   MR_CACHE_VALIDITY = 5.minutes
   MONTHLY_GRAPH_CACHE_VALIDITY = 3.hours
 
-  MR_VERSION = 12
+  LOCATION_VERSION = "v2"
 
   class_methods do
     def user_cache_key(username)
@@ -17,11 +17,11 @@ module CacheConcern
     end
 
     def location_info_cache_key(location)
-      "#{REDIS_NAMESPACE}/location/v2/#{calculate_hash(location)}"
+      "#{REDIS_NAMESPACE}/location/#{LOCATION_VERSION}/#{calculate_hash(location)}"
     end
 
     def location_timezone_name_cache_key(location)
-      "#{REDIS_NAMESPACE}/location/v2/#{calculate_hash(location)}/timezone_name"
+      "#{REDIS_NAMESPACE}/location/#{LOCATION_VERSION}/#{calculate_hash(location)}/timezone_name"
     end
 
     def open_issues_cache_key(issue_iids)
