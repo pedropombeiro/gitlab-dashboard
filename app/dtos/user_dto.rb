@@ -84,9 +84,6 @@ class UserDto
 
     pipeline.startedAt = parse_graphql_time(pipeline.startedAt)
     pipeline.finishedAt = parse_graphql_time(pipeline.finishedAt)
-    if pipeline.status == "RUNNING"
-      pipeline.status += " (#{pipeline.finishedJobs.count.to_i * 100 / pipeline.jobs.count.to_i}%)"
-    end
   end
 
   def convert_core_merge_request(merge_request, merge_requests, open_issues_by_iid, contextual_labels)
