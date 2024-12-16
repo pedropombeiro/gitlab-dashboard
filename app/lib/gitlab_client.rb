@@ -223,9 +223,7 @@ class GitlabClient
   end
 
   def fetch_user(username, format: :open_struct)
-    if username.present?
-      return format_response(format) { execute_query(USER_QUERY, "user", username: username) }
-    end
+    return format_response(format) { execute_query(USER_QUERY, "user", username: username) } if username.present?
 
     format_response(format) { execute_query(CURRENT_USER_QUERY, "user") }
   end
@@ -278,8 +276,6 @@ class GitlabClient
       end.wait
 
       results.first.tap do |final_result|
-        final_result.request_duration = results.map(&:request_duration).max
-
         results[1..].each do |monthly_result|
           monthly_result.data.user.table.keys.each do |k|
             final_result.data.user[k] = monthly_result.data.user[k]
@@ -291,35 +287,50 @@ class GitlabClient
 
   # Fetches a list of issues given 2 lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
   def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids, format: :open_struct)
-    # TODO: Send one request per project in parallel
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
-    project_queries =
-      project_full_paths.map.each_with_index do |project_full_path, index|
-        project_issue_iids = issue_iids.filter_map do |h|
-          (h[:project_full_path] == project_full_path) ? quote(h[:issue_iid]) : nil
-        end.join(", ")
+    response = format_response(format) do
+      results = Async do
+        project_queries =
+          project_full_paths.map.each_with_index do |project_full_path, index|
+            project_issue_iids = issue_iids.filter_map do |h|
+              (h[:project_full_path] == project_full_path) ? h[:issue_iid] : nil
+            end
 
-        <<-GRAPHQL
-          project_#{index}: project(fullPath: "#{project_full_path}") {
-            issues(iids: [#{project_issue_iids}]) {
-              nodes { ...CoreIssueFields }
-            }
-          }
-        GRAPHQL
-      end.join("\n")
+            query = <<-GRAPHQL
+              query($projectFullPath: ID!, $issueIids: [String!]) {
+                project_#{index}: project(fullPath: $projectFullPath) {
+                  issues(iids: $issueIids) {
+                    nodes { ...CoreIssueFields }
+                  }
+                }
+              }
 
-    query = <<-GRAPHQL
-      query {
-        #{project_queries}
-      }
+              #{CORE_LABEL_FRAGMENT}
+              #{CORE_ISSUE_FRAGMENT}
+            GRAPHQL
 
-      #{CORE_LABEL_FRAGMENT}
-      #{CORE_ISSUE_FRAGMENT}
-    GRAPHQL
+            Async do
+              make_serializable(execute_query(
+                query, "issues",
+                projectFullPath: project_full_path,
+                issueIids: project_issue_iids))
+            end
+          end
 
-    response = format_response(format) { execute_query(query, "issues") }
+        project_queries.map(&:wait)
+      end.wait
+
+      results.first.tap do |final_result|
+        results[1..].each do |project_result|
+          project_result.data.table.keys.each do |k|
+            final_result.data[k] = project_result.data[k]
+          end
+        end
+      end
+    end
+
     return response unless format == :open_struct
 
     data = response.response.data
@@ -379,10 +390,6 @@ class GitlabClient
 
     # GraphQL types cannot be serialized, so we work around that by reparsing from JSON into anonymous objects
     JSON.parse!(obj.to_json, object_class: OpenStruct)
-  end
-
-  def quote(s)
-    %("#{s}") if s
   end
 
   # returns two parameters, the first is the duration of the execution, and the second is

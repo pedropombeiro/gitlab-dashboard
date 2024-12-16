@@ -195,7 +195,7 @@ RSpec.describe MergeRequestsController, type: :controller do
     end
 
     context "when assignee is known" do
-      let_it_be(:issues_body) { YAML.load_file(file_fixture("issues.yml"))["two"].to_json }
+      let_it_be(:issues_body) { YAML.load_file(file_fixture("issues.yml"))["two"] }
 
       let(:open_mrs) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
       let(:merged_mrs) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
@@ -238,12 +238,34 @@ RSpec.describe MergeRequestsController, type: :controller do
         let!(:issues_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => include(%[project_0: project(fullPath: "gitlab-org/gitlab")])
-                .and(include(%[project_1: project(fullPath: "gitlab-org/security/gitlab-runner")]))
-                .and(include(%[project_2: project(fullPath: "gitlab-org/gitlab-runner")])),
-              "variables" => {}
+              "query" => a_string_including(%[project_0: project(fullPath: $projectFullPath)]),
+              "variables" => hash_including(
+                "projectFullPath" => "gitlab-org/gitlab",
+                "issueIids" => an_array_matching(%w[
+                  503315 446287 506226 481411 506385 502403 472974 506404 505703 457221 505810 503748 442395 500447
+                  502934 502431 497562 354756
+                ])
+              )
             ))
-            .to_return(status: :ok, body: issues_body)
+            .to_return(status: :ok, body: issues_for_project("project_0"))
+          stub_request(:post, graphql_url)
+            .with(body: hash_including(
+              "query" => a_string_including(%[project_1: project(fullPath: $projectFullPath)]),
+              "variables" => {
+                "projectFullPath" => "gitlab-org/security/gitlab-runner",
+                "issueIids" => %w[32804]
+              }
+            ))
+            .to_return(status: :ok, body: issues_for_project("project_1"))
+          stub_request(:post, graphql_url)
+            .with(body: hash_including(
+              "query" => a_string_including(%[project_2: project(fullPath: $projectFullPath)]),
+              "variables" => {
+                "projectFullPath" => "gitlab-org/gitlab-runner",
+                "issueIids" => %w[32804]
+              }
+            ))
+            .to_return(status: :ok, body: issues_for_project("project_2"))
         end
 
         it "returns http success" do
@@ -437,6 +459,12 @@ RSpec.describe MergeRequestsController, type: :controller do
               contacted_at: Time.current
             )
           end
+        end
+
+        private
+
+        def issues_for_project(project_key)
+          issues_body.deep_dup.tap { |f| f["data"].slice!(project_key) }.to_json
         end
       end
     end
