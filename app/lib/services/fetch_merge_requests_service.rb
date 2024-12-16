@@ -22,11 +22,13 @@ module Services
         open_mrs_response = nil
         merged_mrs_response = nil
 
+        # Fetch merge requests in 2 calls to reduce query complexity, and do it asynchronously for efficiency
         Sync do
-          # Fetch merge requests in 2 calls to reduce query complexity
-          Async { open_mrs_response = gitlab_client.fetch_open_merge_requests(assignee) }
-          Async { merged_mrs_response = gitlab_client.fetch_merged_merge_requests(assignee) }
-        end.wait
+          [
+            Async { open_mrs_response = gitlab_client.fetch_open_merge_requests(assignee) },
+            Async { merged_mrs_response = gitlab_client.fetch_merged_merge_requests(assignee) }
+          ].map(&:wait)
+        end
 
         response = open_mrs_response.response.data
         response.next_update_at = MergeRequestsCacheService.cache_validity.after(open_mrs_response.updated_at)
