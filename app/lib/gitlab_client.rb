@@ -181,6 +181,13 @@ class GitlabClient
                     name
                     trace { htmlSummary }
                     webPath
+                    downstreamPipeline {
+                      jobs(statuses: FAILED, first: 1) {
+                        nodes {
+                          webPath
+                        }
+                      }
+                    }
                   }
                 }
               }

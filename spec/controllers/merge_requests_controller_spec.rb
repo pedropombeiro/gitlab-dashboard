@@ -397,6 +397,10 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%(href="https://gitlab.com/gitlab-org/gitlab-runner/-/issues/32804"))
             # MR links
             expect(response.body).to include(%(>!5166</a>))
+            # Failed job link from downstream pipeline
+            expect(response.body).to include(
+              'href="https://gitlab.example.com/gitlab-org/analytics-section/product-analytics/product-analytics-devkit-mirror/-/jobs/8651198918">Failed<'
+            )
 
             # Captions
             expect(response.body).to include(%r{10 merge requests, open for an average of\s+about 12 hours})
