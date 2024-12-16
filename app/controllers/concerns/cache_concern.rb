@@ -17,11 +17,11 @@ module CacheConcern
     end
 
     def location_info_cache_key(location)
-      "#{REDIS_NAMESPACE}/location/v2/#{Digest::SHA256.hexdigest(location)}"
+      "#{REDIS_NAMESPACE}/location/v2/#{calculate_hash(location)}"
     end
 
     def location_timezone_name_cache_key(location)
-      "#{REDIS_NAMESPACE}/location/v2/#{Digest::SHA256.hexdigest(location)}/timezone_name"
+      "#{REDIS_NAMESPACE}/location/v2/#{calculate_hash(location)}/timezone_name"
     end
 
     def open_issues_cache_key(issue_iids)
@@ -42,21 +42,30 @@ module CacheConcern
 
     private
 
+    def calculate_hash(*args)
+      value =
+        if args.many?
+          args.map { |arg| Digest::SHA256.hexdigest(arg) }.join
+        else
+          args.first
+        end
+
+      Digest::SHA256.hexdigest(value)[0..15]
+    end
+
     def user_hash(username)
-      Digest::SHA256.hexdigest(username&.downcase || Rails.application.credentials.gitlab_token || "Anonymous")[0..15]
+      calculate_hash(username&.downcase || Rails.application.credentials.gitlab_token || "Anonymous")
     end
 
     def user_info_version
-      @user_info_version ||= Digest::SHA256.hexdigest(
-        Digest::SHA256.hexdigest(GitlabClient::USER_QUERY) + Digest::SHA256.hexdigest(GitlabClient::CURRENT_USER_QUERY)
-      )[0..15]
+      @user_info_version ||= calculate_hash(GitlabClient::USER_QUERY, GitlabClient::CURRENT_USER_QUERY)
     end
 
     def merge_requests_version
-      @merge_requests_version = Digest::SHA256.hexdigest(
-        Digest::SHA256.hexdigest(GitlabClient::OPEN_MERGE_REQUESTS_GRAPHQL_QUERY) +
-        Digest::SHA256.hexdigest(GitlabClient::MERGED_MERGE_REQUESTS_GRAPHQL_QUERY)
-      )[0..15]
+      @merge_requests_version ||= calculate_hash(
+        GitlabClient::OPEN_MERGE_REQUESTS_GRAPHQL_QUERY,
+        GitlabClient::MERGED_MERGE_REQUESTS_GRAPHQL_QUERY
+      )
     end
   end
 end
