@@ -51,9 +51,9 @@ module MrStatusOrnamentsConcern
   def workflow_label_class(label_title)
     return [] unless label_title.start_with?(WORKFLOW_LABEL_NS)
 
-    [
-      "bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label_title, "secondary")}",
-      "text-light"
+    %W[
+      bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label_title, "secondary")}
+      text-light
     ]
   end
 

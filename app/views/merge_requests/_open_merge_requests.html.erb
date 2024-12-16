@@ -114,7 +114,7 @@
               <% summary = pipeline_summary(pipeline) %>
               <% web_url = pipeline_web_url(pipeline) %>
 
-              <%= tag.span(class: %w[badge badge-pill] + ["bg-#{mr.bootstrapClass[:pipeline]}"]) do %>
+              <%= tag.span(class: %W[badge badge-pill bg-#{mr.bootstrapClass[:pipeline]}]) do %>
                 <%= link_to humanized_enum(pipeline.status) || "??",
                 web_url,
                 class: "text-light",

@@ -12,7 +12,7 @@ module MergeRequestsHelper
   def user_country_flag_classes(user)
     country_code = Services::LocationLookupService.new.fetch_country_code(user.location)
 
-    ["fi", "fis", "fi-#{country_code.downcase}"] if country_code
+    %W[fi fis fi-#{country_code.downcase}] if country_code
   end
 
   def user_help_hash(user)
