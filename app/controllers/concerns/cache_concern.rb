@@ -9,7 +9,7 @@ module CacheConcern
   MR_CACHE_VALIDITY = 5.minutes
   MONTHLY_GRAPH_CACHE_VALIDITY = 3.hours
 
-  MR_VERSION = 11
+  MR_VERSION = 12
 
   class_methods do
     def user_cache_key(username)
