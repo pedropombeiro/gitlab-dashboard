@@ -142,10 +142,8 @@ class GitlabClient
               finishedJobs: jobs(statuses: [SUCCESS, FAILED, CANCELED, SKIPPED, MANUAL], retried: false) {
                 count
               }
-              runningJobs: jobs(statuses: RUNNING, retried: false) {
+              runningJobs: jobs(statuses: RUNNING, first: 1, retried: false) {
                 count
-              }
-              firstRunningJob: jobs(statuses: RUNNING, first: 1, retried: false) {
                 nodes {
                   webPath
                 }
