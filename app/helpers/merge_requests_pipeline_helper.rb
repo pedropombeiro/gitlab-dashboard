@@ -1,6 +1,16 @@
 module MergeRequestsPipelineHelper
   include ActionView::Helpers::TagHelper
 
+  def pipeline_status(pipeline)
+    status = pipeline.status
+
+    if status == "RUNNING"
+      "#{humanized_enum(status)} (#{pipeline.finishedJobs.count.to_i * 100 / pipeline.jobs.count.to_i}%)"
+    else
+      humanized_enum(status)
+    end
+  end
+
   def pipeline_failure_summary(pipeline)
     failed_jobs = pipeline.failedJobs
     failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }
