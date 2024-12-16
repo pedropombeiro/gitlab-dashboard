@@ -26,9 +26,6 @@ export default class extends Controller {
   }
 
   refresh() {
-    const element = document.getElementById(this.targetDomIdValue);
-    if (element) {
-      element.reload();
-    }
+    location.reload();
   }
 }
