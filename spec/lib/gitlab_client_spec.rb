@@ -23,7 +23,7 @@ RSpec.describe GitlabClient do
 
     before do
       stub_request(:post, graphql_url)
-        .with(body: /user: /)
+        .with(body: a_string_including("user("))
         .to_return(
           status: 200,
           body: user_requests_response_body[username].to_json

@@ -23,7 +23,10 @@ RSpec.describe MergeRequestsController, type: :controller do
     context "when user is unknown" do
       before do
         stub_request(:post, graphql_url)
-          .with(body: hash_including("query" => a_string_matching(/user: /), "variables" => {}))
+          .with(body: hash_including(
+            "query" => a_string_including("user("),
+            "variables" => {username: "non-existent"}
+          ))
           .to_return(status: :ok, body: {data: {user: nil}}.to_json)
       end
 
@@ -40,16 +43,25 @@ RSpec.describe MergeRequestsController, type: :controller do
     context "when user is known" do
       let(:username) { "user1" }
       let(:params) { {assignee: username} }
-      let!(:user_request_stub) do
-        stub_request(:post, graphql_url)
-          .with(body: hash_including("query" => a_string_including("user: "), "variables" => {}))
-          .to_return(status: :ok, body: {
-            data: {user: {
+      let(:user_response_body) do
+        {
+          data: {
+            user: {
               username: username,
               avatarUrl: "/images/avatar.png",
               webUrl: "https://gitlab.example.com/#{username}"
-            }}
-          }.to_json)
+            }
+          }
+        }.to_json
+      end
+
+      let!(:user_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "query" => a_string_including("user("),
+            "variables" => {username: username}
+          ))
+          .to_return(status: :ok, body: user_response_body)
       end
 
       it "returns http success and creates user with correct timestamp", :freeze_time do
@@ -133,6 +145,15 @@ RSpec.describe MergeRequestsController, type: :controller do
             allow(Rails.application.credentials).to receive(:gitlab_token).and_return("secret-token")
           end
 
+          let!(:user_request_stub) do
+            stub_request(:post, graphql_url)
+              .with(body: hash_including(
+                "query" => a_string_including("user: currentUser"),
+                "variables" => {}
+              ))
+              .to_return(status: :ok, body: user_response_body)
+          end
+
           it "redirects to assignee specified in GITLAB_TOKEN" do
             request
 
@@ -156,7 +177,10 @@ RSpec.describe MergeRequestsController, type: :controller do
     context "when assignee is unknown" do
       before do
         stub_request(:post, graphql_url)
-          .with(body: hash_including("query" => a_string_including("user: "), "variables" => {}))
+          .with(body: hash_including(
+            "query" => a_string_including("user("),
+            "variables" => {username: "non-existent"}
+          ))
           .to_return(status: :ok, body: {data: {user: nil}}.to_json)
       end
 
@@ -183,7 +207,10 @@ RSpec.describe MergeRequestsController, type: :controller do
 
         let!(:user_request_stub) do
           stub_request(:post, graphql_url)
-            .with(body: hash_including("query" => a_string_including("user: "), "variables" => {}))
+            .with(body: hash_including(
+              "query" => a_string_including("user("),
+              "variables" => {username: username}
+            ))
             .to_return(status: :ok, body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}}.to_json)
         end
 
