@@ -38,6 +38,14 @@ module MergeRequestsHelper
     )
   end
 
+  def any_failed_pipeline?(merge_requests)
+    merge_requests.any? do |mr|
+      next unless mr.headPipeline&.failedJobs
+
+      !mr.headPipeline.failedJobs.nodes&.all?(&:allowFailure)
+    end
+  end
+
   private
 
   def format_last_activity(last_activity_on)

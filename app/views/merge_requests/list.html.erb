@@ -10,7 +10,8 @@
     <div data-controller="bootstrap-tooltip">
       <%= tag.div data: {
       controller: "unread-badge",
-      unread_badge_count_value: @dto.open_merge_requests.items.count
+      unread_badge_count_value: @dto.open_merge_requests.items.count,
+      unread_badge_problem_value: any_failed_pipeline?(@dto.open_merge_requests.items)
     } do %>
         <%= render "user_merge_requests",
         updated_at: @dto.updated_at,

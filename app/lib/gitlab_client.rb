@@ -132,7 +132,6 @@ class GitlabClient
               conflicts
               blockingMergeRequests {
                 visibleMergeRequests {
-                  iid
                   state
                 }
               }
@@ -174,6 +173,7 @@ class GitlabClient
                   count
                   nodes {
                     name
+                    allowFailure
                   }
                 }
                 failedJobTraces: jobs(statuses: FAILED, first: 2, retried: false) {

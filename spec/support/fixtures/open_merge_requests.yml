@@ -926,8 +926,7 @@ one:
             conflicts: false
             blockingMergeRequests:
               visibleMergeRequests:
-                - iid: "173886"
-                  state: opened
+                - state: opened
             reviewers:
               nodes:
                 - __typename: MergeRequestReviewer
@@ -1199,10 +1198,8 @@ one:
             conflicts: false
             blockingMergeRequests:
               visibleMergeRequests:
-                - iid: "172422"
-                  state: merged
-                - iid: "172698"
-                  state: closed
+                - state: merged
+                - state: closed
             reviewers:
               nodes: []
             headPipeline:
