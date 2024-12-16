@@ -45,7 +45,7 @@ module MergeRequestsPipelineHelper
     summary
   end
 
-  def pipeline_web_url(pipeline)
+  def pipeline_web_url(pipeline, focus_on_failed = false)
     return unless pipeline.path
 
     failed_jobs = pipeline.failedJobs
@@ -58,19 +58,29 @@ module MergeRequestsPipelineHelper
     if failed_job_traces.count == 1
       case pipeline.status
       when "RUNNING"
-        web_path = (pipeline.runningJobs.count == 1) ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
-      when "FAILED"
         web_path =
-          if failed_job_traces.first.downstreamPipeline&.jobs&.nodes&.count == 1
-            failed_job_traces.first.downstreamPipeline.jobs.nodes.first.webPath
+          if focus_on_failed && failed_job_traces.any?
+            failed_job_web_path(failed_job_traces.first)
           else
-            failed_job_traces.first.webPath
+            (pipeline.runningJobs.count == 1) ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
           end
+      when "FAILED"
+        web_path = failed_job_web_path(failed_job_traces.first)
       end
     elsif failed_jobs.count.positive?
       web_path += "/failures"
     end
 
     make_full_url(web_path)
+  end
+
+  private
+
+  def failed_job_web_path(failed_job_trace)
+    if failed_job_trace.downstreamPipeline&.jobs&.nodes&.count == 1
+      failed_job_trace.downstreamPipeline.jobs.nodes.first.webPath
+    else
+      failed_job_trace.webPath
+    end
   end
 end
