@@ -3,7 +3,7 @@ pre-push:
   commands:
     backend-specs:
       glob: "{app,spec}/**/*.rb"
-      run: bin/bundle exec rspec
+      run: yarn build && bin/bundle exec rspec
 
 pre-commit:
   commands:
