@@ -4,6 +4,7 @@ require "async"
 
 module Services
   class GenerateNotificationsService
+    include CacheConcern
     include WebPushConcern
 
     def initialize(assignee, fetch_service)
@@ -39,6 +40,10 @@ module Services
 
     def check_changes(previous_dto, dto)
       notifications = Services::ComputeMergeRequestChangesService.new(previous_dto, dto).execute
+      if notifications.any? { |n| n[:type] == :merge_request_merged }
+        # Clear monthly MR count cache if an MR has been merged
+        Rails.cache.delete(self.class.monthly_merged_mr_lists_cache_key(assignee_user.username))
+      end
 
       notifications.each { |notification| notify_user(**notification) }
     end

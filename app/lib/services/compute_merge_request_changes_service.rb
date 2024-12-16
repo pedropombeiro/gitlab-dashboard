@@ -23,6 +23,7 @@ module Services
 
           mr_changes << merge_request_change(
             mr,
+            type: :merge_request_merged,
             title: "A merge request was merged",
             body: "#{mr.reference}: #{mr.titleHtml}"
           )
@@ -44,9 +45,10 @@ module Services
 
     attr_reader :previous_dto, :dto
 
-    def merge_request_change(mr, title:, body:)
+    def merge_request_change(mr, type:, title:, body:)
       {
         title: title,
+        type: type,
         body: body,
         url: mr.webUrl,
         tag: mr.iid,
@@ -59,6 +61,7 @@ module Services
 
       merge_request_change(
         mr,
+        type: :label_change,
         title: title,
         body: "changed to #{changes[:labels].join(", ")}\n\n#{mr.reference}: #{mr.titleHtml}"
       )
