@@ -78,6 +78,142 @@ class GitlabClient
     }
   GRAPHQL
 
+  USER_QUERY = <<-GRAPHQL
+    query($username: String!) {
+      user(username: $username) {
+        ...CoreUserFields
+      }
+    }
+
+    #{CORE_USER_FRAGMENT}
+  GRAPHQL
+
+  CURRENT_USER_QUERY = <<-GRAPHQL
+    query {
+      user: currentUser {
+        ...CoreUserFields
+      }
+    }
+
+    #{CORE_USER_FRAGMENT}
+  GRAPHQL
+
+  OPEN_MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
+    query($username: String!, $activeReviewsAfter: Time) {
+      user(username: $username) {
+        openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
+          nodes {
+            ...CoreMergeRequestFields
+            approved
+            approvalsRequired
+            approvalsLeft
+            autoMergeEnabled
+            detailedMergeStatus
+            squashOnMerge
+            conflicts
+            blockingMergeRequests {
+              visibleMergeRequests {
+                state
+              }
+            }
+            reviewers {
+              nodes {
+                ...ExtendedUserFields
+                mergeRequestInteraction {
+                  approved
+                  reviewState
+                }
+                activeReviews: reviewRequestedMergeRequests(
+                  state: opened, approved: false, updatedAfter: $activeReviewsAfter
+                ) {
+                  count
+                }
+              }
+            }
+            headPipeline {
+              path
+              startedAt
+              finishedAt
+              status
+              failureReason
+              jobs(retried: false) {
+                count
+              }
+              finishedJobs: jobs(statuses: [SUCCESS, FAILED, CANCELED, SKIPPED, MANUAL], retried: false) {
+                count
+              }
+              runningJobs: jobs(statuses: RUNNING, retried: false) {
+                count
+              }
+              firstRunningJob: jobs(statuses: RUNNING, first: 1, retried: false) {
+                nodes {
+                  webPath
+                }
+              }
+              failedJobs: jobs(statuses: FAILED, retried: false) {
+                count
+                nodes {
+                  name
+                  allowFailure
+                }
+              }
+              failedJobTraces: jobs(statuses: FAILED, first: 2, retried: false) {
+                nodes {
+                  name
+                  trace { htmlSummary }
+                  webPath
+                  downstreamPipeline {
+                    jobs(statuses: FAILED, first: 1) {
+                      nodes {
+                        webPath
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    #{CORE_USER_FRAGMENT}
+    #{EXT_USER_FRAGMENT}
+    #{CORE_LABEL_FRAGMENT}
+    #{CORE_MERGE_REQUEST_FRAGMENT}
+  GRAPHQL
+
+  MERGED_MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
+    query($username: String!) {
+      user(username: $username) {
+        firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
+          nodes {
+            createdAt
+          }
+        }
+        allMergedMergeRequests: authoredMergeRequests(state: merged) {
+          count
+          totalTimeToMerge
+        }
+        mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
+          nodes {
+            iid
+            ...CoreMergeRequestFields
+            mergedAt
+            mergeUser {
+              ...ExtendedUserFields
+            }
+          }
+        }
+      }
+    }
+
+    #{CORE_USER_FRAGMENT}
+    #{EXT_USER_FRAGMENT}
+    #{CORE_LABEL_FRAGMENT}
+    #{CORE_MERGE_REQUEST_FRAGMENT}
+  GRAPHQL
+
   def self.gitlab_instance_url
     @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
   end
@@ -90,121 +226,16 @@ class GitlabClient
 
   def fetch_user(username, format: :open_struct)
     if username.present?
-      query = <<-GRAPHQL
-        query($username: String!) {
-          user(username: $username) {
-            ...CoreUserFields
-          }
-        }
-
-        #{CORE_USER_FRAGMENT}
-      GRAPHQL
-
-      return format_response(format) { execute_query(query, "user", username: username) }
+      return format_response(format) { execute_query(USER_QUERY, "user", username: username) }
     end
 
-    query = <<-GRAPHQL
-      query {
-        user: currentUser {
-          ...CoreUserFields
-        }
-      }
-
-      #{CORE_USER_FRAGMENT}
-    GRAPHQL
-
-    format_response(format) { execute_query(query, "user") }
+    format_response(format) { execute_query(CURRENT_USER_QUERY, "user") }
   end
 
   def fetch_open_merge_requests(username, format: :open_struct)
-    merge_requests_graphql_query = <<-GRAPHQL
-      query($username: String!, $activeReviewsAfter: Time) {
-        user(username: $username) {
-          openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
-            nodes {
-              ...CoreMergeRequestFields
-              approved
-              approvalsRequired
-              approvalsLeft
-              autoMergeEnabled
-              detailedMergeStatus
-              squashOnMerge
-              conflicts
-              blockingMergeRequests {
-                visibleMergeRequests {
-                  state
-                }
-              }
-              reviewers {
-                nodes {
-                  ...ExtendedUserFields
-                  mergeRequestInteraction {
-                    approved
-                    reviewState
-                  }
-                  activeReviews: reviewRequestedMergeRequests(
-                    state: opened, approved: false, updatedAfter: $activeReviewsAfter
-                  ) {
-                    count
-                  }
-                }
-              }
-              headPipeline {
-                path
-                startedAt
-                finishedAt
-                status
-                failureReason
-                jobs(retried: false) {
-                  count
-                }
-                finishedJobs: jobs(statuses: [SUCCESS, FAILED, CANCELED, SKIPPED, MANUAL], retried: false) {
-                  count
-                }
-                runningJobs: jobs(statuses: RUNNING, retried: false) {
-                  count
-                }
-                firstRunningJob: jobs(statuses: RUNNING, first: 1, retried: false) {
-                  nodes {
-                    webPath
-                  }
-                }
-                failedJobs: jobs(statuses: FAILED, retried: false) {
-                  count
-                  nodes {
-                    name
-                    allowFailure
-                  }
-                }
-                failedJobTraces: jobs(statuses: FAILED, first: 2, retried: false) {
-                  nodes {
-                    name
-                    trace { htmlSummary }
-                    webPath
-                    downstreamPipeline {
-                      jobs(statuses: FAILED, first: 1) {
-                        nodes {
-                          webPath
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-
-      #{CORE_USER_FRAGMENT}
-      #{EXT_USER_FRAGMENT}
-      #{CORE_LABEL_FRAGMENT}
-      #{CORE_MERGE_REQUEST_FRAGMENT}
-    GRAPHQL
-
     format_response(format) do
       execute_query(
-        merge_requests_graphql_query,
+        OPEN_MERGE_REQUESTS_GRAPHQL_QUERY,
         "open_merge_requests",
         username: username,
         activeReviewsAfter: 7.days.ago
@@ -213,39 +244,8 @@ class GitlabClient
   end
 
   def fetch_merged_merge_requests(username, format: :open_struct)
-    merge_requests_graphql_query = <<-GRAPHQL
-      query($username: String!) {
-        user(username: $username) {
-          firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
-            nodes {
-              createdAt
-            }
-          }
-          allMergedMergeRequests: authoredMergeRequests(state: merged) {
-            count
-            totalTimeToMerge
-          }
-          mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
-            nodes {
-              iid
-              ...CoreMergeRequestFields
-              mergedAt
-              mergeUser {
-                ...ExtendedUserFields
-              }
-            }
-          }
-        }
-      }
-
-      #{CORE_USER_FRAGMENT}
-      #{EXT_USER_FRAGMENT}
-      #{CORE_LABEL_FRAGMENT}
-      #{CORE_MERGE_REQUEST_FRAGMENT}
-    GRAPHQL
-
     format_response(format) do
-      execute_query(merge_requests_graphql_query, "merged_merge_requests", username: username)
+      execute_query(MERGED_MERGE_REQUESTS_GRAPHQL_QUERY, "merged_merge_requests", username: username)
     end
   end
 

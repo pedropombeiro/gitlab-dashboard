@@ -13,7 +13,7 @@ module CacheConcern
 
   class_methods do
     def user_cache_key(username)
-      "#{REDIS_NAMESPACE}/user_info/v5/#{user_hash(username)}"
+      "#{REDIS_NAMESPACE}/user_info/#{user_info_version}/#{user_hash(username)}"
     end
 
     def location_info_cache_key(location)
@@ -29,7 +29,7 @@ module CacheConcern
     end
 
     def authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v#{MR_VERSION}/authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/authored_list/#{user_hash(user)}"
     end
 
     def monthly_merged_mr_lists_cache_key(user)
@@ -37,13 +37,26 @@ module CacheConcern
     end
 
     def last_authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v#{MR_VERSION}/last_authored_list/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/last_authored_list/#{user_hash(user)}"
     end
 
     private
 
     def user_hash(username)
       Digest::SHA256.hexdigest(username&.downcase || Rails.application.credentials.gitlab_token || "Anonymous")[0..15]
+    end
+
+    def user_info_version
+      @user_info_version ||= Digest::SHA256.hexdigest(
+        Digest::SHA256.hexdigest(GitlabClient::USER_QUERY) + Digest::SHA256.hexdigest(GitlabClient::CURRENT_USER_QUERY)
+      )[0..15]
+    end
+
+    def merge_requests_version
+      @merge_requests_version = Digest::SHA256.hexdigest(
+        Digest::SHA256.hexdigest(GitlabClient::OPEN_MERGE_REQUESTS_GRAPHQL_QUERY) +
+        Digest::SHA256.hexdigest(GitlabClient::MERGED_MERGE_REQUESTS_GRAPHQL_QUERY)
+      )[0..15]
     end
   end
 end
