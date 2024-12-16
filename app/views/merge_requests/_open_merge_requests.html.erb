@@ -112,11 +112,10 @@
             <% if pipeline %>
               <% failed_jobs = pipeline.failedJobs.nodes %>
               <% summary = pipeline_summary(pipeline) %>
-              <% web_url = pipeline_web_url(pipeline) %>
 
               <%= tag.span(class: %W[badge badge-pill bg-#{mr.bootstrapClass[:pipeline]}]) do %>
-                <%= link_to humanized_enum(pipeline.status) || "??",
-                web_url,
+                <%= link_to pipeline_status(pipeline) || "??",
+                pipeline_web_url(pipeline),
                 class: "text-light",
                 target: "_blank",
                 **(
@@ -136,7 +135,7 @@
               <% end %>
 
               <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
-                <%= link_to(web_url, target: "_blank", style: [ "text-decoration: none" ]) do %>
+                <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", style: [ "text-decoration: none" ]) do %>
                   <%= render "shared/abbr_with_title",
                   content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
                   title: pipeline_failure_summary(pipeline),
