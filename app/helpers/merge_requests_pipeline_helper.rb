@@ -62,7 +62,7 @@ module MergeRequestsPipelineHelper
           if focus_on_failed && failed_job_traces.any?
             failed_job_web_path(failed_job_traces.first)
           else
-            (pipeline.runningJobs.count == 1) ? pipeline.firstRunningJob.nodes.first.webPath : "#{web_path}/builds"
+            (pipeline.runningJobs.count == 1) ? pipeline.runningJobs.nodes.first.webPath : "#{web_path}/builds"
           end
       when "FAILED"
         web_path = failed_job_web_path(failed_job_traces.first)

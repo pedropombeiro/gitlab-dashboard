@@ -135,7 +135,6 @@ one:
                 count: 43
               runningJobs:
                 count: 225
-              firstRunningJob:
                 nodes:
                   - webPath: "/gitlab-org/gitlab/-/jobs/8485257218"
               failedJobs:
@@ -273,7 +272,6 @@ one:
                 count: 54
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 0
@@ -403,7 +401,6 @@ one:
                 count: 285
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 1
@@ -547,7 +544,6 @@ one:
                 count: 28
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 0
@@ -692,7 +688,6 @@ one:
                 count: 59
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 0
@@ -823,7 +818,6 @@ one:
                 count: 75
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 0
@@ -955,7 +949,6 @@ one:
                 count: 75
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 0
@@ -1089,7 +1082,6 @@ one:
                 count: 285
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 0
@@ -1214,7 +1206,6 @@ one:
                 count: 755
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 0
@@ -1361,7 +1352,6 @@ one:
                 count: 295
               runningJobs:
                 count: 0
-              firstRunningJob:
                 nodes: []
               failedJobs:
                 count: 1
