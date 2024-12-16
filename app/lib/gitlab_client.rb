@@ -89,9 +89,23 @@ class GitlabClient
   end
 
   def fetch_user(username, format: :open_struct)
+    if username.present?
+      query = <<-GRAPHQL
+        query($username: String!) {
+          user(username: $username) {
+            ...CoreUserFields
+          }
+        }
+
+        #{CORE_USER_FRAGMENT}
+      GRAPHQL
+
+      return format_response(format) { execute_query(query, "user", username: username) }
+    end
+
     query = <<-GRAPHQL
       query {
-        user: #{username ? "user(username: \"#{username}\")" : "currentUser"} {
+        user: currentUser {
           ...CoreUserFields
         }
       }
@@ -324,17 +338,17 @@ class GitlabClient
 
   private
 
-  def execute_query(query, name, *args)
+  def execute_query(query, name, **args)
     Rails.logger.debug { %(Executing "#{name}" GraphQL query (args: #{args})...) }
 
     metric_source "graphql_metrics"
-    metric_attributes(name: name)
+    metric_attributes(name: name, **args.slice(:username))
 
     increment_counter "graphql.query.count"
 
     result = nil
     histogram "graphql.query.duration" do
-      result = self.class.client.query(query, *args)
+      result = self.class.client.query(query, **args)
     end
 
     result
