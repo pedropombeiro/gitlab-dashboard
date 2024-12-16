@@ -15,8 +15,6 @@ RSpec.describe WebPushSubscription, type: :model do
 
     before do
       allow(WebPush).to receive(:payload_send)
-
-      Rails.application.credentials[:webpush] = {vapid_public_key: "pubkey", vapid_private_key: "privkey"}
     end
 
     it "calls WebPush with expected arguments" do
