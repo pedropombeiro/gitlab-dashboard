@@ -306,15 +306,11 @@ class GitlabClient
     fetch_project_issues_fn = -> do
       project_queries =
         project_full_paths.map do |project_full_path|
-          project_issue_iids = issue_iids.filter_map do |h|
-            (h[:project_full_path] == project_full_path) ? h[:issue_iid] : nil
-          end
-
           Async do
             execute_query(
               PROJECT_ISSUES_QUERY, "project_issues",
               projectFullPath: project_full_path,
-              issueIids: project_issue_iids
+              issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
             )
           end
         end
