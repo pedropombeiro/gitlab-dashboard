@@ -29,10 +29,22 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
     context "when user exists", :freeze_time do
       let(:params) { {assignee: username} }
 
-      let!(:merged_mrs_request_stub) do
-        stub_request(:post, graphql_url)
-          .with(body: hash_including("query" => a_string_including("monthlyMergedMergeRequests")))
-          .to_return(status: 200, body: monthly_mr_stats_body.to_json)
+      let!(:merged_mrs_request_stubs) do
+        12.times.map do |offset|
+          bom = Date.new(2024, 12, 31).beginning_of_month - offset.months
+          eom = 1.month.after(bom)
+
+          stub_request(:post, graphql_url)
+            .with(body: hash_including(
+              "query" => a_string_including("monthlyMergedMergeRequests"),
+              "variables" => {
+                "username" => username,
+                "mergedAfter" => bom.to_fs,
+                "mergedBefore" => eom.to_fs
+              }
+            ))
+            .to_return(status: 200, body: monthly_mr_stats_body[offset].to_json)
+        end
       end
 
       it "returns http success" do
@@ -52,7 +64,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
           # A second request generates a second API call
           2.times { perform_request }
 
-          expect(merged_mrs_request_stub).to have_been_requested.times(24)
+          merged_mrs_request_stubs.each { |stub| expect(stub).to have_been_requested.twice }
         end
 
         context "with cache enabled", :with_cache do
@@ -62,7 +74,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
 
             expect(response).to have_http_status :success
 
-            expect(merged_mrs_request_stub).to have_been_requested.times(12)
+            merged_mrs_request_stubs.each { |stub| expect(stub).to have_been_requested.once }
           end
         end
       end

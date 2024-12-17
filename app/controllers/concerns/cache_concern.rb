@@ -33,7 +33,7 @@ module CacheConcern
     end
 
     def monthly_merged_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/v2/monthly_merged/#{user_hash(user)}"
+      "#{REDIS_NAMESPACE}/merge_requests/#{monthly_merge_request_stats_version}/monthly_merged/#{user_hash(user)}"
     end
 
     def last_authored_mr_lists_cache_key(user)
@@ -70,6 +70,10 @@ module CacheConcern
         GitlabClient::OPEN_MERGE_REQUESTS_GRAPHQL_QUERY,
         GitlabClient::MERGED_MERGE_REQUESTS_GRAPHQL_QUERY
       )
+    end
+
+    def monthly_merge_request_stats_version
+      @monthly_merge_request_stats_version ||= calculate_hash(GitlabClient::MONTHLY_MERGE_REQUEST_STATS_QUERY)
     end
   end
 end
