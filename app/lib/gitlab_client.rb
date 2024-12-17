@@ -98,6 +98,19 @@ class GitlabClient
     #{CORE_USER_FRAGMENT}
   GRAPHQL
 
+  PROJECT_ISSUES_QUERY = <<-GRAPHQL
+    query($projectFullPath: ID!, $issueIids: [String!]) {
+      project(fullPath: $projectFullPath) {
+        issues(iids: $issueIids) {
+          nodes { ...CoreIssueFields }
+        }
+      }
+    }
+
+    #{CORE_LABEL_FRAGMENT}
+    #{CORE_ISSUE_FRAGMENT}
+  GRAPHQL
+
   OPEN_MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
     query($username: String!, $activeReviewsAfter: Time) {
       user(username: $username) {
@@ -290,55 +303,34 @@ class GitlabClient
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
-    response = format_response(format) do
-      results = Async do
-        project_queries =
-          project_full_paths.map.each_with_index do |project_full_path, index|
-            project_issue_iids = issue_iids.filter_map do |h|
-              (h[:project_full_path] == project_full_path) ? h[:issue_iid] : nil
-            end
-
-            query = <<-GRAPHQL
-              query($projectFullPath: ID!, $issueIids: [String!]) {
-                project_#{index}: project(fullPath: $projectFullPath) {
-                  issues(iids: $issueIids) {
-                    nodes { ...CoreIssueFields }
-                  }
-                }
-              }
-
-              #{CORE_LABEL_FRAGMENT}
-              #{CORE_ISSUE_FRAGMENT}
-            GRAPHQL
-
-            Async do
-              make_serializable(execute_query(
-                query, "issues",
-                projectFullPath: project_full_path,
-                issueIids: project_issue_iids))
-            end
+    fetch_project_issues_fn = -> do
+      project_queries =
+        project_full_paths.map do |project_full_path|
+          project_issue_iids = issue_iids.filter_map do |h|
+            (h[:project_full_path] == project_full_path) ? h[:issue_iid] : nil
           end
 
-        project_queries.map(&:wait)
-      end.wait
-
-      results.first.tap do |final_result|
-        results[1..].each do |project_result|
-          project_result.data.table.keys.each do |k|
-            final_result.data[k] = project_result.data[k]
+          Async do
+            execute_query(
+              PROJECT_ISSUES_QUERY, "project_issues",
+              projectFullPath: project_full_path,
+              issueIids: project_issue_iids
+            )
           end
         end
-      end
+
+      project_queries.map(&:wait)
     end
 
-    return response unless format == :open_struct
+    format_response(format) do
+      Async { fetch_project_issues_fn.call }.wait
+    end.tap do |response|
+      break unless format == :open_struct
 
-    data = response.response.data
-    response.response.data = project_full_paths.map.each_with_index do |_, index|
-      data.public_send(:"project_#{index}").issues.nodes
-    end.flatten
-
-    response
+      response.response = OpenStruct.new(
+        data: response.response.flat_map { |project_response| project_response.data.project.issues.nodes }
+      )
+    end
   end
 
   def self.client
