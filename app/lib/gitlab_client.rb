@@ -225,6 +225,20 @@ class GitlabClient
     #{CORE_MERGE_REQUEST_FRAGMENT}
   GRAPHQL
 
+  MONTHLY_MERGE_REQUEST_STATS_QUERY = <<-GRAPHQL
+    query($username: String!, $mergedAfter: Time, $mergedBefore: Time) {
+      user(username: $username) {
+        monthlyMergedMergeRequests: authoredMergeRequests(
+          state: merged,
+          mergedAfter: $mergedAfter,
+          mergedBefore: $mergedBefore
+        ) { ...MonthlyMergeRequestStatsFields }
+      }
+    }
+
+    #{MONTHLY_MERGE_REQUEST_STATS_FRAGMENT}
+  GRAPHQL
+
   def self.gitlab_instance_url
     @gitlab_instance_url ||= ENV.fetch("GITLAB_URL", "https://gitlab.com")
   end
@@ -259,42 +273,35 @@ class GitlabClient
   end
 
   def fetch_monthly_merged_merge_requests(username, format: :open_struct)
-    monthly_merge_requests_graphql_queries = 12.times.map do |offset|
-      bom = Time.current.beginning_of_month - offset.months
-      eom = 1.month.after(bom)
+    response = format_response(format) do
+      Async do
+        monthly_merge_requests_graphql_queries = 12.times.map do |offset|
+          bom = Date.current.beginning_of_month - offset.months
+          eom = 1.month.after(bom)
 
-      <<-GRAPHQL
-        query($username: String!) {
-          user(username: $username) {
-            monthlyMergedMergeRequests#{offset}: authoredMergeRequests(
-              state: merged,
-              mergedAfter: "#{bom.to_fs}",
-              mergedBefore: "#{eom.to_fs}") {
-              ...MonthlyMergeRequestStatsFields
-            }
-          }
-        }
-
-        #{MONTHLY_MERGE_REQUEST_STATS_FRAGMENT}
-      GRAPHQL
-    end
-
-    format_response(format) do
-      results = Async do
-        monthly_merge_requests_graphql_queries.map do |query|
           Async do
-            make_serializable(execute_query(query, "monthly_merged_merge_requests", username: username))
-          end
-        end.map(&:wait)
-      end.wait
-
-      results.first.tap do |final_result|
-        results[1..].each do |monthly_result|
-          monthly_result.data.user.table.keys.each do |k|
-            final_result.data.user[k] = monthly_result.data.user[k]
+            execute_query(
+              MONTHLY_MERGE_REQUEST_STATS_QUERY, "monthly_merged_merge_requests",
+              username: username,
+              mergedAfter: bom.to_fs,
+              mergedBefore: eom.to_fs
+            )
           end
         end
+
+        monthly_merge_requests_graphql_queries.map(&:wait)
+      end.wait
+    end
+
+    return response unless format == :open_struct
+
+    response.tap do |final_result|
+      user = OpenStruct.new
+      response.response.each_with_index do |monthly_result, offset|
+        user["monthlyMergedMergeRequests#{offset}"] = monthly_result.data.user.delete_field!("monthlyMergedMergeRequests")
       end
+
+      final_result.response = OpenStruct.new(data: OpenStruct.new(user: user))
     end
   end
 
