@@ -24,8 +24,8 @@ module CacheConcern
       "#{REDIS_NAMESPACE}/location/#{LOCATION_VERSION}/#{calculate_hash(location)}/timezone_name"
     end
 
-    def open_issues_cache_key(issue_iids)
-      "#{REDIS_NAMESPACE}/issues/v5/open/#{issue_iids.join("-")}"
+    def project_issues_cache_key(issues)
+      "#{REDIS_NAMESPACE}/issues/#{project_issues_version}/open/#{calculate_hash(*issues.map { |issue| issue.values.join("/") })}"
     end
 
     def authored_mr_lists_cache_key(user)
@@ -59,6 +59,10 @@ module CacheConcern
 
     def user_info_version
       @user_info_version ||= calculate_hash(GitlabClient::USER_QUERY, GitlabClient::CURRENT_USER_QUERY)
+    end
+
+    def project_issues_version
+      @project_issues_version ||= calculate_hash(GitlabClient::PROJECT_ISSUES_QUERY)
     end
 
     def merge_requests_version

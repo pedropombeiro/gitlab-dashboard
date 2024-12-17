@@ -49,7 +49,8 @@ RSpec.describe GitlabClient do
   end
 
   describe "#fetch_issues" do
-    let_it_be(:issues_response_body) { YAML.load_file(file_fixture("issues.yml")) }
+    let_it_be(:issues0_body) { YAML.load_file(file_fixture("issues.yml"))["project_0"].to_json }
+    let_it_be(:issues2_body) { YAML.load_file(file_fixture("issues.yml"))["project_2"].to_json }
 
     let(:merged_mr_issues) do
       [{project_full_path: "gitlab-org/gitlab", issue_iid: "505810"}]
@@ -68,11 +69,23 @@ RSpec.describe GitlabClient do
 
     before do
       stub_request(:post, graphql_url)
-        .with(body: hash_including("query" => a_string_matching(/project_\d:/)))
-        .to_return(
-          status: 200,
-          body: issues_response_body["one"].to_json
-        )
+        .with(body: hash_including(
+          "query" => a_string_including(%[issues(iids: $issueIids)]),
+          "variables" => hash_including(
+            "projectFullPath" => "gitlab-org/gitlab",
+            "issueIids" => an_array_matching(%w[505810 506226])
+          )
+        ))
+        .to_return(status: :ok, body: issues0_body)
+      stub_request(:post, graphql_url)
+        .with(body: hash_including(
+          "query" => a_string_including(%[issues(iids: $issueIids)]),
+          "variables" => {
+            "projectFullPath" => "gitlab-org/gitlab-runner",
+            "issueIids" => %w[32804]
+          }
+        ))
+        .to_return(status: :ok, body: issues2_body)
     end
 
     it "returns an array with the processed issue data" do

@@ -87,9 +87,9 @@ module Services
     def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
       open_mr_issue_iids = merge_request_issue_iids(open_merge_requests).uniq
       merged_mr_issue_iids = merge_request_issue_iids(merged_merge_requests).uniq
-      issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).pluck(:issue_iid).compact.sort.uniq
+      issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).compact.uniq
 
-      Rails.cache.fetch(self.class.open_issues_cache_key(issue_iids), expires_in: MergeRequestsCacheService.cache_validity) do
+      Rails.cache.fetch(self.class.project_issues_cache_key(issue_iids), expires_in: MergeRequestsCacheService.cache_validity) do
         gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
       end.response&.data.to_h { |issue| [issue.iid, issue] }
     end
