@@ -273,7 +273,7 @@ class GitlabClient
   end
 
   def fetch_monthly_merged_merge_requests(username, format: :open_struct)
-    response = format_response(format) do
+    format_response(format) do
       Async do
         monthly_merge_requests_graphql_queries = 12.times.map do |offset|
           bom = Date.current.beginning_of_month - offset.months
@@ -291,17 +291,15 @@ class GitlabClient
 
         monthly_merge_requests_graphql_queries.map(&:wait)
       end.wait
-    end
+    end.tap do |aggregate|
+      next unless format == :open_struct
 
-    return response unless format == :open_struct
-
-    response.tap do |final_result|
       user = OpenStruct.new
-      response.response.each_with_index do |monthly_result, offset|
+      aggregate.response.each_with_index do |monthly_result, offset|
         user["monthlyMergedMergeRequests#{offset}"] = monthly_result.data.user.delete_field!("monthlyMergedMergeRequests")
       end
 
-      final_result.response = OpenStruct.new(data: OpenStruct.new(user: user))
+      aggregate.response = OpenStruct.new(data: OpenStruct.new(user: user))
     end
   end
 
@@ -310,28 +308,26 @@ class GitlabClient
     issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
-    fetch_project_issues_fn = -> do
-      project_queries =
-        project_full_paths.map do |project_full_path|
-          Async do
-            execute_query(
-              PROJECT_ISSUES_QUERY, "project_issues",
-              projectFullPath: project_full_path,
-              issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
-            )
-          end
-        end
-
-      project_queries.map(&:wait)
-    end
-
     format_response(format) do
-      Async { fetch_project_issues_fn.call }.wait
-    end.tap do |response|
-      break unless format == :open_struct
+      Async do
+        project_queries =
+          project_full_paths.map do |project_full_path|
+            Async do
+              execute_query(
+                PROJECT_ISSUES_QUERY, "project_issues",
+                projectFullPath: project_full_path,
+                issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
+              )
+            end
+          end
 
-      response.response = OpenStruct.new(
-        data: response.response.flat_map { |project_response| project_response.data.project.issues.nodes }
+        project_queries.map(&:wait)
+      end.wait
+    end.tap do |aggregate|
+      next unless format == :open_struct
+
+      aggregate.response = OpenStruct.new(
+        data: aggregate.response.flat_map { |project_response| project_response.data.project.issues.nodes }
       )
     end
   end
