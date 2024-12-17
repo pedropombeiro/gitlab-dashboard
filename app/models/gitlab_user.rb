@@ -13,7 +13,7 @@ class GitlabUser < ApplicationRecord
       metric_source "custom_metrics"
       metric_attributes(**args.last.slice(:username))
 
-      Honeybadger.increment_counter("user.create")
+      increment_counter("user.create")
 
       # We need to use `all.create` to make this implementation follow `find_or_create_by` which delegates this in
       # https://github.com/rails/rails/blob/v6.1.3.2/activerecord/lib/active_record/querying.rb#L22
