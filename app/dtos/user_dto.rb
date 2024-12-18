@@ -46,7 +46,7 @@ class UserDto
     @merged_merge_requests_count = response.user.allMergedMergeRequests.count
     @merged_merge_requests_tttm = response.user.allMergedMergeRequests.totalTimeToMerge
     @first_merged_merge_requests_timestamp =
-      parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.first&.createdAt)
+      parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.sole&.createdAt)
     @merged_merge_requests = MergeRequestCollectionDto.new(
       filter_merged_merge_requests(merged_mrs).map do |mr|
         convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
@@ -74,7 +74,7 @@ class UserDto
   end
 
   def warmup_timezone_cache(mrs)
-    locations = mrs.flat_map { |mr| mr.reviewers.nodes.map(&:location).map(&:presence) }.compact.uniq
+    locations = mrs.flat_map { |mr| mr.reviewers.nodes.map(&:location) }.compact_blank.uniq
 
     location_lookup_service.fetch_timezones(locations)
   end
@@ -108,9 +108,7 @@ class UserDto
         end
       end
 
-      mr.upstreamMergeRequest = merge_requests.select do |target_mr|
-        mr.targetBranch == target_mr.sourceBranch
-      end&.first
+      mr.upstreamMergeRequest = merge_requests.find { |target_mr| mr.targetBranch == target_mr.sourceBranch }
     end
   end
 

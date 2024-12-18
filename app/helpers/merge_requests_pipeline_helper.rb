@@ -18,7 +18,7 @@ module MergeRequestsPipelineHelper
     header = "#{pluralize(failed_jobs.count, "job")} #{pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:"
 
     if failed_job_traces.count == 1
-      failed_job_trace = failed_job_traces.first
+      failed_job_trace = failed_job_traces.sole
 
       [
         "#{header} #{tag.code(failed_job_trace.name, escape: false)}",
@@ -36,7 +36,7 @@ module MergeRequestsPipelineHelper
     failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }
 
     summary = nil
-    if failed_job_traces.count <= 1 && pipeline.status == "RUNNING"
+    if !failed_job_traces.many? && pipeline.status == "RUNNING"
       summary = "#{pluralize(pipeline.runningJobs.count, "job")} still running"
     end
 
@@ -59,13 +59,13 @@ module MergeRequestsPipelineHelper
       case pipeline.status
       when "RUNNING"
         web_path =
-          if focus_on_failed && failed_job_traces.any?
-            failed_job_web_path(failed_job_traces.first)
+          if focus_on_failed
+            failed_job_web_path(failed_job_traces.sole)
           else
-            (pipeline.runningJobs.count == 1) ? pipeline.runningJobs.nodes.first.webPath : "#{web_path}/builds"
+            (pipeline.runningJobs.count == 1) ? pipeline.runningJobs.nodes.sole.webPath : "#{web_path}/builds"
           end
       when "FAILED"
-        web_path = failed_job_web_path(failed_job_traces.first)
+        web_path = failed_job_web_path(failed_job_traces.sole)
       end
     elsif failed_jobs.count.positive?
       web_path += "/failures"
@@ -78,7 +78,7 @@ module MergeRequestsPipelineHelper
 
   def failed_job_web_path(failed_job_trace)
     if failed_job_trace.downstreamPipeline&.jobs&.nodes&.count == 1
-      failed_job_trace.downstreamPipeline.jobs.nodes.first.webPath
+      failed_job_trace.downstreamPipeline.jobs.nodes.sole.webPath
     else
       failed_job_trace.webPath
     end
