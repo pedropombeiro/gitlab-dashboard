@@ -11,10 +11,6 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
       gitlab_client.fetch_monthly_merged_merge_requests(safe_params[:assignee])
     end
 
-    if Rails.env.production?
-      expires_in MONTHLY_GRAPH_CACHE_VALIDITY.after(response.updated_at) - Time.current
-    end
-
     render json: monthly_mrs_graph(response.response.data.user)
       .map { |name, stats| {name: name, data: stats} }
       .chart_json
