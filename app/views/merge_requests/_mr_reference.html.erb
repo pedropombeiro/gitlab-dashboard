@@ -2,7 +2,11 @@
   <!-- Project avatar -->
   <%= link_to make_full_url(merge_request.project.webUrl), target: "_blank", style: "text-decoration: none" do %>
     <% if merge_request.project.avatarUrl.present? %>
-      <%= image_tag(make_full_url(merge_request.project.avatarUrl), size: 16, class: %w[rounded float-left]) %>
+      <%= image_tag(
+        make_full_url(merge_request.project.avatarUrl),
+        size: 16,
+        class: %w[rounded float-left],
+      ) %>
     <% else %>
       <%= image_tag("", size: 16, class: %w[invisible float-left]) %>
     <% end %>

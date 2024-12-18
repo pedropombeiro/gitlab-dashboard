@@ -1,8 +1,7 @@
 <%= tag.abbr(
   content,
   **local_assigns.except(:content, :title),
-  data: {
-    bs_toggle: "tooltip",
-    bs_title: title,
-  }.merge(local_assigns[:data] || {}),
+  data: { bs_toggle: "tooltip", bs_title: title }.merge(
+    local_assigns[:data] || {},
+  ),
 ) -%>

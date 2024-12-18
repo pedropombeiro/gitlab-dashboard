@@ -1,4 +1,5 @@
 <%= tag.button(
+  tag.i(class: "fa fa-clipboard"),
   class: %w[btn p-0 shadow-none float-right d-none d-sm-inline text-secondary],
   aria: {
     hidden: "true",
@@ -9,6 +10,4 @@
     bs_toggle: "tooltip",
     bs_title: "Click to copy",
   },
-) do %>
-  <i class="fa fa-clipboard"></i>
-<% end %>
+) %>

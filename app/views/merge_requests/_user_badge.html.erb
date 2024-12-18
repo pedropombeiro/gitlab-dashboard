@@ -15,7 +15,9 @@
   ) %>
   <% emojis = [user_emoji_character(user.status&.emoji)] %>
   <% emojis << "🔴" if user.status&.availability == "BUSY" %>
-  <%= render "shared/abbr_with_title", content: emojis.uniq.join, title: user.status&.availability %>
+  <%= render "shared/abbr_with_title",
+  content: emojis.uniq.join,
+  title: user.status&.availability %>
 
   <% country_flag_classes = user_country_flag_classes(user) %>
   <%= tag.span(class: country_flag_classes) if country_flag_classes %>
