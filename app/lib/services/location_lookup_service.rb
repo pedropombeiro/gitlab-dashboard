@@ -36,9 +36,10 @@ module Services
         end
 
       Timezone[tzname] if tzname
-    rescue Timezone::Error::GeoNames => exception
+    rescue Timezone::Error::Base => exception
       Honeybadger.notify(exception, {
-        tags: "warning, timezone"
+        tags: "warning, timezone",
+        context: {location: location}
       })
       nil
     end
