@@ -141,6 +141,11 @@ class Badger {
     this._value = val;
     this.updateAll();
   }
+
+  set problem(val) {
+    this.backgroundColor = val ? "#dc3545" : "#198754";
+    this.updateAll();
+  }
 }
 
 var badgerOptions = {}; // See: constructor for customization options
@@ -150,13 +155,19 @@ var badger = new Badger(badgerOptions);
 export default class extends Controller {
   static values = {
     count: Number,
+    problem: Boolean,
   };
 
   connect() {
     badger.value = this.countValue;
+    badger.problem = this.problemValue;
   }
 
   countValueChanged(value, _previousValue) {
     badger.value = value;
+  }
+
+  problemValueChanged(value, _previousValue) {
+    badger.problem = value;
   }
 }
