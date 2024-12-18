@@ -32,7 +32,7 @@ insights:
 
 rails:
   insights:
-    metrics: true
+    metrics: false
     collection_interval: 60
 solid_queue:
   insights:
