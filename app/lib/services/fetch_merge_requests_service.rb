@@ -30,23 +30,18 @@ module Services
           ].map(&:wait)
         end
 
+        responses = [open_mrs_response, merged_mrs_response].compact
         response = open_mrs_response.response.data
-        response.next_update_at = MergeRequestsCacheService.cache_validity.after(open_mrs_response.updated_at)
+        response.request_duration = responses.maximum(:request_duration) || 0
+        response.updated_at = responses.minimum(:updated_at) || Time.current
+        response.next_update_at = MergeRequestsCacheService.cache_validity.after(response.updated_at)
         response.next_scheduled_update_at =
           if any_running_pipelines?(response.user.openMergeRequests.nodes)
             5.minutes.from_now
           else
             30.minutes.from_now
           end
-        response.errors = open_mrs_response&.response&.errors || merged_mrs_response&.response&.errors
-        response.updated_at = [
-          open_mrs_response&.updated_at || Time.current,
-          merged_mrs_response&.updated_at || Time.current
-        ].min
-        response.request_duration = [
-          open_mrs_response&.request_duration || 0,
-          merged_mrs_response&.request_duration || 0
-        ].max
+        response.errors = responses.map { |r| r.response.errors }.first
 
         if response.errors.nil?
           user2 = merged_mrs_response.response.data.user
@@ -77,11 +72,9 @@ module Services
     end
 
     def any_running_pipelines?(merge_requests)
-      merge_requests.any? do |mr|
-        mr.headPipeline &&
-          mr.headPipeline.startedAt.present? &&
-          mr.headPipeline.finishedAt.nil?
-      end
+      merge_requests
+        .filter_map(&:headPipeline)
+        .any? { |pipeline| pipeline.startedAt.present? && pipeline.finishedAt.nil? }
     end
 
     def issues_from_merge_requests(open_merge_requests, merged_merge_requests)
