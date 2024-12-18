@@ -39,11 +39,11 @@ module MergeRequestsHelper
   end
 
   def any_failed_pipeline?(merge_requests)
-    merge_requests.any? do |mr|
-      next unless mr.headPipeline&.failedJobs
-
-      !mr.headPipeline.failedJobs.nodes&.all?(&:allowFailure)
-    end
+    merge_requests
+      .flat_map { |mr| mr.headPipeline&.failedJobs&.nodes }
+      .compact
+      .map(&:allowFailure)
+      .include?(false)
   end
 
   private
@@ -63,8 +63,7 @@ module MergeRequestsHelper
 
   def tooltip_from_hash(hash)
     hash
-      .transform_values(&:presence)
-      .compact
+      .compact_blank
       .map { |title, value| tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) }
       .join
   end
