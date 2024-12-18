@@ -21,8 +21,8 @@
 
       <div class="text-secondary small">
         Fetched in
-        <%= request_duration -%>
-        seconds at
+        <%= pluralize(request_duration, "second") -%>
+        at
         <%= local_relative_time(updated_at, type: "time-or-date", data: bs_data) -%>.
         <% if next_update_at %>
           <span>Cached until
