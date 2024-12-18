@@ -423,7 +423,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             )
 
             # Captions
-            expect(response.body).to include(%r{10 merge requests, open for an average of\s+about 12 hours})
+            expect(response.body).to include(%r{10 merge requests,\s+open\s+for\s+an\s+average\s+of\s+about 12 hours})
             expect(response.body).to include(%r{A total of\s+1311 merge requests})
 
             # Squash MR

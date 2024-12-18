@@ -12,7 +12,8 @@
               merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
             ) %>
 
-          <%= pluralize(merge_requests.count, "merge request") %>, open for an average of
+          <%= pluralize(merge_requests.count, "merge request") %>, open for
+          <% if merge_requests.many? %>an average of<% end %>
           <%= distance_of_time_in_words(avg_open_time) %>.
         </div>
       <% end %>
