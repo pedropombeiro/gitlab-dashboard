@@ -90,7 +90,9 @@
           ) %>
           <% if mr.blockingMergeRequests&.visibleMergeRequests %>
             <% open_blockers =
-              mr.blockingMergeRequests.visibleMergeRequests.filter { |blocker| blocker.state == "opened" } %>
+              mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
+                blocker.state == "opened"
+              end %>
 
             <% if open_blockers.any? %>
               <%= render "shared/abbr_with_title",
@@ -218,7 +220,14 @@
             title: "Approved" %>
           <% else %>
             <%= tag.nobr "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired}",
-                     class: mr.approvalsRequired.present? && mr.approvalsRequired > 3 ? "text-danger" : nil,
+                     class:
+                       (
+                         if mr.approvalsRequired.present? && mr.approvalsRequired > 3
+                           "text-danger"
+                         else
+                           nil
+                         end
+                       ),
                      data: {
                        bs_toggle: "tooltip",
                        bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
