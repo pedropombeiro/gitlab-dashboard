@@ -174,6 +174,12 @@ RSpec.describe MergeRequestsController, type: :controller do
 
     let(:format) { nil }
 
+    around do |example|
+      travel_to Time.utc(2024, 11, 20) do
+        example.run
+      end
+    end
+
     context "when assignee is unknown" do
       before do
         stub_request(:post, graphql_url)
@@ -228,15 +234,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             .to_return(status: :ok, body: open_mrs.to_json)
         end
 
-        let!(:merged_mrs_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "query" => a_string_including("mergedMergeRequests: authoredMergeRequests"),
-              "variables" => {"username" => username}
-            ))
-            .to_return(status: :ok, body: merged_mrs.to_json)
-        end
-
+        let!(:merged_mrs_request_stub) { create_merged_mrs_request_stub }
         let!(:issues_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
@@ -399,9 +397,7 @@ RSpec.describe MergeRequestsController, type: :controller do
           end
 
           it "renders the actual template" do
-            travel_to Time.utc(2024, 11, 20) do
-              request
-            end
+            request
 
             expect(response).to render_template("layouts/application")
             expect(response).to render_template("merge_requests/_user_merge_requests")
@@ -440,17 +436,26 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%(text-danger))
           end
 
-          it "renders the merged MRs from the last week" do
-            travel_to Time.utc(2024, 11, 27) do
-              request
+          context "when merge requests have been merged a long time ago" do
+            around do |example|
+              travel 1.week
+              example.run
+              travel_to 1.week.ago
             end
 
-            expect(response.body).not_to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
-            expect(response.body).not_to include(%(>#32804</a>))
+            it "does not render old merge requests" do
+              stub = create_merged_mrs_request_stub
+
+              request
+
+              expect(response.body).not_to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
+              expect(response.body).not_to include(%(>#32804</a>))
+              expect(stub).to have_been_requested.once
+            end
           end
         end
 
-        context "when turbo param is missing", :freeze_time do
+        context "when turbo param is missing" do
           let(:params) { {assignee: username} }
 
           it "redirects to index with the specified assignee" do
@@ -461,6 +466,20 @@ RSpec.describe MergeRequestsController, type: :controller do
               contacted_at: Time.current
             )
           end
+        end
+
+        private
+
+        def create_merged_mrs_request_stub
+          stub_request(:post, graphql_url)
+            .with(body: hash_including(
+              "query" => a_string_including("mergedMergeRequests: authoredMergeRequests"),
+              "variables" => {
+                "username" => username,
+                "mergedAfter" => 1.week.ago
+              }
+            ))
+            .to_return(status: :ok, body: merged_mrs.to_json)
         end
       end
     end

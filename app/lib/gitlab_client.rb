@@ -195,7 +195,7 @@ class GitlabClient
   GRAPHQL
 
   MERGED_MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
-    query($username: String!) {
+    query($username: String!, $mergedAfter: Time!) {
       user(username: $username) {
         firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
           nodes {
@@ -206,7 +206,7 @@ class GitlabClient
           count
           totalTimeToMerge
         }
-        mergedMergeRequests: authoredMergeRequests(state: merged, sort: MERGED_AT_DESC, first: 20) {
+        mergedMergeRequests: authoredMergeRequests(state: merged, mergedAfter: $mergedAfter, sort: MERGED_AT_DESC) {
           nodes {
             iid
             ...CoreMergeRequestFields
@@ -261,14 +261,16 @@ class GitlabClient
         OPEN_MERGE_REQUESTS_GRAPHQL_QUERY,
         "open_merge_requests",
         username: username,
-        activeReviewsAfter: 7.days.ago
+        activeReviewsAfter: 1.week.ago
       )
     end
   end
 
   def fetch_merged_merge_requests(username, format: :open_struct)
     format_response(format) do
-      execute_query(MERGED_MERGE_REQUESTS_GRAPHQL_QUERY, "merged_merge_requests", username: username)
+      execute_query(
+        MERGED_MERGE_REQUESTS_GRAPHQL_QUERY, "merged_merge_requests", username: username, mergedAfter: 1.week.ago
+      )
     end
   end
 
