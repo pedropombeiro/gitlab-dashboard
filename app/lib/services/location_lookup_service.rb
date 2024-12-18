@@ -33,15 +33,16 @@ module Services
           return unless timezone.valid?
 
           timezone.name
+        rescue Timezone::Error::Base => exception
+          Honeybadger.notify(exception, {
+            tags: "warning, timezone",
+            context: {location: location}
+          })
+
+          nil
         end
 
       Timezone[tzname] if tzname
-    rescue Timezone::Error::Base => exception
-      Honeybadger.notify(exception, {
-        tags: "warning, timezone",
-        context: {location: location}
-      })
-      nil
     end
 
     def fetch_country_code(location)
