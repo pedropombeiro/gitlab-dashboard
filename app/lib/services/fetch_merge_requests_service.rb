@@ -84,7 +84,7 @@ module Services
 
       Rails.cache.fetch(self.class.project_issues_cache_key(issue_iids), expires_in: MergeRequestsCacheService.cache_validity) do
         gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
-      end.response&.data.to_h { |issue| [issue.iid, issue] }
+      end.response&.data&.compact.to_h { |issue| [issue.iid, issue] }
     end
   end
 end

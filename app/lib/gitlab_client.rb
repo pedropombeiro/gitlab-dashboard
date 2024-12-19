@@ -329,7 +329,7 @@ class GitlabClient
       next unless format == :open_struct
 
       aggregate.response = OpenStruct.new(
-        data: aggregate.response.flat_map { |project_response| project_response.data.project.issues.nodes }
+        data: aggregate.response.flat_map { |project_response| project_response.data.project&.issues&.nodes }
       )
     end
   end
