@@ -17,20 +17,24 @@
     </thead>
     <tbody>
       <% @recent_users.each do |user| %>
-        <tr style="cursor: pointer;">
+        <% one_time_visitor = user.contacted_at - user.created_at < 1.second %>
+        <% fg_class = one_time_visitor ? %w[text-secondary] : nil %>
+
+        <%= tag.tr style: "cursor: pointer;" do %>
           <%= tag.th scope: "row" do %>
-            <%= link_to user.username, merge_requests_path(assignee: user.username) %>
+            <%= link_to user.username, merge_requests_path(assignee: user.username), class: fg_class %>
           <% end %>
-          <td>
+          <%= tag.td class: fg_class do %>
             <%= render "shared/relative_timestamp", timestamp: user.created_at %>
-          </td>
-          <td>
+          <% end %>
+          <%= tag.td class: fg_class do %>
             <%= render "shared/relative_timestamp", timestamp: user.contacted_at %>
-          </td>
-          <td>
+          <% end %>
+          <%= tag.td class: fg_class do %>
             <%= render "shared/relative_timestamp", timestamp: user_cache_validity(user.username) %>
-          </td>
-        </tr>
+          <% end %>
+        <% end %>
+
         <% if user.web_push_subscriptions.any? %>
           <tr>
             <td colspan="4" class="px-5">
