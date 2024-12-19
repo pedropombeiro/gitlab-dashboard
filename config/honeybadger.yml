@@ -40,5 +40,5 @@ solid_queue:
     collection_interval: 15
 puma:
   insights:
-    metrics: true
+    metrics: false
     collection_interval: 60
