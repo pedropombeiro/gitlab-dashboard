@@ -1,4 +1,5 @@
 require "rails_helper"
+require "erb"
 
 RSpec.describe MergeRequestsController, type: :controller do
   include ActiveSupport::Testing::TimeHelpers
@@ -41,7 +42,7 @@ RSpec.describe MergeRequestsController, type: :controller do
     end
 
     context "when user is known" do
-      let(:username) { "user1" }
+      let(:username) { "user.1" }
       let(:params) { {assignee: username} }
       let(:user_response_body) do
         {
@@ -121,11 +122,13 @@ RSpec.describe MergeRequestsController, type: :controller do
             %(<img class="rounded float-left" src="https://gitlab.example.com/images/avatar.png" width="24" height="24" />)
           )
           # Includes turbo frame with merge requests list
-          expect(response.body).to include(%(src="#{merge_requests_list_path(username, turbo: true)}"))
+          expect(response.body).to include(
+            %(src="#{ERB::Util.html_escape(merge_requests_list_path(assignee: username, turbo: true))}")
+          )
 
           # Includes refresh button on x-small views
           expect(response.body).to include(
-            %(<form class="button_to" method="get" action="#{merge_requests_path(username)}">)
+            %(<form class="button_to" method="get" action="#{ERB::Util.html_escape(merge_requests_path(assignee: username))}">)
           )
         end
       end
