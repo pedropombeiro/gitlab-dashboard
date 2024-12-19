@@ -1,4 +1,4 @@
-require "tanuki_emoji"
+require "gemoji"
 
 module MergeRequestsHelper
   include ActionView::Helpers::DateHelper
@@ -6,7 +6,7 @@ module MergeRequestsHelper
   include HumanizeHelper
 
   def user_emoji_character(emoji_name)
-    TanukiEmoji.find_by_alpha_code(emoji_name).codepoints if emoji_name
+    Emoji.find_by_alias(emoji_name)&.raw if emoji_name
   end
 
   def user_country_flag_classes(user)
@@ -22,7 +22,7 @@ module MergeRequestsHelper
       Location: format_location(user),
       "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
       "Last activity": format_last_activity(user.lastActivityOn),
-      Message: [user_emoji_character(user.status&.emoji), user.status&.message].compact.join(" ")
+      Message: [user_emoji_character(user.status&.emoji), emojify(user.status&.message)].compact.join(" ")
     }
   end
 
@@ -66,5 +66,11 @@ module MergeRequestsHelper
       .compact_blank
       .map { |title, value| tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) }
       .join
+  end
+
+  def emojify(text)
+    text&.gsub(/:([\w+-]+):/) do |match|
+      user_emoji_character(Regexp.last_match(1)) || match
+    end
   end
 end
