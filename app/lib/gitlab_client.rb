@@ -339,8 +339,8 @@ class GitlabClient
       "#{gitlab_instance_url}/api/graphql",
       headers: {"Authorization" => authorization},
       http_options: {
-        read_timeout: 20,
-        write_timeout: 30
+        read_timeout: 30,
+        write_timeout: 20
       }
     )
   end
