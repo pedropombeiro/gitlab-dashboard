@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
     session[:user_id] = username
     @current_user = username.present? ? GitlabUser.safe_find_or_create_by!(username: username) : nil
 
-    @current_user&.update_column(:contacted_at, Time.current)
+    @current_user&.update_columns(contacted_at: Time.current)
   end
 
   def current_user
