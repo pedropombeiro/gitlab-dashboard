@@ -13,7 +13,6 @@ module Services
     end
 
     def execute
-      fetch_service = FetchMergeRequestsService.new(assignee_user.username)
       previous_dto = nil
       if assignee_user.web_push_subscriptions.any?
         response = cache_service.read(assignee_user.username)
@@ -32,7 +31,7 @@ module Services
 
     private
 
-    attr_reader :assignee_user
+    attr_reader :assignee_user, :fetch_service
 
     def cache_service
       @cache_service ||= MergeRequestsCacheService.new
