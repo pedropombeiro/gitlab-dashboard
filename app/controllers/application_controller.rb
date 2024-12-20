@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class ApplicationController < ActionController::Base
-  include Honeybadger::InstrumentationHelper
-
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
@@ -12,11 +10,7 @@ class ApplicationController < ActionController::Base
 
     return unless @current_user
 
-    metric_source "custom_metrics"
-    metric_attributes(username: @current_user.username)
-    increment_counter("user.visit")
-
-    @current_user&.update_columns(contacted_at: Time.current)
+    @current_user.update_columns(contacted_at: Time.current)
   end
 
   def current_user
