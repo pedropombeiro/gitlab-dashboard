@@ -2,7 +2,9 @@ class Admin::DashboardController < ApplicationController
   helper_method :user_cache_validity
 
   def index
-    @recent_users = GitlabUser.recent
+    @users = GitlabUser.all
+    @recent_users = GitlabUser.recent.order_by_contacted_at_desc
+    @active_users = GitlabUser.active.order_by_contacted_at_desc
   end
 
   private
