@@ -28,7 +28,7 @@ debug: false
 # Enable Honeybadger Insights
 insights:
   enabled: true
-  registry_flush_interval: 600
+  registry_flush_interval: <%= ENV["HONEYBADGER_INSIGHTS_REGISTRY_FLUSH_INTERVAL"]&.to_i || 300 %>
 
 rails:
   insights:
