@@ -21,7 +21,8 @@
       </div>
 
       <% if merged_merge_requests_count.positive? %>
-        <% weekly_merge_rate = (merged_merge_requests_count / ActiveSupport::Duration.build(Time.current - first_merged_merge_requests_timestamp).in_weeks).round %>
+        <% since_first_mr = ActiveSupport::Duration.build(Time.current - first_merged_merge_requests_timestamp) %>
+        <% weekly_merge_rate = (merged_merge_requests_count.to_f / since_first_mr.in_weeks.to_f).round %>
 
         <div class="flex-row-reverse">
           <div>
@@ -29,7 +30,11 @@
             <%= pluralize(merged_merge_requests_count, "merge request") %>
             merged since
             <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
-            <%= weekly_merge_rate.round %> per week.
+            <% if weekly_merge_rate < 1.0 %>
+              <%= (since_first_mr.in_weeks.to_f / merged_merge_requests_count.to_f).round(1) %> weeks per MR.
+            <% else %>
+              <%= weekly_merge_rate.round %> per week.
+            <% end %>
           </div>
           <% if merged_merge_requests_tttm %>
             <div class="text-end">
