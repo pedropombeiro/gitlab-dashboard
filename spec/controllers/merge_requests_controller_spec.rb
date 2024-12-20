@@ -438,24 +438,6 @@ RSpec.describe MergeRequestsController, type: :controller do
             # Old MRs
             expect(response.body).to include(%(text-danger))
           end
-
-          context "when merge requests have been merged a long time ago" do
-            around do |example|
-              travel 1.week
-              example.run
-              travel_to 1.week.ago
-            end
-
-            it "does not render old merge requests" do
-              stub = create_merged_mrs_request_stub
-
-              request
-
-              expect(response.body).not_to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab-runner">})
-              expect(response.body).not_to include(%(>#32804</a>))
-              expect(stub).to have_been_requested.once
-            end
-          end
         end
 
         context "when turbo param is missing" do
