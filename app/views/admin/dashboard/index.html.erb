@@ -17,7 +17,7 @@
     </thead>
     <tbody>
       <% @recent_users.each do |user| %>
-        <% one_time_visitor = user.contacted_at - user.created_at < 1.second %>
+        <% one_time_visitor = user.contacted_at - user.created_at < CacheConcern::MR_CACHE_VALIDITY %>
         <% fg_class = one_time_visitor ? %w[text-secondary] : nil %>
 
         <%= tag.tr style: "cursor: pointer;" do %>
