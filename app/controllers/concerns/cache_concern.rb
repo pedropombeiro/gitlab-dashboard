@@ -47,7 +47,7 @@ module CacheConcern
         if args.many?
           args.map { |arg| Digest::SHA256.hexdigest(arg) }.join
         else
-          args.sole
+          args.first || ""
         end
 
       Digest::SHA256.hexdigest(value)[0..15]
