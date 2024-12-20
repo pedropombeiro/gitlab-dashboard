@@ -55,7 +55,16 @@
       <th scope="col">Updated</th>
       <th scope="col">Workflow Labels</th>
       <th scope="col">Title</th>
-      <th scope="col">Associated Issue</th>
+      <th scope="col">
+        Associated Issue
+        <%= tag.i(
+          class: %w[fa-solid fa-circle-info],
+          data: {
+            bs_toggle: "tooltip",
+            bs_title: "Issue number is extracted from branch name, if present",
+          },
+        ) %>
+      </th>
     </tr>
   </thead>
 
