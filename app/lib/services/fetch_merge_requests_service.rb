@@ -15,8 +15,9 @@ module Services
     attr_reader :assignee
     delegate :make_full_url, to: :gitlab_client
 
-    def initialize(assignee)
+    def initialize(assignee, log_metrics: false)
       @assignee = assignee
+      @log_metrics = log_metrics
     end
 
     def execute
@@ -52,10 +53,12 @@ module Services
           response.user.firstCreatedMergedMergeRequests = user2.firstCreatedMergedMergeRequests
         end
 
-        metric_source "custom_metrics"
-        metric_attributes(username: assignee, duration: response.request_duration)
+        if @log_metrics
+          metric_source "custom_metrics"
+          metric_attributes(username: assignee, duration: response.request_duration)
 
-        increment_counter("user.visit")
+          increment_counter("user.visit")
+        end
 
         response
       end

@@ -55,6 +55,6 @@ class MergeRequestsController < MergeRequestsControllerBase
   end
 
   def fetch_service
-    @fetch_service ||= Services::FetchMergeRequestsService.new(safe_params.expect(:assignee))
+    @fetch_service ||= Services::FetchMergeRequestsService.new(safe_params.expect(:assignee), log_metrics: true)
   end
 end
