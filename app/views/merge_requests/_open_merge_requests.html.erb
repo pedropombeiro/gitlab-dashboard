@@ -42,7 +42,15 @@
       <th scope="col">Created</th>
       <th scope="col">Updated&nbsp;↓</th>
       <th scope="col">Status</th>
-      <th scope="col" class="text-center"><%= tag.i class: %w[fa-solid fa-timeline] %></th>
+      <th scope="col" class="text-center">
+        <%= tag.i(
+          class: %w[fa-solid fa-timeline],
+          data: {
+            bs_toggle: "tooltip",
+            bs_title: "Pipeline Status",
+          },
+        ) %>
+      </th>
       <th scope="col">Title</th>
       <th scope="col" class="text-center"><%= tag.i(
           class: %w[fa-solid fa-angles-down],
@@ -55,7 +63,15 @@
       <% if any_conflicts %>
         <th scope="col">Conflicts?</th>
       <% end %>
-      <th scope="col" class="text-center"><%= tag.i class: %w[fa-regular fa-thumbs-up], title: "Approvals" %></th>
+      <th scope="col" class="text-center">
+        <%= tag.i(
+          class: %w[fa-regular fa-thumbs-up],
+          data: {
+            bs_toggle: "tooltip",
+            bs_title: "Approvals",
+          },
+        ) %>
+      </th>
       <th scope="col" class="text-center"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
         Reviewers</th>
       <th scope="col">
