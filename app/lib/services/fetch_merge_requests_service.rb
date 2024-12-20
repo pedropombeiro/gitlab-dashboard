@@ -4,6 +4,8 @@ require "async"
 
 module Services
   class FetchMergeRequestsService
+    include Honeybadger::InstrumentationHelper
+
     include CacheConcern
     include HumanizeHelper
     include MergeRequestsHelper
@@ -49,6 +51,11 @@ module Services
           response.user.allMergedMergeRequests = user2.allMergedMergeRequests
           response.user.firstCreatedMergedMergeRequests = user2.firstCreatedMergedMergeRequests
         end
+
+        metric_source "custom_metrics"
+        metric_attributes(username: assignee, duration: response.request_duration)
+
+        increment_counter("user.visit")
 
         response
       end
