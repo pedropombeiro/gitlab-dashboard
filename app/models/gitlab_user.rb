@@ -1,7 +1,10 @@
 class GitlabUser < ApplicationRecord
   has_many :web_push_subscriptions
 
-  scope :recent, -> { where(contacted_at: 1.day.ago..).order(contacted_at: :desc) }
+  scope :recently_active, -> { where(contacted_at: 4.hours.ago..) }
+  scope :recent, -> { where(contacted_at: 1.day.ago..) }
+  scope :active, -> { where(contacted_at: CacheConcern::MR_CACHE_VALIDITY.ago..) }
+  scope :order_by_contacted_at_desc, -> { order(contacted_at: :desc) }
 
   class << self
     include Honeybadger::InstrumentationHelper
