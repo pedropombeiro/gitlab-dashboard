@@ -28,7 +28,7 @@ class MergeRequestsController < MergeRequestsControllerBase
 
     save_current_user(assignee)
 
-    response, @dto = Services::GenerateNotificationsService.new(assignee, fetch_service).execute
+    response, @dto = Services::GenerateNotificationsService.new(@current_user, fetch_service).execute
     if @dto.errors
       return respond_to do |format|
         format.html { render file: Rails.public_path.join("500.html").to_s, layout: false, status: :internal_server_error }

@@ -8,7 +8,7 @@ module Services
     include WebPushConcern
 
     def initialize(assignee, fetch_service)
-      @assignee_user = GitlabUser.find_by_username!(assignee)
+      @assignee_user = assignee.is_a?(GitlabUser) ? assignee : GitlabUser.find_by_username!(assignee)
       @fetch_service = fetch_service
     end
 
