@@ -5,7 +5,10 @@
   class="container my-3 shadow rounded p-4 bg-body bg-gradient text-body"
 >
   <table class="table table-hover">
-    <caption class="caption-top">Active Users</caption>
+    <caption class="caption-top">
+      <%= pluralize(@active_users.count, "user dashboard") %> currently active, from a total of
+      <%= pluralize(@users.count, "visited dashboard") %>
+    </caption>
 
     <thead class="thead-dark">
       <tr>
