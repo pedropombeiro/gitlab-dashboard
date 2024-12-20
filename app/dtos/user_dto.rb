@@ -48,9 +48,7 @@ class UserDto
     @first_merged_merge_requests_timestamp =
       parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.first&.createdAt)
     @merged_merge_requests = MergeRequestCollectionDto.new(
-      filter_merged_merge_requests(merged_mrs).map do |mr|
-        convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
-      end
+      merged_mrs.map { |mr| convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid) }
     )
   end
 
@@ -166,10 +164,6 @@ class UserDto
     user_bod = Time.current.in_time_zone(user_tzname).beginning_of_day
 
     %w[fa-solid fa-moon] if user.lastActivityOn.before?(user_bod)
-  end
-
-  def filter_merged_merge_requests(merge_requests)
-    merge_requests.filter { |mr| parse_graphql_time(mr.mergedAt).after?(1.week.ago) }
   end
 
   def location_lookup_service
