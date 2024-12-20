@@ -1,0 +1,28 @@
+merge_requests:
+  status:
+    mappings:
+      BLOCKED_STATUS: "secondary"
+      CI_STILL_RUNNING: "primary"
+      MERGEABLE: "success"
+
+  pipeline:
+    mappings:
+      SUCCESS: "success"
+      FAILED: "danger"
+      RUNNING: "primary"
+
+  labels:
+    workflow:
+      prefix: "workflow::"
+      mappings:
+        "workflow::staging-canary": "info"
+        "workflow::canary": "info"
+        "workflow::staging": "info"
+        "workflow::production": "primary"
+        "workflow::post-deploy-db-staging": "info"
+        "workflow::post-deploy-db-production": "success"
+
+admin_dashboard:
+  links:
+    name: Insights
+    url: https://app.honeybadger.io/projects/129196/insights/dashboards/app-metrics-6MOFYN
