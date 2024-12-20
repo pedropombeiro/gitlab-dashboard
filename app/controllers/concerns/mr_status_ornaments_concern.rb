@@ -5,34 +5,12 @@ module MrStatusOrnamentsConcern
 
   include HumanizeHelper
 
-  MERGE_STATUS_BS_CLASS = {
-    "BLOCKED_STATUS" => "secondary",
-    "CI_STILL_RUNNING" => "primary",
-    "MERGEABLE" => "success"
-  }.freeze
-
-  PIPELINE_BS_CLASS = {
-    "SUCCESS" => "success",
-    "FAILED" => "danger",
-    "RUNNING" => "primary"
-  }.freeze
-
-  WORKFLOW_LABEL_NS = "workflow::"
-  WORKFLOW_LABELS_BS_CLASS = {
-    "#{WORKFLOW_LABEL_NS}staging-canary" => "info",
-    "#{WORKFLOW_LABEL_NS}canary" => "info",
-    "#{WORKFLOW_LABEL_NS}staging" => "info",
-    "#{WORKFLOW_LABEL_NS}production" => "primary",
-    "#{WORKFLOW_LABEL_NS}post-deploy-db-staging" => "info",
-    "#{WORKFLOW_LABEL_NS}post-deploy-db-production" => "success"
-  }.freeze
-
   def open_merge_request_status_class(mr)
     return "warning" if mr.conflicts
     return "warning" if returned_to_assignee?(mr)
     return "secondary" if waiting_for_others?(mr)
 
-    MERGE_STATUS_BS_CLASS.fetch(mr.detailedMergeStatus, "secondary")
+    config.dig(:status, :mappings).fetch(mr.detailedMergeStatus.to_sym, "secondary")
   end
 
   def open_merge_request_status_label(mr)
@@ -45,16 +23,37 @@ module MrStatusOrnamentsConcern
   end
 
   def pipeline_class(pipeline)
-    PIPELINE_BS_CLASS.fetch(pipeline&.status, "secondary")
+    config.dig(:pipeline, :mappings).fetch(pipeline&.status&.to_sym, "secondary")
   end
 
   def workflow_label_class(label_title)
-    return [] unless WORKFLOW_LABELS_BS_CLASS.key?(label_title)
+    class_name = config.dig(:labels, :workflow, :mappings).fetch(label_title&.to_sym, "secondary")
+    return [] unless class_name
 
     %W[
-      bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label_title, "secondary")}
+      bg-#{class_name}
       text-light
     ]
+  end
+
+  def issue_contextual_labels
+    @@issue_contextual_labels ||= config.dig(:labels, :issue, :contextual)
+  end
+
+  def deployment_labels
+    @@deployment_labels ||= config.dig(:labels, :deployment, :contextual)
+  end
+
+  def open_mrs_contextual_labels
+    @@open_mrs_contextual_labels ||= config.dig(:labels, :open_merge_requests, :contextual)
+  end
+
+  def workflow_label_ns
+    @@workflow_label_ns ||= config.dig(:labels, :workflow, :prefix)
+  end
+
+  def workflow_labels
+    @@workflow_labels ||= config.dig(:labels, :workflow, :mappings).keys
   end
 
   private
@@ -70,5 +69,9 @@ module MrStatusOrnamentsConcern
     return true if mr.approvalsLeft&.positive? && mr_interactions.all?(&:approved)
 
     mr_interactions.map(&:reviewState).include?(%w[REVIEWED REQUESTED_CHANGES])
+  end
+
+  def config
+    @@merge_requests_config ||= Rails.application.config_for(:merge_requests)
   end
 end
