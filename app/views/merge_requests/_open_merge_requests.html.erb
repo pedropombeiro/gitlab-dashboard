@@ -1,284 +1,288 @@
 <% merge_requests = merge_requests_dto.items %>
 
-<table class="table table-hover mb-0">
-  <% any_conflicts = merge_requests.any?(&:conflicts) %>
+<% if merge_requests.empty? %>
+  <p class="h4 text-center" style="font-weight: 300">No open merge requests 💤</p>
+<% else %>
+  <table class="table table-hover mb-0">
+    <% any_conflicts = merge_requests.any?(&:conflicts) %>
 
-  <caption class="ms-1">
-    <div class="d-flex justify-content-between align-items-baseline">
-      <% if merge_requests.count.positive? %>
-        <div class="lead">
-          <% avg_open_time =
-            ActiveSupport::Duration.build(
-              merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
-            ) %>
+    <caption class="ms-1">
+      <div class="d-flex justify-content-between align-items-baseline">
+        <% if merge_requests.count.positive? %>
+          <div class="lead">
+            <% avg_open_time =
+              ActiveSupport::Duration.build(
+                merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+              ) %>
 
-          <%= pluralize(merge_requests.count, "merge request") %>, open for
-          <% if merge_requests.many? %>an average of<% end %>
-          <%= distance_of_time_in_words(avg_open_time) %>.
-        </div>
-      <% end %>
-
-      <% bs_data = { bs_toggle: "tooltip", bs_custom_class: "wide-tooltip" } %>
-
-      <div class="text-secondary small">
-        Fetched in
-        <%= pluralize(request_duration, "second") -%>
-        at
-        <%= local_relative_time(updated_at, type: "time-or-date", data: bs_data) -%>.
-        <% if next_update_at %>
-          <span>Cached until
-            <%= local_relative_time(next_update_at, type: "time-or-date", data: bs_data) -%>.
-          </span>
-        <% else %>
-          <span>Not cached.</span>
+            <%= pluralize(merge_requests.count, "merge request") %>, open for
+            <% if merge_requests.many? %>an average of<% end %>
+            <%= distance_of_time_in_words(avg_open_time) %>.
+          </div>
         <% end %>
-      </div>
-    </div>
-  </caption>
 
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Created</th>
-      <th scope="col">Updated&nbsp;↓</th>
-      <th scope="col">Status</th>
-      <th scope="col" class="text-center">
-        <%= tag.i(
-          class: %w[fa-solid fa-timeline],
-          data: {
-            bs_toggle: "tooltip",
-            bs_title: "Pipeline Status",
-          },
-        ) %>
-      </th>
-      <th scope="col">Title</th>
-      <th scope="col" class="text-center"><%= tag.i(
-          class: %w[fa-solid fa-angles-down],
-          data: {
-            bs_toggle: "tooltip",
-            bs_title: "Squash?",
-          },
-        ) %>
-      </th>
-      <% if any_conflicts %>
-        <th scope="col">Conflicts?</th>
-      <% end %>
-      <th scope="col" class="text-center">
-        <%= tag.i(
-          class: %w[fa-regular fa-thumbs-up],
-          data: {
-            bs_toggle: "tooltip",
-            bs_title: "Approvals",
-          },
-        ) %>
-      </th>
-      <th scope="col" class="text-center"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
-        Reviewers</th>
-      <th scope="col">
-        Associated Issue
-        <%= tag.i(
-          class: %w[fa-solid fa-circle-info],
-          data: {
-            bs_toggle: "tooltip",
-            bs_title: "Issue number is extracted from branch name, if present",
-          },
-        ) %>
-      </th>
-    </tr>
-  </thead>
+        <% bs_data = { bs_toggle: "tooltip", bs_custom_class: "wide-tooltip" } %>
 
-  <tbody>
-    <% merge_requests.each do |mr| %>
-      <%= tag.tr style: "cursor: pointer;" do %>
-        <!-- MR ID -->
-        <th scope="row">
-          <%= render "mr_relation", merge_request: mr %>
-        </th>
-        <!-- Created at -->
-        <td>
-          <%= render "shared/relative_timestamp",
-          timestamp: mr.createdAt,
-          age_warning: true,
-          most_significant_only: true %>
-        </td>
-        <!-- Updated at -->
-        <td>
-          <%= render "shared/relative_timestamp",
-          timestamp: mr.updatedAt,
-          most_significant_only: true %>
-        </td>
-        <!-- Merge status -->
-        <td>
-          <%= render(
-            "label",
-            title: mr.mergeStatusLabel,
-            class: ["bg-#{mr.bootstrapClass[:mergeStatus]}"],
-          ) %>
-          <% if mr.blockingMergeRequests&.visibleMergeRequests %>
-            <% open_blockers =
-              mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
-                blocker.state == "opened"
-              end %>
-
-            <% if open_blockers.any? %>
-              <%= render "shared/abbr_with_title",
-              content: tag.i(class: %w[fa-solid fa-road-barrier]),
-              class: "text-danger",
-              title:
-                "This MR is blocked by #{pluralize(open_blockers.count, "merge request")}: " \
-                  "#{open_blockers.map { |mr| "!#{mr.iid}" }.join(", ")}" %>
-            <% end %>
+        <div class="text-secondary small">
+          Fetched in
+          <%= pluralize(request_duration, "second") -%>
+          at
+          <%= local_relative_time(updated_at, type: "time-or-date", data: bs_data) -%>.
+          <% if next_update_at %>
+            <span>Cached until
+              <%= local_relative_time(next_update_at, type: "time-or-date", data: bs_data) -%>.
+            </span>
+          <% else %>
+            <span>Not cached.</span>
           <% end %>
-        </td>
-        <!-- Pipeline -->
-        <td>
-          <nobr>
-            <% pipeline = mr.headPipeline %>
+        </div>
+      </div>
+    </caption>
 
-            <% if pipeline %>
-              <% failed_jobs = pipeline.failedJobs.nodes %>
-              <% summary = pipeline_summary(pipeline) %>
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Created</th>
+        <th scope="col">Updated&nbsp;↓</th>
+        <th scope="col">Status</th>
+        <th scope="col" class="text-center">
+          <%= tag.i(
+            class: %w[fa-solid fa-timeline],
+            data: {
+              bs_toggle: "tooltip",
+              bs_title: "Pipeline Status",
+            },
+          ) %>
+        </th>
+        <th scope="col">Title</th>
+        <th scope="col" class="text-center"><%= tag.i(
+            class: %w[fa-solid fa-angles-down],
+            data: {
+              bs_toggle: "tooltip",
+              bs_title: "Squash?",
+            },
+          ) %>
+        </th>
+        <% if any_conflicts %>
+          <th scope="col">Conflicts?</th>
+        <% end %>
+        <th scope="col" class="text-center">
+          <%= tag.i(
+            class: %w[fa-regular fa-thumbs-up],
+            data: {
+              bs_toggle: "tooltip",
+              bs_title: "Approvals",
+            },
+          ) %>
+        </th>
+        <th scope="col" class="text-center"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
+          Reviewers</th>
+        <th scope="col">
+          Associated Issue
+          <%= tag.i(
+            class: %w[fa-solid fa-circle-info],
+            data: {
+              bs_toggle: "tooltip",
+              bs_title: "Issue number is extracted from branch name, if present",
+            },
+          ) %>
+        </th>
+      </tr>
+    </thead>
 
-              <%= tag.span(class: %W[badge badge-pill bg-#{mr.bootstrapClass[:pipeline]}]) do %>
-                <%= link_to pipeline_status(pipeline) || "??",
-                pipeline_web_url(pipeline),
-                class: "text-light",
-                target: "_blank",
-                **(
-                  if summary
-                    {
-                      title: summary,
-                      data: {
-                        bs_toggle: "tooltip",
-                        bs_html: "true",
-                        bs_custom_class: "x-wide-tooltip",
-                      },
-                    }
-                  else
-                    {}
-                  end
-                ) %>
+    <tbody>
+      <% merge_requests.each do |mr| %>
+        <%= tag.tr style: "cursor: pointer;" do %>
+          <!-- MR ID -->
+          <th scope="row">
+            <%= render "mr_relation", merge_request: mr %>
+          </th>
+          <!-- Created at -->
+          <td>
+            <%= render "shared/relative_timestamp",
+            timestamp: mr.createdAt,
+            age_warning: true,
+            most_significant_only: true %>
+          </td>
+          <!-- Updated at -->
+          <td>
+            <%= render "shared/relative_timestamp",
+            timestamp: mr.updatedAt,
+            most_significant_only: true %>
+          </td>
+          <!-- Merge status -->
+          <td>
+            <%= render(
+              "label",
+              title: mr.mergeStatusLabel,
+              class: ["bg-#{mr.bootstrapClass[:mergeStatus]}"],
+            ) %>
+            <% if mr.blockingMergeRequests&.visibleMergeRequests %>
+              <% open_blockers =
+                mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
+                  blocker.state == "opened"
+                end %>
+
+              <% if open_blockers.any? %>
+                <%= render "shared/abbr_with_title",
+                content: tag.i(class: %w[fa-solid fa-road-barrier]),
+                class: "text-danger",
+                title:
+                  "This MR is blocked by #{pluralize(open_blockers.count, "merge request")}: " \
+                    "#{open_blockers.map { |mr| "!#{mr.iid}" }.join(", ")}" %>
               <% end %>
+            <% end %>
+          </td>
+          <!-- Pipeline -->
+          <td>
+            <nobr>
+              <% pipeline = mr.headPipeline %>
 
-              <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
-                <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", style: [ "text-decoration: none" ]) do %>
+              <% if pipeline %>
+                <% failed_jobs = pipeline.failedJobs.nodes %>
+                <% summary = pipeline_summary(pipeline) %>
+
+                <%= tag.span(class: %W[badge badge-pill bg-#{mr.bootstrapClass[:pipeline]}]) do %>
+                  <%= link_to pipeline_status(pipeline) || "??",
+                  pipeline_web_url(pipeline),
+                  class: "text-light",
+                  target: "_blank",
+                  **(
+                    if summary
+                      {
+                        title: summary,
+                        data: {
+                          bs_toggle: "tooltip",
+                          bs_html: "true",
+                          bs_custom_class: "x-wide-tooltip",
+                        },
+                      }
+                    else
+                      {}
+                    end
+                  ) %>
+                <% end %>
+
+                <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
+                  <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", style: [ "text-decoration: none" ]) do %>
+                    <%= render "shared/abbr_with_title",
+                    content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
+                    title: pipeline_failure_summary(pipeline),
+                    class: "text-warning",
+                    data: {
+                      bs_html: "true",
+                      bs_custom_class: "x-wide-tooltip",
+                    } %>
+                  <% end %>
+                <% end %>
+                <% if pipeline.failureReason %>
                   <%= render "shared/abbr_with_title",
-                  content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
-                  title: pipeline_failure_summary(pipeline),
+                  content: tag.i(class: %w[fa-solid fa-comment-dots]),
                   class: "text-warning",
+                  title: pipeline.failureReason,
                   data: {
                     bs_html: "true",
                     bs_custom_class: "x-wide-tooltip",
                   } %>
                 <% end %>
-              <% end %>
-              <% if pipeline.failureReason %>
-                <%= render "shared/abbr_with_title",
-                content: tag.i(class: %w[fa-solid fa-comment-dots]),
-                class: "text-warning",
-                title: pipeline.failureReason,
-                data: {
-                  bs_html: "true",
-                  bs_custom_class: "x-wide-tooltip",
-                } %>
-              <% end %>
-              <% if pipeline.startedAt %>
-                <% if pipeline.finishedAt.nil? %>
-                  <%= render "shared/relative_timestamp", timestamp: pipeline.startedAt %>
-                <% elsif pipeline.outdated? %>
-                  <%= render "shared/abbr_with_title",
-                  content: "🥶",
-                  title: "Pipeline too old, must be re-run before being merged" %>
+                <% if pipeline.startedAt %>
+                  <% if pipeline.finishedAt.nil? %>
+                    <%= render "shared/relative_timestamp", timestamp: pipeline.startedAt %>
+                  <% elsif pipeline.outdated? %>
+                    <%= render "shared/abbr_with_title",
+                    content: "🥶",
+                    title: "Pipeline too old, must be re-run before being merged" %>
+                  <% end %>
                 <% end %>
               <% end %>
-            <% end %>
 
-            <% if mr.autoMergeEnabled %>
-              <%= render "shared/abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
-            <% end %>
-          </nobr>
+              <% if mr.autoMergeEnabled %>
+                <%= render "shared/abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
+              <% end %>
+            </nobr>
 
-          <br/>
+            <br/>
 
-          <%= render partial: "gitlab_label",
-          spacer_template: "space",
-          collection: mr.contextualLabels,
-          as: :label %>
-        </td>
-        <!-- Title -->
-        <td>
-          <%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
+            <%= render partial: "gitlab_label",
+            spacer_template: "space",
+            collection: mr.contextualLabels,
+            as: :label %>
+          </td>
+          <!-- Title -->
+          <td>
+            <%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
 
-          <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
+            <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
 
-          <div style="max-width: 26em">
-            <%= render "branch_relation",
-            source_branch: mr.sourceBranch,
-            target_branch: mr.targetBranch %>
-          </div>
-        </td>
-        <!-- Squash on merge -->
-        <td class="text-center">
-          <% if mr.squashOnMerge %>
-            <%= render "shared/abbr_with_title",
-            content: tag.i(class: %w[align-middle fa-solid fa-angles-down]),
-            title: "MR set to squash on merge",
-            class: "text-success" %>
-          <% end %>
-        </td>
-        <!-- Conflicts -->
-        <% if any_conflicts %>
+            <div style="max-width: 26em">
+              <%= render "branch_relation",
+              source_branch: mr.sourceBranch,
+              target_branch: mr.targetBranch %>
+            </div>
+          </td>
+          <!-- Squash on merge -->
           <td class="text-center">
-            <% if mr.conflicts %>
+            <% if mr.squashOnMerge %>
               <%= render "shared/abbr_with_title",
-              content: tag.i(class: %w[fa-solid fa-burst]),
-              class: "align-middle text-danger",
-              title: "MR branch has conflicts and should be rebased" %>
+              content: tag.i(class: %w[align-middle fa-solid fa-angles-down]),
+              title: "MR set to squash on merge",
+              class: "text-success" %>
             <% end %>
           </td>
-        <% end %>
-        <!-- Approvals -->
-        <td class="text-end">
-          <% if mr.approved %>
-            <%= render "shared/abbr_with_title",
-            content: tag.i(class: %w[fa-regular fa-thumbs-up]),
-            class: "align-middle text-success",
-            title: "Approved" %>
-          <% else %>
-            <%= tag.nobr "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired}",
-                     class:
-                       (
-                         if mr.approvalsRequired.present? && mr.approvalsRequired > 3
-                           "text-danger"
-                         else
-                           nil
-                         end
-                       ),
-                     data: {
-                       bs_toggle: "tooltip",
-                       bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
-                     } %>
+          <!-- Conflicts -->
+          <% if any_conflicts %>
+            <td class="text-center">
+              <% if mr.conflicts %>
+                <%= render "shared/abbr_with_title",
+                content: tag.i(class: %w[fa-solid fa-burst]),
+                class: "align-middle text-danger",
+                title: "MR branch has conflicts and should be rebased" %>
+              <% end %>
+            </td>
           <% end %>
-        </td>
-        <!-- Reviewers -->
-        <td>
-          <%= render(
-            partial: "reviewer_badge",
-            spacer_template: "space",
-            collection:
-              mr
-                .reviewers
-                .nodes
-                .sort_by { |r| r.mergeRequestInteraction.reviewState }
-                .reverse,
-            as: :reviewer,
-          ) || "Not assigned" %>
-        </td>
-        <!-- Associated Issue -->
-        <td scope="row">
-          <%= render("issue_link", issue: mr.issue) if mr.issue %>
-        </td>
+          <!-- Approvals -->
+          <td class="text-end">
+            <% if mr.approved %>
+              <%= render "shared/abbr_with_title",
+              content: tag.i(class: %w[fa-regular fa-thumbs-up]),
+              class: "align-middle text-success",
+              title: "Approved" %>
+            <% else %>
+              <%= tag.nobr "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired}",
+                       class:
+                         (
+                           if mr.approvalsRequired.present? && mr.approvalsRequired > 3
+                             "text-danger"
+                           else
+                             nil
+                           end
+                         ),
+                       data: {
+                         bs_toggle: "tooltip",
+                         bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
+                       } %>
+            <% end %>
+          </td>
+          <!-- Reviewers -->
+          <td>
+            <%= render(
+              partial: "reviewer_badge",
+              spacer_template: "space",
+              collection:
+                mr
+                  .reviewers
+                  .nodes
+                  .sort_by { |r| r.mergeRequestInteraction.reviewState }
+                  .reverse,
+              as: :reviewer,
+            ) || "Not assigned" %>
+          </td>
+          <!-- Associated Issue -->
+          <td scope="row">
+            <%= render("issue_link", issue: mr.issue) if mr.issue %>
+          </td>
+        <% end %>
       <% end %>
-    <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
+%<% end %>
