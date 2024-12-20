@@ -68,14 +68,12 @@
         start-50 translate-middle d-flex justify-content-center align-items-center
       "
     >
-      <div class="spinner-border me-3" role="status" aria-hidden="true"></div>
-      <div>
-        <span>Loading merge requests…</span>
-        <% if @dto.has_content? %>
-          <span>(last fetched
-            <%= render("shared/relative_timestamp", timestamp: @dto.updated_at) -%>)</span>
-        <% end %>
-      </div>
+      <span
+        class="spinner-border me-3 d-none d-sm-inline"
+        role="status"
+        aria-hidden="true"
+      ></span>
+      <span>Loading merge requests…</span>
     </div>
 
     <% if @dto.has_content? %>
