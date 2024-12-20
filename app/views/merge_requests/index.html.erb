@@ -15,6 +15,25 @@
   <% nav_bg_class = Rails.env.production? ? %w[bg-dark] : %w[bg-danger] %>
 
   <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
+    <% links = Rails.application.config_for(:merge_requests)&.dig(:dashboard, :links) %>
+    <% if links.present? %>
+      <div class="btn-group d-none d-sm-inline">
+        <button
+          type="button"
+          class="btn btn-secondary dropdown-toggle"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          Links
+        </button>
+        <ul class="dropdown-menu">
+          <% links.each do |link| %>
+            <li><%= link_to(link[:name], link[:url], class: "dropdown-item", target: "_blank") %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <div
       class="navbar-brand text-light d-flex align-items-center m-auto"
       data-controller="bootstrap-tooltip"

@@ -8,12 +8,6 @@ class UserDto
   include ReviewerOrnamentsConcern
   include MergeRequestsParsingHelper
 
-  DEPLOYMENT_LABELS = ["Pick into auto-deploy"].freeze
-  WORKFLOW_LABELS = WORKFLOW_LABELS_BS_CLASS.keys.freeze
-  OPEN_MRS_CONTEXTUAL_LABELS = ["pipeline::"].freeze
-  MERGED_MRS_CONTEXTUAL_LABELS = (DEPLOYMENT_LABELS + WORKFLOW_LABELS).freeze
-  ISSUE_CONTEXTUAL_LABELS = ["workflow::"].freeze
-
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :open_merge_requests, :merged_merge_requests
   attr_reader :merged_merge_requests_count, :merged_merge_requests_tttm, :first_merged_merge_requests_timestamp
@@ -91,17 +85,17 @@ class UserDto
       mr.updatedAt = parse_graphql_time(mr.updatedAt)
 
       mr.contextualLabels =
-        mr.labels.nodes.filter { |label| contextual_labels.any? { |prefix| label.title.start_with?(prefix) } }
+        mr.labels.nodes.filter { |label| contextual_labels.any? { |prefix| label.title.start_with?(prefix.to_s) } }
       mr.contextualLabels.each { |label| label.webTitle = label.title }
 
       if mr.issue
         mr.issue.contextualLabels = mr.issue.labels.nodes.filter do |label|
-          ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+          issue_contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
         end
 
         mr.issue.contextualLabels.each do |label|
           label.bootstrapClass = [] # Use label's predefined colors
-          label.webTitle = label.title.delete_prefix(WORKFLOW_LABEL_NS)
+          label.webTitle = label.title.delete_prefix(workflow_label_ns)
         end
       end
 
@@ -110,7 +104,7 @@ class UserDto
   end
 
   def convert_open_merge_request(merge_request, open_merge_requests, issues_by_iid)
-    convert_core_merge_request(merge_request, open_merge_requests, issues_by_iid, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
+    convert_core_merge_request(merge_request, open_merge_requests, issues_by_iid, open_mrs_contextual_labels).tap do |mr|
       mr.bootstrapClass = {
         pipeline: pipeline_class(mr.headPipeline),
         mergeStatus: open_merge_request_status_class(mr)
@@ -146,14 +140,14 @@ class UserDto
       merge_request,
       merged_merge_requests,
       issues_by_iid,
-      MERGED_MRS_CONTEXTUAL_LABELS
+      merged_mrs_contextual_labels
     ).tap do |mr|
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
       mr.labels.nodes.each do |label|
         label.bootstrapClass = workflow_label_class(label.title)
-        label.webTitle = label.title.delete_prefix(WORKFLOW_LABEL_NS)
+        label.webTitle = label.title.delete_prefix(workflow_label_ns)
       end
     end
   end
@@ -169,5 +163,9 @@ class UserDto
 
   def location_lookup_service
     @location_lookup_service ||= Services::LocationLookupService.new
+  end
+
+  def merged_mrs_contextual_labels
+    @merged_mrs_contextual_labels ||= deployment_labels + workflow_labels
   end
 end

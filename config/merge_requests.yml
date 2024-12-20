@@ -1,0 +1,32 @@
+shared:
+  status:
+    mappings:
+      BLOCKED_STATUS: "secondary"
+      CI_STILL_RUNNING: "primary"
+      MERGEABLE: "success"
+
+  pipeline:
+    mappings:
+      SUCCESS: "success"
+      FAILED: "danger"
+      RUNNING: "primary"
+
+  labels:
+    issue:
+      contextual:
+        - "workflow::"
+    deployment:
+      contextual:
+        - "Pick into auto-deploy"
+    open_merge_requests:
+      contextual:
+        - "pipeline::"
+    workflow:
+      prefix: "workflow::"
+      mappings:
+        "workflow::staging-canary": "info"
+        "workflow::canary": "info"
+        "workflow::staging": "info"
+        "workflow::production": "primary"
+        "workflow::post-deploy-db-staging": "info"
+        "workflow::post-deploy-db-production": "success"
