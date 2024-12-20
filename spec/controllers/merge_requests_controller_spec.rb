@@ -231,7 +231,8 @@ RSpec.describe MergeRequestsController, type: :controller do
               "query" => a_string_including("openMergeRequests: "),
               "variables" => hash_including(
                 "username" => username,
-                "activeReviewsAfter" => an_instance_of(String)
+                "activeReviewsAfter" => an_instance_of(String),
+                "updatedAfter" => an_instance_of(String)
               )
             ))
             .to_return(status: :ok, body: open_mrs.to_json)

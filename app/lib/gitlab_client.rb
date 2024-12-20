@@ -112,9 +112,9 @@ class GitlabClient
   GRAPHQL
 
   OPEN_MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
-    query($username: String!, $activeReviewsAfter: Time) {
+    query($username: String!, $activeReviewsAfter: Time, $updatedAfter: Time) {
       user(username: $username) {
-        openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC) {
+        openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC, updatedAfter: $updatedAfter) {
           nodes {
             ...CoreMergeRequestFields
             approved
@@ -261,7 +261,8 @@ class GitlabClient
         OPEN_MERGE_REQUESTS_GRAPHQL_QUERY,
         "open_merge_requests",
         username: username,
-        activeReviewsAfter: 1.week.ago
+        activeReviewsAfter: 1.week.ago,
+        updatedAfter: 1.year.ago
       )
     end
   end
