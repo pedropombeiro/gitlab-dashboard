@@ -6,7 +6,8 @@
 >
   <table class="table table-hover">
     <caption class="caption-top">
-      <%= pluralize(@active_users.count, "user dashboard") %> currently active, from a total of
+      <%= pluralize(@active_users.count, "user dashboard") %>
+      currently active, from a total of
       <%= pluralize(@users.count, "visited dashboard") %>
     </caption>
 
@@ -20,12 +21,19 @@
     </thead>
     <tbody>
       <% @recent_users.each do |user| %>
-        <% one_time_visitor = user.contacted_at - user.created_at < CacheConcern::MR_CACHE_VALIDITY %>
+        <% one_time_visitor =
+          user.contacted_at - user.created_at < CacheConcern::MR_CACHE_VALIDITY %>
         <% fg_class = one_time_visitor ? %w[text-secondary] : nil %>
 
         <%= tag.tr style: "cursor: pointer;" do %>
           <%= tag.th scope: "row" do %>
-            <%= link_to user.username, merge_requests_path(assignee: user.username), class: fg_class %>
+            <%= link_to user.username,
+            merge_requests_path(assignee: user.username),
+            class: fg_class %>
+            (<%= link_to "Profile",
+            "https://gitlab.com/#{user.username}",
+            class: fg_class,
+            target: "_blank" %>)
           <% end %>
           <%= tag.td class: fg_class do %>
             <%= render "shared/relative_timestamp", timestamp: user.created_at %>
@@ -34,7 +42,8 @@
             <%= render "shared/relative_timestamp", timestamp: user.contacted_at %>
           <% end %>
           <%= tag.td class: fg_class do %>
-            <%= render "shared/relative_timestamp", timestamp: user_cache_validity(user.username) %>
+            <%= render "shared/relative_timestamp",
+            timestamp: user_cache_validity(user.username) %>
           <% end %>
         <% end %>
 
