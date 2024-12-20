@@ -76,7 +76,14 @@ module Services
 
         previous_labels = previous_mr_version.contextualLabels.map(&:webTitle)
         labels = mr.contextualLabels.map(&:webTitle)
-        next if labels.blank? || labels == previous_labels
+        next if labels == previous_labels
+
+        # Ignore post-deploy-db-* notifications if the MR is not a database MR
+        if mr.labels.nodes.none? { |label| label.webTitle == "database" }
+          labels.delete_if { |label| label.match?(%r{post-deploy-db-.+}) }
+        end
+
+        next if labels.blank?
 
         {
           mr: mr,

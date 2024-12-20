@@ -7,6 +7,7 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
   end
 
   let_it_be(:open_mrs_response_body) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
+  let_it_be(:merged_mrs_response_body) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
 
   let(:client) { GitlabClient.new }
   let(:assignee) { "pedropombeiro" }
@@ -24,6 +25,12 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
       .to_return(
         status: 200,
         body: open_mrs_response_body.to_json
+      )
+    stub_request(:post, graphql_url)
+      .with(body: hash_including("query" => a_string_matching(/mergedMergeRequests: /)))
+      .to_return(
+        status: 200,
+        body: merged_mrs_response_body.to_json
       )
   end
 
@@ -86,7 +93,11 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
 
       context "when an MR is merged" do
         before do
-          dto.merged_merge_requests.items << response.user.openMergeRequests.nodes.pop
+          dto.merged_merge_requests.items << response.user.openMergeRequests.nodes.delete(merged_mr)
+        end
+
+        let(:merged_mr) do
+          response.user.openMergeRequests.nodes.last
         end
 
         it "contains notification for merged MR" do
@@ -103,16 +114,107 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
         end
       end
     end
+  end
+
+  describe "merged merge request changes" do
+    let(:previous_response) { response }
+    let(:new_response) { response }
+
+    it { is_expected.to be_empty }
+
+    context "when MR pipeline label changes" do
+      before do
+        mr = find_merge_request_with_labels(previous_response.user.mergedMergeRequests.nodes, "pipeline::tier-3")
+        label = mr.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
+        label.title = "pipeline::tier-2"
+      end
+
+      it { is_expected.to be_empty }
+    end
+
+    context "when MR workflow label changes" do
+      before do
+        mr = find_merge_request_with_labels(previous_response.user.mergedMergeRequests.nodes, "workflow::production")
+        label = mr.labels.nodes.find { |label| label.title.start_with?("workflow::production") }
+        label.title = "workflow::staging"
+      end
+
+      it "contains notification for MR with change label" do
+        is_expected.to contain_exactly(
+          a_hash_including(
+            body: a_string_starting_with("changed to production\n\n!"),
+            tag: an_instance_of(String),
+            title: "A merged merge request",
+            type: :label_change,
+            url: an_instance_of(String)
+          )
+        )
+      end
+    end
+
+    context "when MR workflow::post-db-deploy-* label changes" do
+      let(:changed_mr) do
+        find_merge_request_with_labels(
+          previous_response.user.mergedMergeRequests.nodes, "workflow::post-deploy-db-production"
+        )
+      end
+
+      before do
+        label = changed_mr.labels.nodes.find { |label| label.title.start_with?("workflow::post-deploy-db") }
+        label.title = "workflow::post-db-deploy-staging"
+      end
+
+      specify do
+        expect(changed_mr.labels.nodes.find { |label| label.title.start_with?("database") }).to be_nil
+      end
+
+      it { is_expected.to be_empty }
+
+      context "and MR is labelled with database" do
+        let(:changed_mr) do
+          find_merge_request_with_labels(
+            previous_response.user.mergedMergeRequests.nodes, "workflow::post-deploy-db-production", "database"
+          )
+        end
+
+        it "contains notification for MR with change label" do
+          is_expected.to contain_exactly(
+            a_hash_including(
+              body: a_string_starting_with("changed to post-deploy-db-production\n\n!"),
+              tag: an_instance_of(String),
+              title: "A merged merge request",
+              type: :label_change,
+              url: an_instance_of(String)
+            )
+          )
+        end
+      end
+    end
 
     private
 
-    def response
-      client.fetch_open_merge_requests(assignee).tap do |response|
-        response[:user] = response.response.data.user
-        response.user[:mergedMergeRequests] = OpenStruct.new(nodes: [])
-        response.user[:firstCreatedMergedMergeRequests] = OpenStruct.new(nodes: [])
-        response.user[:allMergedMergeRequests] = OpenStruct.new(count: 0, totalTimeToMerge: 0)
+    def find_merge_request_with_labels(merge_requests, *label_prefixes)
+      merge_requests.find do |mr|
+        label_prefixes.all? do |prefix|
+          mr.labels.nodes.any? do |label|
+            label.title.start_with?(prefix)
+          end
+        end
       end
+    end
+  end
+
+  private
+
+  def response
+    client.fetch_open_merge_requests(assignee).tap do |response|
+      response[:user] = response.response.data.user
+
+      merged_mrs_response = client.fetch_merged_merge_requests(assignee)
+      user2 = merged_mrs_response.response.data.user
+      response.user.mergedMergeRequests = user2.mergedMergeRequests
+      response.user.allMergedMergeRequests = user2.allMergedMergeRequests
+      response.user.firstCreatedMergedMergeRequests = user2.firstCreatedMergedMergeRequests
     end
   end
 end
