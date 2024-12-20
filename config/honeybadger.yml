@@ -32,13 +32,13 @@ insights:
 
 rails:
   insights:
-    metrics: false
+    enabled: false
     collection_interval: 60
 solid_queue:
   insights:
-    metrics: false
+    enabled: false
     collection_interval: 15
 puma:
   insights:
-    metrics: false
+    enabled: false
     collection_interval: 60
