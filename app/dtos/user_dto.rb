@@ -46,7 +46,7 @@ class UserDto
     @merged_merge_requests_count = response.user.allMergedMergeRequests.count
     @merged_merge_requests_tttm = response.user.allMergedMergeRequests.totalTimeToMerge
     @first_merged_merge_requests_timestamp =
-      parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.sole&.createdAt)
+      parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.first&.createdAt)
     @merged_merge_requests = MergeRequestCollectionDto.new(
       filter_merged_merge_requests(merged_mrs).map do |mr|
         convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid)
