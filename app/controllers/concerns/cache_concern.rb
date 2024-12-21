@@ -25,7 +25,8 @@ module CacheConcern
     end
 
     def project_issues_cache_key(issues)
-      "#{REDIS_NAMESPACE}/issues/#{project_issues_version}/open/#{calculate_hash(*issues.map { |issue| issue.values.join("/") })}"
+      issue_iids = issues.map { |issue| issue.values.join("/") }.sort
+      "#{REDIS_NAMESPACE}/issues/#{project_issues_version}/#{calculate_hash(*issue_iids)}"
     end
 
     def authored_mr_lists_cache_key(user)
