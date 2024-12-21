@@ -7,14 +7,14 @@ class MergeRequestsController < MergeRequestsControllerBase
   def index
     return unless ensure_assignee
 
-    @user = graphql_user(safe_params[:assignee])
+    @user = graphql_user(assignee)
     render_404 and return unless @user
 
-    save_current_user(safe_params[:assignee])
     if @user.username != safe_params[:assignee]
       redirect_to merge_requests_path(assignee: @user.username) and return
     end
 
+    save_current_user(safe_params[:assignee])
     response = Services::MergeRequestsCacheService.new.read(safe_params[:assignee])
     @dto = fetch_service.parse_dto(response)
 
