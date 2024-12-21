@@ -58,7 +58,9 @@ module MergeRequestsHelper
   def format_location(user)
     return if user.location.blank?
 
-    tag.i(class: user_country_flag_classes(user)) + " " + user.location
+    flag = tag.i(class: user_country_flag_classes(user))
+
+    "#{flag} #{user.location}"
   end
 
   def tooltip_from_hash(hash)
