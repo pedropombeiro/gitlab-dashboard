@@ -1,7 +1,6 @@
-<div
-  class="bg-gradient p-1 p-sm-3 mx-auto mt-1 mt-sm-4"
-  style="width: fit-content;"
->
+<%= tag.div(
+  class: "bg-gradient p-1 p-sm-3 mx-auto mt-3 mt-sm-4",
+  style: open_merge_requests.items.any? ? "width: fit-content;" : nil) do %>
   <% mr_list_panel_class = %w[
     table-responsive
     shadow
@@ -27,4 +26,4 @@
     merged_merge_requests_tttm: merged_merge_requests_tttm,
     first_merged_merge_requests_timestamp: first_merged_merge_requests_timestamp %>
   <% end %>
-</div>
+<% end %>
