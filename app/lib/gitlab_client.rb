@@ -41,6 +41,7 @@ class GitlabClient
       iid
       webUrl
       titleHtml
+      state
       labels {
         nodes { ...CoreLabelFields }
       }

@@ -9,10 +9,17 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
   let_it_be(:open_mrs_response_body) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
   let_it_be(:merged_mrs_response_body) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
 
+  let(:issue_iids) do
+    %w[
+      503315 446287 506226 481411 502403 472974 481411 505703 457221 505810 32804 503748 442395 500447 502934 502431
+      442395 497562 354756 506404
+    ]
+  end
+
   let(:client) { GitlabClient.new }
   let(:assignee) { "pedropombeiro" }
-  let(:previous_dto) { ::UserDto.new(previous_response, assignee, {}) }
-  let(:dto) { ::UserDto.new(new_response, assignee, {}) }
+  let(:previous_dto) { ::UserDto.new(previous_response, assignee, issue_iids.to_h { |iid| [iid, new_issue] }) }
+  let(:dto) { ::UserDto.new(new_response, assignee, issue_iids.to_h { |iid| [iid, new_issue] }) }
   let(:service) { described_class.new(previous_dto, dto) }
 
   subject(:execute) { service.execute }
@@ -22,16 +29,10 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
 
     stub_request(:post, graphql_url)
       .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
-      .to_return(
-        status: 200,
-        body: open_mrs_response_body.to_json
-      )
+      .to_return(status: :ok, body: open_mrs_response_body.to_json)
     stub_request(:post, graphql_url)
       .with(body: hash_including("query" => a_string_matching(/mergedMergeRequests: /)))
-      .to_return(
-        status: 200,
-        body: merged_mrs_response_body.to_json
-      )
+      .to_return(status: :ok, body: merged_mrs_response_body.to_json)
   end
 
   describe "open merge request changes" do
@@ -133,9 +134,12 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
     end
 
     context "when MR workflow label changes" do
+      let(:changed_mr) do
+        find_merge_request_with_labels(previous_response.user.mergedMergeRequests.nodes, "workflow::production")
+      end
+
       before do
-        mr = find_merge_request_with_labels(previous_response.user.mergedMergeRequests.nodes, "workflow::production")
-        label = mr.labels.nodes.find { |label| label.title.start_with?("workflow::production") }
+        label = changed_mr.labels.nodes.find { |label| label.title.start_with?("workflow::production") }
         label.title = "workflow::staging"
       end
 
@@ -149,6 +153,20 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
             url: an_instance_of(String)
           )
         )
+      end
+
+      context "and related issue is closed" do
+        let(:issue_state) { "closed" }
+
+        before do
+          dto.merged_merge_requests.items
+            .find { |mr| mr.iid == changed_mr.iid }
+            .issue.state = issue_state
+        end
+
+        it "does not generate notification" do
+          is_expected.to be_empty
+        end
       end
     end
 
@@ -216,5 +234,13 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
       response.user.allMergedMergeRequests = user2.allMergedMergeRequests
       response.user.firstCreatedMergedMergeRequests = user2.firstCreatedMergedMergeRequests
     end
+  end
+
+  def new_issue
+    OpenStruct.new(
+      state: "opened",
+      labels: OpenStruct.new(nodes: []),
+      contextualLabels: OpenStruct.new(nodes: [])
+    )
   end
 end

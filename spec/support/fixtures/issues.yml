@@ -7,6 +7,7 @@ project_0:
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/issues/506226
             titleHtml: Generate one audit event per project associated/dissociated from
               runner
+            state: opened
             labels:
               nodes:
                 - title: Category:Fleet Visibility
@@ -63,6 +64,7 @@ project_0:
           - iid: "505810"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/issues/505810
             titleHtml: Pass current_runner_manager to destroy_conditionally
+            state: opened
             labels:
               nodes:
                 - title: Category:Fleet Visibility
@@ -114,6 +116,7 @@ project_2:
           - iid: "32804"
             webUrl: https://gitlab.com/gitlab-org/gitlab-runner/-/issues/32804
             titleHtml: Ignore forbidden arguments to register if using --registration-token
+            state: opened
             labels:
               nodes:
                 - title: "[Deprecated] Category:Runner Fleet"

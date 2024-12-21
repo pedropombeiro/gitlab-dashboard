@@ -71,6 +71,9 @@ module Services
       return [] if previous_mrs.blank?
 
       mrs.filter_map do |mr|
+        # Don't send notifications if the issue is closed
+        next if mr.issue&.state == "closed"
+
         previous_mr_version = previous_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
         next if previous_mr_version.nil?
 
