@@ -25,7 +25,7 @@ RSpec.describe GitlabClient do
       stub_request(:post, graphql_url)
         .with(body: a_string_including("user("))
         .to_return(
-          status: 200,
+          status: :ok,
           body: user_requests_response_body[username].to_json
         )
     end
@@ -126,7 +126,7 @@ RSpec.describe GitlabClient do
       stub_request(:post, graphql_url)
         .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
         .to_return(
-          status: 200,
+          status: :ok,
           body: open_mrs_response_body["one"].to_json
         )
     end
@@ -166,6 +166,36 @@ RSpec.describe GitlabClient do
             }
           }
         }
+      )
+    end
+  end
+
+  describe "#fetch_monthly_merged_merge_requests", :freeze_time do
+    let(:username) { "user.1" }
+
+    subject(:fetch_monthly_merged_merge_requests) do
+      client.fetch_monthly_merged_merge_requests(username)
+    end
+
+    before do
+      stub_request(:post, graphql_url)
+        .with(body: hash_including(
+          "query" => a_string_including("monthlyMergedMergeRequests: authoredMergeRequests"),
+          "variables" => matching(
+            "username" => username,
+            "mergedAfter" => an_instance_of(String),
+            "mergedBefore" => an_instance_of(String)
+          )
+        ))
+        .to_return(
+          status: :ok,
+          body: {data: {user: {monthlyMergedMergeRequests: []}}}.to_json
+        ).times(12)
+    end
+
+    it "returns monthly merged merge requests" do
+      expect(fetch_monthly_merged_merge_requests.response.data.user.table).to eq(
+        12.times.to_h { |index| [:"monthlyMergedMergeRequests#{index}", []] }
       )
     end
   end
