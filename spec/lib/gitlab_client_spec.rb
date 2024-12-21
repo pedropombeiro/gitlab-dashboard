@@ -170,6 +170,24 @@ RSpec.describe GitlabClient do
     end
   end
 
+  describe "#fetch_merged_merge_requests" do
+    let(:username) { "user.1" }
+
+    subject(:fetch_merged_merge_requests) do
+      client.fetch_merged_merge_requests(username)
+    end
+
+    before do
+      stub_request(:post, graphql_url)
+        .with(body: hash_including("query" => a_string_including("mergedMergeRequests")))
+        .to_return(status: :ok, body: {data: {user: {mergedMergeRequests: {nodes: []}}}}.to_json)
+    end
+
+    it "returns merged merge requests" do
+      expect(fetch_merged_merge_requests.response.data.user.mergedMergeRequests.nodes).to eq([])
+    end
+  end
+
   describe "#fetch_monthly_merged_merge_requests", :freeze_time do
     let(:username) { "user.1" }
 
