@@ -144,24 +144,41 @@ RSpec.describe MergeRequestsController, type: :controller do
         end
 
         context "when GITLAB_TOKEN is specified" do
-          before do
-            allow(Rails.application.credentials).to receive(:gitlab_token).and_return("secret-token")
+          context "and session does not contain user_id" do
+            before do
+              allow(Rails.application.credentials).to receive(:gitlab_token).and_return("secret-token")
+            end
+
+            let!(:user_request_stub) do
+              stub_request(:post, graphql_url)
+                .with(body: hash_including(
+                  "query" => a_string_including("user: currentUser"),
+                  "variables" => {}
+                ))
+                .to_return(status: :ok, body: user_response_body)
+            end
+
+            it "redirects to assignee specified in GITLAB_TOKEN" do
+              request
+
+              expect(response).to redirect_to action: :index, assignee: username
+              expect(GitlabUser.find_by_username(username)).to be_nil
+            end
           end
 
-          let!(:user_request_stub) do
-            stub_request(:post, graphql_url)
-              .with(body: hash_including(
-                "query" => a_string_including("user: currentUser"),
-                "variables" => {}
-              ))
-              .to_return(status: :ok, body: user_response_body)
-          end
+          context "when session contains user_id" do
+            before do
+              session[:user_id] = "user.1"
+            end
 
-          it "redirects to assignee specified in GITLAB_TOKEN" do
-            request
+            it "redirects to assignee specified in user_id" do
+              expect(Rails.application.credentials).not_to receive(:gitlab_token)
 
-            expect(response).to redirect_to action: :index, assignee: username
-            expect(GitlabUser.find_by_username(username)).to be_nil
+              request
+
+              expect(response).to redirect_to action: :index, assignee: "user.1"
+              expect(GitlabUser.find_by_username(username)).to be_nil
+            end
           end
         end
       end
