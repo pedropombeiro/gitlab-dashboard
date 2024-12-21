@@ -18,7 +18,7 @@ class UserDto
   attr_reader :open_merge_requests, :merged_merge_requests
   attr_reader :merged_merge_requests_count, :merged_merge_requests_tttm, :first_merged_merge_requests_timestamp
 
-  def initialize(response, username, open_issues_by_iid)
+  def initialize(response, username, issues_by_iid)
     @has_content = response.present?
     @username = username
 
@@ -41,14 +41,14 @@ class UserDto
     warmup_timezone_cache(open_mrs)
 
     @open_merge_requests = MergeRequestCollectionDto.new(
-      open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, open_issues_by_iid) }
+      open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, issues_by_iid) }
     )
     @merged_merge_requests_count = response.user.allMergedMergeRequests.count
     @merged_merge_requests_tttm = response.user.allMergedMergeRequests.totalTimeToMerge
     @first_merged_merge_requests_timestamp =
       parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.first&.createdAt)
     @merged_merge_requests = MergeRequestCollectionDto.new(
-      merged_mrs.map { |mr| convert_merged_merge_request(mr, merged_mrs, open_issues_by_iid) }
+      merged_mrs.map { |mr| convert_merged_merge_request(mr, merged_mrs, issues_by_iid) }
     )
   end
 
@@ -84,9 +84,9 @@ class UserDto
     pipeline.finishedAt = parse_graphql_time(pipeline.finishedAt)
   end
 
-  def convert_core_merge_request(merge_request, merge_requests, open_issues_by_iid, contextual_labels)
+  def convert_core_merge_request(merge_request, merge_requests, issues_by_iid, contextual_labels)
     merge_request.tap do |mr|
-      mr.issue = issue_from_mr(mr, open_issues_by_iid)
+      mr.issue = issue_from_mr(mr, issues_by_iid)
       mr.createdAt = parse_graphql_time(mr.createdAt)
       mr.updatedAt = parse_graphql_time(mr.updatedAt)
 
@@ -110,8 +110,8 @@ class UserDto
     end
   end
 
-  def convert_open_merge_request(merge_request, open_merge_requests, open_issues_by_iid)
-    convert_core_merge_request(merge_request, open_merge_requests, open_issues_by_iid, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
+  def convert_open_merge_request(merge_request, open_merge_requests, issues_by_iid)
+    convert_core_merge_request(merge_request, open_merge_requests, issues_by_iid, OPEN_MRS_CONTEXTUAL_LABELS).tap do |mr|
       mr.bootstrapClass = {
         pipeline: pipeline_class(mr.headPipeline),
         mergeStatus: open_merge_request_status_class(mr)
@@ -140,11 +140,11 @@ class UserDto
     end
   end
 
-  def convert_merged_merge_request(merge_request, merged_merge_requests, open_issues_by_iid)
+  def convert_merged_merge_request(merge_request, merged_merge_requests, issues_by_iid)
     convert_core_merge_request(
       merge_request,
       merged_merge_requests,
-      open_issues_by_iid,
+      issues_by_iid,
       MERGED_MRS_CONTEXTUAL_LABELS
     ).tap do |mr|
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
