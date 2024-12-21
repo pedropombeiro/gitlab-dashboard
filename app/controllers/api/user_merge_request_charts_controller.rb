@@ -5,10 +5,10 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
     return unless ensure_assignee
 
     response = Rails.cache.fetch(
-      self.class.monthly_merged_mr_lists_cache_key(safe_params[:assignee]),
+      self.class.monthly_merged_mr_lists_cache_key(assignee),
       expires_in: MONTHLY_GRAPH_CACHE_VALIDITY
     ) do
-      gitlab_client.fetch_monthly_merged_merge_requests(safe_params[:assignee])
+      gitlab_client.fetch_monthly_merged_merge_requests(assignee)
     end
 
     render json: monthly_mrs_graph(response.response.data.user)
