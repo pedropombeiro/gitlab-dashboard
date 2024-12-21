@@ -16,6 +16,12 @@ class WebPushSubscriptionsController < ApplicationController
       sub.user_agent = request.user_agent
     end
 
+    Honeybadger.event(
+      "Created web push subscription",
+      gitlab_user: current_user.username,
+      user_agent: request.user_agent
+    )
+
     head :ok
   end
 
