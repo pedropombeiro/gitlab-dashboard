@@ -1,7 +1,7 @@
 <% merge_requests = merge_requests_dto.items %>
 
 <% if merge_requests.empty? %>
-  <p class="h4 text-center" style="font-weight: 300">No open merge requests 💤</p>
+  <p class="h4 text-center p-2 text-secondary" style="font-weight: 300">💤 No open merge requests 💤</p>
 <% else %>
   <table class="table table-hover mb-0">
     <% any_conflicts = merge_requests.any?(&:conflicts) %>
