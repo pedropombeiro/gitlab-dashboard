@@ -4,9 +4,9 @@ module MergeRequestsParsingHelper
   MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i
   SECURITY_SUBGROUP = "/security"
 
-  def issue_from_mr(mr, open_issues_by_iid)
+  def issue_from_mr(mr, issues_by_iid)
     iid = issue_iid_from_mr(mr)
-    open_issues_by_iid[iid]
+    issues_by_iid[iid]
   end
 
   def issue_iid_from_mr(mr)

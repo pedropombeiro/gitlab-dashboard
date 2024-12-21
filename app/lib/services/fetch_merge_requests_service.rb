@@ -65,14 +65,14 @@ module Services
     end
 
     def parse_dto(response)
-      open_issues_by_iid = []
+      issues_by_iid = []
       if response && response.errors.nil?
         open_merge_requests = response.user.openMergeRequests.nodes
         merged_merge_requests = response.user.mergedMergeRequests.nodes
-        open_issues_by_iid = issues_from_merge_requests(open_merge_requests, merged_merge_requests)
+        issues_by_iid = issues_from_merge_requests(open_merge_requests, merged_merge_requests)
       end
 
-      ::UserDto.new(response, assignee, open_issues_by_iid)
+      ::UserDto.new(response, assignee, issues_by_iid)
     end
 
     private
