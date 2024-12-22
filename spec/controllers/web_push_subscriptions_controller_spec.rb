@@ -1,7 +1,7 @@
 require "rails_helper"
 
-RSpec.describe WebPushSubscriptionsController, type: :controller do
-  describe "HEAD /create" do
+RSpec.describe Api::WebPushSubscriptionsController, type: :controller do
+  describe "POST /create" do
     let(:user) { create(:gitlab_user) }
 
     before do
@@ -10,7 +10,7 @@ RSpec.describe WebPushSubscriptionsController, type: :controller do
 
     it "returns http success" do
       expect do
-        head :create, params: {endpoint: "endpoint", keys: {auth: "auth", p256dh: "p256dh"}}
+        post :create, params: {endpoint: "endpoint", keys: {auth: "auth", p256dh: "p256dh"}}
       end.to change { WebPushSubscription.find_by_gitlab_user_id(user.id) }.to(an_instance_of(WebPushSubscription))
 
       expect(response).to have_http_status(:ok)

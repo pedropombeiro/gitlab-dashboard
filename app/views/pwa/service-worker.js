@@ -33,7 +33,7 @@ self.addEventListener("notificationclick", function (event) {
 
 self.addEventListener("pushsubscriptionchange", async (_event) => {
   const subscription = await self.registration.pushManager.getSubscription();
-  await fetch("/web_push_subscriptions", {
+  await fetch("/api/web_push_subscriptions", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
