@@ -21,6 +21,10 @@ class MergeRequestsController < MergeRequestsControllerBase
     fresh_when(response)
   end
 
+  def legacy_index
+    redirect_to merge_requests_path(**safe_params)
+  end
+
   def list
     assignee = safe_params.expect(:assignee)
     user = graphql_user(assignee)
