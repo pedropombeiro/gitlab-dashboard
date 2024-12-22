@@ -59,7 +59,7 @@ export default class extends Controller {
       });
 
       try {
-        const response = await fetch("/web_push_subscriptions", {
+        const response = await fetch("/api/web_push_subscriptions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

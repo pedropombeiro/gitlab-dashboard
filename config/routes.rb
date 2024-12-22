@@ -1,6 +1,5 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-  resources :web_push_subscriptions, only: :create
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
   get "/mrs", to: "merge_requests#index", as: :merge_requests
@@ -9,6 +8,8 @@ Rails.application.routes.draw do
   get "/api/graph/monthly_merged_mrs",
     to: "api/user_merge_request_charts#monthly_merged_merge_request_stats",
     as: :monthly_merged_merge_request_stats, defaults: {format: :json}
+
+  post "/api/web_push_subscriptions", to: "api/web_push_subscriptions#create", as: :web_push_subscriptions
 
   get "/admin/dashboard", to: "admin/dashboard#index", as: :admin_dashboard
 
