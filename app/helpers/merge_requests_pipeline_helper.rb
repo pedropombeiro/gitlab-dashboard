@@ -17,7 +17,7 @@ module MergeRequestsPipelineHelper
 
     header = "#{pluralize(failed_jobs.count, "job")} #{pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:"
 
-    if failed_job_traces.count == 1
+    if failed_job_traces.one?
       failed_job_trace = failed_job_traces.sole
 
       [
@@ -55,7 +55,7 @@ module MergeRequestsPipelineHelper
     web_path = pipeline.path
 
     # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
-    if failed_job_traces.count == 1
+    if failed_job_traces.one?
       case pipeline.status
       when "RUNNING"
         web_path =
@@ -77,7 +77,7 @@ module MergeRequestsPipelineHelper
   private
 
   def failed_job_web_path(failed_job_trace)
-    if failed_job_trace.downstreamPipeline&.jobs&.nodes&.count == 1
+    if failed_job_trace.downstreamPipeline&.jobs&.nodes&.one?
       failed_job_trace.downstreamPipeline.jobs.nodes.sole.webPath
     else
       failed_job_trace.webPath

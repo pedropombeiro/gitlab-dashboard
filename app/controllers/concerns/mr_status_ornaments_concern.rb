@@ -49,7 +49,7 @@ module MrStatusOrnamentsConcern
   end
 
   def workflow_label_class(label_title)
-    return [] unless label_title.start_with?(WORKFLOW_LABEL_NS)
+    return [] unless WORKFLOW_LABELS_BS_CLASS.key?(label_title)
 
     %W[
       bg-#{WORKFLOW_LABELS_BS_CLASS.fetch(label_title, "secondary")}
@@ -69,8 +69,6 @@ module MrStatusOrnamentsConcern
     # Signal that a reviewer forgot to pass on the review to the follow-up reviewer
     return true if mr.approvalsLeft&.positive? && mr_interactions.all?(&:approved)
 
-    mr_interactions.any? do |mri|
-      %w[REVIEWED REQUESTED_CHANGES].include?(mri.reviewState)
-    end
+    mr_interactions.map(&:reviewState).include?(%w[REVIEWED REQUESTED_CHANGES])
   end
 end
