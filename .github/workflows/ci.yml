@@ -227,7 +227,7 @@ jobs:
           push-to-registry: true
 
       - name: Deploy
-        uses: darnfish/watchtower-update@v3.3
+        uses: darnfish/watchtower-update@v4
         with:
           url: "${{ secrets.WATCHTOWER_URL }}"
           api_token: "${{ secrets.WATCHTOWER_API_TOKEN }}"
