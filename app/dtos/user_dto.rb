@@ -90,19 +90,18 @@ class UserDto
       mr.createdAt = parse_graphql_time(mr.createdAt)
       mr.updatedAt = parse_graphql_time(mr.updatedAt)
 
-      mr.contextualLabels = mr.labels.nodes.filter do |label|
-        label.webTitle = label.title
-        contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
-      end
+      mr.contextualLabels =
+        mr.labels.nodes.filter { |label| contextual_labels.any? { |prefix| label.title.start_with?(prefix) } }
+      mr.contextualLabels.each { |label| label.webTitle = label.title }
 
       if mr.issue
         mr.issue.contextualLabels = mr.issue.labels.nodes.filter do |label|
-          next unless ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+          ISSUE_CONTEXTUAL_LABELS.any? { |prefix| label.title.start_with?(prefix) }
+        end
 
+        mr.issue.contextualLabels.each do |label|
           label.bootstrapClass = [] # Use label's predefined colors
           label.webTitle = label.title.delete_prefix(WORKFLOW_LABEL_NS)
-
-          true
         end
       end
 
@@ -123,7 +122,7 @@ class UserDto
         mr.headPipeline[:outdated?] =
           mr.headPipeline.startedAt &&
           mr.headPipeline.finishedAt&.before?(8.hours.ago) &&
-          mr.contextualLabels.any? { |label| label.title == "pipeline::tier-3" }
+          mr.contextualLabels.map(&:title).include?("pipeline::tier-3")
       end
 
       mr.mergeStatusLabel = open_merge_request_status_label(mr)
