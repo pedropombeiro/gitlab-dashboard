@@ -128,6 +128,8 @@ class UserDto
 
       mr.mergeStatusLabel = open_merge_request_status_label(mr)
       mr.labels.nodes.each { |label| label.bootstrapClass = [] } # Use label's predefined colors
+
+      mr.reviewers.nodes.delete_if(&:bot)
       mr.reviewers.nodes.each do |reviewer|
         reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
         reviewer.review = reviewer.mergeRequestInteraction.reviewState
