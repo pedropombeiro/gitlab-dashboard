@@ -1,8 +1,14 @@
-<%= render "user_badge", user: reviewer, title: reviewer_help_title(reviewer), class_suffix: reviewer.bootstrapClass[:badge] do %>
+<% show_emojis = reviewer.mergeRequestInteraction.reviewState != "APPROVED" %>
+
+<%= render "user_badge",
+  user: reviewer,
+  title: reviewer_help_title(reviewer),
+  show_emojis: show_emojis,
+  class_suffix: reviewer.bootstrapClass[:badge] do %>
   <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
     <%= tag.i class: reviewer.bootstrapClass[:icon] %>
   <% end %>
-  <% if reviewer.bootstrapClass[:activity_icon] %>
+  <% if show_emojis && reviewer.bootstrapClass[:activity_icon] %>
     <%= tag.i class: reviewer.bootstrapClass[:activity_icon] %>
   <% end %>
 <% end %>
