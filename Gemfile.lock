@@ -257,7 +257,7 @@ GEM
     msgpack (1.7.5)
     net-http (0.6.0)
       uri
-    net-imap (0.5.3)
+    net-imap (0.5.4)
       date
       net-protocol
     net-pop (0.1.2)
@@ -605,4 +605,4 @@ DEPENDENCIES
   webmock
 
 BUNDLED WITH
-   2.6.1
+   2.6.2
