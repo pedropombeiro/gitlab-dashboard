@@ -133,6 +133,7 @@ class GitlabClient
             reviewers {
               nodes {
                 ...ExtendedUserFields
+                bot
                 mergeRequestInteraction {
                   approved
                   reviewState

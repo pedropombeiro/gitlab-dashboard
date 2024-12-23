@@ -1340,6 +1340,18 @@ one:
                     reviewState: REVIEWED
                   activeReviews:
                     count: 3
+                - __typename: MergeRequestReviewer
+                  username: GitLabDuo
+                  avatarUrl: /uploads/-/system/user/avatar/21826781/duo-bot.png
+                  webUrl: https://gitlab.com/GitLabDuo
+                  lastActivityOn:
+                  location: ""
+                  status:
+                  mergeRequestInteraction:
+                    approved: false
+                    reviewState: REVIEWED
+                  activeReviews:
+                    count: 0
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1590358850"
               startedAt: "2024-11-21T23:37:11Z"
