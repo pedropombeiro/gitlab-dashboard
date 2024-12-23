@@ -9,4 +9,4 @@ pre-commit:
   commands:
     backend-linter:
       glob: "*.rb"
-      run: bin/rake standard {all_files}
+      run: bin/rake standard {files}
