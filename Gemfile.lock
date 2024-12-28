@@ -137,7 +137,16 @@ GEM
       logger
     faraday-net_http (3.4.0)
       net-http (>= 0.5.0)
-    ffi (1.17.0)
+    ffi (1.17.0-aarch64-linux-gnu)
+    ffi (1.17.0-aarch64-linux-musl)
+    ffi (1.17.0-arm-linux-gnu)
+    ffi (1.17.0-arm-linux-musl)
+    ffi (1.17.0-arm64-darwin)
+    ffi (1.17.0-x86-linux-gnu)
+    ffi (1.17.0-x86-linux-musl)
+    ffi (1.17.0-x86_64-darwin)
+    ffi (1.17.0-x86_64-linux-gnu)
+    ffi (1.17.0-x86_64-linux-musl)
     fiber-annotation (0.2.0)
     fiber-local (1.1.0)
       fiber-storage
@@ -164,10 +173,10 @@ GEM
     hashdiff (1.1.2)
     honeybadger (5.26.1)
       logger
-    hotwire-livereload (1.4.1)
-      actioncable (>= 6.0.0)
+    hotwire-livereload (2.0.0)
+      actioncable (>= 7.0.0)
       listen (>= 3.0.0)
-      railties (>= 6.0.0)
+      railties (>= 7.0.0)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.1.0)
@@ -549,7 +558,7 @@ DEPENDENCIES
   geokit (~> 1.14)
   graphlient
   honeybadger (~> 5.26)
-  hotwire-livereload (~> 1.4)
+  hotwire-livereload (~> 2.0)
   importmap-rails
   jbuilder
   jsbundling-rails (~> 1.3)
