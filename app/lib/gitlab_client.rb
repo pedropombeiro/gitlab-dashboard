@@ -361,7 +361,7 @@ class GitlabClient
     result = nil
     histogram "graphql.query.duration" do
       result = self.class.client.query(query, **args)
-    rescue Graphlient::Errors::TimeoutError
+    rescue Graphlient::Errors::TimeoutError, Faraday::SSLError
       # retry once more after a short wait
       sleep 3
       result = self.class.client.query(query, **args)
