@@ -356,15 +356,13 @@ class GitlabClient
     metric_source "graphql_metrics"
     metric_attributes(name: name, **args.slice(:username))
 
-    increment_counter "graphql.query.count"
-
     result = nil
-    histogram "graphql.query.duration" do
-      result = self.class.client.query(query, **args)
-    rescue Graphlient::Errors::TimeoutError, Faraday::SSLError
-      # retry once more after a short wait
-      sleep 3
-      result = self.class.client.query(query, **args)
+    with_retries(max_tries: 2, rescue: [Graphlient::Errors::TimeoutError, Faraday::SSLError]) do
+      increment_counter "graphql.query.count"
+
+      histogram "graphql.query.duration" do
+        result = self.class.client.query(query, **args)
+      end
     end
 
     result

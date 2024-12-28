@@ -338,6 +338,7 @@ GEM
     regexp_parser (2.10.0)
     reline (0.6.0)
       io-console (~> 0.5)
+    retries (0.0.5)
     rexml (3.4.0)
     rspec (3.13.0)
       rspec-core (~> 3.13.0)
@@ -562,6 +563,7 @@ DEPENDENCIES
   rails (~> 8.0.0)
   rails-controller-testing
   redis (>= 4.0.1)
+  retries (~> 0.0.5)
   rspec-rails (~> 7.1.0)
   rubocop-rails-omakase
   selenium-webdriver
