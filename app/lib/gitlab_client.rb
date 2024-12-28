@@ -356,8 +356,12 @@ class GitlabClient
     metric_source "graphql_metrics"
     metric_attributes(name: name, **args.slice(:username))
 
+    handler = proc do |exception, _attempt_number, _total_delay|
+      increment_counter "graphql.query.error_count", {exception: exception.class.name}
+    end
+
     result = nil
-    with_retries(max_tries: 2, rescue: [Graphlient::Errors::TimeoutError, Faraday::SSLError]) do
+    with_retries(max_tries: 2, handler: handler, rescue: [Graphlient::Errors::TimeoutError, Faraday::SSLError]) do
       increment_counter "graphql.query.count"
 
       histogram "graphql.query.duration" do
