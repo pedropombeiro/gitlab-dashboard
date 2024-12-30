@@ -1,132 +1,132 @@
 <% merge_requests = merge_requests_dto.items %>
 
-<table class="table table-hover mb-0">
-  <caption class="caption-top ms-1">
-    <div class="d-flex justify-content-between align-items-end">
-      <div>
-        <div class="lead">
-          <%= pluralize(merge_requests.count, "merge request") %>
-          merged in the last week.
-        </div>
+<div class="d-flex justify-content-between align-items-end">
+  <div>
+    <div class="lead">
+      <%= pluralize(merge_requests.count, "merge request") %>
+      merged in the last week.
+    </div>
 
-        <% if merge_requests.count.positive? %>
+    <% if merge_requests.count.positive? %>
+      <div>Merged on average after
+        <%= distance_of_time_in_words(
+          ActiveSupport::Duration.build(
+            merge_requests.sum { |mr| Time.current - mr.createdAt } / merge_requests.count,
+          ),
+        ) %>.
+      </div>
+    <% end %>
+  </div>
+
+  <% if merged_merge_requests_count.positive? %>
+    <% since_first_mr = ActiveSupport::Duration.build(Time.current - first_merged_merge_requests_timestamp) %>
+    <% weekly_merge_rate = (merged_merge_requests_count.to_f / since_first_mr.in_weeks.to_f).round %>
+
+    <div class="flex-row-reverse">
+      <div>
+        A total of
+        <%= pluralize(merged_merge_requests_count, "merge request") %>
+        merged since
+        <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
+        <% if weekly_merge_rate < 1.0 %>
+          <%= (since_first_mr.in_weeks.to_f / merged_merge_requests_count.to_f).round(1) %> weeks per MR.
+        <% else %>
+          <%= weekly_merge_rate.round %> per week.
+        <% end %>
+      </div>
+      <% if merged_merge_requests_tttm %>
+        <div class="text-end">
           <div>Merged on average after
             <%= distance_of_time_in_words(
               ActiveSupport::Duration.build(
-                merge_requests.sum { |mr| Time.current - mr.createdAt } / merge_requests.count,
+                merged_merge_requests_tttm / merged_merge_requests_count,
               ),
             ) %>.
           </div>
-        <% end %>
-      </div>
-
-      <% if merged_merge_requests_count.positive? %>
-        <% since_first_mr = ActiveSupport::Duration.build(Time.current - first_merged_merge_requests_timestamp) %>
-        <% weekly_merge_rate = (merged_merge_requests_count.to_f / since_first_mr.in_weeks.to_f).round %>
-
-        <div class="flex-row-reverse">
-          <div>
-            A total of
-            <%= pluralize(merged_merge_requests_count, "merge request") %>
-            merged since
-            <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
-            <% if weekly_merge_rate < 1.0 %>
-              <%= (since_first_mr.in_weeks.to_f / merged_merge_requests_count.to_f).round(1) %> weeks per MR.
-            <% else %>
-              <%= weekly_merge_rate.round %> per week.
-            <% end %>
-          </div>
-          <% if merged_merge_requests_tttm %>
-            <div class="text-end">
-              <div>Merged on average after
-                <%= distance_of_time_in_words(
-                  ActiveSupport::Duration.build(
-                    merged_merge_requests_tttm / merged_merge_requests_count,
-                  ),
-                ) %>.
-              </div>
-            </div>
-          <% end %>
         </div>
       <% end %>
     </div>
-  </caption>
+  <% end %>
+</div>
 
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Created</th>
-      <th scope="col">Merged&nbsp;↓</th>
-      <th scope="col">Updated</th>
-      <th scope="col">Workflow Labels</th>
-      <th scope="col">Title</th>
-      <th scope="col">
-        Associated Issue
-        <%= tag.i(
-          class: %w[fa-solid fa-circle-info],
-          data: {
-            bs_toggle: "tooltip",
-            bs_title: "Issue number is extracted from branch name, if present",
-          },
-        ) %>
-      </th>
-    </tr>
-  </thead>
-
-  <tbody>
-    <% merge_requests.each do |mr| %>
-      <%= tag.tr style: "cursor: pointer;" do %>
-        <!-- MR ID -->
-        <th scope="row">
-          <%= render "mr_relation", merge_request: mr %>
+<% if merge_requests.any? %>
+  <table class="table table-hover mb-0">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Created</th>
+        <th scope="col">Merged&nbsp;↓</th>
+        <th scope="col">Updated</th>
+        <th scope="col">Workflow Labels</th>
+        <th scope="col">Title</th>
+        <th scope="col">
+          Associated Issue
+          <%= tag.i(
+            class: %w[fa-solid fa-circle-info],
+            data: {
+              bs_toggle: "tooltip",
+              bs_title: "Issue number is extracted from branch name, if present",
+            },
+          ) %>
         </th>
-        <!-- Created at -->
-        <td>
-          <%= render "shared/relative_timestamp",
-          timestamp: mr.createdAt,
-          most_significant_only: true %>
-        </td>
-        <!-- Merged at -->
-        <td>
-          <%= render "shared/relative_timestamp",
-          timestamp: mr.mergedAt,
-          most_significant_only: true %>
-          by
-          <br/>
-          <%= render "user_badge", user: mr.mergeUser, title: user_help_title(mr.mergeUser), class_suffix: "approved" %>
-        </td>
-        <!-- Updated at -->
-        <td>
-          <%= render "shared/relative_timestamp",
-          timestamp: mr.updatedAt,
-          most_significant_only: true %>
-        </td>
-        <!-- Workflow Labels -->
-        <td>
-          <%= render partial: "gitlab_label",
-          spacer_template: "space",
-          collection: mr.contextualLabels,
-          as: :label %>
-        </td>
-        <!-- Title -->
-        <td>
-          <%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
-          <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
+      </tr>
+    </thead>
 
-          <div style="max-width: 26em">
-            <%= render "branch_relation",
-            source_branch: mr.sourceBranch,
-            target_branch: mr.targetBranch %>
-          </div>
-        </td>
-        <!-- Associated Issue -->
-        <td>
-          <%= render("issue_link", issue: mr.issue) if mr.issue %>
-        </td>
+    <tbody>
+      <% merge_requests.each do |mr| %>
+        <%= tag.tr style: "cursor: pointer;" do %>
+          <!-- MR ID -->
+          <th scope="row">
+            <%= render "mr_relation", merge_request: mr %>
+          </th>
+          <!-- Created at -->
+          <td>
+            <%= render "shared/relative_timestamp",
+            timestamp: mr.createdAt,
+            most_significant_only: true %>
+          </td>
+          <!-- Merged at -->
+          <td>
+            <%= render "shared/relative_timestamp",
+            timestamp: mr.mergedAt,
+            most_significant_only: true %>
+            by
+            <br/>
+            <%= render "user_badge", user: mr.mergeUser, title: user_help_title(mr.mergeUser), class_suffix: "approved" %>
+          </td>
+          <!-- Updated at -->
+          <td>
+            <%= render "shared/relative_timestamp",
+            timestamp: mr.updatedAt,
+            most_significant_only: true %>
+          </td>
+          <!-- Workflow Labels -->
+          <td>
+            <%= render partial: "gitlab_label",
+            spacer_template: "space",
+            collection: mr.contextualLabels,
+            as: :label %>
+          </td>
+          <!-- Title -->
+          <td>
+            <%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
+            <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
+
+            <div style="max-width: 26em">
+              <%= render "branch_relation",
+              source_branch: mr.sourceBranch,
+              target_branch: mr.targetBranch %>
+            </div>
+          </td>
+          <!-- Associated Issue -->
+          <td>
+            <%= render("issue_link", issue: mr.issue) if mr.issue %>
+          </td>
+        <% end %>
       <% end %>
-    <% end %>
-  </tbody>
-</table>
+    </tbody>
+  </table>
+<% end %>
 
 <div id="graphs", class="h-100 d-flex align-items-center justify-content-center">
   <%= column_chart(
