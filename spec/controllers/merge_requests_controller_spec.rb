@@ -28,7 +28,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             "query" => a_string_including("user("),
             "variables" => {username: "non-existent"}
           ))
-          .to_return(status: :ok, body: {data: {user: nil}}.to_json)
+          .to_return_json(body: {data: {user: nil}})
       end
 
       let(:params) { {assignee: "non-existent"} }
@@ -53,7 +53,7 @@ RSpec.describe MergeRequestsController, type: :controller do
               webUrl: "https://gitlab.example.com/#{username}"
             }
           }
-        }.to_json
+        }
       end
 
       let!(:user_request_stub) do
@@ -62,7 +62,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             "query" => a_string_including("user("),
             "variables" => {username: username}
           ))
-          .to_return(status: :ok, body: user_response_body)
+          .to_return_json(status: :ok, body: user_response_body)
       end
 
       it "returns http success and creates user with correct timestamp", :freeze_time do
@@ -155,7 +155,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                   "query" => a_string_including("user: currentUser"),
                   "variables" => {}
                 ))
-                .to_return(status: :ok, body: user_response_body)
+                .to_return_json(body: user_response_body)
             end
 
             it "redirects to assignee specified in GITLAB_TOKEN" do
@@ -207,7 +207,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             "query" => a_string_including("user("),
             "variables" => {username: "non-existent"}
           ))
-          .to_return(status: :ok, body: {data: {user: nil}}.to_json)
+          .to_return_json(body: {data: {user: nil}})
       end
 
       let(:params) { {assignee: "non-existent"} }
@@ -221,9 +221,7 @@ RSpec.describe MergeRequestsController, type: :controller do
     end
 
     context "when assignee is known" do
-      let_it_be(:issues0_body) { YAML.load_file(file_fixture("issues.yml"))["project_0"].to_json }
-      let_it_be(:issues1_body) { YAML.load_file(file_fixture("issues.yml"))["project_1"].to_json }
-      let_it_be(:issues2_body) { YAML.load_file(file_fixture("issues.yml"))["project_2"].to_json }
+      let_it_be(:issues) { YAML.load_file(file_fixture("issues.yml")) }
 
       let(:open_mrs) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
       let(:merged_mrs) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
@@ -239,7 +237,7 @@ RSpec.describe MergeRequestsController, type: :controller do
               "query" => a_string_including("user("),
               "variables" => {username: username}
             ))
-            .to_return(status: :ok, body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}}.to_json)
+            .to_return_json(body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}})
         end
 
         let!(:open_mrs_request_stub) do
@@ -268,7 +266,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 ])
               )
             ))
-            .to_return(status: :ok, body: issues0_body)
+            .to_return_json(body: issues["project_0"])
           stub_request(:post, graphql_url)
             .with(body: hash_including(
               "query" => a_string_including(%[issues(iids: $issueIids)]),
@@ -277,7 +275,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 "issueIids" => %w[32804]
               }
             ))
-            .to_return(status: :ok, body: issues1_body)
+            .to_return_json(body: issues["project_1"])
           stub_request(:post, graphql_url)
             .with(body: hash_including(
               "query" => a_string_including(%[issues(iids: $issueIids)]),
@@ -286,7 +284,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 "issueIids" => %w[32804]
               }
             ))
-            .to_return(status: :ok, body: issues2_body)
+            .to_return_json(body: issues["project_2"])
         end
 
         it "returns http success" do
@@ -332,7 +330,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
                 stub_request(:post, graphql_url)
                   .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
-                  .to_return(status: :ok, body: open_mrs.to_json)
+                  .to_return_json(body: open_mrs)
 
                 perform_request
 
@@ -341,7 +339,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
                 stub_request(:post, graphql_url)
                   .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
-                  .to_return(status: :ok, body: open_mrs.to_json)
+                  .to_return_json(body: open_mrs)
 
                 expect(WebPush).not_to receive(:payload_send)
 
@@ -384,10 +382,10 @@ RSpec.describe MergeRequestsController, type: :controller do
 
                 stub_request(:post, graphql_url)
                   .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
-                  .to_return(status: :ok, body: open_mrs.to_json)
+                  .to_return_json(body: open_mrs)
                 stub_request(:post, graphql_url)
                   .with(body: hash_including("query" => a_string_including("mergedMergeRequests: ")))
-                  .to_return(status: :ok, body: merged_mrs.to_json)
+                  .to_return_json(body: merged_mrs)
 
                 expect(WebPush).to receive(:payload_send)
                   .with(payload_of_merged_mr_notification(merged_mr))
@@ -482,7 +480,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 "mergedAfter" => 1.week.ago
               }
             ))
-            .to_return(status: :ok, body: merged_mrs.to_json)
+            .to_return_json(body: merged_mrs)
         end
       end
     end

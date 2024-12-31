@@ -43,7 +43,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
                 "mergedBefore" => eom.to_fs
               }
             ))
-            .to_return(status: 200, body: monthly_mr_stats_body[offset].to_json)
+            .to_return_json(body: monthly_mr_stats_body[offset])
         end
       end
 
