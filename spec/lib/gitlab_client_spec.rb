@@ -24,10 +24,7 @@ RSpec.describe GitlabClient do
     before do
       stub_request(:post, graphql_url)
         .with(body: a_string_including("user("))
-        .to_return(
-          status: :ok,
-          body: user_requests_response_body[username].to_json
-        )
+        .to_return_json(body: user_requests_response_body[username])
     end
 
     it "returns the user data", :freeze_time do
@@ -49,8 +46,7 @@ RSpec.describe GitlabClient do
   end
 
   describe "#fetch_issues" do
-    let_it_be(:issues0_body) { YAML.load_file(file_fixture("issues.yml"))["project_0"].to_json }
-    let_it_be(:issues2_body) { YAML.load_file(file_fixture("issues.yml"))["project_2"].to_json }
+    let_it_be(:issues) { YAML.load_file(file_fixture("issues.yml")) }
 
     let(:merged_mr_issues) do
       [{project_full_path: "gitlab-org/gitlab", issue_iid: "505810"}]
@@ -76,7 +72,7 @@ RSpec.describe GitlabClient do
             "issueIids" => an_array_matching(%w[505810 506226])
           )
         ))
-        .to_return(status: :ok, body: issues0_body)
+        .to_return_json(body: issues["project_0"])
       stub_request(:post, graphql_url)
         .with(body: hash_including(
           "query" => a_string_including(%[issues(iids: $issueIids)]),
@@ -85,7 +81,7 @@ RSpec.describe GitlabClient do
             "issueIids" => %w[32804]
           }
         ))
-        .to_return(status: :ok, body: issues2_body)
+        .to_return_json(body: issues["project_2"])
     end
 
     it "returns an array with the processed issue data" do
@@ -125,10 +121,7 @@ RSpec.describe GitlabClient do
     before do
       stub_request(:post, graphql_url)
         .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
-        .to_return(
-          status: :ok,
-          body: open_mrs_response_body["one"].to_json
-        )
+        .to_return_json(body: open_mrs_response_body["one"])
     end
 
     it "returns the merge request data", :freeze_time do
@@ -180,7 +173,7 @@ RSpec.describe GitlabClient do
     before do
       stub_request(:post, graphql_url)
         .with(body: hash_including("query" => a_string_including("mergedMergeRequests")))
-        .to_return(status: :ok, body: {data: {user: {mergedMergeRequests: {nodes: []}}}}.to_json)
+        .to_return_json(status: :ok, body: {data: {user: {mergedMergeRequests: {nodes: []}}}})
     end
 
     it "returns merged merge requests" do
@@ -205,10 +198,8 @@ RSpec.describe GitlabClient do
             "mergedBefore" => an_instance_of(String)
           )
         ))
-        .to_return(
-          status: :ok,
-          body: {data: {user: {monthlyMergedMergeRequests: []}}}.to_json
-        ).times(12)
+        .to_return_json(body: {data: {user: {monthlyMergedMergeRequests: []}}})
+        .times(12)
     end
 
     it "returns monthly merged merge requests" do
