@@ -1,0 +1,225 @@
+dmeshcharakou:
+  data:
+    user:
+      __typename: UserCore
+      username: dmeshcharakou
+      avatarUrl: "/uploads/-/system/user/avatar/12459192/avatar.png"
+      webUrl: https://gitlab.com/dmeshcharakou
+      lastActivityOn:
+      location: Switzerland
+      status:
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: true
+          - approved: false
+          - approved: false
+
+bucoleary:
+  data:
+    user:
+      __typename: UserCore
+      username: bucoleary
+      avatarUrl: "/uploads/-/system/user/avatar/21563091/avatar.png"
+      webUrl: https://gitlab.com/bucoleary
+      lastActivityOn: "2024-11-27"
+      location: NYC, US
+      status:
+        availability: NOT_SET
+        message: ""
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+
+rutgerwessels:
+  data:
+    user:
+      __typename: UserCore
+      username: rutgerwessels
+      avatarUrl: "/uploads/-/system/user/avatar/12926454/avatar.png"
+      webUrl: https://gitlab.com/rutgerwessels
+      lastActivityOn: "2024-11-27"
+      location: Assen, The Netherlands
+      status:
+        availability: NOT_SET
+        message: ""
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+          - approved: false
+
+halilcoban:
+  data:
+    user:
+      __typename: UserCore
+      username: halilcoban
+      avatarUrl: "/uploads/-/system/user/avatar/13172759/avatar.png"
+      webUrl: https://gitlab.com/halilcoban
+      lastActivityOn: "2024-11-27"
+      location: ""
+      status:
+        availability: NOT_SET
+        message: ""
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+
+hmehra:
+  data:
+    user:
+      __typename: UserCore
+      username: hmehra
+      avatarUrl: "/uploads/-/system/user/avatar/10761376/avatar.png"
+      webUrl: https://gitlab.com/hmehra
+      lastActivityOn: "2024-11-27"
+      location: ""
+      status:
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+          - approved: false
+          - approved: false
+          - approved: false
+
+vshushlin:
+  data:
+    user:
+      __typename: UserCore
+      username: vshushlin
+      avatarUrl: "/uploads/-/system/user/avatar/3379682/avatar.png"
+      webUrl: https://gitlab.com/vshushlin
+      lastActivityOn: "2024-11-27"
+      location: Amsterdam (UTC+1)
+      status:
+        availability: NOT_SET
+        message: Mention @vshushlin, if you need my reply or action! I only
+          use todos!
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+          - approved: false
+
+cwiesner:
+  data:
+    user:
+      __typename: UserCore
+      username: cwiesner
+      avatarUrl: "/uploads/-/system/user/avatar/4799322/avatar.png"
+      webUrl: https://gitlab.com/cwiesner
+      lastActivityOn: "2024-11-27"
+      location: Germany
+      status:
+        availability: NOT_SET
+        message: ""
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+          - approved: false
+
+"aish.sub":
+  data:
+    user:
+      __typename: UserCore
+      username: aish.sub
+      avatarUrl: "/uploads/-/system/user/avatar/11167007/avatar.png"
+      webUrl: https://gitlab.com/aish.sub
+      lastActivityOn: "2024-11-27"
+      location: ""
+      status:
+        availability: NOT_SET
+        message: ""
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+
+akotte:
+  data:
+    user:
+      __typename: UserCore
+      username: akotte
+      avatarUrl: "/uploads/-/system/user/avatar/12515238/avatar.png"
+      webUrl: https://gitlab.com/akotte
+      lastActivityOn: "2024-11-27"
+      location: Hyderabad, India
+      status:
+        availability: NOT_SET
+        message: ""
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+          - approved: false
+
+eugielimpin:
+  data:
+    user:
+      __typename: UserCore
+      username: eugielimpin
+      avatarUrl: "/uploads/-/system/user/avatar/9670031/avatar.png"
+      webUrl: https://gitlab.com/eugielimpin
+      lastActivityOn: "2024-11-27"
+      location: ""
+      status:
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+          - approved: false
+          - approved: false
+          - approved: false
+
+emmaspark:
+  data:
+    user:
+      __typename: UserCore
+      username: emmaspark
+      avatarUrl: "/uploads/-/system/user/avatar/21572755/avatar.png"
+      webUrl: https://gitlab.com/emmaspark
+      lastActivityOn: "2024-11-27"
+      location: ""
+      status:
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+
+mbobin:
+  data:
+    user:
+      __typename: UserCore
+      username: mbobin
+      avatarUrl: https://secure.gravatar.com/avatar/130da6066ec37628a1d76ab60715b7acb7f04f7efe9a42a768d877a48c480ac2?s=80&d=identicon
+      webUrl: https://gitlab.com/mbobin
+      lastActivityOn: "2024-11-27"
+      location: Bucharest
+      status:
+        availability: NOT_SET
+        message: ""
+      bot: false
+      activeReviews:
+        nodes:
+          - approved: false
+          - approved: false
+          - approved: false
+
+GitLabDuo:
+  data:
+    user:
+      __typename: UserCore
+      __typename: UserCore
+      username: GitLabDuo
+      avatarUrl: /uploads/-/system/user/avatar/21826781/duo-bot.png
+      webUrl: https://gitlab.com/GitLabDuo
+      lastActivityOn:
+      location: ""
+      status:
+      bot: true
+      activeReviews:
+        nodes: []

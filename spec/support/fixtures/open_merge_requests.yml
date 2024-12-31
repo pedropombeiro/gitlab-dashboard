@@ -99,30 +99,14 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: dmeshcharakou
-                  avatarUrl: "/uploads/-/system/user/avatar/12459192/avatar.png"
-                  webUrl: https://gitlab.com/dmeshcharakou
-                  lastActivityOn:
-                  location: Switzerland
-                  status:
                   mergeRequestInteraction:
                     approved: true
                     reviewState: APPROVED
-                  activeReviews:
-                    count: 3
                 - __typename: MergeRequestReviewer
                   username: bucoleary
-                  avatarUrl: "/uploads/-/system/user/avatar/21563091/avatar.png"
-                  webUrl: https://gitlab.com/bucoleary
-                  lastActivityOn: "2024-11-27"
-                  location: NYC, US
-                  status:
-                    availability: NOT_SET
-                    message: ""
                   mergeRequestInteraction:
                     approved: true
                     reviewState: APPROVED
-                  activeReviews:
-                    count: 1
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1562777670"
               startedAt: "2024-11-27T14:02:14Z"
@@ -248,18 +232,9 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: rutgerwessels
-                  avatarUrl: "/uploads/-/system/user/avatar/12926454/avatar.png"
-                  webUrl: https://gitlab.com/rutgerwessels
-                  lastActivityOn: "2024-11-27"
-                  location: Assen, The Netherlands
-                  status:
-                    availability: NOT_SET
-                    message: ""
                   mergeRequestInteraction:
                     approved: false
                     reviewState: UNREVIEWED
-                  activeReviews:
-                    count: 2
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1562737387"
               startedAt: "2024-11-27T13:40:26Z"
@@ -377,18 +352,9 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: halilcoban
-                  avatarUrl: "/uploads/-/system/user/avatar/13172759/avatar.png"
-                  webUrl: https://gitlab.com/halilcoban
-                  lastActivityOn: "2024-11-27"
-                  location: ""
-                  status:
-                    availability: NOT_SET
-                    message: ""
                   mergeRequestInteraction:
                     approved: false
                     reviewState: UNREVIEWED
-                  activeReviews:
-                    count: 1
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1562345814"
               startedAt: "2024-11-27T09:56:09Z"
@@ -522,16 +488,9 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: hmehra
-                  avatarUrl: "/uploads/-/system/user/avatar/10761376/avatar.png"
-                  webUrl: https://gitlab.com/hmehra
-                  lastActivityOn: "2024-11-27"
-                  location: ""
-                  status:
                   mergeRequestInteraction:
                     approved: false
                     reviewState: UNREVIEWED
-                  activeReviews:
-                    count: 4
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1562376596"
               startedAt: "2024-11-27T10:12:13Z"
@@ -649,33 +608,14 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: vshushlin
-                  avatarUrl: "/uploads/-/system/user/avatar/3379682/avatar.png"
-                  webUrl: https://gitlab.com/vshushlin
-                  lastActivityOn: "2024-11-27"
-                  location: Amsterdam (UTC+1)
-                  status:
-                    availability: NOT_SET
-                    message: Mention @vshushlin, if you need my reply or action! I only
-                      use todos!
                   mergeRequestInteraction:
                     approved: false
                     reviewState: UNREVIEWED
-                  activeReviews:
-                    count: 2
                 - __typename: MergeRequestReviewer
                   username: cwiesner
-                  avatarUrl: "/uploads/-/system/user/avatar/4799322/avatar.png"
-                  webUrl: https://gitlab.com/cwiesner
-                  lastActivityOn: "2024-11-27"
-                  location: Germany
-                  status:
-                    availability: NOT_SET
-                    message: ""
                   mergeRequestInteraction:
                     approved: true
                     reviewState: APPROVED
-                  activeReviews:
-                    count: 2
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1561551217"
               startedAt: "2024-11-26T19:37:05Z"
@@ -794,18 +734,9 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: aish.sub
-                  avatarUrl: "/uploads/-/system/user/avatar/11167007/avatar.png"
-                  webUrl: https://gitlab.com/aish.sub
-                  lastActivityOn: "2024-11-27"
-                  location: ""
-                  status:
-                    availability: NOT_SET
-                    message: ""
                   mergeRequestInteraction:
                     approved: false
                     reviewState: UNREVIEWED
-                  activeReviews:
-                    count: 1
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1561352489"
               startedAt: "2024-11-26T16:52:02Z"
@@ -925,18 +856,9 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: akotte
-                  avatarUrl: "/uploads/-/system/user/avatar/12515238/avatar.png"
-                  webUrl: https://gitlab.com/akotte
-                  lastActivityOn: "2024-11-27"
-                  location: Hyderabad, India
-                  status:
-                    availability: NOT_SET
-                    message: ""
                   mergeRequestInteraction:
                     approved: false
                     reviewState: UNREVIEWED
-                  activeReviews:
-                    count: 2
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1561290040"
               startedAt: "2024-11-26T16:11:36Z"
@@ -1048,28 +970,14 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: eugielimpin
-                  avatarUrl: "/uploads/-/system/user/avatar/9670031/avatar.png"
-                  webUrl: https://gitlab.com/eugielimpin
-                  lastActivityOn: "2024-11-27"
-                  location: ""
-                  status:
                   mergeRequestInteraction:
                     approved: false
                     reviewState: UNREVIEWED
-                  activeReviews:
-                    count: 4
                 - __typename: MergeRequestReviewer
                   username: emmaspark
-                  avatarUrl: "/uploads/-/system/user/avatar/21572755/avatar.png"
-                  webUrl: https://gitlab.com/emmaspark
-                  lastActivityOn: "2024-11-27"
-                  location: ""
-                  status:
                   mergeRequestInteraction:
                     approved: true
                     reviewState: APPROVED
-                  activeReviews:
-                    count: 1
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1561176021"
               startedAt: "2024-11-26T15:09:07Z"
@@ -1328,30 +1236,14 @@ one:
               nodes:
                 - __typename: MergeRequestReviewer
                   username: mbobin
-                  avatarUrl: https://secure.gravatar.com/avatar/130da6066ec37628a1d76ab60715b7acb7f04f7efe9a42a768d877a48c480ac2?s=80&d=identicon
-                  webUrl: https://gitlab.com/mbobin
-                  lastActivityOn: "2024-11-27"
-                  location: Bucharest
-                  status:
-                    availability: NOT_SET
-                    message: ""
                   mergeRequestInteraction:
                     approved: false
                     reviewState: REVIEWED
-                  activeReviews:
-                    count: 3
                 - __typename: MergeRequestReviewer
                   username: GitLabDuo
-                  avatarUrl: /uploads/-/system/user/avatar/21826781/duo-bot.png
-                  webUrl: https://gitlab.com/GitLabDuo
-                  lastActivityOn:
-                  location: ""
-                  status:
                   mergeRequestInteraction:
                     approved: false
                     reviewState: REVIEWED
-                  activeReviews:
-                    count: 0
             headPipeline:
               path: "/gitlab-org/gitlab/-/pipelines/1590358850"
               startedAt: "2024-11-21T23:37:11Z"
