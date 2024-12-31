@@ -113,8 +113,8 @@ class GitlabClient
   GRAPHQL
 
   REVIEWER_QUERY = <<-GRAPHQL
-    query($username: String!, $activeReviewsAfter: Time) {
-      user(username: $username) {
+    query($reviewer: String!, $activeReviewsAfter: Time) {
+      user(username: $reviewer) {
         ...ExtendedUserFields
         bot
         activeReviews: reviewRequestedMergeRequests(state: opened, approved: false, updatedAfter: $activeReviewsAfter) {
@@ -271,7 +271,7 @@ class GitlabClient
       execute_query(
         REVIEWER_QUERY,
         "reviewer",
-        username: username,
+        reviewer: username,
         activeReviewsAfter: 1.week.ago
       )
     end

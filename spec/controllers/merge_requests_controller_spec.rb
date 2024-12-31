@@ -258,12 +258,12 @@ RSpec.describe MergeRequestsController, type: :controller do
             .with(body: hash_including(
               "query" => a_string_including("activeReviews: reviewRequestedMergeRequests"),
               "variables" => hash_including(
-                "username" => an_instance_of(String),
+                "reviewer" => an_instance_of(String),
                 "activeReviewsAfter" => an_instance_of(String)
               )
             ))
             .to_return do |request|
-              username = JSON.parse(request.body).dig(*%w[variables username])
+              username = JSON.parse(request.body).dig(*%w[variables reviewer])
 
               {body: reviewer_responses.fetch(username).to_json}
             end
