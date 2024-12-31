@@ -29,6 +29,10 @@ module CacheConcern
       "#{REDIS_NAMESPACE}/issues/#{project_issues_version}/#{calculate_hash(*issue_iids)}"
     end
 
+    def reviewer_cache_key(username)
+      "#{REDIS_NAMESPACE}/reviewer_info/#{reviewer_info_version}/#{user_hash(username)}"
+    end
+
     def authored_mr_lists_cache_key(user)
       "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/authored_list/#{user_hash(user)}"
     end
@@ -62,14 +66,19 @@ module CacheConcern
       @user_info_version ||= calculate_hash(GitlabClient::USER_QUERY, GitlabClient::CURRENT_USER_QUERY)
     end
 
+    def reviewer_info_version
+      @reviewer_info_version ||= calculate_hash(GitlabClient::REVIEWER_QUERY)
+    end
+
     def project_issues_version
       @project_issues_version ||= calculate_hash(GitlabClient::PROJECT_ISSUES_QUERY)
     end
 
     def merge_requests_version
       @merge_requests_version ||= calculate_hash(
-        GitlabClient::OPEN_MERGE_REQUESTS_GRAPHQL_QUERY,
-        GitlabClient::MERGED_MERGE_REQUESTS_GRAPHQL_QUERY
+        GitlabClient::OPEN_MERGE_REQUESTS_QUERY,
+        GitlabClient::REVIEWER_QUERY,
+        GitlabClient::MERGED_MERGE_REQUESTS_QUERY
       )
     end
 

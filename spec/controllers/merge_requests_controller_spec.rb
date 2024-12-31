@@ -223,6 +223,7 @@ RSpec.describe MergeRequestsController, type: :controller do
     context "when assignee is known" do
       let_it_be(:issues) { YAML.load_file(file_fixture("issues.yml")) }
 
+      let!(:reviewer_responses) { YAML.load_file(file_fixture("reviewers.yml")) }
       let(:open_mrs) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
       let(:merged_mrs) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
       let(:username) { "pedropombeiro" }
@@ -246,11 +247,26 @@ RSpec.describe MergeRequestsController, type: :controller do
               "query" => a_string_including("openMergeRequests: "),
               "variables" => hash_including(
                 "username" => username,
-                "activeReviewsAfter" => an_instance_of(String),
                 "updatedAfter" => an_instance_of(String)
               )
             ))
-            .to_return(status: :ok, body: open_mrs.to_json)
+            .to_return_json(body: open_mrs)
+        end
+
+        let!(:reviewers_request_stub) do
+          stub_request(:post, graphql_url)
+            .with(body: hash_including(
+              "query" => a_string_including("activeReviews: reviewRequestedMergeRequests"),
+              "variables" => hash_including(
+                "username" => an_instance_of(String),
+                "activeReviewsAfter" => an_instance_of(String)
+              )
+            ))
+            .to_return do |request|
+              username = JSON.parse(request.body).dig(*%w[variables username])
+
+              {body: reviewer_responses.fetch(username).to_json}
+            end
         end
 
         let!(:merged_mrs_request_stub) { create_merged_mrs_request_stub }

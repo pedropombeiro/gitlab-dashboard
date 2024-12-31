@@ -28,7 +28,11 @@ module Services
         # Fetch merge requests in 2 calls to reduce query complexity, and do it asynchronously for efficiency
         Sync do
           [
-            Async { open_mrs_response = gitlab_client.fetch_open_merge_requests(assignee) },
+            Async do
+              open_mrs_response = gitlab_client.fetch_open_merge_requests(assignee).tap do |response|
+                fill_reviewers_info(response.response.data.user.openMergeRequests.nodes)
+              end
+            end,
             Async { merged_mrs_response = gitlab_client.fetch_merged_merge_requests(assignee) }
           ].map(&:wait)
         end
@@ -95,6 +99,34 @@ module Services
       Rails.cache.fetch(self.class.project_issues_cache_key(issue_iids), expires_in: MergeRequestsCacheService.cache_validity) do
         gitlab_client.fetch_issues(merged_mr_issue_iids, open_mr_issue_iids)
       end.response&.data&.compact.to_h { |issue| [issue.iid, issue] }
+    end
+
+    def fill_reviewers_info(open_merge_requests)
+      reviewer_usernames = open_merge_requests.flat_map { |mr| mr.reviewers.nodes.map(&:username) }.uniq
+
+      reviewers_info = Sync do
+        reviewer_usernames.map do |reviewer_username|
+          Async do
+            Rails.cache.fetch(self.class.reviewer_cache_key(reviewer_username), expires_in: 30.minutes) do
+              gitlab_client.fetch_reviewer(reviewer_username)
+            end
+          end
+        end.map(&:wait)
+      end
+
+      reviewers_hash =
+        reviewers_info
+          .map { |response| response.response.data.user }
+          .to_h { |reviewer| [reviewer.username, reviewer] }
+
+      open_merge_requests.flat_map { |mr| mr.reviewers.nodes }.each do |reviewer|
+        reviewer.table.reverse_merge!(reviewers_hash[reviewer.username].table)
+
+        # NOTE: This is required because we can't filter on `active: true` reviews until
+        # the `mr_approved_filter` FF is removed or enabled
+        reviewer.activeReviews[:count] = reviewer.activeReviews.nodes.count { |review| !review.approved }
+        reviewer.activeReviews.delete_field!(:nodes)
+      end
     end
   end
 end

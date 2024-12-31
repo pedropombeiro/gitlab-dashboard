@@ -112,8 +112,24 @@ class GitlabClient
     #{CORE_ISSUE_FRAGMENT}
   GRAPHQL
 
-  OPEN_MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
-    query($username: String!, $activeReviewsAfter: Time, $updatedAfter: Time) {
+  REVIEWER_QUERY = <<-GRAPHQL
+    query($username: String!, $activeReviewsAfter: Time) {
+      user(username: $username) {
+        ...ExtendedUserFields
+        bot
+        activeReviews: reviewRequestedMergeRequests(state: opened, approved: false, updatedAfter: $activeReviewsAfter) {
+          # count # approved: false filter is behind the `mr_approved_filter` ops FF, so we need to request the nodes for now
+          nodes { approved }
+        }
+      }
+    }
+
+    #{CORE_USER_FRAGMENT}
+    #{EXT_USER_FRAGMENT}
+  GRAPHQL
+
+  OPEN_MERGE_REQUESTS_QUERY = <<-GRAPHQL
+    query($username: String!, $updatedAfter: Time) {
       user(username: $username) {
         openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC, updatedAfter: $updatedAfter) {
           nodes {
@@ -132,16 +148,10 @@ class GitlabClient
             }
             reviewers {
               nodes {
-                ...ExtendedUserFields
-                bot
+                username
                 mergeRequestInteraction {
                   approved
                   reviewState
-                }
-                activeReviews: reviewRequestedMergeRequests(
-                  state: opened, approved: false, updatedAfter: $activeReviewsAfter
-                ) {
-                  count
                 }
               }
             }
@@ -191,12 +201,11 @@ class GitlabClient
     }
 
     #{CORE_USER_FRAGMENT}
-    #{EXT_USER_FRAGMENT}
     #{CORE_LABEL_FRAGMENT}
     #{CORE_MERGE_REQUEST_FRAGMENT}
   GRAPHQL
 
-  MERGED_MERGE_REQUESTS_GRAPHQL_QUERY = <<-GRAPHQL
+  MERGED_MERGE_REQUESTS_QUERY = <<-GRAPHQL
     query($username: String!, $mergedAfter: Time!) {
       user(username: $username) {
         firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
@@ -257,13 +266,23 @@ class GitlabClient
     format_response(format) { execute_query(CURRENT_USER_QUERY, "user") }
   end
 
+  def fetch_reviewer(username, format: :open_struct)
+    format_response(format) do
+      execute_query(
+        REVIEWER_QUERY,
+        "reviewer",
+        username: username,
+        activeReviewsAfter: 1.week.ago
+      )
+    end
+  end
+
   def fetch_open_merge_requests(username, format: :open_struct)
     format_response(format) do
       execute_query(
-        OPEN_MERGE_REQUESTS_GRAPHQL_QUERY,
+        OPEN_MERGE_REQUESTS_QUERY,
         "open_merge_requests",
         username: username,
-        activeReviewsAfter: 1.week.ago,
         updatedAfter: 1.year.ago
       )
     end
@@ -272,7 +291,7 @@ class GitlabClient
   def fetch_merged_merge_requests(username, format: :open_struct)
     format_response(format) do
       execute_query(
-        MERGED_MERGE_REQUESTS_GRAPHQL_QUERY, "merged_merge_requests", username: username, mergedAfter: 1.week.ago
+        MERGED_MERGE_REQUESTS_QUERY, "merged_merge_requests", username: username, mergedAfter: 1.week.ago
       )
     end
   end
