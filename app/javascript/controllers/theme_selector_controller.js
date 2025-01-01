@@ -10,8 +10,10 @@ export default class extends Controller {
       (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
     ) {
       headElement.setAttribute("data-bs-theme", "dark");
+      this.element.innerHTML = '<i class="fa-regular fa-moon"></i>';
     } else if (headElement.hasAttribute("data-bs-theme")) {
       headElement.removeAttribute("data-bs-theme");
+      this.element.innerHTML = '<i class="fa-regular fa-sun"></i>';
     }
   }
 
