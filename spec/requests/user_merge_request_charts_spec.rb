@@ -31,7 +31,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
 
       let!(:merged_mrs_request_stubs) do
         12.times.map do |offset|
-          bom = Date.new(2024, 12, 31).beginning_of_month - offset.months
+          bom = Date.current.beginning_of_month - offset.months
           eom = 1.month.after(bom)
 
           stub_request(:post, graphql_url)
