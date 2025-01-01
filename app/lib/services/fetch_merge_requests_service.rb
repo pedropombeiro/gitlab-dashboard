@@ -22,18 +22,15 @@ module Services
 
     def execute
       Rails.cache.fetch(self.class.authored_mr_lists_cache_key(assignee), expires_in: MergeRequestsCacheService.cache_validity) do
-        open_mrs_response = nil
-        merged_mrs_response = nil
-
         # Fetch merge requests in 2 calls to reduce query complexity, and do it asynchronously for efficiency
-        Sync do
+        open_mrs_response, merged_mrs_response = Sync do |task|
           [
-            Async do
-              open_mrs_response = gitlab_client.fetch_open_merge_requests(assignee).tap do |response|
+            task.async do
+              gitlab_client.fetch_open_merge_requests(assignee).tap do |response|
                 fill_reviewers_info(response.response.data.user.openMergeRequests.nodes)
               end
             end,
-            Async { merged_mrs_response = gitlab_client.fetch_merged_merge_requests(assignee) }
+            task.async { gitlab_client.fetch_merged_merge_requests(assignee) }
           ].map(&:wait)
         end
 
@@ -104,9 +101,9 @@ module Services
     def fill_reviewers_info(open_merge_requests)
       reviewer_usernames = open_merge_requests.flat_map { |mr| mr.reviewers.nodes.map(&:username) }.uniq
 
-      reviewers_info = Sync do
+      reviewers_info = Sync do |task|
         reviewer_usernames.map do |reviewer_username|
-          Async do
+          task.async do
             Rails.cache.fetch(self.class.reviewer_cache_key(reviewer_username), expires_in: 30.minutes) do
               gitlab_client.fetch_reviewer(reviewer_username)
             end

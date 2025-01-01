@@ -15,9 +15,11 @@ module Services
     def fetch_timezones(locations)
       return unless timezone_configured?
 
-      locations.map do |l|
-        Async { [l, fetch_timezone(l)] }
-      end.map(&:wait).to_h
+      Sync do |task|
+        locations.map do |l|
+          task.async { [l, fetch_timezone(l)] }
+        end.to_h(&:wait)
+      end
     end
 
     def fetch_timezone(location)
