@@ -70,11 +70,10 @@
 
     <%= tag.button(
       class: %w[btn mx-2 text-light d-none d-sm-inline],
-      data: {
-        controller: "theme-selector",
-        action: "theme-selector#switch",
-      },
-    ) %>
+      data: { controller: "theme-selector", action: "theme-selector#switch" },
+    ) do %>
+      <%= tag.i class: %w[fa-solid fa-circle-half-stroke] %>
+    <% end %>
 
     <%= link_to "Status",
     "https://status.pombei.ro/sites/a268525c-738a-46c6-bb70-d96bf1c05e59",
