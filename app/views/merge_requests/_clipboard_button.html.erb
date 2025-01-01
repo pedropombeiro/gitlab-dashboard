@@ -1,10 +1,9 @@
-<%= tag.button(
+<%= tag.span(
   tag.i(class: "fa fa-clipboard"),
-  class: %w[btn p-0 shadow-none float-right d-none d-sm-inline text-secondary],
+  class: %w[me-2 float-right d-none d-sm-inline text-secondary],
   aria: {
     hidden: "true",
   },
-  focusable: false,
   data: {
     action: "clipboard#copy",
     bs_toggle: "tooltip",
