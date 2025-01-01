@@ -11,9 +11,14 @@ export default class extends Controller {
     ) {
       headElement.setAttribute("data-bs-theme", "dark");
       this.element.innerHTML = '<i class="fa-regular fa-moon"></i>';
-    } else if (headElement.hasAttribute("data-bs-theme")) {
-      headElement.removeAttribute("data-bs-theme");
+    } else if (localStorage.theme === "light") {
+      headElement.setAttribute("data-bs-theme", "light");
       this.element.innerHTML = '<i class="fa-regular fa-sun"></i>';
+    } else {
+      if (headElement.hasAttribute("data-bs-theme")) {
+        headElement.removeAttribute("data-bs-theme");
+      }
+      this.element.innerHTML = '<i class="fa-solid fa-circle-half-stroke"></i>';
     }
   }
 
@@ -27,6 +32,7 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log("Connecting theme-selector");
     this.refreshTheme();
   }
 
