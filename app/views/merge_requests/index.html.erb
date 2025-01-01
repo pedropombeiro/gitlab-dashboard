@@ -68,6 +68,13 @@
       <% end %>
     </div>
 
+    <%= tag.button(
+      class: %w[btn mx-2 text-light],
+      data: { controller: "theme-selector", action: "theme-selector#switch" },
+    ) do %>
+      <%= tag.i class: %w[fa-solid fa-circle-half-stroke] %>
+    <% end %>
+
     <%= link_to "Status",
     "https://status.pombei.ro/sites/a268525c-738a-46c6-bb70-d96bf1c05e59",
     class: "text-light mx-2 d-none d-sm-inline",
@@ -83,8 +90,9 @@
     src: merge_requests_list_path(assignee: params[:assignee], turbo: true) do %>
     <div
       class="
-        shadow rounded p-4 mb-5 bg-body bg-gradient text-body z-3 position-absolute top-50
-        start-50 translate-middle d-flex justify-content-center align-items-center
+        shadow rounded p-4 mb-5 bg-body bg-gradient text-body z-3 position-absolute
+        top-50 start-50 translate-middle d-flex justify-content-center
+        align-items-center
       "
     >
       <span
