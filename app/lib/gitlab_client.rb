@@ -298,12 +298,12 @@ class GitlabClient
 
   def fetch_monthly_merged_merge_requests(username, format: :open_struct)
     format_response(format) do
-      Async do
-        monthly_merge_requests_graphql_queries = 12.times.map do |offset|
+      Sync do |task|
+        12.times.map do |offset|
           bom = Date.current.beginning_of_month - offset.months
           eom = 1.month.after(bom)
 
-          Async do
+          task.async do
             execute_query(
               MONTHLY_MERGE_REQUEST_STATS_QUERY, "monthly_merged_merge_requests",
               username: username,
@@ -311,10 +311,8 @@ class GitlabClient
               mergedBefore: eom.to_fs
             )
           end
-        end
-
-        monthly_merge_requests_graphql_queries.map(&:wait)
-      end.wait
+        end.map(&:wait)
+      end
     end.tap do |aggregate|
       next unless format == :open_struct
 
@@ -333,9 +331,9 @@ class GitlabClient
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
     format_response(format) do
-      Sync do
+      Sync do |task|
         project_full_paths.map do |project_full_path|
-          Async do
+          task.async do
             execute_query(
               PROJECT_ISSUES_QUERY, "project_issues",
               projectFullPath: project_full_path,
