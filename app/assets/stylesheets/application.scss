@@ -10,6 +10,13 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
   }
 }
 
+@media (prefers-color-scheme: dark) {
+  // Cheap dark mode for charts
+  canvas {
+    filter: invert(1) hue-rotate(180deg);
+  }
+}
+
 .wide-tooltip {
   --bs-tooltip-max-width: 400px !important;
 }
