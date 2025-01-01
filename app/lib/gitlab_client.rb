@@ -333,20 +333,17 @@ class GitlabClient
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
     format_response(format) do
-      Async do
-        project_queries =
-          project_full_paths.map do |project_full_path|
-            Async do
-              execute_query(
-                PROJECT_ISSUES_QUERY, "project_issues",
-                projectFullPath: project_full_path,
-                issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
-              )
-            end
+      Sync do
+        project_full_paths.map do |project_full_path|
+          Async do
+            execute_query(
+              PROJECT_ISSUES_QUERY, "project_issues",
+              projectFullPath: project_full_path,
+              issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
+            )
           end
-
-        project_queries.map(&:wait)
-      end.wait
+        end.map(&:wait)
+      end
     end.tap do |aggregate|
       next unless format == :open_struct
 
