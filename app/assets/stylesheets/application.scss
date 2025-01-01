@@ -10,11 +10,9 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
   }
 }
 
-@media (prefers-color-scheme: dark) {
-  // Cheap dark mode for charts
-  canvas {
-    filter: invert(1) hue-rotate(180deg);
-  }
+// Cheap dark mode for charts
+.dark-canvas {
+  filter: invert(1) hue-rotate(180deg);
 }
 
 .wide-tooltip {

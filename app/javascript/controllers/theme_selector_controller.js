@@ -19,6 +19,10 @@ export default class extends Controller {
       this.element.setAttribute("data-bs-theme", "light");
       this.buttonTarget.innerHTML = '<i class="fa-regular fa-sun"></i>';
     }
+
+    Chartkick.eachChart(function (chart) {
+      chart.element.firstChild.classList.toggle("dark-canvas");
+    });
   }
 
   toggleTheme() {
