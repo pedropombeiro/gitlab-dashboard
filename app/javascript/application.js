@@ -4,8 +4,8 @@ import "@hotwired/turbo-rails";
 import "@fortawesome/fontawesome-free/js/all";
 import "./controllers";
 
-import "chartkick/chart.js"
+import "chartkick/chart.js";
 
 import LocalTime from "local-time";
-LocalTime.config.useFormat24 = true
+LocalTime.config.useFormat24 = true;
 LocalTime.start();

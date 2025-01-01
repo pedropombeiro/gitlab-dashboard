@@ -70,7 +70,7 @@
 
     <%= tag.button(
       class: %w[btn mx-2 text-light d-none d-sm-inline],
-      data: { controller: "theme-selector", action: "theme-selector#switch" },
+      data: { action: "theme-selector#switch", theme_selector_target: "button" },
     ) %>
 
     <%= link_to "Status",
