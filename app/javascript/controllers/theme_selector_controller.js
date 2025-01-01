@@ -2,23 +2,22 @@ import { Controller } from "@hotwired/stimulus";
 
 // Connects to data-controller="theme-selector"
 export default class extends Controller {
-  refreshTheme() {
-    let headElement = document.documentElement;
+  static targets = ["button"];
 
-    if (
+  isDark() {
+    return (
       localStorage.theme === "dark" ||
       (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      headElement.setAttribute("data-bs-theme", "dark");
-      this.element.innerHTML = '<i class="fa-regular fa-moon"></i>';
-    } else if (localStorage.theme === "light") {
-      headElement.setAttribute("data-bs-theme", "light");
-      this.element.innerHTML = '<i class="fa-regular fa-sun"></i>';
+    );
+  }
+
+  refreshTheme() {
+    if (this.isDark()) {
+      this.element.setAttribute("data-bs-theme", "dark");
+      this.buttonTarget.innerHTML = '<i class="fa-regular fa-moon"></i>';
     } else {
-      if (headElement.hasAttribute("data-bs-theme")) {
-        headElement.removeAttribute("data-bs-theme");
-      }
-      this.element.innerHTML = '<i class="fa-solid fa-circle-half-stroke"></i>';
+      this.element.setAttribute("data-bs-theme", "light");
+      this.buttonTarget.innerHTML = '<i class="fa-regular fa-sun"></i>';
     }
   }
 
