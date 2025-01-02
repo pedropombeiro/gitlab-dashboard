@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 
 // Connects to data-controller="theme-selector"
 export default class extends Controller {
-  static targets = ["button"];
+  static targets = ["button", "graph"];
 
   isDark() {
     return (
@@ -12,7 +12,9 @@ export default class extends Controller {
   }
 
   refreshTheme() {
-    if (this.isDark()) {
+    const isDark = this.isDark();
+
+    if (isDark) {
       this.element.setAttribute("data-bs-theme", "dark");
       this.buttonTarget.innerHTML = '<i class="fa-regular fa-moon"></i>';
     } else {
@@ -20,9 +22,34 @@ export default class extends Controller {
       this.buttonTarget.innerHTML = '<i class="fa-regular fa-sun"></i>';
     }
 
+    this.refreshChartsTheme(isDark);
+  }
+
+  refreshChartsTheme(isDark) {
     Chartkick.eachChart(function (chart) {
-      chart.element.firstChild.classList.toggle("dark-canvas");
+      this.refreshChartTheme(chart.element, isDark);
     });
+  }
+
+  refreshChartTheme(chart, isDark) {
+    const canvases = chart.getElementsByTagName("canvas");
+
+    if (canvases.length === 0) {
+      // Workaround: if the canvas isn't yet loaded, retry in a short while. This will lead to short periods of wrong
+      // styling, but its the best we can do for now.
+      setTimeout(() => {
+        this.refreshChartTheme(chart, isDark);
+      }, 500);
+      return;
+    }
+
+    for (const canvas of canvases) {
+      if (isDark) {
+        canvas.classList.add("dark-canvas");
+      } else {
+        canvas.classList.remove("dark-canvas");
+      }
+    }
   }
 
   toggleTheme() {
@@ -37,6 +64,10 @@ export default class extends Controller {
   connect() {
     console.log("Connecting theme-selector");
     this.refreshTheme();
+  }
+
+  graphTargetConnected(graph) {
+    this.refreshChartTheme(graph, this.isDark());
   }
 
   switch(event) {
