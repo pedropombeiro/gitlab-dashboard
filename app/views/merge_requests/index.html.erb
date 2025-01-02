@@ -38,11 +38,6 @@
       class="navbar-brand text-light d-flex align-items-center m-auto"
       data-controller="bootstrap-tooltip"
     >
-      <%= button_to tag.i(class: %w[fa-solid fa-rotate]),
-      merge_requests_path(assignee: @user.username),
-      method: :get,
-      class: %w[btn mx-2 text-light d-sm-none] %>
-
       <span class="mb-0 ms-2 d-flex fw-lighter flex-grow-1 justify-content-center">
         <span class="d-sm-none me-2">
           <%= render "user_image", user: @user, size: 24 %>

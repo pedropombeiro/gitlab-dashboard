@@ -118,11 +118,6 @@ RSpec.describe MergeRequestsController, type: :controller do
           expect(response.body).to include(
             %(src="#{ERB::Util.html_escape(merge_requests_list_path(assignee: username, turbo: true))}")
           )
-
-          # Includes refresh button on x-small views
-          expect(response.body).to include(
-            %(<form class="button_to" method="get" action="#{ERB::Util.html_escape(merge_requests_path(assignee: username))}">)
-          )
         end
       end
 
