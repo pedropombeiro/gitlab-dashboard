@@ -1,10 +1,8 @@
 require "rails_helper"
+require_relative "../../support/graphql_shared_contexts"
 
 RSpec.describe Services::ComputeMergeRequestChangesService do
-  let_it_be(:graphql_url) { "https://example.gitlab.com/api/graphql" }
-  let_it_be(:graphql_client) do
-    ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
-  end
+  include_context "stub graphql client"
 
   let_it_be(:open_mrs_response_body) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
   let_it_be(:merged_mrs_response_body) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
@@ -25,8 +23,6 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
   subject(:execute) { service.execute }
 
   before do
-    allow(GitlabClient).to receive(:client).and_return(graphql_client)
-
     stub_request(:post, graphql_url)
       .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
       .to_return_json(body: open_mrs_response_body)

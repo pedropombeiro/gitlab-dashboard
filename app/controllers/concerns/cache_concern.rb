@@ -47,12 +47,21 @@ module CacheConcern
 
     private
 
+    def value_as_string(obj)
+      case obj
+      when GraphQL::Client::OperationDefinition
+        obj.document.to_query_string
+      else
+        obj.to_s
+      end
+    end
+
     def calculate_hash(*args)
       value =
         if args.many?
-          args.map { |arg| Digest::SHA256.hexdigest(arg) }.join
+          args.map { |arg| Digest::SHA256.hexdigest(value_as_string(arg)) }.join
         else
-          args.first || ""
+          value_as_string(args.first) || ""
         end
 
       Digest::SHA256.hexdigest(value)[0..15]
@@ -63,27 +72,27 @@ module CacheConcern
     end
 
     def user_info_version
-      @user_info_version ||= calculate_hash(GitlabClient::USER_QUERY, GitlabClient::CURRENT_USER_QUERY)
+      @user_info_version ||= calculate_hash(GitlabClient::UserQuery, GitlabClient::CurrentUserQuery)
     end
 
     def reviewer_info_version
-      @reviewer_info_version ||= calculate_hash(GitlabClient::REVIEWER_QUERY)
+      @reviewer_info_version ||= calculate_hash(GitlabClient::ReviewerQuery)
     end
 
     def project_issues_version
-      @project_issues_version ||= calculate_hash(GitlabClient::PROJECT_ISSUES_QUERY)
+      @project_issues_version ||= calculate_hash(GitlabClient::ProjectIssuesQuery)
     end
 
     def merge_requests_version
       @merge_requests_version ||= calculate_hash(
-        GitlabClient::OPEN_MERGE_REQUESTS_QUERY,
-        GitlabClient::REVIEWER_QUERY,
-        GitlabClient::MERGED_MERGE_REQUESTS_QUERY
+        GitlabClient::OpenMergeRequestsQuery,
+        GitlabClient::ReviewerQuery,
+        GitlabClient::MergedMergeRequestsQuery
       )
     end
 
     def monthly_merge_request_stats_version
-      @monthly_merge_request_stats_version ||= calculate_hash(GitlabClient::MONTHLY_MERGE_REQUEST_STATS_QUERY)
+      @monthly_merge_request_stats_version ||= calculate_hash(GitlabClient::MonthlyMergeRequestsQuery)
     end
   end
 end
