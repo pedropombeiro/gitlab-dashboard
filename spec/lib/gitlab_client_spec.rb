@@ -9,7 +9,7 @@ RSpec.describe GitlabClient do
   let(:client) { described_class.new }
 
   before do
-    allow(described_class).to receive(:client).and_return(graphql_client)
+    stub_const("#{described_class}::Client", graphql_client)
   end
 
   describe "#fetch_user" do

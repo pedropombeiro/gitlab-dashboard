@@ -1,18 +1,11 @@
 require "rails_helper"
 require "erb"
+require_relative "../support/graphql_shared_contexts"
 
 RSpec.describe MergeRequestsController, type: :controller do
   include ActiveSupport::Testing::TimeHelpers
 
-  let_it_be(:graphql_url) { "https://gitlab.example.com/api/graphql" }
-  let_it_be(:graphql_client) do
-    ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
-  end
-
-  before do
-    allow(GitlabClient).to receive(:client).and_return(graphql_client)
-    stub_env("GITLAB_URL", "https://gitlab.example.com")
-  end
+  include_context "stub graphql client"
 
   describe "GET /index" do
     def perform_request

@@ -1,17 +1,10 @@
 require "rails_helper"
+require_relative "../support/graphql_shared_contexts"
 
 RSpec.describe "UserMergeRequestCharts", type: :request do
   include GitlabDashboard::Application.routes.url_helpers
 
-  let_it_be(:graphql_url) { "https://gitlab.example.com/api/graphql" }
-  let_it_be(:graphql_client) do
-    ::Graphlient::Client.new(graphql_url, schema_path: file_fixture("gitlab_graphql_schema.json"))
-  end
-
-  before do
-    allow(GitlabClient).to receive(:client).and_return(graphql_client)
-    stub_env("GITLAB_URL", "https://gitlab.example.com")
-  end
+  include_context "stub graphql client"
 
   describe "GET /monthly_merged_merge_request_stats" do
     def perform_request
