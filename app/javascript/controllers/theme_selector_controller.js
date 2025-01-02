@@ -41,7 +41,7 @@ export default class extends Controller {
       // styling, but its the best we can do for now.
       setTimeout(() => {
         this.refreshChartTheme(chart, isDark);
-      }, 500);
+      }, 100);
       return;
     }
 
