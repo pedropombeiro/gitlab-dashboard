@@ -24,17 +24,18 @@ class GitlabClient
     allow_dynamic_queries: false
   )
 
-  CORE_USER_FRAGMENT = <<-'GRAPHQL'
-    fragment CoreUserFields on User {
+  # rubocop:disable Style/RedundantHeredocDelimiterQuotes -- we want to ensure we don't use interpolation
+  CoreUserFragment = Client.parse <<-'GRAPHQL'
+    fragment on User {
       username
       avatarUrl
       webUrl
     }
   GRAPHQL
 
-  EXT_USER_FRAGMENT = <<-'GRAPHQL'
-    fragment ExtendedUserFields on User {
-      ...CoreUserFields
+  ExtendedUserFragment = Client.parse <<-'GRAPHQL'
+    fragment on User {
+      ...GitlabClient::CoreUserFragment
       lastActivityOn
       location
       status {
@@ -45,8 +46,8 @@ class GitlabClient
     }
   GRAPHQL
 
-  CORE_LABEL_FRAGMENT = <<-'GRAPHQL'
-    fragment CoreLabelFields on Label {
+  CoreLabelFragment = Client.parse <<-'GRAPHQL'
+    fragment on Label {
       title
       descriptionHtml
       color
@@ -54,20 +55,20 @@ class GitlabClient
     }
   GRAPHQL
 
-  CORE_ISSUE_FRAGMENT = <<-'GRAPHQL'
-    fragment CoreIssueFields on Issue {
+  CoreIssueFragment = Client.parse <<-'GRAPHQL'
+    fragment on Issue {
       iid
       webUrl
       titleHtml
       state
       labels {
-        nodes { ...CoreLabelFields }
+        nodes { ...GitlabClient::CoreLabelFragment }
       }
     }
   GRAPHQL
 
-  CORE_MERGE_REQUEST_FRAGMENT = <<-'GRAPHQL'
-    fragment CoreMergeRequestFields on MergeRequest {
+  CoreMergeRequestFragment = Client.parse <<-'GRAPHQL'
+    fragment on MergeRequest {
       iid
       webUrl
       titleHtml
@@ -82,58 +83,51 @@ class GitlabClient
       createdAt
       updatedAt
       assignees {
-        nodes { ...CoreUserFields }
+        nodes { ...GitlabClient::CoreUserFragment }
       }
       labels {
-        nodes { ...CoreLabelFields }
+        nodes { ...GitlabClient::CoreLabelFragment }
       }
     }
   GRAPHQL
 
-  MONTHLY_MERGE_REQUEST_STATS_FRAGMENT = <<-'GRAPHQL'
-    fragment MonthlyMergeRequestStatsFields on MergeRequestConnection {
+  MonthlyMergeRequestStatsFragment = Client.parse <<-'GRAPHQL'
+    fragment on MergeRequestConnection {
       count
       totalTimeToMerge
     }
   GRAPHQL
 
-  UserQuery = Client.parse <<-GRAPHQL
+  UserQuery = Client.parse <<-'GRAPHQL'
     query($username: String!) {
       user(username: $username) {
-        ...CoreUserFields
+        ...GitlabClient::CoreUserFragment
       }
     }
-
-    #{CORE_USER_FRAGMENT}
   GRAPHQL
 
-  CurrentUserQuery = Client.parse <<-GRAPHQL
+  CurrentUserQuery = Client.parse <<-'GRAPHQL'
     query {
       user: currentUser {
-        ...CoreUserFields
+        ...GitlabClient::CoreUserFragment
       }
     }
-
-    #{CORE_USER_FRAGMENT}
   GRAPHQL
 
-  ProjectIssuesQuery = Client.parse <<-GRAPHQL
+  ProjectIssuesQuery = Client.parse <<-'GRAPHQL'
     query($projectFullPath: ID!, $issueIids: [String!]) {
       project(fullPath: $projectFullPath) {
         issues(iids: $issueIids) {
-          nodes { ...CoreIssueFields }
+          nodes { ...GitlabClient::CoreIssueFragment }
         }
       }
     }
-
-    #{CORE_LABEL_FRAGMENT}
-    #{CORE_ISSUE_FRAGMENT}
   GRAPHQL
 
-  ReviewerQuery = Client.parse <<-GRAPHQL
+  ReviewerQuery = Client.parse <<-'GRAPHQL'
     query($reviewer: String!, $activeReviewsAfter: Time) {
       user(username: $reviewer) {
-        ...ExtendedUserFields
+        ...GitlabClient::ExtendedUserFragment
         bot
         activeReviews: reviewRequestedMergeRequests(state: opened, approved: false, updatedAfter: $activeReviewsAfter) {
           # count # approved: false filter is behind the `mr_approved_filter` ops FF, so we need to request the nodes for now
@@ -141,17 +135,14 @@ class GitlabClient
         }
       }
     }
-
-    #{CORE_USER_FRAGMENT}
-    #{EXT_USER_FRAGMENT}
   GRAPHQL
 
-  OpenMergeRequestsQuery = Client.parse <<-GRAPHQL
+  OpenMergeRequestsQuery = Client.parse <<-'GRAPHQL'
     query($username: String!, $updatedAfter: Time) {
       user(username: $username) {
         openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC, updatedAfter: $updatedAfter) {
           nodes {
-            ...CoreMergeRequestFields
+            ...GitlabClient::CoreMergeRequestFragment
             approved
             approvalsRequired
             approvalsLeft
@@ -217,13 +208,9 @@ class GitlabClient
         }
       }
     }
-
-    #{CORE_USER_FRAGMENT}
-    #{CORE_LABEL_FRAGMENT}
-    #{CORE_MERGE_REQUEST_FRAGMENT}
   GRAPHQL
 
-  MergedMergeRequestsQuery = Client.parse <<-GRAPHQL
+  MergedMergeRequestsQuery = Client.parse <<-'GRAPHQL'
     query($username: String!, $mergedAfter: Time!) {
       user(username: $username) {
         firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
@@ -238,35 +225,29 @@ class GitlabClient
         mergedMergeRequests: authoredMergeRequests(state: merged, mergedAfter: $mergedAfter, sort: MERGED_AT_DESC) {
           nodes {
             iid
-            ...CoreMergeRequestFields
+            ...GitlabClient::CoreMergeRequestFragment
             mergedAt
             mergeUser {
-              ...ExtendedUserFields
+              ...GitlabClient::ExtendedUserFragment
             }
           }
         }
       }
     }
-
-    #{CORE_USER_FRAGMENT}
-    #{EXT_USER_FRAGMENT}
-    #{CORE_LABEL_FRAGMENT}
-    #{CORE_MERGE_REQUEST_FRAGMENT}
   GRAPHQL
 
-  MonthlyMergeRequestsQuery = Client.parse <<-GRAPHQL
+  MonthlyMergeRequestsQuery = Client.parse <<-'GRAPHQL'
     query($username: String!, $mergedAfter: Time, $mergedBefore: Time) {
       user(username: $username) {
         monthlyMergedMergeRequests: authoredMergeRequests(
           state: merged,
           mergedAfter: $mergedAfter,
           mergedBefore: $mergedBefore
-        ) { ...MonthlyMergeRequestStatsFields }
+        ) { ...GitlabClient::MonthlyMergeRequestStatsFragment }
       }
     }
-
-    #{MONTHLY_MERGE_REQUEST_STATS_FRAGMENT}
   GRAPHQL
+  # rubocop:enable Style/RedundantHeredocDelimiterQuotes
 
   def make_full_url(path)
     return path if path.nil? || path.start_with?("http")
