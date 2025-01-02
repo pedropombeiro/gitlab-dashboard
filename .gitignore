@@ -43,3 +43,4 @@ storage
 /node_modules
 config/secrets.yml
 config/environments/development/ssl/localhost.crt
+.rake_tasks

@@ -1,6 +1,9 @@
 pre-push:
   parallel: true
   commands:
+    backend-linter:
+      glob: "*.rb"
+      run: bin/rake standard
     backend-specs:
       glob: "{app,spec}/**/*.rb"
       run: bin/bundle exec rspec

@@ -48,4 +48,4 @@ create-dockerfile:
       --arg-deploy=GIT_REPO_COMMIT_SHA:null
 
 lint:
-    rake standard:fix
+    rake standard
