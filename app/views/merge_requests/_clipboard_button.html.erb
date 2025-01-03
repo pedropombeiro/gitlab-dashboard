@@ -1,5 +1,5 @@
-<%= tag.span(
-  tag.i(class: "fa fa-clipboard"),
+<%= link_to(
+  "#",
   class: %w[me-2 float-right d-none d-sm-inline text-secondary],
   aria: {
     hidden: "true",
@@ -8,5 +8,6 @@
     action: "clipboard#copy",
     bs_toggle: "tooltip",
     bs_title: "Click to copy",
-  },
-) %>
+  }) do %>
+  <%= tag.i(class: "fa fa-clipboard") %>
+<% end %>
