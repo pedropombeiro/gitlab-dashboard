@@ -39,8 +39,9 @@ export default class extends Controller {
     if (canvases.length === 0) {
       // Workaround: if the canvas isn't yet loaded, retry in a short while. This will lead to short periods of wrong
       // styling, but its the best we can do for now.
+      const fn = this.refreshChartTheme.bind(this);
       setTimeout(() => {
-        this.refreshChartTheme(chart, isDark);
+        fn(chart, isDark);
       }, 100);
       return;
     }
