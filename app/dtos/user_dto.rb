@@ -155,10 +155,7 @@ class UserDto
   def user_activity_icon_class(user)
     return if user.lastActivityOn.nil?
 
-    user_tzname = location_lookup_service.fetch_timezone(user.location)&.name || Time.now.getlocal.zone
-    user_bod = Time.current.in_time_zone(user_tzname).beginning_of_day
-
-    %w[fa-solid fa-moon] if user.lastActivityOn.before?(user_bod)
+    %w[fa-solid fa-moon] if user.lastActivityOn.before?(Time.current.beginning_of_day)
   end
 
   def location_lookup_service
