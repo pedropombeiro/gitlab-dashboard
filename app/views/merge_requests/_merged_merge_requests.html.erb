@@ -1,4 +1,23 @@
 <% merge_requests = merge_requests_dto.items %>
+<% avg_time_to_merge =
+  (
+    if merge_requests.count.positive?
+      ActiveSupport::Duration.build(
+        merge_requests.sum { |mr| Time.current - mr.createdAt } /
+          merge_requests.count,
+      )
+    else
+      0
+    end
+  ) %>
+<% overall_avg_time_to_merge =
+  if merged_merge_requests_tttm
+    ActiveSupport::Duration.build(
+      merged_merge_requests_tttm / merged_merge_requests_count,
+    )
+  else
+    ActiveSupport::Duration.years(1000)
+  end %>
 
 <div class="d-flex justify-content-between align-items-end">
   <div>
@@ -9,18 +28,18 @@
 
     <% if merge_requests.count.positive? %>
       <div>Merged on average after
-        <%= distance_of_time_in_words(
-          ActiveSupport::Duration.build(
-            merge_requests.sum { |mr| Time.current - mr.createdAt } / merge_requests.count,
-          ),
-        ) %>.
+        <%= distance_of_time_in_words(avg_time_to_merge) %>.
       </div>
     <% end %>
   </div>
 
   <% if merged_merge_requests_count.positive? %>
-    <% since_first_mr = ActiveSupport::Duration.build(Time.current - first_merged_merge_requests_timestamp) %>
-    <% weekly_merge_rate = (merged_merge_requests_count.to_f / since_first_mr.in_weeks.to_f).round %>
+    <% since_first_mr =
+      ActiveSupport::Duration.build(
+        Time.current - first_merged_merge_requests_timestamp,
+      ) %>
+    <% monthly_merge_rate =
+      (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round %>
 
     <div class="flex-row-reverse">
       <div>
@@ -28,20 +47,18 @@
         <%= pluralize(merged_merge_requests_count, "merge request") %>
         merged since
         <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
-        <% if weekly_merge_rate < 1.0 %>
-          <%= (since_first_mr.in_weeks.to_f / merged_merge_requests_count.to_f).round(1) %> weeks per MR.
+        <% if monthly_merge_rate < 1.0 %>
+          <%= (since_first_mr.in_months.to_f / merged_merge_requests_count.to_f).round(1) %>
+          months per MR.
         <% else %>
-          <%= weekly_merge_rate.round %> per week.
+          <%= monthly_merge_rate.round %>
+          per month.
         <% end %>
       </div>
       <% if merged_merge_requests_tttm %>
         <div class="text-end">
           <div>Merged on average after
-            <%= distance_of_time_in_words(
-              ActiveSupport::Duration.build(
-                merged_merge_requests_tttm / merged_merge_requests_count,
-              ),
-            ) %>.
+            <%= distance_of_time_in_words(overall_avg_time_to_merge) %>.
           </div>
         </div>
       <% end %>
@@ -86,12 +103,17 @@
             most_significant_only: true %>
             by
             <br/>
-            <%= render "user_badge", user: mr.mergeUser, title: user_help_title(mr.mergeUser), class_suffix: "approved" %>
+            <%= render "user_badge",
+            user: mr.mergeUser,
+            title: user_help_title(mr.mergeUser),
+            class_suffix: "approved" %>
           </td>
           <!-- Merged After -->
           <td>
             <%= tag.span(
               distance_of_time_in_words(mr.mergedAt - mr.createdAt),
+              class:
+                ("text-danger" if mr.mergedAt - mr.createdAt > overall_avg_time_to_merge),
               data: {
                 bs_toggle: "tooltip",
                 bs_custom_class: "wide-tooltip",
@@ -133,7 +155,11 @@
   </table>
 <% end %>
 
-<div id="graphs" class="h-100 d-flex align-items-center justify-content-center" data-theme-selector-target="graph">
+<div
+  id="graphs"
+  class="h-100 d-flex align-items-center justify-content-center"
+  data-theme-selector-target="graph"
+>
   <%= column_chart(
     monthly_merged_merge_request_stats_path(assignee: params[:assignee]),
     title: "MRs merged in last 12 months",
