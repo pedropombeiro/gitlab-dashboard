@@ -12,6 +12,10 @@ export default class extends Controller {
   }
 
   refreshTheme() {
+    if (this.element === null || this.buttonTarget === null) {
+      return;
+    }
+
     const isDark = this.isDark();
 
     if (isDark) {
@@ -21,8 +25,6 @@ export default class extends Controller {
       this.element.setAttribute("data-bs-theme", "light");
       this.buttonTarget.innerHTML = '<i class="fa-regular fa-sun"></i>';
     }
-
-    this.refreshChartsTheme(isDark);
   }
 
   refreshChartsTheme(isDark) {
@@ -62,6 +64,7 @@ export default class extends Controller {
       localStorage.theme = "dark";
     }
     this.refreshTheme();
+    this.refreshChartsTheme(this.getDark());
   }
 
   connect() {
@@ -71,6 +74,10 @@ export default class extends Controller {
 
   graphTargetConnected(graph) {
     this.refreshChartTheme(graph, this.isDark());
+  }
+
+  buttonTargetConnected(_button) {
+    this.refreshTheme();
   }
 
   switch(event) {
