@@ -18,7 +18,7 @@ module MergeRequestsHelper
 
     emojis << "🔴" if user_status.availability == "BUSY"
 
-    emojis.uniq.join
+    emojis.uniq.join(" ")
   end
 
   def user_country_flag_classes(user)
