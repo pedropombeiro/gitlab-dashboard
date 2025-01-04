@@ -26,7 +26,7 @@ export default class extends Controller {
   }
 
   refreshChartsTheme(isDark) {
-    const fn = this.refreshChartTheme;
+    const fn = this.refreshChartTheme.bind(this);
 
     Chartkick.eachChart(function (chart) {
       fn(chart.element, isDark);
