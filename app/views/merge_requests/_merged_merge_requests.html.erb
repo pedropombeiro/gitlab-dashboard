@@ -54,8 +54,8 @@
     <thead>
       <tr>
         <th scope="col">ID</th>
-        <th scope="col">Created</th>
         <th scope="col">Merged&nbsp;↓</th>
+        <th scope="col">Merged After</th>
         <th scope="col">Updated</th>
         <th scope="col">Workflow Labels</th>
         <th scope="col">Title</th>
@@ -79,12 +79,6 @@
           <th scope="row">
             <%= render "mr_relation", merge_request: mr %>
           </th>
-          <!-- Created at -->
-          <td>
-            <%= render "shared/relative_timestamp",
-            timestamp: mr.createdAt,
-            most_significant_only: true %>
-          </td>
           <!-- Merged at -->
           <td>
             <%= render "shared/relative_timestamp",
@@ -93,6 +87,17 @@
             by
             <br/>
             <%= render "user_badge", user: mr.mergeUser, title: user_help_title(mr.mergeUser), class_suffix: "approved" %>
+          </td>
+          <!-- Merged After -->
+          <td>
+            <%= tag.span(
+              distance_of_time_in_words(mr.mergedAt - mr.createdAt),
+              data: {
+                bs_toggle: "tooltip",
+                bs_custom_class: "wide-tooltip",
+                bs_title: "#{mr.createdAt.utc.to_formatted_s(:long)} UTC",
+              },
+            ) %>
           </td>
           <!-- Updated at -->
           <td>
