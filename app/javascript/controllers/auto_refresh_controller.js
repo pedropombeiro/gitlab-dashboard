@@ -18,7 +18,7 @@ export default class extends Controller {
 
     document.addEventListener("visibilitychange", onVisibilityChange, false, { signal: this.controller.signal });
 
-    setTimeout(this.refresh, this.timeoutValue);
+    setTimeout(this.refresh.bind(this), this.timeoutValue);
   }
 
   disconnect() {
