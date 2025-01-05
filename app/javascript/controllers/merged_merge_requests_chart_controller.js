@@ -57,4 +57,10 @@ export default class extends Controller {
 
     this.createChart();
   }
+
+  disconnect() {
+    if (this.chartTarget !== null) {
+      this.chartTarget.replaceChildren();
+    }
+  }
 }
