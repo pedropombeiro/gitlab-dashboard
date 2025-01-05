@@ -50,6 +50,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
 
         allow(user_dto).to receive(:first_merged_merge_requests_timestamp).and_return(1.year.ago)
         allow(user_dto).to receive(:merged_merge_requests_count).and_return(500)
+        allow(user_dto).to receive(:merged_merge_requests_tttm).and_return(11597219.020233)
 
         allow(Services::FetchMergeRequestsService).to receive(:new).with(username).and_return(service)
       end
