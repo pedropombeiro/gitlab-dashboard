@@ -29,7 +29,7 @@ export default class extends Controller {
         type: "bar",
         data: chartData,
         options: {
-          aspectRatio: 3,
+          height: "100%",
           datasets: {
             line: {
               pointStyle: false,
