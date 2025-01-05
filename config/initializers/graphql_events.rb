@@ -2,7 +2,7 @@ class GraphQLQueryEventPublisher
   include Honeybadger::InstrumentationHelper
 
   def publish(event)
-    name = event.payload[:operation_name].delete_prefix("#{self.class.name}__").delete_suffix("Query").underscore
+    name = event.payload[:operation_name].delete_prefix("GitlabClient__").delete_suffix("Query").underscore
 
     metric_source "graphql_metrics"
     metric_attributes(name: name, **event.payload[:variables].slice("username"))
