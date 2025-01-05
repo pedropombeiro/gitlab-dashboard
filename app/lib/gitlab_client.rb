@@ -339,7 +339,7 @@ class GitlabClient
   def execute_query(query, **args)
     name = query.operation_name.delete_prefix("#{self.class.name}__").delete_suffix("Query").underscore
 
-    Rails.logger.debug { %(Executing "#{name}" GraphQL query (args: #{args})...) }
+    Rails.logger.debug { %(Executing #{query.operation_name} GraphQL query (args: #{args})...) }
 
     metric_source "graphql_metrics"
     metric_attributes(name: name, **args.slice(:username))
