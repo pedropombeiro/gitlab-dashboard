@@ -14,6 +14,6 @@ end
 
 graphql_event_publisher = GraphQLQueryEventPublisher.new
 
-ActiveSupport::Notifications.subscribe "query.graphql" do |event|
+ActiveSupport::Notifications.monotonic_subscribe "query.graphql" do |event|
   graphql_event_publisher.publish(event)
 end
