@@ -256,38 +256,26 @@ class GitlabClient
   end
 
   def fetch_user(username, format: :open_struct)
-    return format_response(format) { execute_query(UserQuery, "user", username: username) } if username.present?
+    return format_response(format) { execute_query(UserQuery, username: username) } if username.present?
 
-    format_response(format) { execute_query(CurrentUserQuery, "user") }
+    format_response(format) { execute_query(CurrentUserQuery) }
   end
 
   def fetch_reviewer(username, format: :open_struct)
     format_response(format) do
-      execute_query(
-        ReviewerQuery,
-        "reviewer",
-        reviewer: username,
-        activeReviewsAfter: 1.week.ago
-      )
+      execute_query(ReviewerQuery, reviewer: username, activeReviewsAfter: 1.week.ago)
     end
   end
 
   def fetch_open_merge_requests(username, format: :open_struct)
     format_response(format) do
-      execute_query(
-        OpenMergeRequestsQuery,
-        "open_merge_requests",
-        username: username,
-        updatedAfter: 1.year.ago
-      )
+      execute_query(OpenMergeRequestsQuery, username: username, updatedAfter: 1.year.ago)
     end
   end
 
   def fetch_merged_merge_requests(username, format: :open_struct)
     format_response(format) do
-      execute_query(
-        MergedMergeRequestsQuery, "merged_merge_requests", username: username, mergedAfter: 1.week.ago
-      )
+      execute_query(MergedMergeRequestsQuery, username: username, mergedAfter: 1.week.ago)
     end
   end
 
@@ -300,7 +288,7 @@ class GitlabClient
 
           task.async do
             execute_query(
-              MonthlyMergeRequestsQuery, "monthly_merged_merge_requests",
+              MonthlyMergeRequestsQuery,
               username: username,
               mergedAfter: bom.to_fs,
               mergedBefore: eom.to_fs
@@ -330,7 +318,7 @@ class GitlabClient
         project_full_paths.map do |project_full_path|
           task.async do
             execute_query(
-              ProjectIssuesQuery, "project_issues",
+              ProjectIssuesQuery,
               projectFullPath: project_full_path,
               issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
             )
@@ -348,7 +336,9 @@ class GitlabClient
 
   private
 
-  def execute_query(query, name, **args)
+  def execute_query(query, **args)
+    name = query.operation_name.delete_prefix("#{self.class.name}__").delete_suffix("Query").underscore
+
     Rails.logger.debug { %(Executing "#{name}" GraphQL query (args: #{args})...) }
 
     metric_source "graphql_metrics"
