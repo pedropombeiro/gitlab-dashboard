@@ -34,27 +34,58 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
     user_dto = fetch_service.parse_dto(response)
     since_first_mr = ActiveSupport::Duration.build(Time.current - user_dto.first_merged_merge_requests_timestamp)
     monthly_merge_rate = (user_dto.merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round
+    overall_monthly_merge_ttm = if user_dto.merged_merge_requests_count
+      (user_dto.merged_merge_requests_tttm.seconds.in_days / user_dto.merged_merge_requests_count).round(1)
+    end
 
     {
       datasets: [
         {
-          label: "Merged count",
-          type: "bar",
-          order: 2,
-          data: series_values(user, ->(stats) { stats.count })
-        },
-        {
           label: "Average days to merge",
           type: "line",
           order: 1,
+          backgroundColor: "#FF6384",
+          borderColor: "#FF6384A0",
           data: series_values(user, ->(stats) do
             stats.totalTimeToMerge ? (stats.totalTimeToMerge.seconds.in_days / stats.count).round(1) : nil
           end)
         },
         {
-          label: "Average merged per month",
+          label: "All-time average",
+          type: "line",
+          order: 1,
+          backgroundColor: "#FF6384",
+          borderColor: "#FF6384A0",
+          pointStyle: false,
+          borderDash: [10, 5],
+          data: series_values(user, ->(stats) { overall_monthly_merge_ttm })
+        },
+        {
+          label: "Merged count",
+          type: "bar",
+          stack: "merged-count",
+          order: 2,
+          backgroundColor: "#37A2EBA0",
+          borderColor: "#37A2EB",
+          data: series_values(user, ->(stats) { stats.count })[0...11]
+        },
+        {
+          label: "",
+          type: "bar",
+          stack: "merged-count",
+          order: 2,
+          backgroundColor: "#37A2EB60",
+          borderColor: "#37A2EB",
+          data: series_values(user, ->(stats) { stats.count })[11..]
+        },
+        {
+          label: "All-time average",
           type: "line",
           order: 3,
+          pointStyle: false,
+          borderDash: [10, 5],
+          borderColor: "#37A2EBA0",
+          backgroundColor: "#37A2EBA0",
           data: series_values(user, ->(stats) { monthly_merge_rate })
         }
       ]

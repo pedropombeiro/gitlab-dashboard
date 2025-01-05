@@ -30,10 +30,22 @@ export default class extends Controller {
         data: chartData,
         options: {
           height: "100%",
+          aspectRatio: 3,
           datasets: {
             line: {
-              pointStyle: false,
+              pointStyle: "circle",
               tension: 0.5,
+            },
+          },
+          plugins: {
+            legend: {
+              labels: {
+                generateLabels: (chart) => {
+                  const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
+
+                  return items.filter(label => label.text && label.text.trim() !== "");
+                },
+              },
             },
           },
         },
