@@ -18,29 +18,36 @@
   else
     ActiveSupport::Duration.years(1000)
   end %>
+<% since_first_mr =
+  ActiveSupport::Duration.build(
+    Time.current - first_merged_merge_requests_timestamp,
+  ) %>
+<% monthly_merge_rate =
+  (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round %>
 
 <div class="d-flex justify-content-between align-items-end">
   <div>
     <div class="lead">
-      <%= pluralize(merge_requests.count, "merge request") %>
-      merged in the last week.
+      <% merge_rate_ok = merge_requests.count / 1.week.in_days * 30 >= monthly_merge_rate %>
+      <%= tag.span(
+        "#{pluralize(merge_requests.count, "merge request")} #{merge_rate_ok ? "↗" : "↘"}",
+        class: merge_rate_ok ? "text-success" : "text-warning",
+      ) %>
+      merged in the last week
     </div>
 
     <% if merge_requests.count.positive? %>
+      <% merge_time_ok = avg_time_to_merge <= overall_avg_time_to_merge %>
       <div>Merged on average after
-        <%= distance_of_time_in_words(avg_time_to_merge) %>.
+        <%= tag.span(
+          "#{distance_of_time_in_words(avg_time_to_merge)} #{merge_time_ok ? "↘" : "↗"}",
+          class: merge_time_ok ? "text-success" : "text-warning",
+        ) %>
       </div>
     <% end %>
   </div>
 
   <% if merged_merge_requests_count.positive? %>
-    <% since_first_mr =
-      ActiveSupport::Duration.build(
-        Time.current - first_merged_merge_requests_timestamp,
-      ) %>
-    <% monthly_merge_rate =
-      (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round %>
-
     <div class="flex-row-reverse">
       <div>
         A total of
@@ -49,16 +56,16 @@
         <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
         <% if monthly_merge_rate < 1.0 %>
           <%= (since_first_mr.in_months.to_f / merged_merge_requests_count.to_f).round(1) %>
-          months per MR.
+          months per MR
         <% else %>
           <%= monthly_merge_rate.round %>
-          per month.
+          per month
         <% end %>
       </div>
       <% if merged_merge_requests_tttm %>
         <div class="text-end">
           <div>Merged on average after
-            <%= distance_of_time_in_words(overall_avg_time_to_merge) %>.
+            <%= distance_of_time_in_words(overall_avg_time_to_merge) %>
           </div>
         </div>
       <% end %>
