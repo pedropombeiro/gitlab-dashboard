@@ -10,7 +10,6 @@
     "autoprefixer": "^10.4.20",
     "bootstrap": "^5.3.3",
     "chart.js": "^4.4.7",
-    "chartkick": "^5.0.1",
     "local-time": "^3.0.2",
     "nodemon": "^3.1.7",
     "sass": "^1.80.6"

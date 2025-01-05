@@ -13,6 +13,9 @@ application.register("bootstrap-tooltip", BootstrapTooltipController)
 import ClipboardController from "./clipboard_controller"
 application.register("clipboard", ClipboardController)
 
+import MergedMergeRequestsChartController from "./merged_merge_requests_chart_controller"
+application.register("merged-merge-requests-chart", MergedMergeRequestsChartController)
+
 import ThemeSelectorController from "./theme_selector_controller"
 application.register("theme-selector", ThemeSelectorController)
 

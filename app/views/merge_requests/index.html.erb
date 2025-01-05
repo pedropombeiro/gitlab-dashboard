@@ -65,7 +65,10 @@
 
     <%= tag.button(
       class: %w[btn mx-2 text-light d-none d-sm-inline],
-      data: { action: "theme-selector#switch", theme_selector_target: "button" },
+      data: {
+        action: "theme-selector#switch",
+        theme_selector_target: "button",
+      },
     ) %>
 
     <%= link_to "Status",
@@ -99,6 +102,7 @@
     <% if @dto.has_content? %>
       <!-- Show last stored state, while we wait for the refreshed state -->
       <%= render "user_merge_requests",
+      load_charts: false,
       updated_at: @dto.updated_at,
       next_update_at: @dto.next_update_at,
       request_duration: @dto.request_duration,

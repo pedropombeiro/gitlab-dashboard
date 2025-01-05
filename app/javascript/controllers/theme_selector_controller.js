@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 
 // Connects to data-controller="theme-selector"
 export default class extends Controller {
-  static targets = ["button", "graph"];
+  static targets = ["button", "chart"];
 
   isDark() {
     return (
@@ -30,9 +30,7 @@ export default class extends Controller {
   refreshChartsTheme(isDark) {
     const fn = this.refreshChartTheme.bind(this);
 
-    Chartkick.eachChart(function (chart) {
-      fn(chart.element, isDark);
-    });
+    fn(this.chartTarget, isDark);
   }
 
   refreshChartTheme(chart, isDark) {
@@ -64,7 +62,7 @@ export default class extends Controller {
       localStorage.theme = "dark";
     }
     this.refreshTheme();
-    this.refreshChartsTheme(this.getDark());
+    this.refreshChartsTheme(this.isDark());
   }
 
   connect() {
@@ -72,8 +70,8 @@ export default class extends Controller {
     this.refreshTheme();
   }
 
-  graphTargetConnected(graph) {
-    this.refreshChartTheme(graph, this.isDark());
+  chartTargetConnected(chart) {
+    this.refreshChartTheme(chart, this.isDark());
   }
 
   buttonTargetConnected(_button) {

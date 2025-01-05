@@ -40,6 +40,20 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
         end
       end
 
+      before do
+        service = instance_double(Services::FetchMergeRequestsService)
+        response = double
+        user_dto = double
+
+        allow(service).to receive(:execute).and_return(response)
+        allow(service).to receive(:parse_dto).with(response).and_return(user_dto)
+
+        allow(user_dto).to receive(:first_merged_merge_requests_timestamp).and_return(1.year.ago)
+        allow(user_dto).to receive(:merged_merge_requests_count).and_return(500)
+
+        allow(Services::FetchMergeRequestsService).to receive(:new).with(username).and_return(service)
+      end
+
       it "returns http success" do
         request
 
@@ -51,6 +65,8 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
 
         expect(response.content_type).to eq "application/json; charset=utf-8"
       end
+
+      pending "Test JSON return value"
 
       context "when called twice" do
         it "calls api twice" do
