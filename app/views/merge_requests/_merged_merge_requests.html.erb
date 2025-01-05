@@ -155,15 +155,19 @@
   </table>
 <% end %>
 
-<%= tag.div class: %w[d-flex mt-2 align-items-sm-center justify-content-sm-center],
+<%= tag.div style: "height: 300px", class: %w[d-flex mt-2 align-items-sm-center justify-content-sm-center],
   data: (load_charts ? {
     controller: "merged-merge-requests-chart",
     merged_merge_requests_chart_url_value: monthly_merged_merge_request_stats_url(assignee: params[:assignee])
   } : nil) do %>
-  <div
-    id="chartContainer"
-    data-merged-merge-requests-chart-target="chart"
-    data-theme-selector-target="chart"
-    style="width: 60%; text-align: center; color: #999; font-size: 14px; font-family: 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif;"
-  >Loading…</div>
+  <%= tag.div(
+    "Loading…",
+    id: "chartContainer",
+    data: {
+      merged_merge_requests_chart_target: "chart",
+      theme_selector_target: "chart",
+    },
+    style:
+      "width: 60%; text-align: center; color: #999; font-size: 14px; font-family: 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif;",
+  ) %>
 <% end %>
