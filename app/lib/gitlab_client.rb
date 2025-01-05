@@ -4,8 +4,6 @@ require "async"
 require "ostruct"
 
 class GitlabClient
-  include Honeybadger::InstrumentationHelper
-
   private_class_method def self.authorization
     "Bearer #{Rails.application.credentials.gitlab_token}"
   end
@@ -337,27 +335,11 @@ class GitlabClient
   private
 
   def execute_query(query, **args)
-    name = query.operation_name.delete_prefix("#{self.class.name}__").delete_suffix("Query").underscore
-
     Rails.logger.debug { %(Executing #{query.operation_name} GraphQL query (args: #{args})...) }
 
-    metric_source "graphql_metrics"
-    metric_attributes(name: name, **args.slice(:username))
-
-    handler = proc do |exception, _attempt_number, _total_delay|
-      increment_counter "graphql.query.error_count", {exception: exception.class.name}
+    with_retries(max_tries: 2, rescue: [Graphlient::Errors::TimeoutError, Faraday::SSLError]) do
+      Client.query(query, **args)
     end
-
-    result = nil
-    with_retries(max_tries: 2, handler: handler, rescue: [Graphlient::Errors::TimeoutError, Faraday::SSLError]) do
-      increment_counter "graphql.query.count"
-
-      histogram "graphql.query.duration" do
-        result = Client.query(query, **args)
-      end
-    end
-
-    result
   end
 
   def format_response(format)
