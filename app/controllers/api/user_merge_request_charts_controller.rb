@@ -51,7 +51,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           end)
         },
         {
-          label: "All-time average",
+          label: "All-time average (#{helpers.pluralize(overall_monthly_merge_ttm.round, "day")})",
           type: "line",
           order: 1,
           backgroundColor: "#FF6384",
@@ -79,7 +79,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           data: series_values(user, ->(stats) { stats.count })[11..]
         },
         {
-          label: "All-time average",
+          label: "All-time average (#{monthly_merge_rate.round}/month)",
           type: "line",
           order: 3,
           pointStyle: false,
