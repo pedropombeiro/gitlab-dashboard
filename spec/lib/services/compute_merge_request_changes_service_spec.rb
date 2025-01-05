@@ -24,10 +24,10 @@ RSpec.describe Services::ComputeMergeRequestChangesService do
 
   before do
     stub_request(:post, graphql_url)
-      .with(body: hash_including("query" => a_string_matching(/openMergeRequests: /)))
+      .with(body: hash_including("query" => a_string_including("query GitlabClient__OpenMergeRequestsQuery")))
       .to_return_json(body: open_mrs_response_body)
     stub_request(:post, graphql_url)
-      .with(body: hash_including("query" => a_string_matching(/mergedMergeRequests: /)))
+      .with(body: hash_including("query" => a_string_including("query GitlabClient__MergedMergeRequestsQuery")))
       .to_return_json(body: merged_mrs_response_body)
   end
 
