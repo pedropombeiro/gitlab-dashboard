@@ -18,7 +18,7 @@ RSpec.describe MergeRequestsController, type: :controller do
       before do
         stub_request(:post, graphql_url)
           .with(body: hash_including(
-            "query" => a_string_including("user("),
+            "query" => a_string_including("query GitlabClient__UserQuery"),
             "variables" => {username: "non-existent"}
           ))
           .to_return_json(body: {data: {user: nil}})
@@ -52,7 +52,7 @@ RSpec.describe MergeRequestsController, type: :controller do
       let!(:user_request_stub) do
         stub_request(:post, graphql_url)
           .with(body: hash_including(
-            "query" => a_string_including("user("),
+            "query" => a_string_including("query GitlabClient__UserQuery"),
             "variables" => {username: username}
           ))
           .to_return_json(status: :ok, body: user_response_body)
@@ -140,7 +140,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             let!(:user_request_stub) do
               stub_request(:post, graphql_url)
                 .with(body: hash_including(
-                  "query" => a_string_including("user: currentUser"),
+                  "query" => a_string_including("query GitlabClient__CurrentUserQuery"),
                   "variables" => {}
                 ))
                 .to_return_json(body: user_response_body)
@@ -192,7 +192,7 @@ RSpec.describe MergeRequestsController, type: :controller do
       before do
         stub_request(:post, graphql_url)
           .with(body: hash_including(
-            "query" => a_string_including("user("),
+            "query" => a_string_including("query GitlabClient__UserQuery"),
             "variables" => {username: "non-existent"}
           ))
           .to_return_json(body: {data: {user: nil}})
@@ -223,7 +223,7 @@ RSpec.describe MergeRequestsController, type: :controller do
         let!(:user_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including("user("),
+              "query" => a_string_including("query GitlabClient__UserQuery"),
               "variables" => {username: username}
             ))
             .to_return_json(body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}})
@@ -232,7 +232,7 @@ RSpec.describe MergeRequestsController, type: :controller do
         let!(:open_mrs_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including("openMergeRequests: "),
+              "query" => a_string_including("query GitlabClient__OpenMergeRequestsQuery"),
               "variables" => hash_including(
                 "username" => username,
                 "updatedAfter" => an_instance_of(String)
@@ -244,7 +244,7 @@ RSpec.describe MergeRequestsController, type: :controller do
         let!(:reviewers_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including("activeReviews: reviewRequestedMergeRequests"),
+              "query" => a_string_including("query GitlabClient__ReviewerQuery"),
               "variables" => hash_including(
                 "reviewer" => an_instance_of(String),
                 "activeReviewsAfter" => an_instance_of(String)
@@ -261,7 +261,7 @@ RSpec.describe MergeRequestsController, type: :controller do
         let!(:issues_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including(%[issues(iids: $issueIids)]),
+              "query" => a_string_including("query GitlabClient__ProjectIssuesQuery"),
               "variables" => hash_including(
                 "projectFullPath" => "gitlab-org/gitlab",
                 "issueIids" => an_array_matching(%w[
@@ -273,7 +273,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             .to_return_json(body: issues["project_0"])
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including(%[issues(iids: $issueIids)]),
+              "query" => a_string_including("query GitlabClient__ProjectIssuesQuery"),
               "variables" => {
                 "projectFullPath" => "gitlab-org/security/gitlab-runner",
                 "issueIids" => %w[32804]
@@ -282,7 +282,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             .to_return_json(body: issues["project_1"])
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including(%[issues(iids: $issueIids)]),
+              "query" => a_string_including("query GitlabClient__ProjectIssuesQuery"),
               "variables" => {
                 "projectFullPath" => "gitlab-org/gitlab-runner",
                 "issueIids" => %w[32804]
@@ -333,7 +333,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 opened_mr = open_mr_nodes.delete_at(0)
 
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
+                  .with(body: hash_including("query" => a_string_including("query GitlabClient__OpenMergeRequestsQuery")))
                   .to_return_json(body: open_mrs)
 
                 perform_request
@@ -342,7 +342,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 open_mr_nodes << opened_mr
 
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
+                  .with(body: hash_including("query" => a_string_including("query GitlabClient__OpenMergeRequestsQuery")))
                   .to_return_json(body: open_mrs)
 
                 expect(WebPush).not_to receive(:payload_send)
@@ -385,10 +385,10 @@ RSpec.describe MergeRequestsController, type: :controller do
                 merged_mr_nodes << merged_mr
 
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_including("openMergeRequests: ")))
+                  .with(body: hash_including("query" => a_string_including("query GitlabClient__OpenMergeRequestsQuery")))
                   .to_return_json(body: open_mrs)
                 stub_request(:post, graphql_url)
-                  .with(body: hash_including("query" => a_string_including("mergedMergeRequests: ")))
+                  .with(body: hash_including("query" => a_string_including("query GitlabClient__MergedMergeRequestsQuery")))
                   .to_return_json(body: merged_mrs)
 
                 expect(WebPush).to receive(:payload_send)
@@ -478,7 +478,7 @@ RSpec.describe MergeRequestsController, type: :controller do
         def create_merged_mrs_request_stub
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including("mergedMergeRequests: authoredMergeRequests"),
+              "query" => a_string_including("query GitlabClient__MergedMergeRequestsQuery"),
               "variables" => {
                 "username" => username,
                 "mergedAfter" => 1.week.ago
