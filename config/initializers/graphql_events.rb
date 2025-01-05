@@ -8,7 +8,7 @@ class GraphQLQueryEventPublisher
     metric_attributes(name: name, **event.payload[:variables].slice("username"))
 
     increment_counter "graphql.query.count"
-    histogram "graphql.query.duration", duration: (event.duration / 1000).seconds
+    histogram "graphql.query.duration", duration: event.duration
   end
 end
 
