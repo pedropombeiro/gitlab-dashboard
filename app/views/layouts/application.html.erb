@@ -28,6 +28,7 @@
     <%= javascript_include_tag :application,
     "data-turbo-track": Rails.env.production? ? "reload" : "",
     type: "module" %>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   </head>
   <!-- Google tag (gtag.js) -->
   <% if ENV["GOOGLE_TAG_MEASUREMENT_ID"].present? %>
