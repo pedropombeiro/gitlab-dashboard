@@ -149,10 +149,12 @@ RSpec.describe GitlabClient do
                   a_hash_including(iid: "173916", **common_mr_attrs),
                   a_hash_including(iid: "173886", **common_mr_attrs),
                   a_hash_including(iid: "173885", **common_mr_attrs,
-                    blockingMergeRequests: {visibleMergeRequests: [state: "opened"]}),
+                    blockingMergeRequests: {visibleMergeRequests: [iid: "173886", state: "opened"]}),
                   a_hash_including(iid: "173639", **common_mr_attrs),
                   a_hash_including(iid: "171848", **common_mr_attrs,
-                    blockingMergeRequests: {visibleMergeRequests: [{state: "merged"}, {state: "closed"}]}),
+                    blockingMergeRequests: {
+                      visibleMergeRequests: [{iid: "172422", state: "merged"}, {iid: "172698", state: "closed"}]
+                    }),
                   a_hash_including(iid: "173007", **common_mr_attrs)
                 ]
               }

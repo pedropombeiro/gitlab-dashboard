@@ -150,6 +150,7 @@ class GitlabClient
             conflicts
             blockingMergeRequests {
               visibleMergeRequests {
+                iid
                 state
               }
             }
