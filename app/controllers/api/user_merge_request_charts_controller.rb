@@ -29,7 +29,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
   end
 
   def monthly_mrs_graph(user)
-    fetch_service = Services::FetchMergeRequestsService.new(params[:assignee])
+    fetch_service = FetchMergeRequestsService.new(params[:assignee])
     response = fetch_service.execute
     user_dto = fetch_service.parse_dto(response)
     since_first_mr = ActiveSupport::Duration.build(

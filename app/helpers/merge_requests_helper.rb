@@ -22,13 +22,13 @@ module MergeRequestsHelper
   end
 
   def user_country_flag_classes(user)
-    country_code = Services::LocationLookupService.new.fetch_country_code(user.location)
+    country_code = LocationLookupService.new.fetch_country_code(user.location)
 
     %W[fi fis fi-#{country_code.downcase}] if country_code
   end
 
   def user_help_hash(user)
-    timezone = Services::LocationLookupService.new.fetch_timezone(user.location)
+    timezone = LocationLookupService.new.fetch_timezone(user.location)
 
     {
       Location: format_location(user),

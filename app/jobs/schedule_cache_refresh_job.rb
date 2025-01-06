@@ -4,7 +4,7 @@ class ScheduleCacheRefreshJob < ApplicationJob
   queue_as :default
 
   def perform(*_args)
-    service = Services::MergeRequestsCacheService.new
+    service = MergeRequestsCacheService.new
 
     scope
       .pluck(:username)

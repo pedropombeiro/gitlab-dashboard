@@ -15,7 +15,7 @@ class MergeRequestsController < MergeRequestsControllerBase
     end
 
     save_current_user(safe_params[:assignee])
-    response = Services::MergeRequestsCacheService.new.read(safe_params[:assignee])
+    response = MergeRequestsCacheService.new.read(safe_params[:assignee])
     @dto = fetch_service.parse_dto(response)
 
     fresh_when(response)
@@ -32,7 +32,7 @@ class MergeRequestsController < MergeRequestsControllerBase
 
     save_current_user(assignee)
 
-    response, @dto = Services::GenerateNotificationsService.new(@current_user, fetch_service).execute
+    response, @dto = GenerateNotificationsService.new(@current_user, fetch_service).execute
     if @dto.errors
       return respond_to do |format|
         format.html { render file: Rails.public_path.join("500.html").to_s, layout: false, status: :internal_server_error }
@@ -41,7 +41,7 @@ class MergeRequestsController < MergeRequestsControllerBase
     end
 
     if Rails.env.production?
-      expires_in Services::MergeRequestsCacheService.cache_validity.after(response.updated_at) - Time.current
+      expires_in MergeRequestsCacheService.cache_validity.after(response.updated_at) - Time.current
     end
 
     respond_to do |format|
@@ -59,7 +59,6 @@ class MergeRequestsController < MergeRequestsControllerBase
   end
 
   def fetch_service
-    @fetch_service ||=
-      Services::FetchMergeRequestsService.new(safe_params.expect(:assignee), request_ip: request.remote_ip)
+    @fetch_service ||= FetchMergeRequestsService.new(safe_params.expect(:assignee), request_ip: request.remote_ip)
   end
 end
