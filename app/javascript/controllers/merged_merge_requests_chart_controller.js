@@ -30,7 +30,6 @@ export default class extends Controller {
         data: chartData,
         options: {
           height: "100%",
-          aspectRatio: 3,
           datasets: {
             line: {
               pointStyle: "circle",
