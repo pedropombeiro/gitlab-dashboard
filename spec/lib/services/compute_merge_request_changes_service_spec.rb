@@ -1,7 +1,7 @@
 require "rails_helper"
 require_relative "../../support/graphql_shared_contexts"
 
-RSpec.describe Services::ComputeMergeRequestChangesService do
+RSpec.describe ComputeMergeRequestChangesService do
   include_context "stub graphql client"
 
   let_it_be(:open_mrs_response_body) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }

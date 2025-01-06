@@ -159,7 +159,7 @@ class UserDto
   end
 
   def location_lookup_service
-    @location_lookup_service ||= Services::LocationLookupService.new
+    @location_lookup_service ||= LocationLookupService.new
   end
 
   def merged_mrs_contextual_labels
