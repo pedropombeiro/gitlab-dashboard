@@ -82,7 +82,7 @@ group :test do
   gem "selenium-webdriver"
   gem "webmock"
   gem "shoulda-matchers", "~> 6.0"
-  gem "test-prof", "~> 1.0"
+  gem "test-prof", "~> 1.4"
   gem "stub_env"
   gem "simplecov"
   gem "rails-controller-testing"
