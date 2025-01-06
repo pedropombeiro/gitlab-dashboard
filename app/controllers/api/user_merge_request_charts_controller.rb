@@ -32,10 +32,15 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
     fetch_service = Services::FetchMergeRequestsService.new(params[:assignee])
     response = fetch_service.execute
     user_dto = fetch_service.parse_dto(response)
-    since_first_mr = ActiveSupport::Duration.build(Time.current - user_dto.first_merged_merge_requests_timestamp)
-    monthly_merge_rate = (user_dto.merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round
-    overall_monthly_merge_ttm = if user_dto.merged_merge_requests_count
+    since_first_mr = ActiveSupport::Duration.build(
+      user_dto.first_merged_merge_requests_timestamp ? Time.current - user_dto.first_merged_merge_requests_timestamp : 0
+    )
+    monthly_merge_rate = since_first_mr.positive? ?
+      (user_dto.merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round : 0
+    overall_monthly_merge_ttm = if user_dto.merged_merge_requests_count.positive? && user_dto.merged_merge_requests_tttm
       (user_dto.merged_merge_requests_tttm.seconds.in_days / user_dto.merged_merge_requests_count).round(1)
+    else
+      0
     end
 
     {
