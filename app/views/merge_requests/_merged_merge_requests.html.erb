@@ -20,10 +20,10 @@
   end %>
 <% since_first_mr =
   ActiveSupport::Duration.build(
-    Time.current - first_merged_merge_requests_timestamp,
+    Time.current - (first_merged_merge_requests_timestamp || Time.current),
   ) %>
-<% monthly_merge_rate =
-  (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round %>
+<% monthly_merge_rate = since_first_mr.positive? ?
+  (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round : 0 %>
 
 <div class="d-flex justify-content-between align-items-end">
   <div>
