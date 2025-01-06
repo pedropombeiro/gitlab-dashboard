@@ -175,7 +175,7 @@
 <% end %>
 
 <% if merged_merge_requests_count.positive? %>
-  <%= tag.div style: "min-height: 300px", class: %w[d-flex mt-2 align-items-center justify-content-sm-center],
+  <%= tag.div style: "height: 300px", class: %w[d-flex mt-2 align-items-center justify-content-sm-center],
     data: (load_charts ? {
       controller: "merged-merge-requests-chart",
       merged_merge_requests_chart_url_value: monthly_merged_merge_request_stats_url(assignee: params[:assignee])
