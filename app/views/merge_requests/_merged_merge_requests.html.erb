@@ -20,10 +20,22 @@
   end %>
 <% since_first_mr =
   ActiveSupport::Duration.build(
-    Time.current - (first_merged_merge_requests_timestamp || Time.current),
+    (
+      if first_merged_merge_requests_timestamp
+        Time.current - first_merged_merge_requests_timestamp
+      else
+        0
+      end
+    ),
   ) %>
-<% monthly_merge_rate = since_first_mr.positive? ?
-  (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round : 0 %>
+<% monthly_merge_rate =
+  (
+    if since_first_mr.positive?
+      (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round
+    else
+      0
+    end
+  ) %>
 
 <div class="d-flex justify-content-between align-items-end">
   <div>
@@ -162,19 +174,21 @@
   </table>
 <% end %>
 
-<%= tag.div style: "height: 300px", class: %w[d-flex mt-2 align-items-center justify-content-sm-center],
-  data: (load_charts ? {
-    controller: "merged-merge-requests-chart",
-    merged_merge_requests_chart_url_value: monthly_merged_merge_request_stats_url(assignee: params[:assignee])
-  } : nil) do %>
-  <%= tag.div(
-    "Loading…",
-    class: %w[d-flex align-items-center justify-content-center w-75 h-100],
-    data: {
-      merged_merge_requests_chart_target: "chart",
-      theme_selector_target: "chart",
-    },
-    style:
-      "color: #999; font-size: 14px; font-family: 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif;",
-  ) %>
+<% if merged_merge_requests_count.positive? %>
+  <%= tag.div style: "height: 300px", class: %w[d-flex mt-2 align-items-center justify-content-sm-center],
+    data: (load_charts ? {
+      controller: "merged-merge-requests-chart",
+      merged_merge_requests_chart_url_value: monthly_merged_merge_request_stats_url(assignee: params[:assignee])
+    } : nil) do %>
+    <%= tag.div(
+      "Loading…",
+      class: %w[d-flex align-items-center justify-content-center w-75 h-100],
+      data: {
+        merged_merge_requests_chart_target: "chart",
+        theme_selector_target: "chart",
+      },
+      style:
+        "color: #999; font-size: 14px; font-family: 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif;",
+    ) %>
+  <% end %>
 <% end %>
