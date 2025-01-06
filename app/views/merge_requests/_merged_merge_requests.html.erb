@@ -175,14 +175,14 @@
 <% end %>
 
 <% if merged_merge_requests_count.positive? %>
-  <%= tag.div style: "height: 300px", class: %w[d-flex mt-2 align-items-center justify-content-sm-center],
+  <%= tag.div style: "min-height: 300px", class: %w[d-flex mt-2 align-items-center justify-content-sm-center],
     data: (load_charts ? {
       controller: "merged-merge-requests-chart",
       merged_merge_requests_chart_url_value: monthly_merged_merge_request_stats_url(assignee: params[:assignee])
     } : nil) do %>
     <%= tag.div(
       "Loading…",
-      class: %w[d-flex align-items-center justify-content-center w-75 h-100],
+      class: %w[d-flex align-items-center justify-content-center w-50 h-100],
       data: {
         merged_merge_requests_chart_target: "chart",
         theme_selector_target: "chart",
