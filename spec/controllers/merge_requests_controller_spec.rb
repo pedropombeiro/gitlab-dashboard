@@ -457,6 +457,9 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%(fa-solid fa-check))
             # Old MRs
             expect(response.body).to include(%(text-danger))
+
+            # Blocked MRs
+            expect(response.body).to include(%(This MR is blocked by 1 merge request: !173886))
           end
         end
 
