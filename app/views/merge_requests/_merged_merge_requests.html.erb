@@ -175,20 +175,19 @@
 <% end %>
 
 <% if merged_merge_requests_count.positive? %>
-  <%= tag.div style: "height: 300px", class: %w[d-flex mt-2 align-items-center justify-content-sm-center],
-    data: (load_charts ? {
-      controller: "merged-merge-requests-chart",
-      merged_merge_requests_chart_url_value: monthly_merged_merge_request_stats_url(assignee: params[:assignee])
-    } : nil) do %>
+  <div id="mergedChartContainer" class="d-flex justify-content-sm-center mt-2 w-100 p-6">
     <%= tag.div(
-      "Loading…",
-      class: %w[d-flex align-items-center justify-content-center w-100 h-100 p-6],
       data: {
         merged_merge_requests_chart_target: "chart",
         theme_selector_target: "chart",
-      },
+      }.merge(load_charts ? {
+        controller: "merged-merge-requests-chart",
+        merged_merge_requests_chart_url_value: monthly_merged_merge_request_stats_url(assignee: params[:assignee])
+      } : {}),
       style:
-        "color: #999; font-size: 14px; font-family: 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif;",
-    ) %>
-  <% end %>
+        "width: 900px; height: 300px; color: #999; font-size: 14px; font-family: 'Lucida Grande', 'Lucida Sans Unicode', Verdana, Arial, Helvetica, sans-serif;",
+    ) do %>
+      <span class="d-flex align-items-center justify-content-center w-100 h-100">Loading…</span>
+    <% end %>
+  </div>
 <% end %>
