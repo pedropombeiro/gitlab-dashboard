@@ -89,13 +89,6 @@ class GitlabClient
     }
   GRAPHQL
 
-  MonthlyMergeRequestStatsFragment = Client.parse <<-'GRAPHQL'
-    fragment on MergeRequestConnection {
-      count
-      totalTimeToMerge
-    }
-  GRAPHQL
-
   UserQuery = Client.parse <<-'GRAPHQL'
     query($username: String!) {
       user(username: $username) {
@@ -242,7 +235,10 @@ class GitlabClient
           state: merged,
           mergedAfter: $mergedAfter,
           mergedBefore: $mergedBefore
-        ) { ...GitlabClient::MonthlyMergeRequestStatsFragment }
+        ) {
+          count
+          totalTimeToMerge
+        }
       }
     }
   GRAPHQL
