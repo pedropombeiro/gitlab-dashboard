@@ -43,5 +43,9 @@
   "spec/models/*_spec.rb": {
     "type": "spec",
     "alternate": "app/models/{}.rb"
+  },
+  "spec/lib/*_spec.rb": {
+    "type": "spec",
+    "alternate": "app/lib/{}.rb"
   }
 }
