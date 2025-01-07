@@ -3,7 +3,7 @@
 
 <%= turbo_frame_tag(@dto, :merge_requests) do %>
   <%= tag.div data: {
-    controller: "auto-refresh",
+    controller: Rails.env.production? ? "auto-refresh" : nil,
     auto_refresh_target_dom_id_value: dom_id(@dto, :merge_requests),
     auto_refresh_timeout_value: (next_update_remaining_secs.clamp(10, 60) * 1000).round.to_i
   } do %>
