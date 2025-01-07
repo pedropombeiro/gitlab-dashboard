@@ -216,7 +216,6 @@ class GitlabClient
         }
         mergedMergeRequests: authoredMergeRequests(state: merged, mergedAfter: $mergedAfter, sort: MERGED_AT_DESC) {
           nodes {
-            iid
             ...GitlabClient::CoreMergeRequestFragment
             mergedAt
             mergeUser {
