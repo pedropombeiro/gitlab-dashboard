@@ -3,7 +3,7 @@
   (
     if merge_requests.count.positive?
       ActiveSupport::Duration.build(
-        merge_requests.sum { |mr| Time.current - mr.createdAt } /
+        merge_requests.sum { |mr| mr.mergedAt - mr.createdAt } /
           merge_requests.count,
       )
     else
@@ -175,7 +175,10 @@
 <% end %>
 
 <% if merged_merge_requests_count.positive? %>
-  <div id="mergedChartContainer" class="d-flex justify-content-sm-center mt-2 w-100 p-6">
+  <div
+    id="mergedChartContainer"
+    class="d-flex justify-content-sm-center mt-2 w-100 p-6"
+  >
     <%= tag.div(
       data: {
         merged_merge_requests_chart_target: "chart",
