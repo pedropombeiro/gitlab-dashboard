@@ -330,10 +330,16 @@ class GitlabClient
 
   private
 
+  GRAPHQL_RETRIABLE_ERRORS = [
+    Graphlient::Errors::TimeoutError,
+    Graphlient::Errors::FaradayServerError,
+    Faraday::SSLError
+  ]
+
   def execute_query(query, **args)
     Rails.logger.debug { %(Executing #{query.operation_name} GraphQL query (args: #{args})...) }
 
-    with_retries(max_tries: 2, rescue: [Graphlient::Errors::TimeoutError, Faraday::SSLError]) do
+    with_retries(max_tries: 2, rescue: GRAPHQL_RETRIABLE_ERRORS) do
       Client.query(query, **args)
     end
   end
