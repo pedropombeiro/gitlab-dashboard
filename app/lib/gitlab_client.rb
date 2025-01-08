@@ -331,9 +331,10 @@ class GitlabClient
   private
 
   GRAPHQL_RETRIABLE_ERRORS = [
-    Graphlient::Errors::TimeoutError,
+    Faraday::SSLError,
+    Graphlient::Errors::ConnectionFailedError,
     Graphlient::Errors::FaradayServerError,
-    Faraday::SSLError
+    Graphlient::Errors::TimeoutError
   ]
 
   def execute_query(query, **args)
