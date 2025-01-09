@@ -50,6 +50,14 @@ class MergeRequestsController < MergeRequestsControllerBase
     end
   end
 
+  def merged_chart
+    assignee = safe_params.expect(:assignee)
+    user = graphql_user(assignee)
+    render_404 and return unless user
+
+    save_current_user(assignee)
+  end
+
   private
 
   def graphql_user(assignee)

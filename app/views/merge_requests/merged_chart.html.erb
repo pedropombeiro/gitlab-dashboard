@@ -1,0 +1,18 @@
+<% data = {
+  merged_merge_requests_chart_target: "chart",
+  theme_selector_target: "chart",
+} %>
+
+<% if params[:load_charts]
+  data.merge!(
+    controller: "merged-merge-requests-chart",
+    merged_merge_requests_chart_url_value:
+      monthly_merged_merge_request_stats_url(assignee: params[:assignee]),
+  )
+end %>
+
+<%= turbo_frame_tag(params[:assignee], :merged_merge_requests_chart) do %>
+  <%= tag.div(data: data, class: "h-100", style: "width: 900px;") do %>
+    <span class="d-flex align-items-center justify-content-center w-100 h-100">Loading…</span>
+  <% end %>
+<% end %>
