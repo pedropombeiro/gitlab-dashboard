@@ -31,9 +31,9 @@ class GitlabClient
     }
   GRAPHQL
 
-  ExtendedUserFragment = Client.parse <<-'GRAPHQL'
+  ExtendedUserFragment = Client.parse <<-GRAPHQL
     fragment on User {
-      ...GitlabClient::CoreUserFragment
+      ...#{name}::CoreUserFragment
       lastActivityOn
       location
       status {
@@ -53,19 +53,19 @@ class GitlabClient
     }
   GRAPHQL
 
-  CoreIssueFragment = Client.parse <<-'GRAPHQL'
+  CoreIssueFragment = Client.parse <<-GRAPHQL
     fragment on Issue {
       iid
       webUrl
       titleHtml
       state
       labels {
-        nodes { ...GitlabClient::CoreLabelFragment }
+        nodes { ...#{name}::CoreLabelFragment }
       }
     }
   GRAPHQL
 
-  CoreMergeRequestFragment = Client.parse <<-'GRAPHQL'
+  CoreMergeRequestFragment = Client.parse <<-GRAPHQL
     fragment on MergeRequest {
       iid
       webUrl
@@ -81,44 +81,44 @@ class GitlabClient
       createdAt
       updatedAt
       assignees {
-        nodes { ...GitlabClient::CoreUserFragment }
+        nodes { ...#{name}::CoreUserFragment }
       }
       labels {
-        nodes { ...GitlabClient::CoreLabelFragment }
+        nodes { ...#{name}::CoreLabelFragment }
       }
     }
   GRAPHQL
 
-  UserQuery = Client.parse <<-'GRAPHQL'
+  UserQuery = Client.parse <<-GRAPHQL
     query($username: String!) {
       user(username: $username) {
-        ...GitlabClient::CoreUserFragment
+        ...#{name}::CoreUserFragment
       }
     }
   GRAPHQL
 
-  CurrentUserQuery = Client.parse <<-'GRAPHQL'
+  CurrentUserQuery = Client.parse <<-GRAPHQL
     query {
       user: currentUser {
-        ...GitlabClient::CoreUserFragment
+        ...#{name}::CoreUserFragment
       }
     }
   GRAPHQL
 
-  ProjectIssuesQuery = Client.parse <<-'GRAPHQL'
+  ProjectIssuesQuery = Client.parse <<-GRAPHQL
     query($projectFullPath: ID!, $issueIids: [String!]) {
       project(fullPath: $projectFullPath) {
         issues(iids: $issueIids) {
-          nodes { ...GitlabClient::CoreIssueFragment }
+          nodes { ...#{name}::CoreIssueFragment }
         }
       }
     }
   GRAPHQL
 
-  ReviewerQuery = Client.parse <<-'GRAPHQL'
+  ReviewerQuery = Client.parse <<-GRAPHQL
     query($reviewer: String!, $activeReviewsAfter: Time) {
       user(username: $reviewer) {
-        ...GitlabClient::ExtendedUserFragment
+        ...#{name}::ExtendedUserFragment
         bot
         activeReviews: reviewRequestedMergeRequests(state: opened, approved: false, updatedAfter: $activeReviewsAfter) {
           # count # approved: false filter is behind the `mr_approved_filter` ops FF, so we need to request the nodes for now
@@ -128,12 +128,12 @@ class GitlabClient
     }
   GRAPHQL
 
-  OpenMergeRequestsQuery = Client.parse <<-'GRAPHQL'
+  OpenMergeRequestsQuery = Client.parse <<-GRAPHQL
     query($username: String!, $updatedAfter: Time) {
       user(username: $username) {
         openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC, updatedAfter: $updatedAfter) {
           nodes {
-            ...GitlabClient::CoreMergeRequestFragment
+            ...#{name}::CoreMergeRequestFragment
             approved
             approvalsRequired
             approvalsLeft
@@ -202,7 +202,7 @@ class GitlabClient
     }
   GRAPHQL
 
-  MergedMergeRequestsQuery = Client.parse <<-'GRAPHQL'
+  MergedMergeRequestsQuery = Client.parse <<-GRAPHQL
     query($username: String!, $mergedAfter: Time!) {
       user(username: $username) {
         firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
@@ -216,10 +216,10 @@ class GitlabClient
         }
         mergedMergeRequests: authoredMergeRequests(state: merged, mergedAfter: $mergedAfter, sort: MERGED_AT_DESC) {
           nodes {
-            ...GitlabClient::CoreMergeRequestFragment
+            ...#{name}::CoreMergeRequestFragment
             mergedAt
             mergeUser {
-              ...GitlabClient::ExtendedUserFragment
+              ...#{name}::ExtendedUserFragment
             }
           }
         }
