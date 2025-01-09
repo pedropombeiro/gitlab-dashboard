@@ -4,6 +4,7 @@ Rails.application.routes.draw do
 
   get "/mrs", to: "merge_requests#index", as: :merge_requests
   get "/mrs/list", to: "merge_requests#list", as: :merge_requests_list
+  get "/mrs/merged_chart", to: "merge_requests#merged_chart", as: :merged_merge_requests_chart
 
   get "/mrs/:assignee", to: "merge_requests#legacy_index"
 
