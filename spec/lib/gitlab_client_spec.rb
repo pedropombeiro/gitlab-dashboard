@@ -23,7 +23,7 @@ RSpec.describe GitlabClient do
 
     before do
       stub_request(:post, graphql_url)
-        .with(body: hash_including("query" => a_string_including("query GitlabClient__UserQuery")))
+        .with(body: hash_including("operationName" => "GitlabClient__UserQuery"))
         .to_return_json(body: user_requests_response_body[username])
     end
 
@@ -66,7 +66,7 @@ RSpec.describe GitlabClient do
     before do
       stub_request(:post, graphql_url)
         .with(body: hash_including(
-          "query" => a_string_including("query GitlabClient__ProjectIssuesQuery"),
+          "operationName" => "GitlabClient__ProjectIssuesQuery",
           "variables" => hash_including(
             "projectFullPath" => "gitlab-org/gitlab",
             "issueIids" => an_array_matching(%w[505810 506226])
@@ -75,7 +75,7 @@ RSpec.describe GitlabClient do
         .to_return_json(body: issues["project_0"])
       stub_request(:post, graphql_url)
         .with(body: hash_including(
-          "query" => a_string_including("query GitlabClient__ProjectIssuesQuery"),
+          "operationName" => "GitlabClient__ProjectIssuesQuery",
           "variables" => {
             "projectFullPath" => "gitlab-org/gitlab-runner",
             "issueIids" => %w[32804]
@@ -120,7 +120,7 @@ RSpec.describe GitlabClient do
 
     before do
       stub_request(:post, graphql_url)
-        .with(body: hash_including("query" => a_string_including("query GitlabClient__OpenMergeRequestsQuery")))
+        .with(body: hash_including("operationName" => "GitlabClient__OpenMergeRequestsQuery"))
         .to_return_json(body: open_mrs_response_body["one"])
     end
 
@@ -174,7 +174,7 @@ RSpec.describe GitlabClient do
 
     before do
       stub_request(:post, graphql_url)
-        .with(body: hash_including("query" => a_string_including("query GitlabClient__MergedMergeRequestsQuery")))
+        .with(body: hash_including("operationName" => "GitlabClient__MergedMergeRequestsQuery"))
         .to_return_json(body: {data: {user: {mergedMergeRequests: {nodes: []}}}})
     end
 
@@ -193,7 +193,7 @@ RSpec.describe GitlabClient do
     before do
       stub_request(:post, graphql_url)
         .with(body: hash_including(
-          "query" => a_string_including("query GitlabClient__MonthlyMergeRequestsQuery"),
+          "operationName" => "GitlabClient__MonthlyMergeRequestsQuery",
           "variables" => matching(
             "username" => username,
             "mergedAfter" => an_instance_of(String),

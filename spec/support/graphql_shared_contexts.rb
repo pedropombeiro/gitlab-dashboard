@@ -8,7 +8,7 @@ RSpec.shared_context "stub graphql client" do
   before do
     stub_env("GITLAB_URL", gitlab_instance_url)
     stub_request(:post, graphql_url)
-      .with(body: hash_including("query" => a_string_including("query IntrospectionQuery")))
+      .with(body: hash_including("operationName" => "IntrospectionQuery"))
       .to_return_json(body: JSON.load_file(graphql_schema_file))
     stub_const("GitlabClient::Client", graphql_client)
     allow(GitlabClient).to receive(:gitlab_instance_url).and_return(gitlab_instance_url)
