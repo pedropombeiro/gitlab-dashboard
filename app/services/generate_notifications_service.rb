@@ -6,23 +6,24 @@ class GenerateNotificationsService
   include CacheConcern
   include WebPushConcern
 
-  def initialize(assignee, fetch_service)
+  def initialize(assignee, type, fetch_service)
     @assignee_user = assignee.is_a?(GitlabUser) ? assignee : GitlabUser.find_by_username!(assignee)
+    @type = type
     @fetch_service = fetch_service
   end
 
   def execute
     previous_dto = nil
     if assignee_user.web_push_subscriptions.any?
-      response = cache_service.read(assignee_user.username)
-      previous_dto = fetch_service.parse_dto(response)
+      response = cache_service.read(assignee_user.username, type)
+      previous_dto = fetch_service.parse_dto(response, type)
     end
 
-    response = fetch_service.execute
+    response = fetch_service.execute(type)
 
-    cache_service.write(assignee_user.username, response) if response.errors.nil?
+    cache_service.write(assignee_user.username, type, response) if response.errors.nil?
 
-    dto = fetch_service.parse_dto(response)
+    dto = fetch_service.parse_dto(response, type)
     check_changes(previous_dto, dto) if dto.errors.blank? && assignee_user.web_push_subscriptions.any?
 
     [response, dto]
@@ -30,14 +31,14 @@ class GenerateNotificationsService
 
   private
 
-  attr_reader :assignee_user, :fetch_service
+  attr_reader :assignee_user, :type, :fetch_service
 
   def cache_service
     @cache_service ||= MergeRequestsCacheService.new
   end
 
   def check_changes(previous_dto, dto)
-    notifications = ComputeMergeRequestChangesService.new(previous_dto, dto).execute
+    notifications = ComputeMergeRequestChangesService.new(type, previous_dto, dto).execute
     if notifications.pluck(:type).include?(:merge_request_merged)
       # Clear monthly MR count cache if an MR has been merged
       Rails.cache.delete(self.class.monthly_merged_mr_lists_cache_key(assignee_user.username))

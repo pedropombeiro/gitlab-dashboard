@@ -8,8 +8,11 @@ class ScheduleCacheRefreshJob < ApplicationJob
 
     scope
       .pluck(:username)
-      .select { |assignee| service.needs_scheduled_update?(assignee) }
-      .each { |assignee| MergeRequestsFetchJob.perform_later(assignee) }
+      .each do |assignee|
+        %i[open merged]
+          .select { |type| service.needs_scheduled_update?(assignee, type) }
+          .each { |type| MergeRequestsFetchJob.perform_later(assignee, type) }
+      end
   end
 
   private

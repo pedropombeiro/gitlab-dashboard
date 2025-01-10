@@ -3,9 +3,11 @@ Rails.application.routes.draw do
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
   get "/mrs", to: "merge_requests#index", as: :merge_requests
-  get "/mrs/list", to: "merge_requests#list", as: :merge_requests_list
+  get "/mrs/open_list", to: "merge_requests#open_list", as: :open_merge_requests_list
+  get "/mrs/merged_list", to: "merge_requests#merged_list", as: :merged_merge_requests_list
   get "/mrs/merged_chart", to: "merge_requests#merged_chart", as: :merged_merge_requests_chart
 
+  get "/mrs/list", to: "merge_requests#open_list"
   get "/mrs/:assignee", to: "merge_requests#legacy_index"
 
   get "/api/graph/monthly_merged_mrs",

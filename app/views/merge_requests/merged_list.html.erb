@@ -1,0 +1,19 @@
+<% next_update_remaining_secs =
+  5.seconds.after(@dto.next_update_at || Time.current) - Time.current %>
+
+<%= turbo_frame_tag(@dto, :merged_merge_requests) do %>
+  <%= tag.div data: {
+    controller: Rails.env.production? ? "auto-refresh" : nil,
+    auto_refresh_target_dom_id_value: dom_id(@dto, :merged_merge_requests),
+    auto_refresh_timeout_value: (next_update_remaining_secs.clamp(10, 60) * 1000).round.to_i
+  } do %>
+    <div data-controller="bootstrap-tooltip">
+      <%= render "merged_merge_requests",
+      merge_requests_dto: @dto.merged_merge_requests,
+      merged_merge_requests_count: @dto.merged_merge_requests_count,
+      merged_merge_requests_tttm: @dto.merged_merge_requests_tttm,
+      first_merged_merge_requests_timestamp:
+        @dto.first_merged_merge_requests_timestamp %>
+    </div>
+  <% end %>
+<% end %>

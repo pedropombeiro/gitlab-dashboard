@@ -9,7 +9,11 @@ RSpec.describe "routes for Merge Requests", type: :routing do
     expect(get("/mrs")).to route_to("merge_requests#index")
   end
 
-  it "routes /mrs/list to the merge requests controller" do
-    expect(get("/mrs/list")).to route_to("merge_requests#list")
+  it "routes /mrs/open_list to the merge requests controller" do
+    expect(get("/mrs/open_list")).to route_to("merge_requests#open_list")
+  end
+
+  it "routes /mrs/merged_list to the merge requests controller" do
+    expect(get("/mrs/merged_list")).to route_to("merge_requests#merged_list")
   end
 end

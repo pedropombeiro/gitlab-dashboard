@@ -15,8 +15,8 @@ class MergeRequestsController < MergeRequestsControllerBase
     end
 
     save_current_user(safe_params[:assignee])
-    response = MergeRequestsCacheService.new.read(safe_params[:assignee])
-    @dto = fetch_service.parse_dto(response)
+    response = MergeRequestsCacheService.new.read(safe_params[:assignee], :open)
+    @dto = fetch_service.parse_dto(response, :open)
 
     fresh_when(response)
   end
@@ -25,29 +25,12 @@ class MergeRequestsController < MergeRequestsControllerBase
     redirect_to merge_requests_path(**safe_params)
   end
 
-  def list
-    assignee = safe_params.expect(:assignee)
-    user = graphql_user(assignee)
-    render_404 and return unless user
+  def open_list
+    handle_merge_requests_list(:open)
+  end
 
-    save_current_user(assignee)
-
-    response, @dto = GenerateNotificationsService.new(@current_user, fetch_service).execute
-    if @dto.errors
-      return respond_to do |format|
-        format.html { render file: Rails.public_path.join("500.html").to_s, layout: false, status: :internal_server_error }
-        format.any { head :internal_server_error }
-      end
-    end
-
-    if Rails.env.production?
-      expires_in MergeRequestsCacheService.cache_validity.after(response.updated_at) - Time.current
-    end
-
-    respond_to do |format|
-      format.html { redirect_to merge_requests_path(assignee: assignee) unless params[:turbo] }
-      format.json { render json: response }
-    end
+  def merged_list
+    handle_merge_requests_list(:merged)
   end
 
   def merged_chart
@@ -68,5 +51,24 @@ class MergeRequestsController < MergeRequestsControllerBase
 
   def fetch_service
     @fetch_service ||= FetchMergeRequestsService.new(safe_params.expect(:assignee), request_ip: request.remote_ip)
+  end
+
+  def handle_merge_requests_list(type)
+    assignee = safe_params.expect(:assignee)
+    user = graphql_user(assignee)
+    render_404 and return unless user
+
+    save_current_user(assignee)
+
+    response, @dto = GenerateNotificationsService.new(@current_user, type, fetch_service).execute
+
+    if Rails.env.production?
+      expires_in MergeRequestsCacheService.cache_validity.after(response.updated_at) - Time.current
+    end
+
+    respond_to do |format|
+      format.html { redirect_to merge_requests_path(assignee: assignee) unless params[:turbo] }
+      format.json { render json: response }
+    end
   end
 end

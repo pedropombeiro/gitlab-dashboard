@@ -33,16 +33,16 @@ module CacheConcern
       "#{REDIS_NAMESPACE}/reviewer_info/#{reviewer_info_version}/#{user_hash(username)}"
     end
 
-    def authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/authored_list/#{user_hash(user)}"
+    def authored_mr_lists_cache_key(user, type)
+      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/authored_#{type}_list/#{user_hash(user)}"
     end
 
     def monthly_merged_mr_lists_cache_key(user)
       "#{REDIS_NAMESPACE}/merge_requests/#{monthly_merge_request_stats_version}/monthly_merged/#{user_hash(user)}"
     end
 
-    def last_authored_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/last_authored_list/#{user_hash(user)}"
+    def last_authored_mr_lists_cache_key(user, type)
+      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/last_authored_#{type}_list/#{user_hash(user)}"
     end
 
     private

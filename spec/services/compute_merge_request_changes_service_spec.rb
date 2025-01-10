@@ -1,5 +1,5 @@
 require "rails_helper"
-require_relative "../../support/graphql_shared_contexts"
+require_relative "../support/graphql_shared_contexts"
 
 RSpec.describe ComputeMergeRequestChangesService do
   include_context "stub graphql client"
@@ -16,9 +16,9 @@ RSpec.describe ComputeMergeRequestChangesService do
 
   let(:client) { GitlabClient.new }
   let(:assignee) { "pedropombeiro" }
-  let(:previous_dto) { ::UserDto.new(previous_response, assignee, issue_iids.to_h { |iid| [iid, new_issue] }) }
-  let(:dto) { ::UserDto.new(new_response, assignee, issue_iids.to_h { |iid| [iid, new_issue] }) }
-  let(:service) { described_class.new(previous_dto, dto) }
+  let(:previous_dto) { ::UserDto.new(previous_response, assignee, type, issue_iids.to_h { |iid| [iid, new_issue] }) }
+  let(:dto) { ::UserDto.new(new_response, assignee, type, issue_iids.to_h { |iid| [iid, new_issue] }) }
+  let(:service) { described_class.new(type, previous_dto, dto) }
 
   subject(:execute) { service.execute }
 
@@ -34,6 +34,7 @@ RSpec.describe ComputeMergeRequestChangesService do
   describe "open merge request changes" do
     let(:previous_response) { response }
     let(:new_response) { response }
+    let(:type) { :open }
 
     it { is_expected.to be_empty }
 
@@ -87,35 +88,13 @@ RSpec.describe ComputeMergeRequestChangesService do
           ]
         end
       end
-
-      context "when an MR is merged" do
-        before do
-          dto.merged_merge_requests.items << response.user.openMergeRequests.nodes.delete(merged_mr)
-        end
-
-        let(:merged_mr) do
-          response.user.openMergeRequests.nodes.last
-        end
-
-        it "contains notification for merged MR" do
-          is_expected.to include(
-            a_hash_including(
-              body: "!173007: Save runner taggings to shard table",
-              tag: "173007",
-              timestamp: DateTime.parse("2024-11-22T14:44:47Z"),
-              title: "A merge request was merged",
-              type: :merge_request_merged,
-              url: "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173007"
-            )
-          )
-        end
-      end
     end
   end
 
   describe "merged merge request changes" do
     let(:previous_response) { response }
     let(:new_response) { response }
+    let(:type) { :merged }
 
     it { is_expected.to be_empty }
 
@@ -202,6 +181,29 @@ RSpec.describe ComputeMergeRequestChangesService do
             )
           )
         end
+      end
+    end
+
+    context "when an MR is merged" do
+      before do
+        dto.merged_merge_requests.items << response.user.openMergeRequests.nodes.delete(merged_mr)
+      end
+
+      let(:merged_mr) do
+        response.user.openMergeRequests.nodes.last
+      end
+
+      it "contains notification for merged MR" do
+        is_expected.to include(
+          a_hash_including(
+            body: "!173007: Save runner taggings to shard table",
+            tag: "173007",
+            timestamp: DateTime.parse("2024-11-22T14:44:47Z"),
+            title: "A merge request was merged",
+            type: :merge_request_merged,
+            url: "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173007"
+          )
+        )
       end
     end
 

@@ -10,7 +10,7 @@ class Admin::DashboardController < ApplicationController
   private
 
   def user_cache_validity(assignee)
-    response = MergeRequestsCacheService.new.read(assignee)
+    response = MergeRequestsCacheService.new.read(assignee, :open)
     return unless response&.next_scheduled_update_at
 
     response.next_scheduled_update_at

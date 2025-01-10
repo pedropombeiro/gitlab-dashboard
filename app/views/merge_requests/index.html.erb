@@ -80,36 +80,41 @@
     target: "_blank" %>
   <% end %>
 
-  <%= turbo_frame_tag @dto, :merge_requests,
-    src: merge_requests_list_path(assignee: params[:assignee], turbo: true) do %>
-    <div
-      class="
-        shadow rounded p-4 mb-5 bg-body bg-gradient text-body z-3 position-absolute
-        top-50 start-50 translate-middle d-flex justify-content-center
-        align-items-center
-      "
-    >
-      <span
-        class="spinner-border me-3 d-none d-sm-inline"
-        role="status"
-        aria-hidden="true"
-      ></span>
-      <span>Loading merge requests…</span>
-    </div>
+  <%= tag.div(class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
+    <%= tag.div(id: "open_merge_requests", class: mr_list_panel_classes + %w[bg-body mt-5]) do %>
+      <%= turbo_frame_tag @dto, :open_merge_requests, src: open_merge_requests_list_path(assignee: params[:assignee], turbo: true) do %>
+        <% if @dto.has_content? %>
+          <!-- Show last stored state, while we wait for the refreshed state
+          -->
+          <%= render "open_merge_requests",
+          merge_requests_dto: @dto.open_merge_requests,
+          updated_at: @dto.updated_at,
+          next_update_at: @dto.next_update_at,
+          request_duration: @dto.request_duration %>
+        <% else %>
+          <%= tag.div(class: "d-flex align-items-center justify-content-center p-3 w-100 h-100") do %>
+            <span
+              class="spinner-border me-3 d-none d-sm-inline"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <span>Loading open merge requests…</span>
+          <% end %>
+        <% end %>
+      <% end %>
+    <% end %>
 
-    <% if @dto.has_content? %>
-      <!-- Show last stored state, while we wait for the refreshed state -->
-      <%= render "user_merge_requests",
-      load_charts: false,
-      updated_at: @dto.updated_at,
-      next_update_at: @dto.next_update_at,
-      request_duration: @dto.request_duration,
-      open_merge_requests: @dto.open_merge_requests,
-      merged_merge_requests: @dto.merged_merge_requests,
-      merged_merge_requests_count: @dto.merged_merge_requests_count,
-      merged_merge_requests_tttm: @dto.merged_merge_requests_tttm,
-      first_merged_merge_requests_timestamp:
-        @dto.first_merged_merge_requests_timestamp %>
+    <%= tag.div(id: "merged_merge_requests", class: mr_list_panel_classes + %w[bg-tertiary mt-3 mt-sm-5], style: "--bs-bg-opacity: .1;") do %>
+      <%= turbo_frame_tag(@dto, :merged_merge_requests, loading: "lazy", src: merged_merge_requests_list_path(assignee: params[:assignee], turbo: true)) do %>
+        <%= tag.div(class: "d-flex align-items-center justify-content-center p-3 w-100 h-100") do %>
+          <span
+            class="spinner-border me-3 d-none d-sm-inline"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          <span>Loading merged merge requests…</span>
+        <% end %>
+      <% end %>
     <% end %>
   <% end %>
 <% end %>

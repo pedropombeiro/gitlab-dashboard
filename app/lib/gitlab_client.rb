@@ -302,9 +302,9 @@ class GitlabClient
     end
   end
 
-  # Fetches a list of issues given 2 lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
-  def fetch_issues(merged_mr_issue_iids, open_mr_issue_iids, format: :open_struct)
-    issue_iids = (open_mr_issue_iids + merged_mr_issue_iids).filter { |h| h[:issue_iid] }.uniq
+  # Fetches a list of issues given a lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
+  def fetch_issues(issue_iids, format: :open_struct)
+    issue_iids = issue_iids.filter { |h| h[:issue_iid] }.uniq
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
     format_response(format) do
