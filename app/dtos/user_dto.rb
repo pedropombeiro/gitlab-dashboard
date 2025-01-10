@@ -9,10 +9,10 @@ class UserDto
   include MergeRequestsParsingHelper
 
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
-  attr_reader :open_merge_requests, :merged_merge_requests
+  attr_reader :open_merge_requests, :merged_merge_requests, :type
   attr_reader :merged_merge_requests_count, :merged_merge_requests_tttm, :first_merged_merge_requests_timestamp
 
-  def initialize(response, username, issues_by_iid)
+  def initialize(response, username, type, issues_by_iid)
     @has_content = response.present?
     @username = username
 
@@ -22,6 +22,7 @@ class UserDto
       return
     end
 
+    @type = type
     @errors = response.errors
     @request_duration = response.request_duration
     @updated_at = response.updated_at
@@ -29,21 +30,26 @@ class UserDto
 
     @next_update_at = response.next_update_at
 
-    open_mrs = response.user.openMergeRequests.nodes
-    merged_mrs = response.user.mergedMergeRequests.nodes
+    case @type
+    when :open
+      open_mrs = response.user.openMergeRequests.nodes
 
-    warmup_timezone_cache(open_mrs)
+      warmup_timezone_cache(open_mrs)
 
-    @open_merge_requests = MergeRequestCollectionDto.new(
-      open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, issues_by_iid) }
-    )
-    @merged_merge_requests_count = response.user.allMergedMergeRequests.count
-    @merged_merge_requests_tttm = response.user.allMergedMergeRequests.totalTimeToMerge
-    @first_merged_merge_requests_timestamp =
-      parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.first&.createdAt)
-    @merged_merge_requests = MergeRequestCollectionDto.new(
-      merged_mrs.map { |mr| convert_merged_merge_request(mr, merged_mrs, issues_by_iid) }
-    )
+      @open_merge_requests = MergeRequestCollectionDto.new(
+        open_mrs.map { |mr| convert_open_merge_request(mr, open_mrs, issues_by_iid) }
+      )
+    when :merged
+      merged_mrs = response.user.mergedMergeRequests.nodes
+
+      @merged_merge_requests_count = response.user.allMergedMergeRequests.count
+      @merged_merge_requests_tttm = response.user.allMergedMergeRequests.totalTimeToMerge
+      @first_merged_merge_requests_timestamp =
+        parse_graphql_time(response.user.firstCreatedMergedMergeRequests.nodes.first&.createdAt)
+      @merged_merge_requests = MergeRequestCollectionDto.new(
+        merged_mrs.map { |mr| convert_merged_merge_request(mr, merged_mrs, issues_by_iid) }
+      )
+    end
   end
 
   def has_content?

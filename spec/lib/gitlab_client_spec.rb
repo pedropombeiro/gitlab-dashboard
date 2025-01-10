@@ -48,19 +48,16 @@ RSpec.describe GitlabClient do
   describe "#fetch_issues" do
     let_it_be(:issues) { YAML.load_file(file_fixture("issues.yml")) }
 
-    let(:merged_mr_issues) do
-      [{project_full_path: "gitlab-org/gitlab", issue_iid: "505810"}]
-    end
-
-    let(:open_mr_issues) do
+    let(:mr_issue_iids) do
       [
         {project_full_path: "gitlab-org/gitlab-runner", issue_iid: "32804"},
-        {project_full_path: "gitlab-org/gitlab", issue_iid: "506226"}
+        {project_full_path: "gitlab-org/gitlab", issue_iid: "506226"},
+        {project_full_path: "gitlab-org/gitlab", issue_iid: "505810"}
       ]
     end
 
     subject(:fetch_issues) do
-      client.fetch_issues(merged_mr_issues, open_mr_issues)
+      client.fetch_issues(mr_issue_iids)
     end
 
     before do

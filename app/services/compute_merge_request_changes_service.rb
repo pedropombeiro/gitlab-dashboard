@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class ComputeMergeRequestChangesService
-  def initialize(previous_dto, dto)
+  def initialize(type, previous_dto, dto)
+    @type = type
     @previous_dto = previous_dto
     @dto = dto
   end
@@ -9,16 +10,17 @@ class ComputeMergeRequestChangesService
   def execute
     return [] unless previous_dto
 
-    previous_open_mrs = previous_dto.open_merge_requests.items
-    previous_merged_mrs = previous_dto.merged_merge_requests.items
-    open_mrs = dto.open_merge_requests.items
-    merged_mrs = dto.merged_merge_requests.items
+    previous_open_mrs = (type == :open) ? previous_dto.open_merge_requests.items : nil
+    open_mrs = (type == :open) ? dto.open_merge_requests.items : nil
+
+    previous_merged_mrs = (type == :merged) ? previous_dto.merged_merge_requests.items : nil
+    merged_mrs = (type == :merged) ? dto.merged_merge_requests.items : nil
 
     [].tap do |mr_changes|
-      # Open MR merged
-      merged_mrs.each do |mr|
-        previous_mr_version = previous_open_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
-        next if previous_mr_version.nil?
+      # New MR merged
+      merged_mrs&.each do |mr|
+        previous_mr_version = previous_merged_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
+        next unless previous_merged_mrs.any? && previous_mr_version.nil?
 
         mr_changes << merge_request_change(
           mr,
@@ -42,7 +44,7 @@ class ComputeMergeRequestChangesService
 
   private
 
-  attr_reader :previous_dto, :dto
+  attr_reader :type, :previous_dto, :dto
 
   def merge_request_change(mr, type:, title:, body:)
     {

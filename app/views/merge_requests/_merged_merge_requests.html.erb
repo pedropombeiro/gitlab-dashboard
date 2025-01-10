@@ -1,4 +1,8 @@
-<% merge_requests = merge_requests_dto.items %>
+<% merge_requests = local_assigns[:merge_requests_dto].items %>
+<% merged_merge_requests_tttm = local_assigns[:merged_merge_requests_tttm] %>
+<% merged_merge_requests_count = local_assigns[:merged_merge_requests_count] %>
+<% first_merged_merge_requests_timestamp = local_assigns[:first_merged_merge_requests_timestamp] %>
+
 <% avg_time_to_merge =
   (
     if merge_requests.count.positive?
@@ -183,11 +187,7 @@
     <%= turbo_frame_tag params[:assignee],
     :merged_merge_requests_chart,
     loading: "lazy",
-    src:
-      merged_merge_requests_chart_path(
-        assignee: params[:assignee],
-        load_charts: load_charts,
-      ) do %>
+    src: merged_merge_requests_chart_path(assignee: params[:assignee]) do %>
       <span class="d-flex align-items-center justify-content-center w-100 h-100">Initializing…</span>
     <% end %>
   </div>

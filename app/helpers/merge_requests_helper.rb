@@ -5,6 +5,18 @@ module MergeRequestsHelper
   include ActionView::Helpers::TagHelper
   include HumanizeHelper
 
+  def mr_list_panel_classes
+    %w[
+      table-responsive
+      shadow
+      align-middle
+      border
+      rounded
+      bg-gradient
+      p-2
+    ]
+  end
+
   def user_emojis(user_status)
     return unless user_status
 
