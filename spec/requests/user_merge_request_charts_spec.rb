@@ -29,7 +29,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
 
           stub_request(:post, graphql_url)
             .with(body: hash_including(
-              "query" => a_string_including("query GitlabClient__MonthlyMergeRequestsQuery"),
+              "operationName" => "GitlabClient__MonthlyMergeRequestsQuery",
               "variables" => {
                 "username" => username,
                 "mergedAfter" => bom.to_fs,
