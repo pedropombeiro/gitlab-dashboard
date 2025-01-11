@@ -6,9 +6,9 @@
 >
   <table class="table table-hover">
     <caption class="caption-top">
-      <%= pluralize(@active_users.count, "user dashboard") %>
+      <%= pluralize(number_with_delimiter(@active_users.count), "user dashboard") %>
       currently active, from a total of
-      <%= pluralize(@users.count, "visited dashboard") %>
+      <%= pluralize(number_with_delimiter(@users.count), "visited dashboard") %>
     </caption>
 
     <thead class="thead-dark">

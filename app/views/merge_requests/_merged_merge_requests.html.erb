@@ -56,7 +56,7 @@
               "merged per month",
         },
       ) do %>
-        <%= pluralize(merge_requests.count, "merge request") %>
+        <%= pluralize(number_with_delimiter(merge_requests.count), "merge request") %>
         <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
         <%= merge_rate_ok ? "↗" : "↘" %>
       <% end %>
@@ -87,7 +87,7 @@
     <div class="flex-row-reverse">
       <div>
         A total of
-        <%= pluralize(merged_merge_requests_count, "merge request") %>
+        <%= pluralize(number_with_delimiter(merged_merge_requests_count), "merge request") %>
         merged since
         <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
         <% if monthly_merge_rate < 1.0 %>
@@ -108,7 +108,8 @@
                   "recommended baseline of #{pluralize(recommended_monthly_merge_rate, "merge request")} per month",
             },
           ) do %>
-            <%= monthly_merge_rate.round %> per month
+            <%= monthly_merge_rate.round %>
+            per month
             <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
           <% end %>
         <% end %>
