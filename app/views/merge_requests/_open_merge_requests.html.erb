@@ -164,7 +164,7 @@
                 <% end %>
 
                 <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
-                  <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", style: [ "text-decoration: none" ]) do %>
+                  <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", class: "text-decoration-none") do %>
                     <%= render "shared/abbr_with_title",
                     content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
                     title: pipeline_failure_summary(pipeline),

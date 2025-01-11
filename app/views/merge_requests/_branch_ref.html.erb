@@ -3,11 +3,12 @@
   class="d-none text-truncate d-md-flex align-items-center"
 >
   <i class="fa-solid fa-code-branch"></i>
-  <%= tag.span(
+  <%= tag.a(
     branch_name,
-    class: %w[text-truncate mx-1 small],
+    class: %w[text-body text-decoration-none text-truncate mx-1 small],
     data: {
       clipboard_target: "source",
+      action: "clipboard#copy",
       bs_toggle: "tooltip",
       bs_custom_class: "x-wide-tooltip",
       bs_title: branch_name,
