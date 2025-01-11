@@ -43,6 +43,8 @@ module MergeRequestsHelper
     timezone = LocationLookupService.new.fetch_timezone(user.location)
 
     {
+      "Job Title": user.jobTitle,
+      Pronouns: user.pronouns,
       Location: format_location(user),
       "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
       "Last activity": format_last_activity(user.lastActivityOn),
@@ -73,7 +75,7 @@ module MergeRequestsHelper
   private
 
   def format_last_activity(last_activity_on)
-    return "N/A" if last_activity_on.nil?
+    return if last_activity_on.nil?
     return "today" if last_activity_on.after?(1.day.ago)
 
     "#{time_ago_in_words(last_activity_on)} ago"

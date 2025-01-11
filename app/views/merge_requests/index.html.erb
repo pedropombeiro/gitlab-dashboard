@@ -44,7 +44,15 @@
         <span class="collapse navbar-collapse">
           &nbsp;for&nbsp;
           <%= render "user_image", user: @user, size: 24 %>&nbsp;
-          <%= link_to @user.username, @user.webUrl, class: "fw-light" %>
+          <%= link_to @user.username,
+          @user.webUrl,
+          class: "fw-light",
+          data: {
+            bs_toggle: "tooltip",
+            bs_title: user_help_title(@user),
+            bs_custom_class: "wide-tooltip",
+            bs_html: "true",
+          } %>
         </span>
       </span>
 

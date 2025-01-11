@@ -35,12 +35,21 @@ class GitlabClient
     fragment on User {
       ...#{name}::CoreUserFragment
       lastActivityOn
+      jobTitle
       location
+      pronouns
       status {
         availability
         emoji
         message
       }
+    }
+  GRAPHQL
+
+  CurrentUserFragment = Client.parse <<-GRAPHQL
+    fragment on User {
+      ...#{name}::CoreUserFragment
+      jobTitle
     }
   GRAPHQL
 
@@ -92,7 +101,7 @@ class GitlabClient
   UserQuery = Client.parse <<-GRAPHQL
     query($username: String!) {
       user(username: $username) {
-        ...#{name}::CoreUserFragment
+        ...#{name}::CurrentUserFragment
       }
     }
   GRAPHQL
@@ -100,7 +109,7 @@ class GitlabClient
   CurrentUserQuery = Client.parse <<-GRAPHQL
     query {
       user: currentUser {
-        ...#{name}::CoreUserFragment
+        ...#{name}::CurrentUserFragment
       }
     }
   GRAPHQL
