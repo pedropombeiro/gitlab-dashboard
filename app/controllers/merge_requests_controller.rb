@@ -67,7 +67,7 @@ class MergeRequestsController < MergeRequestsControllerBase
     end
 
     respond_to do |format|
-      format.html { redirect_to merge_requests_path(assignee: assignee) unless params[:turbo] }
+      format.html
       format.json { render json: response }
     end
   end

@@ -116,10 +116,10 @@ RSpec.describe MergeRequestsController, type: :controller do
           )
           # Includes turbo frame with merge requests lists
           expect(response.body).to include(
-            %(src="#{ERB::Util.html_escape(open_merge_requests_list_path(assignee: username, turbo: true))}")
+            %(src="#{ERB::Util.html_escape(open_merge_requests_list_path(assignee: username))}")
           )
           expect(response.body).to include(
-            %(src="#{ERB::Util.html_escape(merged_merge_requests_list_path(assignee: username, turbo: true))}")
+            %(src="#{ERB::Util.html_escape(merged_merge_requests_list_path(assignee: username))}")
           )
         end
       end
@@ -220,7 +220,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
       context "when user exists" do
         let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
-        let(:params) { {assignee: username, turbo: true} }
+        let(:params) { {assignee: username} }
 
         let!(:user_request_stub) do
           stub_request(:post, graphql_url)
@@ -389,19 +389,6 @@ RSpec.describe MergeRequestsController, type: :controller do
           end
         end
 
-        context "when turbo param is missing" do
-          let(:params) { {assignee: username} }
-
-          it "redirects to index with the specified assignee" do
-            request
-
-            expect(response).to redirect_to action: :index, assignee: username
-            expect(GitlabUser.find_by_username(username)).to have_attributes(
-              contacted_at: Time.current
-            )
-          end
-        end
-
         private
 
         def create_merged_mrs_request_stub
@@ -463,7 +450,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
       context "when user exists" do
         let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
-        let(:params) { {assignee: username, turbo: true} }
+        let(:params) { {assignee: username} }
 
         let!(:user_request_stub) do
           stub_request(:post, graphql_url)
@@ -687,19 +674,6 @@ RSpec.describe MergeRequestsController, type: :controller do
 
             # Captions
             expect(response.body).to include(%r{A total of\s+1,311 merge requests})
-          end
-        end
-
-        context "when turbo param is missing" do
-          let(:params) { {assignee: username} }
-
-          it "redirects to index with the specified assignee" do
-            request
-
-            expect(response).to redirect_to action: :index, assignee: username
-            expect(GitlabUser.find_by_username(username)).to have_attributes(
-              contacted_at: Time.current
-            )
           end
         end
 
