@@ -1,7 +1,8 @@
 <% merge_requests = local_assigns[:merge_requests_dto].items %>
 <% merged_merge_requests_tttm = local_assigns[:merged_merge_requests_tttm] %>
 <% merged_merge_requests_count = local_assigns[:merged_merge_requests_count] %>
-<% first_merged_merge_requests_timestamp = local_assigns[:first_merged_merge_requests_timestamp] %>
+<% first_merged_merge_requests_timestamp =
+  local_assigns[:first_merged_merge_requests_timestamp] %>
 
 <% avg_time_to_merge =
   (
@@ -41,14 +42,24 @@
     end
   ) %>
 
-<div class="d-flex justify-content-between align-items-end">
+<div class="d-flex justify-content-between align-items-end mx-2">
   <div>
     <div class="lead">
       <% merge_rate_ok = merge_requests.count / 1.week.in_days * 30 >= monthly_merge_rate %>
       <%= tag.span(
-        "#{pluralize(merge_requests.count, "merge request")} #{merge_rate_ok ? "↗" : "↘"}",
         class: merge_rate_ok ? "text-success" : "text-warning",
-      ) %>
+        data: {
+          bs_toggle: "tooltip",
+          bs_title:
+            "The projected monthly merge rate of #{(merge_requests.count / 1.week.in_days * 30).round} " \
+              "is #{merge_rate_ok ? "above" : "below"} the historical average of #{pluralize(monthly_merge_rate, "merge request")} " \
+              "merged per month",
+        },
+      ) do %>
+        <%= pluralize(merge_requests.count, "merge request") %>
+        <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+        <%= merge_rate_ok ? "↗" : "↘" %>
+      <% end %>
       merged in the last week
     </div>
 
@@ -56,9 +67,18 @@
       <% merge_time_ok = avg_time_to_merge <= overall_avg_time_to_merge %>
       <div>Merged on average after
         <%= tag.span(
-          "#{distance_of_time_in_words(avg_time_to_merge)} #{merge_time_ok ? "↘" : "↗"}",
           class: merge_time_ok ? "text-success" : "text-warning",
-        ) %>
+          data: {
+            bs_toggle: "tooltip",
+            bs_title:
+              "Merged requests this week took #{distance_of_time_in_words(avg_time_to_merge)} to be merged, " \
+                "#{merge_time_ok ? "at or below" : "above"} the historical average of #{distance_of_time_in_words(overall_avg_time_to_merge)}",
+          },
+        ) do %>
+          <%= distance_of_time_in_words(avg_time_to_merge) %>
+          <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+          <%= merge_time_ok ? "↘" : "↗" %>
+        <% end %>
       </div>
     <% end %>
   </div>
@@ -71,11 +91,26 @@
         merged since
         <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
         <% if monthly_merge_rate < 1.0 %>
-          <%= (since_first_mr.in_months.to_f / merged_merge_requests_count.to_f).round(1) %>
-          months per MR
+          <span class="text-danger">
+            <%= (since_first_mr.in_months.to_f / merged_merge_requests_count.to_f).round(1) %>
+            months per MR
+          </span>
         <% else %>
-          <%= monthly_merge_rate.round %>
-          per month
+          <% recommended_monthly_merge_rate = 13 %>
+          <% merge_rate_ok = monthly_merge_rate >= recommended_monthly_merge_rate %>
+
+          <%= tag.span(
+            class: merge_rate_ok ? "text-success" : "text-warning",
+            data: {
+              bs_toggle: "tooltip",
+              bs_title:
+                "The monthly merge rate of #{monthly_merge_rate} is #{merge_rate_ok ? "above" : "below"} the " \
+                  "recommended baseline of #{pluralize(recommended_monthly_merge_rate, "merge request")} per month",
+            },
+          ) do %>
+            <%= monthly_merge_rate.round %> per month
+            <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+          <% end %>
         <% end %>
       </div>
       <% if merged_merge_requests_tttm %>
@@ -102,7 +137,7 @@
         <th scope="col">
           Associated Issue
           <%= tag.i(
-            class: %w[fa-solid fa-circle-info],
+            class: %w[small fa-solid fa-circle-info],
             data: {
               bs_toggle: "tooltip",
               bs_title: "Issue number is extracted from branch name, if present",
