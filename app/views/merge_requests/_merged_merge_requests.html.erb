@@ -116,9 +116,21 @@
       </div>
       <% if merged_merge_requests_tttm %>
         <div class="text-end">
-          <div>Merged on average after
+          <% merge_time_ok = overall_avg_time_to_merge < mr_age_limit %>
+          Merged on average after
+          <%= tag.span(
+            class: merge_time_ok ? "text-success" : "text-warning",
+            data: {
+              bs_toggle: "tooltip",
+              bs_title:
+              merge_time_ok ?
+              "Merged requests historically have taken less than #{distance_of_time_in_words(mr_age_limit)} to merge" :
+              "Merged requests historically have taken over #{distance_of_time_in_words(mr_age_limit)} to merge",
+            },
+          ) do %>
             <%= distance_of_time_in_words(overall_avg_time_to_merge) %>
-          </div>
+            <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+          <% end %>
         </div>
       <% end %>
     </div>
