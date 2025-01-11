@@ -108,7 +108,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
           # Includes header with link to user's merge requests
           expect(response.body).to include(
-            %(<a class="fw-light" href="https://gitlab.example.com/#{username}">#{username}</a>)
+            %(<a target="_blank" class="fw-normal" href="https://gitlab.example.com/#{username}">#{username}</a>)
           )
           # and user's avatar
           expect(response.body).to include(

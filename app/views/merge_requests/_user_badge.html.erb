@@ -1,17 +1,17 @@
 <%= tag.span(
-  class: %W[badge shadow bg-gradient bg-review-#{class_suffix} text-review-#{class_suffix}],
+  class: local_assigns.key?(:bg_class) ? %W[badge shadow bg-gradient #{local_assigns[:bg_class]}] : nil,
   data: {
     bs_toggle: "tooltip",
     bs_custom_class: "wide-tooltip",
     bs_html: "true",
     bs_title: title
   }) do %>
-  <%= render "user_image", user: user %>
+  <%= render "user_image", user: user, **local_assigns.slice(:size, :class) %>
   <%= link_to(
     user.username,
     user.webUrl,
     target: "_blank",
-    class: %W[bg-transparent text-review-#{class_suffix}],
+    class: %W[fw-normal] + (local_assigns.key?(:text_class) ? %W[bg-transparent #{local_assigns[:text_class]}] : []),
   ) %>
 
   <% if local_assigns.fetch(:show_emojis, true) %>

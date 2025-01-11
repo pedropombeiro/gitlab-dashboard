@@ -50,6 +50,11 @@ class GitlabClient
     fragment on User {
       ...#{name}::CoreUserFragment
       jobTitle
+      status {
+        availability
+        emoji
+        message
+      }
     }
   GRAPHQL
 
