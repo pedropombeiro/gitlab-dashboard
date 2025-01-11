@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MergeRequestsParsingHelper
-  MR_ISSUE_PATTERN = %r{[^\d]*(?<issue_id>\d+)[/-].+}i
+  MR_ISSUE_PATTERN = %r{\b(?<issue_id>\d+)[/-].+}i
   SECURITY_SUBGROUP = "/security"
 
   def issue_from_mr(mr, issues_by_iid)
