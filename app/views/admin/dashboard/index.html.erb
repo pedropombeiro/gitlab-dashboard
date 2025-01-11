@@ -25,7 +25,7 @@
           user.contacted_at - user.created_at < CacheConcern::MR_CACHE_VALIDITY %>
         <% fg_class = one_time_visitor ? %w[text-secondary] : nil %>
 
-        <%= tag.tr style: "cursor: pointer;" do %>
+        <%= tag.tr do %>
           <%= tag.th scope: "row" do %>
             <%= link_to user.username,
             merge_requests_path(assignee: user.username),
@@ -62,7 +62,7 @@
                 </thead>
                 <tbody>
                   <% user.web_push_subscriptions.each do |subscription| %>
-                    <tr style="cursor: pointer;">
+                    <tr>
                       <td>
                         <%= render "shared/relative_timestamp", timestamp: subscription.created_at %>
                       </td>
