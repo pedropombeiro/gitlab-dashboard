@@ -1,5 +1,5 @@
 <%= image_tag(
   make_full_url(user.avatarUrl),
   size: local_assigns[:size] || 16,
-  class: %w[rounded float-left],
+  class: %w[rounded float-left] + (Array.wrap(local_assigns[:class]) || []),
 ) %>

@@ -36,25 +36,16 @@
       class="navbar-brand text-light d-flex align-items-center m-auto"
       data-controller="bootstrap-tooltip"
     >
-      <span class="mb-0 ms-2 d-flex fw-lighter flex-grow-1 justify-content-center">
+      <%= tag.span class: "mb-0 ms-2 fw-lighter d-flex flex-grow-1 justify-content-center" do %>
         <span class="d-sm-none me-2">
           <%= render "user_image", user: @user, size: 24 %>
         </span>
         Merge Requests Dashboard
         <span class="collapse navbar-collapse">
           &nbsp;for&nbsp;
-          <%= render "user_image", user: @user, size: 24 %>&nbsp;
-          <%= link_to @user.username,
-          @user.webUrl,
-          class: "fw-light",
-          data: {
-            bs_toggle: "tooltip",
-            bs_title: user_help_title(@user),
-            bs_custom_class: "wide-tooltip",
-            bs_html: "true",
-          } %>
+          <%= render "user_badge", user: @user, title: user_help_title(@user), size: 24 %>
         </span>
-      </span>
+      <% end %>
 
       <%= tag.button(
         class: %w[btn mx-2 text-light],
