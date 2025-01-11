@@ -150,7 +150,7 @@
 
     <tbody>
       <% merge_requests.each do |mr| %>
-        <%= tag.tr style: "cursor: pointer;" do %>
+        <%= tag.tr do %>
           <!-- MR ID -->
           <th scope="row">
             <%= render "mr_relation", merge_request: mr %>
