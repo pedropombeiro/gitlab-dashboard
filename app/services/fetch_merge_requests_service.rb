@@ -25,7 +25,7 @@ class FetchMergeRequestsService
         case type
         when :open
           gitlab_client.fetch_open_merge_requests(assignee).tap do |response|
-            fill_reviewers_info(response.response.data.user.openMergeRequests.nodes)
+            fill_reviewers_info(merge_requests_from_response(response.response.data, type))
           end
         when :merged
           gitlab_client.fetch_merged_merge_requests(assignee)
@@ -36,7 +36,7 @@ class FetchMergeRequestsService
       response.request_duration = raw_response.request_duration
       response.next_update_at = MergeRequestsCacheService.cache_validity.after(response.updated_at)
       response.next_scheduled_update_at =
-        if type == :open && any_running_pipelines?(response.user.openMergeRequests.nodes)
+        if type == :open && any_running_pipelines?(merge_requests_from_response(response, type))
           5.minutes.from_now
         else
           30.minutes.from_now
@@ -66,14 +66,7 @@ class FetchMergeRequestsService
   def parse_dto(response, type)
     issues_by_iid = []
     if response && response.errors.nil?
-      merge_requests =
-        case type
-        when :open
-          response.user.openMergeRequests.nodes
-        when :merged
-          response.user.mergedMergeRequests.nodes
-        end
-      issues_by_iid = issues_from_merge_requests(merge_requests)
+      issues_by_iid = issues_from_merge_requests(merge_requests_from_response(response, type))
     end
 
     ::UserDto.new(response, assignee, type, issues_by_iid)
@@ -83,6 +76,15 @@ class FetchMergeRequestsService
 
   def gitlab_client
     @gitlab_client ||= GitlabClient.new
+  end
+
+  def merge_requests_from_response(response, type)
+    case type
+    when :open
+      response.user.openMergeRequests.nodes
+    when :merged
+      response.user.mergedMergeRequests.nodes
+    end
   end
 
   def any_running_pipelines?(merge_requests)
