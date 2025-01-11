@@ -130,7 +130,7 @@ one:
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
             reference: "!173450"
             sourceBranch: pedropombeiro/505703/add-deprecation
-            targetBranch: master
+            targetBranch: test
             createdAt: "2024-11-21T18:49:45Z"
             updatedAt: "2024-11-27T13:34:41Z"
             assignees:
