@@ -8,7 +8,7 @@
     },
     class:
       (
-        if local_assigns[:age_warning] && timestamp.before?(2.weeks.ago)
+        if local_assigns[:age_warning] && timestamp.before?(mr_age_limit.ago)
           "text-danger"
         end
       ),

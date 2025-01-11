@@ -5,6 +5,10 @@ module MergeRequestsHelper
   include ActionView::Helpers::TagHelper
   include HumanizeHelper
 
+  def mr_age_limit
+    2.weeks
+  end
+
   def mr_list_panel_classes
     %w[
       table-responsive
