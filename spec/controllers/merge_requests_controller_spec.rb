@@ -686,7 +686,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%(>!5166</a>))
 
             # Captions
-            expect(response.body).to include(%r{A total of\s+1311 merge requests})
+            expect(response.body).to include(%r{A total of\s+1,311 merge requests})
           end
         end
 
