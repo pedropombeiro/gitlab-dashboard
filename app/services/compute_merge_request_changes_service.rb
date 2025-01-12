@@ -16,30 +16,32 @@ class ComputeMergeRequestChangesService
     previous_merged_mrs = (type == :merged) ? previous_dto.merged_merge_requests.items : nil
     merged_mrs = (type == :merged) ? dto.merged_merge_requests.items : nil
 
-    [].tap do |mr_changes|
-      # New MR merged
-      merged_mrs&.each do |mr|
-        previous_mr_version = previous_merged_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
-        next unless previous_merged_mrs.any? && previous_mr_version.nil?
+    mr_changes = []
 
-        mr_changes << merge_request_change(
-          mr,
-          type: :merge_request_merged,
-          title: "A merge request was merged",
-          body: "#{mr.reference}: #{mr.titleHtml}"
-        )
-      end
+    # New MR merged
+    merged_mrs&.each do |mr|
+      previous_mr_version = previous_merged_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
+      next unless previous_merged_mrs.any? && previous_mr_version.nil?
 
-      # Open MR changes
-      changed_labels(previous_open_mrs, open_mrs).each do |change|
-        mr_changes << merge_request_labels_change("An open merge request", change)
-      end
-
-      # Merged MR changes
-      changed_labels(previous_merged_mrs, merged_mrs).each do |change|
-        mr_changes << merge_request_labels_change("A merged merge request", change)
-      end
+      mr_changes << merge_request_change(
+        mr,
+        type: :merge_request_merged,
+        title: "A merge request was merged",
+        body: "#{mr.reference}: #{mr.titleHtml}"
+      )
     end
+
+    # Open MR changes
+    changed_labels(previous_open_mrs, open_mrs).each do |change|
+      mr_changes << merge_request_labels_change("An open merge request", change)
+    end
+
+    # Merged MR changes
+    changed_labels(previous_merged_mrs, merged_mrs).each do |change|
+      mr_changes << merge_request_labels_change("A merged merge request", change)
+    end
+
+    mr_changes
   end
 
   private
