@@ -9,15 +9,26 @@
     <caption class="mx-2">
       <div class="d-flex justify-content-between align-items-baseline">
         <div class="lead">
-          <% if merge_requests.count.positive? %>
+          <% if merge_requests.any? %>
             <% avg_open_time =
               ActiveSupport::Duration.build(
                 merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
               ) %>
+            <% merge_time_ok = avg_open_time < mr_age_limit %>
 
             <%= pluralize(number_with_delimiter(merge_requests.count), "merge request") -%>, open for
             <% if merge_requests.many? %>an average of<% end %>
-            <%= distance_of_time_in_words(avg_open_time) %>
+            <%= tag.span(
+              class: merge_time_ok ? nil : "text-warning",
+              data: merge_time_ok ? nil : {
+                bs_toggle: "tooltip",
+                bs_title:
+                  "Merge requests have been open for longer than the recommended #{distance_of_time_in_words(mr_age_limit)}",
+              },
+            ) do -%>
+              <%= distance_of_time_in_words(avg_open_time) -%>
+              <%= tag.i(class: %w[small fa-solid fa-circle-info]) unless merge_time_ok -%>
+            <% end %>
           <% end %>
         </div>
         <%= render "request_info",

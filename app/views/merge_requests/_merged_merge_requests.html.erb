@@ -124,8 +124,8 @@
               bs_toggle: "tooltip",
               bs_title:
               merge_time_ok ?
-              "Merged requests historically have taken less than #{distance_of_time_in_words(mr_age_limit)} to merge" :
-              "Merged requests historically have taken over #{distance_of_time_in_words(mr_age_limit)} to merge",
+              "Merged merge requests historically have taken less than #{distance_of_time_in_words(mr_age_limit)} to merge" :
+              "Merged merge requests historically have taken over #{distance_of_time_in_words(mr_age_limit)} to merge",
             },
           ) do %>
             <%= distance_of_time_in_words(overall_avg_time_to_merge) %>
@@ -241,7 +241,7 @@
   <div
     id="mergedChartContainer"
     style="height: 300px;"
-    class="d-flex justify-content-sm-center text-secondary mt-2 w-100 p-6"
+    class="container-fluid d-flex justify-content-sm-center text-secondary mt-2 p-6"
   >
     <%= turbo_frame_tag params[:author],
     :merged_merge_requests_chart,
