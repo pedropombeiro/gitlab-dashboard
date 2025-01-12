@@ -1,4 +1,16 @@
 module ApplicationHelper
+  def safe_url(url)
+    uri = URI.parse(url)
+
+    if uri.relative? && uri.path.present?
+      uri.to_s if uri.is_a?(URI::Generic)
+    else
+      "/"
+    end
+  rescue URI::InvalidURIError
+    "/"
+  end
+
   def git_repo_url
     repo_url = "https://github.com/pedropombeiro/gitlab-dashboard"
     commit_sha = GitlabDashboard::Application::GIT_COMMIT_SHA

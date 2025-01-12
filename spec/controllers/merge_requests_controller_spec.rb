@@ -7,6 +7,51 @@ RSpec.describe MergeRequestsController, type: :controller do
 
   include_context "stub graphql client"
 
+  shared_context "a request updating current_user" do
+    it "returns http success and creates user with correct timestamp" do
+      expect(GitlabUser.find_by_username(author)).to be_nil
+
+      request
+
+      expect(response).to have_http_status :success
+      expect(GitlabUser.find_by_username(author)).to have_attributes(
+        created_at: Time.current,
+        updated_at: Time.current,
+        contacted_at: Time.current
+      )
+    end
+
+    context "with referrer" do
+      let(:params) { {author: author, referrer: merge_requests_path(author: "user.2")} }
+
+      it "returns http success and does not create user" do
+        expect { request }.not_to change { GitlabUser.find_by_username(author) }.from(nil)
+      end
+
+      context "with render_views" do
+        include ActionView::Helpers::SanitizeHelper
+
+        before do
+          stub_request(:get, %r{^https://nominatim\.openstreetmap\.org/search\?addressdetails=1})
+            .to_return(status: :not_found)
+        end
+
+        render_views
+
+        it "renders the actual template" do
+          request
+
+          expect(response).to have_http_status(:ok)
+
+          # Includes header with link to user's merge requests
+          response.body.scan(%r{<turbo-frame .*src=.*>}).each do |match|
+            expect(match).to include(sanitize(params.to_query))
+          end
+        end
+      end
+    end
+  end
+
   describe "GET /index" do
     def perform_request
       get :index, params: params
@@ -58,17 +103,8 @@ RSpec.describe MergeRequestsController, type: :controller do
           .to_return_json(status: :ok, body: user_response_body)
       end
 
-      it "returns http success and creates user with correct timestamp", :freeze_time do
-        expect(GitlabUser.find_by_username(author)).to be_nil
-
-        request
-
-        expect(response).to have_http_status :success
-        expect(GitlabUser.find_by_username(author)).to have_attributes(
-          created_at: Time.current,
-          updated_at: Time.current,
-          contacted_at: Time.current
-        )
+      context "with time frozen", :freeze_time do
+        it_behaves_like "a request updating current_user"
       end
 
       it "responds to html by default" do
@@ -217,59 +253,61 @@ RSpec.describe MergeRequestsController, type: :controller do
       let!(:reviewer_responses) { YAML.load_file(file_fixture("reviewers.yml")) }
       let(:open_mrs) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
       let(:author) { "pedropombeiro" }
+      let(:params) { {author: author} }
+
+      let!(:user_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__UserQuery",
+            "variables" => {username: author}
+          ))
+          .to_return_json(body: {data: {user: {username: author, avatarUrl: "", webUrl: ""}}})
+      end
+
+      let!(:open_mrs_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__OpenMergeRequestsQuery",
+            "variables" => hash_including(
+              "author" => author,
+              "updatedAfter" => an_instance_of(String)
+            )
+          ))
+          .to_return_json(body: open_mrs)
+      end
+
+      let!(:reviewers_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__ReviewerQuery",
+            "variables" => hash_including(
+              "reviewer" => an_instance_of(String),
+              "activeReviewsAfter" => an_instance_of(String)
+            )
+          ))
+          .to_return do |request|
+            username = JSON.parse(request.body).dig(*%w[variables reviewer])
+
+            {body: reviewer_responses.fetch(username).to_json}
+          end
+      end
+
+      let!(:issues_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__ProjectIssuesQuery",
+            "variables" => hash_including(
+              "projectFullPath" => "gitlab-org/gitlab",
+              "issueIids" => an_array_matching(%w[503315 446287 506226 481411 506385 502403 472974])
+            )
+          ))
+          .to_return_json(body: issues["project_0"])
+      end
+
+      it_behaves_like "a request updating current_user"
 
       context "when user exists" do
         let!(:user) { create(:gitlab_user, username: author, contacted_at: 1.day.ago) }
-        let(:params) { {author: author} }
-
-        let!(:user_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__UserQuery",
-              "variables" => {username: author}
-            ))
-            .to_return_json(body: {data: {user: {username: author, avatarUrl: "", webUrl: ""}}})
-        end
-
-        let!(:open_mrs_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__OpenMergeRequestsQuery",
-              "variables" => hash_including(
-                "author" => author,
-                "updatedAfter" => an_instance_of(String)
-              )
-            ))
-            .to_return_json(body: open_mrs)
-        end
-
-        let!(:reviewers_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__ReviewerQuery",
-              "variables" => hash_including(
-                "reviewer" => an_instance_of(String),
-                "activeReviewsAfter" => an_instance_of(String)
-              )
-            ))
-            .to_return do |request|
-              username = JSON.parse(request.body).dig(*%w[variables reviewer])
-
-              {body: reviewer_responses.fetch(username).to_json}
-            end
-        end
-
-        let!(:issues_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__ProjectIssuesQuery",
-              "variables" => hash_including(
-                "projectFullPath" => "gitlab-org/gitlab",
-                "issueIids" => an_array_matching(%w[503315 446287 506226 481411 506385 502403 472974])
-              )
-            ))
-            .to_return_json(body: issues["project_0"])
-        end
 
         it "returns http success" do
           request
@@ -414,6 +452,7 @@ RSpec.describe MergeRequestsController, type: :controller do
     subject(:request) { perform_request }
 
     let(:format) { nil }
+    let(:params) { {author: author} }
 
     around do |example|
       travel_to Time.utc(2024, 11, 20) do
@@ -431,7 +470,7 @@ RSpec.describe MergeRequestsController, type: :controller do
           .to_return_json(body: {data: {user: nil}})
       end
 
-      let(:params) { {author: "non-existent"} }
+      let(:author) { "non-existent" }
 
       it "returns http not_found" do
         request
@@ -448,68 +487,75 @@ RSpec.describe MergeRequestsController, type: :controller do
       let(:merged_mrs) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
       let(:author) { "pedropombeiro" }
 
+      let!(:user_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__UserQuery",
+            "variables" => {username: author}
+          ))
+          .to_return_json(body: {data: {user: {username: author, avatarUrl: "", webUrl: ""}}})
+      end
+
+      let!(:reviewers_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__ReviewerQuery",
+            "variables" => hash_including(
+              "reviewer" => an_instance_of(String),
+              "activeReviewsAfter" => an_instance_of(String)
+            )
+          ))
+          .to_return do |request|
+          username = JSON.parse(request.body).dig(*%w[variables reviewer])
+
+          {body: reviewer_responses.fetch(username).to_json}
+        end
+      end
+
+      let!(:merged_mrs_request_stub) { create_merged_mrs_request_stub }
+      let!(:issues_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__ProjectIssuesQuery",
+            "variables" => hash_including(
+              "projectFullPath" => "gitlab-org/gitlab",
+              "issueIids" => including(
+                "506404", "505703", "457221", "505810", "503748", "472974", "442395", "500447", "502934", "502431",
+                "497562", "354756"
+              )
+            )
+          ))
+          .to_return_json(body: issues["project_0"])
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__ProjectIssuesQuery",
+            "variables" => hash_including(
+              "projectFullPath" => "gitlab-org/security/gitlab-runner",
+              "issueIids" => %w[32804]
+            )
+          ))
+          .to_return_json(body: issues["project_1"])
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__ProjectIssuesQuery",
+            "variables" => hash_including(
+              "projectFullPath" => "gitlab-org/gitlab-runner",
+              "issueIids" => %w[32804]
+            )
+          ))
+          .to_return_json(body: issues["project_2"])
+      end
+
+      it "returns http success" do
+        request
+
+        expect(response).to have_http_status :success
+      end
+
+      it_behaves_like "a request updating current_user"
+
       context "when user exists" do
         let!(:user) { create(:gitlab_user, username: author, contacted_at: 1.day.ago) }
-        let(:params) { {author: author} }
-
-        let!(:user_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__UserQuery",
-              "variables" => {username: author}
-            ))
-            .to_return_json(body: {data: {user: {username: author, avatarUrl: "", webUrl: ""}}})
-        end
-
-        let!(:reviewers_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__ReviewerQuery",
-              "variables" => hash_including(
-                "reviewer" => an_instance_of(String),
-                "activeReviewsAfter" => an_instance_of(String)
-              )
-            ))
-            .to_return do |request|
-            username = JSON.parse(request.body).dig(*%w[variables reviewer])
-
-            {body: reviewer_responses.fetch(username).to_json}
-          end
-        end
-
-        let!(:merged_mrs_request_stub) { create_merged_mrs_request_stub }
-        let!(:issues_request_stub) do
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__ProjectIssuesQuery",
-              "variables" => hash_including(
-                "projectFullPath" => "gitlab-org/gitlab",
-                "issueIids" => including(
-                  "506404", "505703", "457221", "505810", "503748", "472974", "442395", "500447", "502934", "502431",
-                  "497562", "354756"
-                )
-              )
-            ))
-            .to_return_json(body: issues["project_0"])
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__ProjectIssuesQuery",
-              "variables" => hash_including(
-                "projectFullPath" => "gitlab-org/security/gitlab-runner",
-                "issueIids" => %w[32804]
-              )
-            ))
-            .to_return_json(body: issues["project_1"])
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__ProjectIssuesQuery",
-              "variables" => hash_including(
-                "projectFullPath" => "gitlab-org/gitlab-runner",
-                "issueIids" => %w[32804]
-              )
-            ))
-            .to_return_json(body: issues["project_2"])
-        end
 
         it "returns http success" do
           request
@@ -676,20 +722,20 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%r{A total of\s+1,311 merge requests})
           end
         end
+      end
 
-        private
+      private
 
-        def create_merged_mrs_request_stub
-          stub_request(:post, graphql_url)
-            .with(body: hash_including(
-              "operationName" => "GitlabClient__MergedMergeRequestsQuery",
-              "variables" => {
-                "author" => author,
-                "mergedAfter" => 1.week.ago
-              }
-            ))
-            .to_return_json(body: merged_mrs)
-        end
+      def create_merged_mrs_request_stub
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__MergedMergeRequestsQuery",
+            "variables" => {
+              "author" => author,
+              "mergedAfter" => 1.week.ago
+            }
+          ))
+          .to_return_json(body: merged_mrs)
       end
     end
   end

@@ -14,7 +14,7 @@ class MergeRequestsController < MergeRequestsControllerBase
       redirect_to merge_requests_path(author: @user.username) and return
     end
 
-    save_current_user(safe_params[:author])
+    save_current_user(safe_params[:author]) if safe_params.exclude?(:referrer)
     response = MergeRequestsCacheService.new.read(safe_params[:author], :open)
     fetch_service = FetchMergeRequestsService.new(safe_params[:author], request_ip: request.remote_ip)
     @dto = fetch_service.parse_dto(response, :open)
@@ -39,7 +39,7 @@ class MergeRequestsController < MergeRequestsControllerBase
     user = graphql_user(author)
     render_404 and return unless user
 
-    save_current_user(author)
+    save_current_user(safe_params[:author]) if safe_params.exclude?(:referrer)
   end
 
   private
@@ -55,10 +55,16 @@ class MergeRequestsController < MergeRequestsControllerBase
     user = graphql_user(author)
     render_404 and return unless user
 
-    save_current_user(author)
+    log_visit_metric = type == :open && safe_params.exclude?(:referrer)
+    fetch_service = FetchMergeRequestsService.new(author, request_ip: log_visit_metric ? request.remote_ip : nil)
+    if safe_params.include?(:referrer)
+      response = fetch_service.execute(type)
+      @dto = fetch_service.parse_dto(response, type)
+    else
+      save_current_user(author)
 
-    fetch_service = FetchMergeRequestsService.new(author, request_ip: request.remote_ip)
-    response, @dto = GenerateNotificationsService.new(@current_user, type, fetch_service).execute
+      response, @dto = GenerateNotificationsService.new(@current_user, type, fetch_service).execute
+    end
 
     if Rails.env.production?
       expires_in MergeRequestsCacheService.cache_validity.after(response.updated_at) - Time.current
