@@ -4,6 +4,9 @@ require "async"
 require "ostruct"
 
 class GitlabClient
+  ACTIVE_REVIEWS_AGE_LIMIT = 1.week
+  OPEN_MERGE_REQUESTS_MIN_ACTIVITY = 1.year
+
   private_class_method def self.authorization
     "Bearer #{Rails.application.credentials.gitlab_token}"
   end
@@ -271,13 +274,13 @@ class GitlabClient
 
   def fetch_reviewer(username, format: :open_struct)
     format_response(format) do
-      execute_query(ReviewerQuery, reviewer: username, activeReviewsAfter: 1.week.ago)
+      execute_query(ReviewerQuery, reviewer: username, activeReviewsAfter: ACTIVE_REVIEWS_AGE_LIMIT.ago)
     end
   end
 
   def fetch_open_merge_requests(author, format: :open_struct)
     format_response(format) do
-      execute_query(OpenMergeRequestsQuery, author: author, updatedAfter: 1.year.ago)
+      execute_query(OpenMergeRequestsQuery, author: author, updatedAfter: OPEN_MERGE_REQUESTS_MIN_ACTIVITY.ago)
     end
   end
 
@@ -291,8 +294,8 @@ class GitlabClient
     format_response(format) do
       Sync do |task|
         12.times.map do |offset|
-          bom = Date.current.beginning_of_month - offset.months
-          eom = 1.month.after(bom)
+          bom = offset.months.ago.beginning_of_month.to_date
+          eom = bom.next_month
 
           task.async do
             execute_query(
