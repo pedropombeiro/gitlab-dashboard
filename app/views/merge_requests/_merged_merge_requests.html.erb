@@ -87,12 +87,12 @@
     <div class="flex-row-reverse">
       <div>
         A total of
-        <%= pluralize(number_with_delimiter(merged_merge_requests_count), "merge request") %>
+        <%= pluralize(number_with_delimiter(merged_merge_requests_count), "merge request") -%>
         merged since
         <%= local_relative_time(first_merged_merge_requests_timestamp, type: "time-or-date") %>,
         <% if monthly_merge_rate < 1.0 %>
           <span class="text-danger">
-            <%= (since_first_mr.in_months.to_f / merged_merge_requests_count.to_f).round(1) %>
+            <%= (since_first_mr.in_months.to_f / merged_merge_requests_count.to_f).round(1) -%>
             months per MR
           </span>
         <% else %>
@@ -108,7 +108,7 @@
                   "recommended baseline of #{pluralize(recommended_monthly_merge_rate, "merge request")} per month",
             },
           ) do %>
-            <%= monthly_merge_rate.round %>
+            <%= monthly_merge_rate.round -%>
             per month
             <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
           <% end %>
@@ -181,7 +181,7 @@
           <td>
             <%= render "shared/relative_timestamp",
             timestamp: mr.mergedAt,
-            most_significant_only: true %>
+            most_significant_only: true -%>
             by
             <br/>
             <%= render "user_badge",
