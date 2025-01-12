@@ -25,7 +25,7 @@ class FetchMergeRequestsService
         case type
         when :open
           gitlab_client.fetch_open_merge_requests(assignee).tap do |response|
-            fill_reviewers_info(merge_requests_from_response(response.response.data, type))
+            merge_requests_from_response(response.response.data, type).then { |mrs| fill_reviewers_info(mrs) }
           end
         when :merged
           gitlab_client.fetch_merged_merge_requests(assignee)
@@ -66,7 +66,7 @@ class FetchMergeRequestsService
   def parse_dto(response, type)
     issues_by_iid = []
     if response && response.errors.nil?
-      issues_by_iid = issues_from_merge_requests(merge_requests_from_response(response, type))
+      issues_by_iid = merge_requests_from_response(response, type).then { |mrs| issues_from_merge_requests(mrs) }
     end
 
     ::UserDto.new(response, assignee, type, issues_by_iid)
