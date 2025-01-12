@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <%= turbo_refreshes_with method: :morph, scroll: :preserve %>
+    <%= turbo_refreshes_with method: :morph, scroll: :preserve if Rails.env.production? %>
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
     <%= action_cable_meta_tag %>
