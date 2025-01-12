@@ -6,14 +6,23 @@
     bs_html: "true",
     bs_title: title
   }) do %>
-  <%= tag.a(href: merge_requests_path(author: user.username), target: "_top") do %>
+  <%= link_to(
+    merge_requests_path(author: user.username, referrer: params[:referrer] || merge_requests_path(author: params[:author])),
+    target: "_top"
+  ) do %>
     <%= render "user_image", user: user, **local_assigns.slice(:size, :class) %>
   <% end %>
   <%= link_to(
     user.username,
     user.webUrl,
     target: "_blank",
-    class: %W[fw-normal] + (local_assigns.key?(:text_class) ? %W[bg-transparent #{local_assigns[:text_class]}] : []),
+    class:
+      %W[fw-normal] +
+        (
+          if local_assigns.key?(:text_class)
+            %W[bg-transparent #{local_assigns[:text_class]}]
+          end || []
+        ),
   ) %>
 
   <% if local_assigns.fetch(:show_emojis, true) %>

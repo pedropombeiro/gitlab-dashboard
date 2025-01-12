@@ -246,7 +246,7 @@
     <%= turbo_frame_tag params[:author],
     :merged_merge_requests_chart,
     loading: "lazy",
-    src: merged_merge_requests_chart_path(author: params[:author]) do %>
+    src: merged_merge_requests_chart_path(controller_params) do %>
       <span class="d-flex align-items-center justify-content-center w-100 h-100">Initializing…</span>
     <% end %>
   </div>

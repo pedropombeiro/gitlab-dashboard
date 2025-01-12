@@ -23,7 +23,15 @@ RSpec.describe Admin::DashboardController, type: :controller do
     end
 
     context "with render_views" do
+      include ActionView::Helpers::SanitizeHelper
+
       render_views
+
+      before do
+        merge_requests_cache_service = instance_double(MergeRequestsCacheService)
+        allow(merge_requests_cache_service).to receive(:read).and_return(nil)
+        allow(MergeRequestsCacheService).to receive(:new).and_return(merge_requests_cache_service)
+      end
 
       it "renders the actual template" do
         request
@@ -33,7 +41,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
         users.each do |user|
           expect(response.body).to include(
-            %(<a href="#{merge_requests_path(author: user.username)}">#{user.username}</a>)
+            %(<a href="#{sanitize(merge_requests_path(author: user.username, referrer: admin_dashboard_path))}">#{user.username}</a>)
           )
         end
 
@@ -41,6 +49,8 @@ RSpec.describe Admin::DashboardController, type: :controller do
       end
 
       context "with subscription" do
+        include ActionView::Helpers::SanitizeHelper
+
         let!(:subscription) do
           create(:web_push_subscription, gitlab_user: users.first, created_at: 1.day.ago, notified_at: 10.seconds.ago)
         end
@@ -53,7 +63,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
           users.each do |user|
             expect(response.body).to include(
-              %(<a href="#{merge_requests_path(author: user.username)}">#{user.username}</a>)
+              %(<a href="#{sanitize(merge_requests_path(author: user.username, referrer: admin_dashboard_path))}">#{user.username}</a>)
             )
           end
 

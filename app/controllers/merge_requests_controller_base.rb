@@ -10,7 +10,7 @@ class MergeRequestsControllerBase < ApplicationController
   end
 
   def safe_params
-    params.permit(:author)
+    params.permit(:author, :referrer)
   end
 
   def author
