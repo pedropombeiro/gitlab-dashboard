@@ -24,7 +24,7 @@ RSpec.describe MergeRequestsController, type: :controller do
           .to_return_json(body: {data: {user: nil}})
       end
 
-      let(:params) { {assignee: "non-existent"} }
+      let(:params) { {author: "non-existent"} }
 
       it "returns http not_found" do
         request
@@ -35,15 +35,15 @@ RSpec.describe MergeRequestsController, type: :controller do
     end
 
     context "when user is known" do
-      let(:username) { "user.1" }
-      let(:params) { {assignee: username} }
+      let(:author) { "user.1" }
+      let(:params) { {author: author} }
       let(:user_response_body) do
         {
           data: {
             user: {
-              username: username,
+              username: author,
               avatarUrl: "/images/avatar.png",
-              webUrl: "https://gitlab.example.com/#{username}"
+              webUrl: "https://gitlab.example.com/#{author}"
             }
           }
         }
@@ -53,18 +53,18 @@ RSpec.describe MergeRequestsController, type: :controller do
         stub_request(:post, graphql_url)
           .with(body: hash_including(
             "operationName" => "GitlabClient__UserQuery",
-            "variables" => {username: username}
+            "variables" => {username: author}
           ))
           .to_return_json(status: :ok, body: user_response_body)
       end
 
       it "returns http success and creates user with correct timestamp", :freeze_time do
-        expect(GitlabUser.find_by_username(username)).to be_nil
+        expect(GitlabUser.find_by_username(author)).to be_nil
 
         request
 
         expect(response).to have_http_status :success
-        expect(GitlabUser.find_by_username(username)).to have_attributes(
+        expect(GitlabUser.find_by_username(author)).to have_attributes(
           created_at: Time.current,
           updated_at: Time.current,
           contacted_at: Time.current
@@ -108,7 +108,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
           # Includes header with link to user's merge requests
           expect(response.body).to include(
-            %(<a target="_blank" class="fw-normal" href="https://gitlab.example.com/#{username}">#{username}</a>)
+            %(<a target="_blank" class="fw-normal" href="https://gitlab.example.com/#{author}">#{author}</a>)
           )
           # and user's avatar
           expect(response.body).to include(
@@ -116,22 +116,22 @@ RSpec.describe MergeRequestsController, type: :controller do
           )
           # Includes turbo frame with merge requests lists
           expect(response.body).to include(
-            %(src="#{ERB::Util.html_escape(open_merge_requests_list_path(assignee: username))}")
+            %(src="#{ERB::Util.html_escape(open_merge_requests_list_path(author: author))}")
           )
           expect(response.body).to include(
-            %(src="#{ERB::Util.html_escape(merged_merge_requests_list_path(assignee: username))}")
+            %(src="#{ERB::Util.html_escape(merged_merge_requests_list_path(author: author))}")
           )
         end
       end
 
-      context "when assignee is not specified" do
+      context "when author is not specified" do
         let(:params) { nil }
 
         it "returns network_authentication_required" do
           request
 
           expect(response).to have_http_status(:network_authentication_required)
-          expect(GitlabUser.find_by_username(username)).to be_nil
+          expect(GitlabUser.find_by_username(author)).to be_nil
         end
 
         context "when GITLAB_TOKEN is specified" do
@@ -149,11 +149,11 @@ RSpec.describe MergeRequestsController, type: :controller do
                 .to_return_json(body: user_response_body)
             end
 
-            it "redirects to assignee specified in GITLAB_TOKEN" do
+            it "redirects to author specified in GITLAB_TOKEN" do
               request
 
-              expect(response).to redirect_to action: :index, assignee: username
-              expect(GitlabUser.find_by_username(username)).to be_nil
+              expect(response).to redirect_to action: :index, author: author
+              expect(GitlabUser.find_by_username(author)).to be_nil
             end
           end
 
@@ -162,13 +162,13 @@ RSpec.describe MergeRequestsController, type: :controller do
               session[:user_id] = "user.1"
             end
 
-            it "redirects to assignee specified in user_id" do
+            it "redirects to author specified in user_id" do
               expect(Rails.application.credentials).not_to receive(:gitlab_token)
 
               request
 
-              expect(response).to redirect_to action: :index, assignee: "user.1"
-              expect(GitlabUser.find_by_username(username)).to be_nil
+              expect(response).to redirect_to action: :index, author: "user.1"
+              expect(GitlabUser.find_by_username(author)).to be_nil
             end
           end
         end
@@ -191,7 +191,7 @@ RSpec.describe MergeRequestsController, type: :controller do
       end
     end
 
-    context "when assignee is unknown" do
+    context "when author is unknown" do
       before do
         stub_request(:post, graphql_url)
           .with(body: hash_including(
@@ -201,7 +201,7 @@ RSpec.describe MergeRequestsController, type: :controller do
           .to_return_json(body: {data: {user: nil}})
       end
 
-      let(:params) { {assignee: "non-existent"} }
+      let(:params) { {author: "non-existent"} }
 
       it "returns http not_found" do
         request
@@ -211,24 +211,24 @@ RSpec.describe MergeRequestsController, type: :controller do
       end
     end
 
-    context "when assignee is known" do
+    context "when author is known" do
       let_it_be(:issues) { YAML.load_file(file_fixture("issues.yml")) }
 
       let!(:reviewer_responses) { YAML.load_file(file_fixture("reviewers.yml")) }
       let(:open_mrs) { YAML.load_file(file_fixture("open_merge_requests.yml"))["one"] }
-      let(:username) { "pedropombeiro" }
+      let(:author) { "pedropombeiro" }
 
       context "when user exists" do
-        let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
-        let(:params) { {assignee: username} }
+        let!(:user) { create(:gitlab_user, username: author, contacted_at: 1.day.ago) }
+        let(:params) { {author: author} }
 
         let!(:user_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
               "operationName" => "GitlabClient__UserQuery",
-              "variables" => {username: username}
+              "variables" => {username: author}
             ))
-            .to_return_json(body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}})
+            .to_return_json(body: {data: {user: {username: author, avatarUrl: "", webUrl: ""}}})
         end
 
         let!(:open_mrs_request_stub) do
@@ -236,7 +236,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             .with(body: hash_including(
               "operationName" => "GitlabClient__OpenMergeRequestsQuery",
               "variables" => hash_including(
-                "username" => username,
+                "author" => author,
                 "updatedAfter" => an_instance_of(String)
               )
             ))
@@ -316,7 +316,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
                 perform_request
 
-                Rails.cache.delete(described_class.authored_mr_lists_cache_key(username, :open))
+                Rails.cache.delete(described_class.authored_mr_lists_cache_key(author, :open))
                 open_mr_nodes << opened_mr
 
                 stub_request(:post, graphql_url)
@@ -355,7 +355,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response).to render_template("layouts/application")
             expect(response).to render_template("merge_requests/_open_merge_requests")
 
-            expect(response.body).to include(%(<turbo-frame id="open_merge_requests_user_dto_#{username}">))
+            expect(response.body).to include(%(<turbo-frame id="open_merge_requests_user_dto_#{author}">))
             # Project link
             expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab">})
             # Project avatar
@@ -396,7 +396,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             .with(body: hash_including(
               "operationName" => "GitlabClient__MergedMergeRequestsQuery",
               "variables" => {
-                "username" => username,
+                "author" => author,
                 "mergedAfter" => 1.week.ago
               }
             ))
@@ -421,7 +421,7 @@ RSpec.describe MergeRequestsController, type: :controller do
       end
     end
 
-    context "when assignee is unknown" do
+    context "when author is unknown" do
       before do
         stub_request(:post, graphql_url)
           .with(body: hash_including(
@@ -431,7 +431,7 @@ RSpec.describe MergeRequestsController, type: :controller do
           .to_return_json(body: {data: {user: nil}})
       end
 
-      let(:params) { {assignee: "non-existent"} }
+      let(:params) { {author: "non-existent"} }
 
       it "returns http not_found" do
         request
@@ -441,24 +441,24 @@ RSpec.describe MergeRequestsController, type: :controller do
       end
     end
 
-    context "when assignee is known" do
+    context "when author is known" do
       let_it_be(:issues) { YAML.load_file(file_fixture("issues.yml")) }
 
       let!(:reviewer_responses) { YAML.load_file(file_fixture("reviewers.yml")) }
       let(:merged_mrs) { YAML.load_file(file_fixture("merged_merge_requests.yml"))["one"] }
-      let(:username) { "pedropombeiro" }
+      let(:author) { "pedropombeiro" }
 
       context "when user exists" do
-        let!(:user) { create(:gitlab_user, username: username, contacted_at: 1.day.ago) }
-        let(:params) { {assignee: username} }
+        let!(:user) { create(:gitlab_user, username: author, contacted_at: 1.day.ago) }
+        let(:params) { {author: author} }
 
         let!(:user_request_stub) do
           stub_request(:post, graphql_url)
             .with(body: hash_including(
               "operationName" => "GitlabClient__UserQuery",
-              "variables" => {username: username}
+              "variables" => {username: author}
             ))
-            .to_return_json(body: {data: {user: {username: username, avatarUrl: "", webUrl: ""}}})
+            .to_return_json(body: {data: {user: {username: author, avatarUrl: "", webUrl: ""}}})
         end
 
         let!(:reviewers_request_stub) do
@@ -539,7 +539,7 @@ RSpec.describe MergeRequestsController, type: :controller do
                 .with(body: hash_including(
                   "operationName" => "GitlabClient__OpenMergeRequestsQuery",
                   "variables" => hash_including(
-                    "username" => username,
+                    "author" => author,
                     "updatedAfter" => an_instance_of(String)
                   )
                 ))
@@ -569,7 +569,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
                 perform_request
 
-                Rails.cache.delete(described_class.authored_mr_lists_cache_key(username, :open))
+                Rails.cache.delete(described_class.authored_mr_lists_cache_key(author, :open))
                 open_mr_nodes << opened_mr
 
                 stub_request(:post, graphql_url)
@@ -598,7 +598,7 @@ RSpec.describe MergeRequestsController, type: :controller do
               it "sends web push notification" do
                 perform_request
 
-                Rails.cache.delete(described_class.authored_mr_lists_cache_key(username, :merged))
+                Rails.cache.delete(described_class.authored_mr_lists_cache_key(author, :merged))
 
                 open_mr_nodes = open_mrs.dig(*%w[data user openMergeRequests nodes])
                 merged_mr_nodes = merged_mrs.dig(*%w[data user mergedMergeRequests nodes])
@@ -656,7 +656,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response).to render_template("layouts/application")
             expect(response).to render_template("merge_requests/_merged_merge_requests")
 
-            expect(response.body).to include(%(<turbo-frame id="merged_merge_requests_user_dto_#{username}">))
+            expect(response.body).to include(%(<turbo-frame id="merged_merge_requests_user_dto_#{author}">))
             # Project link
             expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/gitlab">})
             expect(response.body).to include(%r{<a [^>]+href="https://gitlab.com/gitlab-org/security/gitlab-runner">})
@@ -684,7 +684,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             .with(body: hash_including(
               "operationName" => "GitlabClient__MergedMergeRequestsQuery",
               "variables" => {
-                "username" => username,
+                "author" => author,
                 "mergedAfter" => 1.week.ago
               }
             ))

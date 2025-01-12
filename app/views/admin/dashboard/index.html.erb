@@ -28,7 +28,7 @@
         <%= tag.tr do %>
           <%= tag.th scope: "row" do %>
             <%= link_to user.username,
-            merge_requests_path(assignee: user.username),
+            merge_requests_path(author: user.username),
             class: fg_class %>
             (<%= link_to "Profile",
             "https://gitlab.com/#{user.username}",

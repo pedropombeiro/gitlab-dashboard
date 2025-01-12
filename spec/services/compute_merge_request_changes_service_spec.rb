@@ -15,9 +15,9 @@ RSpec.describe ComputeMergeRequestChangesService do
   end
 
   let(:client) { GitlabClient.new }
-  let(:assignee) { "pedropombeiro" }
-  let(:previous_dto) { ::UserDto.new(previous_response, assignee, type, issue_iids.to_h { |iid| [iid, new_issue] }) }
-  let(:dto) { ::UserDto.new(new_response, assignee, type, issue_iids.to_h { |iid| [iid, new_issue] }) }
+  let(:author) { "pedropombeiro" }
+  let(:previous_dto) { ::UserDto.new(previous_response, author, type, issue_iids.to_h { |iid| [iid, new_issue] }) }
+  let(:dto) { ::UserDto.new(new_response, author, type, issue_iids.to_h { |iid| [iid, new_issue] }) }
   let(:service) { described_class.new(type, previous_dto, dto) }
 
   subject(:execute) { service.execute }
@@ -223,10 +223,10 @@ RSpec.describe ComputeMergeRequestChangesService do
   private
 
   def response
-    client.fetch_open_merge_requests(assignee).tap do |response|
+    client.fetch_open_merge_requests(author).tap do |response|
       response[:user] = response.response.data.user
 
-      merged_mrs_response = client.fetch_merged_merge_requests(assignee)
+      merged_mrs_response = client.fetch_merged_merge_requests(author)
       user2 = merged_mrs_response.response.data.user
       response.user.mergedMergeRequests = user2.mergedMergeRequests
       response.user.allMergedMergeRequests = user2.allMergedMergeRequests

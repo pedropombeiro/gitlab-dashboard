@@ -17,10 +17,10 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
       YAML.load_file(file_fixture("monthly_merged_merge_request_stats.yml"))["one"]
     end
 
-    let(:username) { "pedropombeiro" }
+    let(:author) { "pedropombeiro" }
 
     context "when user exists", :freeze_time do
-      let(:params) { {assignee: username} }
+      let(:params) { {author: author} }
 
       let!(:merged_mrs_request_stubs) do
         12.times.map do |offset|
@@ -31,7 +31,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
             .with(body: hash_including(
               "operationName" => "GitlabClient__MonthlyMergeRequestsQuery",
               "variables" => {
-                "username" => username,
+                "author" => author,
                 "mergedAfter" => bom.to_fs,
                 "mergedBefore" => eom.to_fs
               }
@@ -52,7 +52,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
         allow(user_dto).to receive(:merged_merge_requests_count).and_return(500)
         allow(user_dto).to receive(:merged_merge_requests_tttm).and_return(11597219.020233)
 
-        allow(FetchMergeRequestsService).to receive(:new).with(username).and_return(service)
+        allow(FetchMergeRequestsService).to receive(:new).with(author).and_return(service)
       end
 
       it "returns http success" do

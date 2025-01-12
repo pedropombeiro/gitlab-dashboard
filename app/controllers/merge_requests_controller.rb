@@ -5,17 +5,18 @@ class MergeRequestsController < MergeRequestsControllerBase
   helper_method :make_full_url
 
   def index
-    return unless ensure_assignee
+    return unless ensure_author
 
-    @user = graphql_user(assignee)
+    @user = graphql_user(author)
     render_404 and return unless @user
 
-    if @user.username != safe_params[:assignee]
-      redirect_to merge_requests_path(assignee: @user.username) and return
+    if @user.username != safe_params[:author]
+      redirect_to merge_requests_path(author: @user.username) and return
     end
 
-    save_current_user(safe_params[:assignee])
-    response = MergeRequestsCacheService.new.read(safe_params[:assignee], :open)
+    save_current_user(safe_params[:author])
+    response = MergeRequestsCacheService.new.read(safe_params[:author], :open)
+    fetch_service = FetchMergeRequestsService.new(safe_params[:author], request_ip: request.remote_ip)
     @dto = fetch_service.parse_dto(response, :open)
 
     fresh_when(response)
@@ -34,32 +35,29 @@ class MergeRequestsController < MergeRequestsControllerBase
   end
 
   def merged_chart
-    assignee = safe_params.expect(:assignee)
-    user = graphql_user(assignee)
+    author = safe_params.expect(:author)
+    user = graphql_user(author)
     render_404 and return unless user
 
-    save_current_user(assignee)
+    save_current_user(author)
   end
 
   private
 
-  def graphql_user(assignee)
-    Rails.cache.fetch(self.class.user_cache_key(assignee), expires_in: USER_CACHE_VALIDITY) do
-      gitlab_client.fetch_user(assignee)
+  def graphql_user(username)
+    Rails.cache.fetch(self.class.user_cache_key(username), expires_in: USER_CACHE_VALIDITY) do
+      gitlab_client.fetch_user(username)
     end.response.data.user
   end
 
-  def fetch_service
-    @fetch_service ||= FetchMergeRequestsService.new(safe_params.expect(:assignee), request_ip: request.remote_ip)
-  end
-
   def handle_merge_requests_list(type)
-    assignee = safe_params.expect(:assignee)
-    user = graphql_user(assignee)
+    author = safe_params.expect(:author)
+    user = graphql_user(author)
     render_404 and return unless user
 
-    save_current_user(assignee)
+    save_current_user(author)
 
+    fetch_service = FetchMergeRequestsService.new(author, request_ip: request.remote_ip)
     response, @dto = GenerateNotificationsService.new(@current_user, type, fetch_service).execute
 
     if Rails.env.production?

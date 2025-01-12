@@ -6,7 +6,7 @@
     bs_html: "true",
     bs_title: title
   }) do %>
-  <%= tag.a(href: merge_requests_path(assignee: user.username), target: "_top") do %>
+  <%= tag.a(href: merge_requests_path(author: user.username), target: "_top") do %>
     <%= render "user_image", user: user, **local_assigns.slice(:size, :class) %>
   <% end %>
   <%= link_to(

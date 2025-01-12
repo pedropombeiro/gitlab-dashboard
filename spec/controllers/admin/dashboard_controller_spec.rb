@@ -33,7 +33,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
         users.each do |user|
           expect(response.body).to include(
-            %(<a href="#{merge_requests_path(assignee: user.username)}">#{user.username}</a>)
+            %(<a href="#{merge_requests_path(author: user.username)}">#{user.username}</a>)
           )
         end
 
@@ -53,7 +53,7 @@ RSpec.describe Admin::DashboardController, type: :controller do
 
           users.each do |user|
             expect(response.body).to include(
-              %(<a href="#{merge_requests_path(assignee: user.username)}">#{user.username}</a>)
+              %(<a href="#{merge_requests_path(author: user.username)}">#{user.username}</a>)
             )
           end
 

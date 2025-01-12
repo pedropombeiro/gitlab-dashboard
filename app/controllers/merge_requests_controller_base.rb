@@ -10,15 +10,15 @@ class MergeRequestsControllerBase < ApplicationController
   end
 
   def safe_params
-    params.permit(:assignee)
+    params.permit(:author)
   end
 
-  def assignee
-    safe_params[:assignee] || session[:user_id]
+  def author
+    safe_params[:author] || session[:user_id]
   end
 
-  def ensure_assignee
-    unless assignee || Rails.application.credentials.gitlab_token
+  def ensure_author
+    unless author || Rails.application.credentials.gitlab_token
       render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
       return false
     end

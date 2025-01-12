@@ -2,13 +2,13 @@
 
 class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
   def monthly_merged_merge_request_stats
-    return unless ensure_assignee
+    return unless ensure_author
 
     response = Rails.cache.fetch(
-      self.class.monthly_merged_mr_lists_cache_key(assignee),
+      self.class.monthly_merged_mr_lists_cache_key(author),
       expires_in: MONTHLY_GRAPH_CACHE_VALIDITY
     ) do
-      gitlab_client.fetch_monthly_merged_merge_requests(assignee)
+      gitlab_client.fetch_monthly_merged_merge_requests(author)
     end
 
     render json: monthly_mrs_graph(response.response.data.user)
@@ -29,7 +29,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
   end
 
   def monthly_mrs_graph(user)
-    fetch_service = FetchMergeRequestsService.new(params[:assignee])
+    fetch_service = FetchMergeRequestsService.new(params[:author])
     response = fetch_service.execute(:merged)
     user_dto = fetch_service.parse_dto(response, :merged)
     since_first_mr = ActiveSupport::Duration.build(
