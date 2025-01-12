@@ -19,7 +19,7 @@
   <% if local_assigns.fetch(:show_emojis, true) %>
     <%= render "shared/abbr_with_title",
     content: user_emojis(user.status),
-    title: user.status&.availability %>
+    title: user.status&.availability -%>
 
     <% country_flag_classes = user_country_flag_classes(user) %>
     <%= tag.i(class: country_flag_classes) if country_flag_classes %>

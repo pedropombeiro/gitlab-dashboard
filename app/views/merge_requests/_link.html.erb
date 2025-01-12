@@ -9,7 +9,7 @@
       bs_title: web_url,
     },
     target: "_blank",
-  }.deep_merge(local_assigns.except(:title, :web_url) || {}) %>
+  }.deep_merge(local_assigns.except(:title, :web_url) || {}) -%>
 
   <%= render "clipboard_button" %>
 </nobr>
