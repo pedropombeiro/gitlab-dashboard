@@ -98,7 +98,7 @@ class FetchMergeRequestsService
     reviewers_info = Sync do |task|
       reviewer_usernames.map do |reviewer_username|
         task.async do
-          Rails.cache.fetch(self.class.reviewer_cache_key(reviewer_username), expires_in: 30.minutes) do
+          Rails.cache.fetch(self.class.reviewer_cache_key(reviewer_username), expires_in: REVIEWER_VALIDITY) do
             gitlab_client.fetch_reviewer(reviewer_username)
           end
         end

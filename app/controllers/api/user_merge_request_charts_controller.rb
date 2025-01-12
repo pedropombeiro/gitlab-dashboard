@@ -18,7 +18,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
 
   def series_values(user, fn)
     12.times.map do |index|
-      month = Time.current.beginning_of_month - index.months
+      month = index.months.ago.beginning_of_month
       stats = user["monthlyMergedMergeRequests#{index}"]
 
       {

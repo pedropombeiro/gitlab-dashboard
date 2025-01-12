@@ -8,6 +8,8 @@ class UserDto
   include ReviewerOrnamentsConcern
   include MergeRequestsParsingHelper
 
+  PIPELINE_AGE_LIMIT = 8.hours
+
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :open_merge_requests, :merged_merge_requests, :type
   attr_reader :merged_merge_requests_count, :merged_merge_requests_tttm, :first_merged_merge_requests_timestamp
@@ -121,7 +123,7 @@ class UserDto
       if mr.headPipeline
         mr.headPipeline[:outdated?] =
           mr.headPipeline.startedAt &&
-          mr.headPipeline.finishedAt&.before?(8.hours.ago) &&
+          mr.headPipeline.finishedAt&.before?(PIPELINE_AGE_LIMIT.ago) &&
           mr.contextualLabels.map(&:title).include?("pipeline::tier-3")
       end
 
