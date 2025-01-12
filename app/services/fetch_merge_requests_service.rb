@@ -12,9 +12,8 @@ class FetchMergeRequestsService
   attr_reader :author
   delegate :make_full_url, to: :gitlab_client
 
-  def initialize(author, request_ip: nil)
+  def initialize(author)
     @author = author
-    @request_ip = request_ip
   end
 
   def execute(type)
@@ -31,35 +30,27 @@ class FetchMergeRequestsService
           gitlab_client.fetch_merged_merge_requests(author)
         end
 
-      response = raw_response.response.data
-      response.updated_at = raw_response.updated_at
-      response.request_duration = raw_response.request_duration
-      response.next_update_at = MergeRequestsCacheService.cache_validity.after(response.updated_at)
-      response.next_scheduled_update_at =
-        if type == :open && any_running_pipelines?(merge_requests_from_response(response, type))
-          5.minutes.from_now
-        else
-          30.minutes.from_now
-        end
+      raw_response.response.data.tap do |response|
+        response.updated_at = raw_response.updated_at
+        response.request_duration = raw_response.request_duration
+        response.next_update_at = MergeRequestsCacheService.cache_validity.after(raw_response.updated_at)
+        response.next_scheduled_update_at =
+          if type == :open && any_running_pipelines?(merge_requests_from_response(response, type))
+            5.minutes.from_now
+          else
+            30.minutes.from_now
+          end
 
-      # Clear merged MRs cache if its next scheduled update is too far in the future,
-      # since an MR might just have been merged and moved out of the open MRs list
-      if type == :open
-        cache_key = self.class.authored_mr_lists_cache_key(author, :merged)
-        merged_response = Rails.cache.read(cache_key)
-        if merged_response && merged_response.next_scheduled_update_at > response.next_scheduled_update_at
-          Rails.cache.delete(cache_key)
+        # Clear merged MRs cache if its next scheduled update is too far in the future,
+        # since an MR might just have been merged and moved out of the open MRs list
+        if type == :open
+          cache_key = self.class.authored_mr_lists_cache_key(author, :merged)
+          merged_response = Rails.cache.read(cache_key)
+          if merged_response && merged_response.next_scheduled_update_at > response.next_scheduled_update_at
+            Rails.cache.delete(cache_key)
+          end
         end
       end
-
-      if @request_ip
-        metric_source "custom_metrics"
-        metric_attributes(username: author, duration: response.request_duration, type: type.to_s, request_ip: @request_ip)
-
-        increment_counter("user.visit")
-      end
-
-      response
     end
   end
 

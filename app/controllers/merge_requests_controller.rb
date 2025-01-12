@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MergeRequestsController < MergeRequestsControllerBase
+  include Honeybadger::InstrumentationHelper
+
   delegate :make_full_url, to: :gitlab_client
   helper_method :make_full_url
 
@@ -14,10 +16,15 @@ class MergeRequestsController < MergeRequestsControllerBase
       redirect_to merge_requests_path(author: @user.username) and return
     end
 
-    save_current_user(safe_params[:author]) if safe_params.exclude?(:referrer)
-    response = MergeRequestsCacheService.new.read(safe_params[:author], :open)
-    fetch_service = FetchMergeRequestsService.new(safe_params[:author], request_ip: request.remote_ip)
+    save_current_user(author) if safe_params.exclude?(:referrer)
+
+    response = MergeRequestsCacheService.new.read(author, :open)
+    fetch_service = FetchMergeRequestsService.new(author)
     @dto = fetch_service.parse_dto(response, :open)
+
+    metric_source "custom_metrics"
+    metric_attributes(username: author, referrer: safe_params[:referrer], request_ip: request.remote_ip)
+    increment_counter("user.visit")
 
     fresh_when(response)
   end
@@ -55,8 +62,7 @@ class MergeRequestsController < MergeRequestsControllerBase
     user = graphql_user(author)
     render_404 and return unless user
 
-    log_visit_metric = type == :open && safe_params.exclude?(:referrer)
-    fetch_service = FetchMergeRequestsService.new(author, request_ip: log_visit_metric ? request.remote_ip : nil)
+    fetch_service = FetchMergeRequestsService.new(author)
     if safe_params.include?(:referrer)
       response = fetch_service.execute(type)
       @dto = fetch_service.parse_dto(response, type)
