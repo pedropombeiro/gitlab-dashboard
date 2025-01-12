@@ -1,0 +1,15 @@
+<% bs_data = { bs_toggle: "tooltip", bs_custom_class: "wide-tooltip" } %>
+
+<span class="text-secondary small">
+  Fetched in
+  <%= pluralize(request_duration, "second") -%>
+  at
+  <%= local_relative_time(updated_at, type: "time-or-date", data: bs_data) -%>.
+  <% if next_update_at %>
+    <span>Cached until
+      <%= local_relative_time(next_update_at, type: "time-or-date", data: bs_data) -%>
+    </span>
+  <% else %>
+    <span>Not cached</span>
+  <% end %>
+</span>
