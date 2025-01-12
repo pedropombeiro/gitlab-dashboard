@@ -8,7 +8,7 @@
   }) do %>
   <%= link_to(
     merge_requests_path(author: user.username, referrer: params[:referrer] || merge_requests_path(author: params[:author])),
-    target: "_top"
+    class: "text-decoration-none", target: "_top"
   ) do %>
     <%= render "user_image", user: user, **local_assigns.slice(:size, :class) %>
   <% end %>
