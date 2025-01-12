@@ -9,26 +9,26 @@ class FetchMergeRequestsService
   include MergeRequestsParsingHelper
   include MergeRequestsPipelineHelper
 
-  attr_reader :assignee
+  attr_reader :author
   delegate :make_full_url, to: :gitlab_client
 
-  def initialize(assignee, request_ip: nil)
-    @assignee = assignee
+  def initialize(author, request_ip: nil)
+    @author = author
     @request_ip = request_ip
   end
 
   def execute(type)
     Rails.cache.fetch(
-      self.class.authored_mr_lists_cache_key(assignee, type), expires_in: MergeRequestsCacheService.cache_validity
+      self.class.authored_mr_lists_cache_key(author, type), expires_in: MergeRequestsCacheService.cache_validity
     ) do
       raw_response =
         case type
         when :open
-          gitlab_client.fetch_open_merge_requests(assignee).tap do |response|
+          gitlab_client.fetch_open_merge_requests(author).tap do |response|
             merge_requests_from_response(response.response.data, type).then { |mrs| fill_reviewers_info(mrs) }
           end
         when :merged
-          gitlab_client.fetch_merged_merge_requests(assignee)
+          gitlab_client.fetch_merged_merge_requests(author)
         end
 
       response = raw_response.response.data
@@ -45,7 +45,7 @@ class FetchMergeRequestsService
       # Clear merged MRs cache if its next scheduled update is too far in the future,
       # since an MR might just have been merged and moved out of the open MRs list
       if type == :open
-        cache_key = self.class.authored_mr_lists_cache_key(assignee, :merged)
+        cache_key = self.class.authored_mr_lists_cache_key(author, :merged)
         merged_response = Rails.cache.read(cache_key)
         if merged_response && merged_response.next_scheduled_update_at > response.next_scheduled_update_at
           Rails.cache.delete(cache_key)
@@ -54,7 +54,7 @@ class FetchMergeRequestsService
 
       if @request_ip
         metric_source "custom_metrics"
-        metric_attributes(username: assignee, duration: response.request_duration, type: type.to_s, request_ip: @request_ip)
+        metric_attributes(username: author, duration: response.request_duration, type: type.to_s, request_ip: @request_ip)
 
         increment_counter("user.visit")
       end
@@ -69,7 +69,7 @@ class FetchMergeRequestsService
       issues_by_iid = merge_requests_from_response(response, type).then { |mrs| issues_from_merge_requests(mrs) }
     end
 
-    ::UserDto.new(response, assignee, type, issues_by_iid)
+    ::UserDto.new(response, author, type, issues_by_iid)
   end
 
   private

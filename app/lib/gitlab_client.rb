@@ -143,8 +143,8 @@ class GitlabClient
   GRAPHQL
 
   OpenMergeRequestsQuery = Client.parse <<-GRAPHQL
-    query($username: String!, $updatedAfter: Time) {
-      user(username: $username) {
+    query($author: String!, $updatedAfter: Time) {
+      user(username: $author) {
         openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC, updatedAfter: $updatedAfter) {
           nodes {
             ...#{name}::CoreMergeRequestFragment
@@ -217,8 +217,8 @@ class GitlabClient
   GRAPHQL
 
   MergedMergeRequestsQuery = Client.parse <<-GRAPHQL
-    query($username: String!, $mergedAfter: Time!) {
-      user(username: $username) {
+    query($author: String!, $mergedAfter: Time!) {
+      user(username: $author) {
         firstCreatedMergedMergeRequests: authoredMergeRequests(state: merged, sort: CREATED_ASC, first: 1) {
           nodes {
             createdAt
@@ -242,8 +242,8 @@ class GitlabClient
   GRAPHQL
 
   MonthlyMergeRequestsQuery = Client.parse <<-'GRAPHQL'
-    query($username: String!, $mergedAfter: Time, $mergedBefore: Time) {
-      user(username: $username) {
+    query($author: String!, $mergedAfter: Time, $mergedBefore: Time) {
+      user(username: $author) {
         monthlyMergedMergeRequests: authoredMergeRequests(
           state: merged,
           mergedAfter: $mergedAfter,
@@ -275,19 +275,19 @@ class GitlabClient
     end
   end
 
-  def fetch_open_merge_requests(username, format: :open_struct)
+  def fetch_open_merge_requests(author, format: :open_struct)
     format_response(format) do
-      execute_query(OpenMergeRequestsQuery, username: username, updatedAfter: 1.year.ago)
+      execute_query(OpenMergeRequestsQuery, author: author, updatedAfter: 1.year.ago)
     end
   end
 
-  def fetch_merged_merge_requests(username, format: :open_struct)
+  def fetch_merged_merge_requests(author, format: :open_struct)
     format_response(format) do
-      execute_query(MergedMergeRequestsQuery, username: username, mergedAfter: 1.week.ago)
+      execute_query(MergedMergeRequestsQuery, author: author, mergedAfter: 1.week.ago)
     end
   end
 
-  def fetch_monthly_merged_merge_requests(username, format: :open_struct)
+  def fetch_monthly_merged_merge_requests(author, format: :open_struct)
     format_response(format) do
       Sync do |task|
         12.times.map do |offset|
@@ -297,7 +297,7 @@ class GitlabClient
           task.async do
             execute_query(
               MonthlyMergeRequestsQuery,
-              username: username,
+              author: author,
               mergedAfter: bom.to_fs,
               mergedBefore: eom.to_fs
             )

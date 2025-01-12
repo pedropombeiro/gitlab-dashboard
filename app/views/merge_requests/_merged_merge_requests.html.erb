@@ -233,10 +233,10 @@
     style="height: 300px;"
     class="d-flex justify-content-sm-center text-secondary mt-2 w-100 p-6"
   >
-    <%= turbo_frame_tag params[:assignee],
+    <%= turbo_frame_tag params[:author],
     :merged_merge_requests_chart,
     loading: "lazy",
-    src: merged_merge_requests_chart_path(assignee: params[:assignee]) do %>
+    src: merged_merge_requests_chart_path(author: params[:author]) do %>
       <span class="d-flex align-items-center justify-content-center w-100 h-100">Initializing…</span>
     <% end %>
   </div>

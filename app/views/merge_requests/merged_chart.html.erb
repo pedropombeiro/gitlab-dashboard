@@ -3,10 +3,10 @@
   theme_selector_target: "chart",
   controller: "merged-merge-requests-chart",
   merged_merge_requests_chart_url_value:
-    monthly_merged_merge_request_stats_url(assignee: params[:assignee]),
+    monthly_merged_merge_request_stats_url(author: params[:author]),
 } %>
 
-<%= turbo_frame_tag(params[:assignee], :merged_merge_requests_chart) do %>
+<%= turbo_frame_tag(params[:author], :merged_merge_requests_chart) do %>
   <%= tag.div(data: data, class: "h-100", style: "width: 900px;") do %>
     <span class="d-flex align-items-center justify-content-center w-100 h-100">Loading graph…</span>
   <% end %>

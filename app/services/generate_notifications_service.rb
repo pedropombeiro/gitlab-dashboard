@@ -6,32 +6,32 @@ class GenerateNotificationsService
   include CacheConcern
   include WebPushConcern
 
-  def initialize(assignee, type, fetch_service)
-    @assignee_user = assignee.is_a?(GitlabUser) ? assignee : GitlabUser.find_by_username!(assignee)
+  def initialize(author, type, fetch_service)
+    @author_user = author.is_a?(GitlabUser) ? author : GitlabUser.find_by_username!(author)
     @type = type
     @fetch_service = fetch_service
   end
 
   def execute
     previous_dto = nil
-    if assignee_user.web_push_subscriptions.any?
-      response = cache_service.read(assignee_user.username, type)
+    if author_user.web_push_subscriptions.any?
+      response = cache_service.read(author_user.username, type)
       previous_dto = fetch_service.parse_dto(response, type)
     end
 
     response = fetch_service.execute(type)
 
-    cache_service.write(assignee_user.username, type, response) if response.errors.nil?
+    cache_service.write(author_user.username, type, response) if response.errors.nil?
 
     dto = fetch_service.parse_dto(response, type)
-    check_changes(previous_dto, dto) if dto.errors.blank? && assignee_user.web_push_subscriptions.any?
+    check_changes(previous_dto, dto) if dto.errors.blank? && author_user.web_push_subscriptions.any?
 
     [response, dto]
   end
 
   private
 
-  attr_reader :assignee_user, :type, :fetch_service
+  attr_reader :author_user, :type, :fetch_service
 
   def cache_service
     @cache_service ||= MergeRequestsCacheService.new
@@ -41,7 +41,7 @@ class GenerateNotificationsService
     notifications = ComputeMergeRequestChangesService.new(type, previous_dto, dto).execute
     if notifications.pluck(:type).include?(:merge_request_merged)
       # Clear monthly MR count cache if an MR has been merged
-      Rails.cache.delete(self.class.monthly_merged_mr_lists_cache_key(assignee_user.username))
+      Rails.cache.delete(self.class.monthly_merged_mr_lists_cache_key(author_user.username))
     end
 
     notifications.each { |notification| notify_user(**notification) }
@@ -51,7 +51,7 @@ class GenerateNotificationsService
     icon ||= ActionController::Base.helpers.asset_url("apple-touch-icon-180x180.png")
     badge ||= ActionController::Base.helpers.asset_url("apple-touch-icon-120x120.png")
 
-    publish(assignee_user, {
+    publish(author_user, {
       type: "push_notification",
       payload: {
         title: title,

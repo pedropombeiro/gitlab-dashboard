@@ -108,11 +108,11 @@ RSpec.describe GitlabClient do
   describe "#fetch_open_merge_requests" do
     let_it_be(:open_mrs_response_body) { YAML.load_file(file_fixture("open_merge_requests.yml")) }
 
-    let(:username) { "pedropombeiro" }
+    let(:author) { "pedropombeiro" }
     let(:result_as_hash) { openstruct_to_hash(fetch_open_merge_requests) }
 
     subject(:fetch_open_merge_requests) do
-      client.fetch_open_merge_requests(username)
+      client.fetch_open_merge_requests(author)
     end
 
     before do
@@ -163,10 +163,10 @@ RSpec.describe GitlabClient do
   end
 
   describe "#fetch_merged_merge_requests" do
-    let(:username) { "user.1" }
+    let(:author) { "user.1" }
 
     subject(:fetch_merged_merge_requests) do
-      client.fetch_merged_merge_requests(username)
+      client.fetch_merged_merge_requests(author)
     end
 
     before do
@@ -181,10 +181,10 @@ RSpec.describe GitlabClient do
   end
 
   describe "#fetch_monthly_merged_merge_requests", :freeze_time do
-    let(:username) { "user.1" }
+    let(:author) { "user.1" }
 
     subject(:fetch_monthly_merged_merge_requests) do
-      client.fetch_monthly_merged_merge_requests(username)
+      client.fetch_monthly_merged_merge_requests(author)
     end
 
     before do
@@ -192,7 +192,7 @@ RSpec.describe GitlabClient do
         .with(body: hash_including(
           "operationName" => "GitlabClient__MonthlyMergeRequestsQuery",
           "variables" => matching(
-            "username" => username,
+            "author" => author,
             "mergedAfter" => an_instance_of(String),
             "mergedBefore" => an_instance_of(String)
           )
