@@ -274,7 +274,7 @@
                   .sort_by { |r| r.mergeRequestInteraction.reviewState }
                   .reverse,
               as: :reviewer,
-            ) || "Not assigned" %>
+            ) || tag.span("Not assigned", class: "text-warning") %>
           </td>
           <!-- Associated Issue -->
           <td scope="row">
