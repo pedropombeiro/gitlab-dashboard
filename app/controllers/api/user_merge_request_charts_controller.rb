@@ -72,7 +72,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           order: 2,
           backgroundColor: "#37A2EBA0",
           borderColor: "#37A2EB",
-          data: series_values(user, ->(stats) { stats.count })[0...11]
+          data: series_values(user, ->(stats) { stats.count }).take(11)
         },
         {
           label: "",
@@ -81,7 +81,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           order: 2,
           backgroundColor: "#37A2EB60",
           borderColor: "#37A2EB",
-          data: series_values(user, ->(stats) { stats.count })[11..]
+          data: series_values(user, ->(stats) { stats.count }).drop(11)
         },
         {
           label: "All-time average (#{monthly_merge_rate.round}/month)",
