@@ -209,6 +209,17 @@ RSpec.describe MergeRequestsController, type: :controller do
           end
         end
       end
+
+      context "with legacy assignee query param" do
+        let(:params) { {assignee: author} }
+
+        it "redirects to author specified in assignee" do
+          request
+
+          expect(response).to redirect_to action: :index, author: author
+          expect(GitlabUser.find_by_username(author)).to be_nil
+        end
+      end
     end
   end
 

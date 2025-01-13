@@ -7,6 +7,10 @@ class MergeRequestsController < MergeRequestsControllerBase
   helper_method :make_full_url
 
   def index
+    if params[:assignee].present?
+      return redirect_to merge_requests_path(author: params[:assignee], referrer: safe_params[:referrer])
+    end
+
     return unless ensure_author
 
     @user = graphql_user(author)
