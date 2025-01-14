@@ -14,12 +14,10 @@ module MrStatusOrnamentsConcern
   end
 
   def open_merge_request_status_label(mr)
-    status = humanized_enum(mr.detailedMergeStatus.remove("STATUS"))
-
     return "Returned to you" if returned_to_assignee?(mr)
     return "Waiting for others" if waiting_for_others?(mr)
 
-    status
+    humanized_enum(mr.detailedMergeStatus.delete_suffix("_STATUS"))
   end
 
   def pipeline_class(pipeline)

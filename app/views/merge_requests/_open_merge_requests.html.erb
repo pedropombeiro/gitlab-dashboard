@@ -91,7 +91,7 @@
 
     <tbody>
       <% merge_requests.each do |mr| %>
-        <%= tag.tr do %>
+        <%= tag.tr(class: mr.detailedMergeStatus == "BLOCKED_STATUS" ? "opacity-50" : nil) do %>
           <!-- MR ID -->
           <th scope="row">
             <%= render "mr_relation", merge_request: mr %>
