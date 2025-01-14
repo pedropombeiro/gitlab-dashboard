@@ -1,7 +1,7 @@
 <%= render "mr_reference", merge_request: merge_request %>
 
 <% if merge_request.upstreamMergeRequest %>
-  <div class="d-flex align-items-baseline">
+  <div class="d-flex align-items-baseline opacity-75">
     <%= render "dependent_symbol" -%>
     <%= render "mr_reference", merge_request: merge_request.upstreamMergeRequest %>
   </div>
