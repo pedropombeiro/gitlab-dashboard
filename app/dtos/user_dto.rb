@@ -96,6 +96,11 @@ class UserDto
         mr.labels.nodes.filter { |label| contextual_labels.any? { |prefix| label.title.start_with?(prefix.to_s) } }
       mr.contextualLabels.each { |label| label.webTitle = label.title }
 
+      if mr.approved
+        # GitLab returns 'approved == true' if no review has actually happened, which is a bit misleading
+        mr.approved = false if mr.reviewers.nodes.any? { |reviewer| !reviewer.mergeRequestInteraction.approved }
+      end
+
       if mr.issue
         mr.issue.contextualLabels = mr.issue.labels.nodes.filter do |label|
           issue_contextual_labels.any? { |prefix| label.title.start_with?(prefix) }
