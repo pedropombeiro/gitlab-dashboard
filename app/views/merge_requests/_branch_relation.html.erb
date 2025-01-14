@@ -6,6 +6,7 @@
     <% open_mrs = @dto.open_merge_requests %>
     <% if open_mrs && open_mrs.items.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
       <%= render "shared/abbr_with_title", content: "🚀", title: "Auto-merge is enabled" -%>
+      &nbsp;
     <% end %>
     <%= render "branch_ref", branch_name: target_branch %>
   </div>
