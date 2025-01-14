@@ -69,6 +69,8 @@ module MergeRequestsPipelineHelper
       end
     elsif failed_jobs.count.positive?
       web_path += "/failures"
+    elsif pipeline.status == "RUNNING" && pipeline.runningJobs.count == 1
+      web_path = pipeline.runningJobs.nodes.sole.webPath
     end
 
     make_full_url(web_path)
