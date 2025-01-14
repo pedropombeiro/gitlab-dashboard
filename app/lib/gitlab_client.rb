@@ -158,6 +158,7 @@ class GitlabClient
             detailedMergeStatus
             squashOnMerge
             conflicts
+            commitCount
             blockingMergeRequests {
               visibleMergeRequests {
                 iid

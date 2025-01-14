@@ -58,7 +58,7 @@
             class: %w[fa-solid fa-angles-down],
             data: {
               bs_toggle: "tooltip",
-              bs_title: "Squash?",
+              bs_title: "Commits",
             },
           ) %>
         </th>
@@ -219,14 +219,22 @@
               target_branch: mr.targetBranch %>
             </div>
           </td>
-          <!-- Squash on merge -->
-          <td class="text-center">
+          <!-- Commit info -->
+          <td class="text-end">
             <% if mr.squashOnMerge %>
               <%= render "shared/abbr_with_title",
               content: tag.i(class: %w[align-middle fa-solid fa-angles-down]),
               title: "MR set to squash on merge",
               class: "text-success" %>
             <% end %>
+            <%= tag.span(
+              number_with_delimiter(mr.commitCount),
+              class: mr.commitCount && mr.commitCount > 10 ? "text-warning" : nil,
+              data: {
+                bs_toggle: "tooltip",
+                bs_title: pluralize(mr.commitCount, "commit"),
+              },
+            ) %>
           </td>
           <!-- Conflicts -->
           <% if any_conflicts %>

@@ -93,6 +93,7 @@ one:
             detailedMergeStatus: CI_STILL_RUNNING
             squashOnMerge: true
             conflicts: false
+            commitCount: 3
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
@@ -226,6 +227,7 @@ one:
             detailedMergeStatus: NOT_APPROVED
             squashOnMerge: true
             conflicts: false
+            commitCount: 1
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
@@ -346,6 +348,7 @@ one:
             detailedMergeStatus: NOT_APPROVED
             squashOnMerge: true
             conflicts: false
+            commitCount: 1
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
@@ -482,6 +485,7 @@ one:
             detailedMergeStatus: UNCHECKED
             squashOnMerge: true
             conflicts: false
+            commitCount: 2
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
@@ -602,6 +606,7 @@ one:
             detailedMergeStatus: UNCHECKED
             squashOnMerge: true
             conflicts: false
+            commitCount: 1
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
@@ -728,6 +733,7 @@ one:
             detailedMergeStatus: MERGEABLE
             squashOnMerge: true
             conflicts: false
+            commitCount: 1
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
@@ -849,6 +855,7 @@ one:
             detailedMergeStatus: BLOCKED_STATUS
             squashOnMerge: true
             conflicts: false
+            commitCount: 6
             blockingMergeRequests:
               visibleMergeRequests:
                 - iid: "173886"
@@ -965,6 +972,7 @@ one:
             detailedMergeStatus: UNCHECKED
             squashOnMerge: false
             conflicts: false
+            commitCount: 2
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
@@ -1097,6 +1105,7 @@ one:
             detailedMergeStatus: UNCHECKED
             squashOnMerge: true
             conflicts: false
+            commitCount: 4
             blockingMergeRequests:
               visibleMergeRequests:
                 - iid: "172422"
@@ -1233,6 +1242,7 @@ one:
             detailedMergeStatus: UNCHECKED
             squashOnMerge: true
             conflicts: false
+            commitCount: 6
             blockingMergeRequests:
               visibleMergeRequests: []
             reviewers:
