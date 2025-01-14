@@ -42,6 +42,23 @@ class GenerateNotificationsService
     if notifications.pluck(:type).include?(:merge_request_merged)
       # Clear monthly MR count cache if an MR has been merged
       Rails.cache.delete(self.class.monthly_merged_mr_lists_cache_key(author_user.username))
+
+      # Clear merged MRs cache if its next scheduled update is too far in the future,
+      # since an MR might just have been merged and moved out of the open MRs list
+      case type
+      when :open
+        cache_key = self.class.authored_mr_lists_cache_key(author_user.username, :merged)
+        merged_response = Rails.cache.read(cache_key)
+        if merged_response && merged_response.next_scheduled_update_at > response.next_scheduled_update_at
+          Rails.cache.delete(cache_key)
+        end
+      when :merged
+        cache_key = self.class.authored_mr_lists_cache_key(author_user.username, :open)
+        open_response = Rails.cache.read(cache_key)
+        if open_response && open_response.next_scheduled_update_at > response.next_scheduled_update_at
+          Rails.cache.delete(cache_key)
+        end
+      end
     end
 
     notifications.each { |notification| notify_user(**notification) }
