@@ -31,7 +31,7 @@ FROM base AS prebuild
 # Install packages needed to build gems and node modules
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add build-base curl gyp linux-headers openssl-dev pkgconfig
+  apk add build-base curl gyp linux-headers openssl-dev pkgconfig yaml-dev
 
 
 ############################################################################
