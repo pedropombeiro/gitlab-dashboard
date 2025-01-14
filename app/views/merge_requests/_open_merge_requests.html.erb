@@ -55,7 +55,7 @@
         </th>
         <th scope="col">Title</th>
         <th scope="col" class="text-center"><%= tag.i(
-            class: %w[fa-solid fa-angles-down],
+            class: %w[fa-solid fa-code-commit],
             data: {
               bs_toggle: "tooltip",
               bs_title: "Commits",
@@ -220,21 +220,25 @@
             </div>
           </td>
           <!-- Commit info -->
-          <td class="text-end">
+          <td class="text-center">
+            <div>
+              <%= tag.span(
+                class: %w[badge rounded-pill text-dark] + (mr.commitCount && mr.commitCount > 10 ? ["bg-warning"] : ["bg-info"]),
+                data: {
+                  bs_toggle: "tooltip",
+                  bs_title: pluralize(mr.commitCount, "commit"),
+                },
+              ) do %>
+                <%= number_with_delimiter(mr.commitCount) %>
+                <span class="visually-hidden">commits</span>
+              <% end %>
+            </div>
             <% if mr.squashOnMerge %>
               <%= render "shared/abbr_with_title",
               content: tag.i(class: %w[align-middle fa-solid fa-angles-down]),
               title: "MR set to squash on merge",
-              class: "text-success" %>
+              class: "text-info" %>
             <% end %>
-            <%= tag.span(
-              number_with_delimiter(mr.commitCount),
-              class: mr.commitCount && mr.commitCount > 10 ? "text-warning" : nil,
-              data: {
-                bs_toggle: "tooltip",
-                bs_title: pluralize(mr.commitCount, "commit"),
-              },
-            ) %>
           </td>
           <!-- Conflicts -->
           <% if any_conflicts %>
