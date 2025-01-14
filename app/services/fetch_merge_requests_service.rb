@@ -40,16 +40,6 @@ class FetchMergeRequestsService
           else
             30.minutes.from_now
           end
-
-        # Clear merged MRs cache if its next scheduled update is too far in the future,
-        # since an MR might just have been merged and moved out of the open MRs list
-        if type == :open
-          cache_key = self.class.authored_mr_lists_cache_key(author, :merged)
-          merged_response = Rails.cache.read(cache_key)
-          if merged_response && merged_response.next_scheduled_update_at > response.next_scheduled_update_at
-            Rails.cache.delete(cache_key)
-          end
-        end
       end
     end
   end
