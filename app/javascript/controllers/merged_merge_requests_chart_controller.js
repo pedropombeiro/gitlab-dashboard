@@ -53,7 +53,7 @@ export default class extends Controller {
     } catch (error) {
       console.error("Error creating chart:", error);
       // Optionally display an error message to the user:
-      this.chartTarget.innerHTML = "<p>Error loading chart data.</p>";
+      this.chartTarget.innerHTML = "<p class='d-flex justify-content-center'>Error loading chart data.</p>";
     }
   }
 
