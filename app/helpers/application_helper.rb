@@ -4,6 +4,8 @@ module ApplicationHelper
 
     if uri.relative? && uri.path.present?
       uri.to_s if uri.is_a?(URI::Generic)
+    elsif uri.absolute? && uri.is_a?(URI::HTTPS) && uri.host == "app.honeybadger.io"
+      uri.to_s
     else
       "/"
     end
