@@ -1,7 +1,7 @@
 <%= render "branch_ref", branch_name: source_branch %>
 
 <% if %w[master main].exclude?(target_branch) %>
-  <div class="d-flex d-none d-md-flex align-items-center">
+  <div class="d-flex d-none d-md-flex align-items-center opacity-75">
     <%= render "dependent_symbol" -%>
     <% open_mrs = @dto.open_merge_requests %>
     <% if open_mrs && open_mrs.items.any? { |other_mr| other_mr.sourceBranch == target_branch && other_mr.autoMergeEnabled } %>
