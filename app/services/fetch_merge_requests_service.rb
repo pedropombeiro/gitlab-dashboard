@@ -71,7 +71,7 @@ class FetchMergeRequestsService
   def any_running_pipelines?(merge_requests)
     merge_requests
       .filter_map(&:headPipeline)
-      .any? { |pipeline| pipeline.startedAt.present? && pipeline.finishedAt.nil? }
+      .any? { |pipeline| pipeline.status == "PENDING" || (pipeline.startedAt.present? && pipeline.finishedAt.nil?) }
   end
 
   def issues_from_merge_requests(merge_requests)
