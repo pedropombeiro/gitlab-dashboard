@@ -8,6 +8,10 @@ data: {
   bs_title: issue.titleHtml,
 } %>
 
+<% if issue.milestone %>
+  <%= tag.span "(#{issue.milestone.title})" %>
+<% end %>
+
 <div>
   <%= render partial: "gitlab_label",
   spacer_template: "space",

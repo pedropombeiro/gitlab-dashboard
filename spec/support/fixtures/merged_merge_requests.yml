@@ -15,6 +15,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173913"
             sourceBranch: pedropombeiro/506404/expose-user-timezone
             targetBranch: master
@@ -128,6 +130,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173450"
             sourceBranch: pedropombeiro/505703/add-deprecation
             targetBranch: test
@@ -263,6 +267,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173852"
             sourceBranch: pedropombeiro/deduplicate-project-ids
             targetBranch: master
@@ -354,6 +360,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173862"
             sourceBranch: pedropombeiro/457221/improve-message
             targetBranch: master
@@ -449,6 +457,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173548"
             sourceBranch: pedropombeiro/505810/pass-runner_manager
             targetBranch: master
@@ -541,6 +551,8 @@ one:
               fullPath: gitlab-org/security/gitlab-runner
               webUrl: https://gitlab.com/gitlab-org/security/gitlab-runner
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png
+            milestone:
+              title: "17.7"
             reference: "!5166"
             sourceBranch: pedropombeiro/32804/change-unregister-runner-manager-log-output
             targetBranch: main
@@ -599,6 +611,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!172965"
             sourceBranch: pedropombeiro/503748/update-milestone
             targetBranch: master
@@ -723,6 +737,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!172422"
             sourceBranch: pedropombeiro/503748/delete-orphaned-records
             targetBranch: master
@@ -856,6 +872,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!170778"
             sourceBranch: pedropombeiro/472974/create_ci_runner_tags
             targetBranch: master
@@ -974,6 +992,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!172684"
             sourceBranch: pedropombeiro/442395/add-missing-yml-dictionary-file
             targetBranch: master
@@ -1085,6 +1105,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!172377"
             sourceBranch: pedropombeiro/500447/remove-lfk
             targetBranch: master
@@ -1195,6 +1217,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!171901"
             sourceBranch: pedropombeiro/502934/backfill-ci_runner_machines_687967fa8a
             targetBranch: master
@@ -1311,6 +1335,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!171575"
             sourceBranch: pedropombeiro/502431/avoid-creating-runner-managers
             targetBranch: master
@@ -1415,6 +1441,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!166520"
             sourceBranch: pedropombeiro/442395/3-backfill-p_ci_runners
             targetBranch: master
@@ -1529,6 +1557,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!171308"
             sourceBranch: pedropombeiro/497562/drop-fk-from-partitioned-ci_runner_machines
             targetBranch: master
@@ -1655,6 +1685,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!171172"
             sourceBranch: pedropombeiro/442395/use-sharding_key_id-for-runner-owner
             targetBranch: master
@@ -1761,6 +1793,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!170483"
             sourceBranch: pedropombeiro/354756/add-service-ping
             targetBranch: master
@@ -1869,6 +1903,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!171246"
             sourceBranch: pedropombeiro/497562/drop-fk-from-partitioned-ci_runner_machines
             targetBranch: master
@@ -1985,6 +2021,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!168131"
             sourceBranch: pedropombeiro/497562/create-partitioned-table
             targetBranch: master
@@ -2097,6 +2135,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.6"
             reference: "!170915"
             sourceBranch: pedropombeiro/update-deprecations
             targetBranch: master

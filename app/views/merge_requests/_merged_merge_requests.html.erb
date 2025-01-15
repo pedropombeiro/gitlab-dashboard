@@ -138,6 +138,8 @@
 </div>
 
 <% if merge_requests.any? %>
+  <% any_milestones = merge_requests.any? { |mr| mr.milestone&.title&.present? } %>
+
   <table class="table table-hover mb-0">
     <caption>
       <div class="d-flex justify-content-between align-items-baseline">
@@ -157,6 +159,9 @@
         <th scope="col">Updated</th>
         <th scope="col">Workflow Labels</th>
         <th scope="col">Title</th>
+        <% if any_milestones %>
+          <th scope="col" class="text-end">Milestone</th>
+        <% end %>
         <th scope="col">
           Associated Issue
           <%= tag.i(
@@ -227,6 +232,15 @@
               target_branch: mr.targetBranch %>
             </div>
           </td>
+          <% if any_milestones %>
+            <!-- Milestone -->
+            <td class="text-end">
+              <% milestone_mismatch = mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title) %>
+              <% milestone_class = milestone_mismatch ? "text-warning" : nil %>
+
+              <%= tag.span mr.milestone.title, class: milestone_class %>
+            </td>
+          <% end %>
           <!-- Associated Issue -->
           <td>
             <%= render("issue_link", issue: mr.issue) if mr.issue %>
