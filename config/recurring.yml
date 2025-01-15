@@ -11,6 +11,11 @@ production:
     queue: background
     args: []
     schedule: '* * * * *'
+  periodic_metrics_refresh:
+    class: SendMetricsJob
+    queue: background
+    args: []
+    schedule: '* * * * *'
   # periodic_command:
   #   command: "SoftDeletedRecord.due.delete_all"
   #   priority: 2
