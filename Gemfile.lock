@@ -295,6 +295,8 @@ GEM
     parser (3.3.6.0)
       ast (~> 2.4.1)
       racc
+    prometheus_exporter (2.2.0)
+      webrick
     propshaft (1.1.0)
       actionpack (>= 7.0.0)
       activesupport (>= 7.0.0)
@@ -535,6 +537,7 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
+    webrick (1.9.1)
     websocket (1.2.11)
     websocket-driver (0.7.7)
       base64
@@ -582,6 +585,7 @@ DEPENDENCIES
   lefthook
   local_time (~> 3.0)
   mission_control-jobs
+  prometheus_exporter
   propshaft
   puma (>= 5.0)
   rails (~> 8.0.0)

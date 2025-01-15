@@ -41,3 +41,9 @@ plugin :honeybadger
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
+
+require "prometheus_exporter/instrumentation"
+PrometheusExporter::Instrumentation::ActiveRecord.start(
+  custom_labels: {type: "puma_single_mode"}, # optional params
+  config_labels: [:database, :host] # optional params
+)

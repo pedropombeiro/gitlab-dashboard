@@ -103,3 +103,5 @@ gem "honeybadger", "~> 5.26"
 gem "gemoji", "~> 4.1"
 
 gem "retries", "~> 0.0.5"
+
+gem "prometheus_exporter"
