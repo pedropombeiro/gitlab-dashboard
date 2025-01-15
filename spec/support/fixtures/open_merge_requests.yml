@@ -10,6 +10,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173741"
             sourceBranch: pedropombeiro/503315/cleanup-code
             targetBranch: master
@@ -134,6 +136,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!174004"
             sourceBranch: pedropombeiro/446287/fix-flaky-test
             targetBranch: master
@@ -262,6 +266,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173789"
             sourceBranch: pedropombeiro/506226/create-audit-event-per-project
             targetBranch: master
@@ -387,6 +393,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173874"
             sourceBranch: pedropombeiro/481411/fix-flaky-test
             targetBranch: master
@@ -520,6 +528,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173916"
             sourceBranch: pedropombeiro/503315/log-last-contacted-time
             targetBranch: master
@@ -646,6 +656,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173886"
             sourceBranch: pedropombeiro/503315/1-add-bulk-delete-runner-audit-event
             targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
@@ -768,6 +780,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173885"
             sourceBranch: pedropombeiro/506385/add-create-runner-audit-event
             targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
@@ -892,6 +906,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173639"
             sourceBranch: pedropombeiro/503315/0-fix-runner-audit-events
             targetBranch: master
@@ -1012,6 +1028,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!171848"
             sourceBranch: pedropombeiro/502403/recreate-fk-from-partitioned-ci_runner_managers-to-ci_runners
             targetBranch: master
@@ -1139,6 +1157,8 @@ one:
               fullPath: gitlab-org/gitlab
               webUrl: https://gitlab.com/gitlab-org/gitlab
               avatarUrl: https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png
+            milestone:
+              title: "17.7"
             reference: "!173007"
             sourceBranch: pedropombeiro/472974/save-taggings-to-ci_runner_taggings
             targetBranch: master

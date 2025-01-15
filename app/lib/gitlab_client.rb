@@ -80,6 +80,9 @@ class GitlabClient
         webUrl
         avatarUrl
       }
+      milestone {
+        title
+      }
       reference
       sourceBranch
       targetBranch
@@ -119,6 +122,9 @@ class GitlabClient
             webUrl
             titleHtml
             state
+            milestone {
+              title
+            }
             labels {
               nodes { ...#{name}::CoreLabelFragment }
             }
