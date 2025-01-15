@@ -70,18 +70,6 @@ class GitlabClient
     }
   GRAPHQL
 
-  CoreIssueFragment = Client.parse <<-GRAPHQL
-    fragment on Issue {
-      iid
-      webUrl
-      titleHtml
-      state
-      labels {
-        nodes { ...#{name}::CoreLabelFragment }
-      }
-    }
-  GRAPHQL
-
   CoreMergeRequestFragment = Client.parse <<-GRAPHQL
     fragment on MergeRequest {
       iid
@@ -126,7 +114,15 @@ class GitlabClient
     query($projectFullPath: ID!, $issueIids: [String!]) {
       project(fullPath: $projectFullPath) {
         issues(iids: $issueIids) {
-          nodes { ...#{name}::CoreIssueFragment }
+          nodes {
+            iid
+            webUrl
+            titleHtml
+            state
+            labels {
+              nodes { ...#{name}::CoreLabelFragment }
+            }
+          }
         }
       }
     }
