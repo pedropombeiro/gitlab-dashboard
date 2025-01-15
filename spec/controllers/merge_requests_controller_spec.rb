@@ -429,7 +429,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%r{10 merge requests,\s+open\s+for\s+an\s+average\s+of\s+<span>\s+about 12 hours})
 
             # Squash MR
-            expect(response.body).to include(%(fa-solid fa-angles-down))
+            expect(response.body).to include(%(bi bi-chevron-bar-down))
             # Unreviewed icon
             expect(response.body).to include(%(fa-solid fa-hourglass-start))
             # Reviewed icon
