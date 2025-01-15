@@ -235,10 +235,13 @@
           <% if any_milestones %>
             <!-- Milestone -->
             <td class="text-end">
-              <% milestone_mismatch = mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title) %>
-              <% milestone_class = milestone_mismatch ? "text-warning" : nil %>
+              <% if mr.milestone %>
+                <% milestone_mismatch =
+                  mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title) %>
+                <% milestone_class = milestone_mismatch ? "text-warning" : nil %>
 
-              <%= tag.span mr.milestone.title, class: milestone_class %>
+                <%= tag.span mr.milestone.title, class: milestone_class %>
+              <% end %>
             </td>
           <% end %>
           <!-- Associated Issue -->
