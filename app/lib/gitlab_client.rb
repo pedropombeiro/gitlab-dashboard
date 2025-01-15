@@ -110,6 +110,16 @@ class GitlabClient
     end
   end
 
+  def fetch_project_version(project_web_url)
+    res = %w[master main].find do |branch|
+      uri = project_version_file_uri(project_web_url, branch)
+      res = Net::HTTP.get_response(uri)
+      break res unless res.is_a?(Net::HTTPNotFound)
+    end
+
+    res.body.strip.delete_suffix("-pre") if res.is_a?(Net::HTTPSuccess)
+  end
+
   private
 
   GRAPHQL_RETRIABLE_ERRORS = [
@@ -378,6 +388,10 @@ class GitlabClient
         request_duration: request_duration.round(1)
       )
     end
+  end
+
+  def project_version_file_uri(project_web_url, branch)
+    URI("#{project_web_url}/-/raw/#{branch}/VERSION")
   end
 
   def make_serializable(obj)

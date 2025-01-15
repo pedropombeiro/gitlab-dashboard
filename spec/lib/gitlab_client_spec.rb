@@ -208,6 +208,48 @@ RSpec.describe GitlabClient do
     end
   end
 
+  describe "#fetch_project_version" do
+    let(:project_web_url) { "https://gitlab.com/gitlab-org/gitlab" }
+    let(:branch) { "master" }
+
+    subject(:fetch_project_version) do
+      client.fetch_project_version(project_web_url)
+    end
+
+    context "when master branch exists" do
+      before do
+        stub_request(:get, "#{project_web_url}/-/raw/master/VERSION")
+          .to_return(body: "17.7.0-pre")
+      end
+
+      it "returns contents from VERSION file from master branch" do
+        is_expected.to eq("17.7.0")
+      end
+    end
+
+    context "when master branch does not exist" do
+      before do
+        stub_request(:get, "#{project_web_url}/-/raw/master/VERSION")
+          .to_return(status: 404)
+        stub_request(:get, "#{project_web_url}/-/raw/main/VERSION")
+          .to_return(body: "17.7.0-pre")
+      end
+
+      it "returns contents from VERSION file from main branch" do
+        is_expected.to eq("17.7.0")
+      end
+    end
+
+    context "when VERSION file does not exist" do
+      before do
+        stub_request(:get, %r{#{project_web_url}/-/raw/\w+/VERSION})
+          .to_return(status: 404)
+      end
+
+      it { is_expected.to be_nil }
+    end
+  end
+
   private
 
   def openstruct_to_hash(object, hash = {})

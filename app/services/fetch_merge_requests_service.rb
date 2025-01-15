@@ -24,7 +24,11 @@ class FetchMergeRequestsService
         case type
         when :open
           gitlab_client.fetch_open_merge_requests(author).tap do |response|
-            merge_requests_from_response(response.response.data, type).then { |mrs| fill_reviewers_info(mrs) }
+            merge_requests_from_response(response.response.data, type)
+              .tap do |mrs|
+                fill_reviewers_info(mrs)
+                fill_project_milestone(mrs)
+              end
           end
         when :merged
           gitlab_client.fetch_merged_merge_requests(author)
@@ -80,6 +84,28 @@ class FetchMergeRequestsService
     Rails.cache.fetch(self.class.project_issues_cache_key(issue_iids), expires_in: MergeRequestsCacheService.cache_validity) do
       gitlab_client.fetch_issues(issue_iids)
     end.response&.data&.compact.to_h { |issue| [issue.iid, issue] }
+  end
+
+  def fill_project_milestone(open_merge_requests)
+    project_full_paths = open_merge_requests.filter_map { |mr| mr.project.webUrl }.uniq
+
+    project_versions = Sync do |task|
+      project_full_paths.map do |project_full_path|
+        task.async do
+          Rails.cache.fetch(self.class.project_version_cache_key(project_full_path), expires_in: 6.hours) do
+            gitlab_client.fetch_project_version(project_full_path).tap do |v|
+              Rails.logger.info "#{project_full_path} = #{v}"
+            end
+          end
+        end
+      end.map(&:wait)
+    end
+
+    project_versions_hash = project_full_paths.zip(project_versions).to_h
+
+    open_merge_requests.flat_map { |mr| mr.project }.each do |project|
+      project[:version] = project_versions_hash[project.webUrl]
+    end
   end
 
   def fill_reviewers_info(open_merge_requests)

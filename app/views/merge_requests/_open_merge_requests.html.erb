@@ -225,11 +225,16 @@
             <!-- Milestone -->
             <td class="text-end">
               <% if mr.milestone %>
-                <% milestone_mismatch =
-                  mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title) %>
-                <% milestone_class = milestone_mismatch ? "text-warning" : nil %>
-
-                <%= tag.span mr.milestone.title, class: milestone_class %>
+                <% div_class = milestone_class(mr) %>
+                <%= tag.div class: div_class,
+                    data: {
+                      bs_toggle: "tooltip",
+                      bs_title: milestone_mismatch_tooltip(mr),
+                    } do %>
+                  <%= tag.i(class: %w[small fa-solid fa-circle-info]) if div_class %>
+                  <%= tag.i(class: %w[small bi bi-diamond]) %>
+                  <%= tag.span mr.milestone.title %>
+                <% end %>
               <% end %>
             </td>
           <% end %>

@@ -34,6 +34,10 @@ module CacheConcern
       "#{REDIS_NAMESPACE}/reviewer_info/#{reviewer_info_version}/#{user_hash(username)}"
     end
 
+    def project_version_cache_key(project_full_path)
+      "#{REDIS_NAMESPACE}/project_version/#{calculate_hash(project_full_path)}"
+    end
+
     def authored_mr_lists_cache_key(user, type)
       "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/authored_#{type}_list/#{user_hash(user)}"
     end

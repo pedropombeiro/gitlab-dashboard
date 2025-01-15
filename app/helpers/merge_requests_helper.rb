@@ -25,6 +25,26 @@ module MergeRequestsHelper
     ]
   end
 
+  def milestone_class(mr)
+    return unless mr.milestone
+
+    milestone_mismatch = mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title)
+    milestone_mismatch ||= mr.project.version && !mr.project.version.start_with?(mr.milestone.title)
+    milestone_mismatch ? "text-warning" : nil
+  end
+
+  def milestone_mismatch_tooltip(mr)
+    return unless mr.milestone
+
+    if mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title)
+      return "Merge request is assigned to #{mr.milestone.title} but issue is assigned to #{mr.issue&.milestone&.title}"
+    end
+
+    if mr.project.version && !mr.project.version.start_with?(mr.milestone.title)
+      "Merge request is assigned to #{mr.milestone.title} but the active milestone for the project is #{mr.project.version}"
+    end
+  end
+
   def user_emojis(user_status)
     return unless user_status
 
