@@ -163,7 +163,7 @@
           <th scope="col" class="text-end">Milestone</th>
         <% end %>
         <th scope="col">
-          Associated Issue
+          Issue
           <%= tag.i(
             class: %w[small bi bi-info-circle],
             data: {
@@ -248,7 +248,7 @@
               <% end %>
             </td>
           <% end %>
-          <!-- Associated Issue -->
+          <!-- Issue -->
           <td>
             <%= render("issue_link", issue: mr.issue) if mr.issue %>
           </td>

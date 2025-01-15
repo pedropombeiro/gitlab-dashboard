@@ -75,7 +75,7 @@
         <th scope="col" class="text-center"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
           Reviewers</th>
         <th scope="col">
-          Associated Issue
+          Issue
           <%= tag.i(
             class: %w[small bi bi-info-circle],
             data: {
@@ -300,7 +300,7 @@
               as: :reviewer,
             ) || tag.span("Not assigned", class: "text-warning") %>
           </td>
-          <!-- Associated Issue -->
+          <!-- Issue -->
           <td scope="row">
             <%= render("issue_link", issue: mr.issue) if mr.issue %>
           </td>
