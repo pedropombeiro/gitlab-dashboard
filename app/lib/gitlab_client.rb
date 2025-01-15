@@ -25,6 +25,100 @@ class GitlabClient
     allow_dynamic_queries: false
   )
 
+  def make_full_url(path)
+    return path if path.nil? || path.start_with?("http")
+
+    "#{self.class.gitlab_instance_url}#{path}"
+  end
+
+  def fetch_user(username, format: :open_struct)
+    return format_response(format) { execute_query(UserQuery, username: username) } if username.present?
+
+    format_response(format) { execute_query(CurrentUserQuery) }
+  end
+
+  def fetch_reviewer(username, format: :open_struct)
+    format_response(format) do
+      execute_query(ReviewerQuery, reviewer: username, activeReviewsAfter: ACTIVE_REVIEWS_AGE_LIMIT.ago)
+    end
+  end
+
+  def fetch_open_merge_requests(author, format: :open_struct)
+    format_response(format) do
+      execute_query(OpenMergeRequestsQuery, author: author, updatedAfter: OPEN_MERGE_REQUESTS_MIN_ACTIVITY.ago)
+    end
+  end
+
+  def fetch_merged_merge_requests(author, format: :open_struct)
+    format_response(format) do
+      execute_query(MergedMergeRequestsQuery, author: author, mergedAfter: 1.week.ago)
+    end
+  end
+
+  def fetch_monthly_merged_merge_requests(author, format: :open_struct)
+    format_response(format) do
+      Sync do |task|
+        12.times.map do |offset|
+          bom = offset.months.ago.beginning_of_month.to_date
+          eom = bom.next_month
+
+          task.async do
+            execute_query(
+              MonthlyMergeRequestsQuery,
+              author: author,
+              mergedAfter: bom.to_fs,
+              mergedBefore: eom.to_fs
+            )
+          end
+        end.map(&:wait)
+      end
+    end.tap do |aggregate|
+      next unless format == :open_struct
+
+      user = OpenStruct.new
+      aggregate.response.each_with_index do |monthly_result, offset|
+        user["monthlyMergedMergeRequests#{offset}"] = monthly_result.data.user.delete_field!("monthlyMergedMergeRequests")
+      end
+
+      aggregate.response = OpenStruct.new(data: OpenStruct.new(user: user))
+    end
+  end
+
+  # Fetches a list of issues given a lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
+  def fetch_issues(issue_iids, format: :open_struct)
+    issue_iids = issue_iids.filter { |h| h[:issue_iid] }.uniq
+    project_full_paths = issue_iids.pluck(:project_full_path).uniq
+
+    format_response(format) do
+      Sync do |task|
+        project_full_paths.map do |project_full_path|
+          task.async do
+            execute_query(
+              ProjectIssuesQuery,
+              projectFullPath: project_full_path,
+              issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
+            )
+          end
+        end.map(&:wait)
+      end
+    end.tap do |aggregate|
+      next unless format == :open_struct
+
+      aggregate.response = OpenStruct.new(
+        data: aggregate.response.flat_map { |project_response| project_response.data.project&.issues&.nodes }
+      )
+    end
+  end
+
+  private
+
+  GRAPHQL_RETRIABLE_ERRORS = [
+    Faraday::SSLError,
+    Graphlient::Errors::ConnectionFailedError,
+    Graphlient::Errors::FaradayServerError,
+    Graphlient::Errors::TimeoutError
+  ]
+
   # rubocop:disable Style/RedundantHeredocDelimiterQuotes -- we want to ensure we don't use interpolation
   CoreUserFragment = Client.parse <<-'GRAPHQL'
     fragment on User {
@@ -262,100 +356,6 @@ class GitlabClient
     }
   GRAPHQL
   # rubocop:enable Style/RedundantHeredocDelimiterQuotes
-
-  def make_full_url(path)
-    return path if path.nil? || path.start_with?("http")
-
-    "#{self.class.gitlab_instance_url}#{path}"
-  end
-
-  def fetch_user(username, format: :open_struct)
-    return format_response(format) { execute_query(UserQuery, username: username) } if username.present?
-
-    format_response(format) { execute_query(CurrentUserQuery) }
-  end
-
-  def fetch_reviewer(username, format: :open_struct)
-    format_response(format) do
-      execute_query(ReviewerQuery, reviewer: username, activeReviewsAfter: ACTIVE_REVIEWS_AGE_LIMIT.ago)
-    end
-  end
-
-  def fetch_open_merge_requests(author, format: :open_struct)
-    format_response(format) do
-      execute_query(OpenMergeRequestsQuery, author: author, updatedAfter: OPEN_MERGE_REQUESTS_MIN_ACTIVITY.ago)
-    end
-  end
-
-  def fetch_merged_merge_requests(author, format: :open_struct)
-    format_response(format) do
-      execute_query(MergedMergeRequestsQuery, author: author, mergedAfter: 1.week.ago)
-    end
-  end
-
-  def fetch_monthly_merged_merge_requests(author, format: :open_struct)
-    format_response(format) do
-      Sync do |task|
-        12.times.map do |offset|
-          bom = offset.months.ago.beginning_of_month.to_date
-          eom = bom.next_month
-
-          task.async do
-            execute_query(
-              MonthlyMergeRequestsQuery,
-              author: author,
-              mergedAfter: bom.to_fs,
-              mergedBefore: eom.to_fs
-            )
-          end
-        end.map(&:wait)
-      end
-    end.tap do |aggregate|
-      next unless format == :open_struct
-
-      user = OpenStruct.new
-      aggregate.response.each_with_index do |monthly_result, offset|
-        user["monthlyMergedMergeRequests#{offset}"] = monthly_result.data.user.delete_field!("monthlyMergedMergeRequests")
-      end
-
-      aggregate.response = OpenStruct.new(data: OpenStruct.new(user: user))
-    end
-  end
-
-  # Fetches a list of issues given a lists of MRs, represented by a hash of { project_full_path:, issue_iid: }
-  def fetch_issues(issue_iids, format: :open_struct)
-    issue_iids = issue_iids.filter { |h| h[:issue_iid] }.uniq
-    project_full_paths = issue_iids.pluck(:project_full_path).uniq
-
-    format_response(format) do
-      Sync do |task|
-        project_full_paths.map do |project_full_path|
-          task.async do
-            execute_query(
-              ProjectIssuesQuery,
-              projectFullPath: project_full_path,
-              issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
-            )
-          end
-        end.map(&:wait)
-      end
-    end.tap do |aggregate|
-      next unless format == :open_struct
-
-      aggregate.response = OpenStruct.new(
-        data: aggregate.response.flat_map { |project_response| project_response.data.project&.issues&.nodes }
-      )
-    end
-  end
-
-  private
-
-  GRAPHQL_RETRIABLE_ERRORS = [
-    Faraday::SSLError,
-    Graphlient::Errors::ConnectionFailedError,
-    Graphlient::Errors::FaradayServerError,
-    Graphlient::Errors::TimeoutError
-  ]
 
   def execute_query(query, **args)
     Rails.logger.debug { %(Executing #{query.operation_name} GraphQL query (args: #{args})...) }
