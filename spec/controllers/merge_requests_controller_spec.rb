@@ -315,6 +315,10 @@ RSpec.describe MergeRequestsController, type: :controller do
           .to_return_json(body: issues["project_0"])
       end
 
+      let!(:project_version_request_stub) do
+        stub_request(:get, "https://gitlab.com/gitlab-org/gitlab/-/raw/master/VERSION").to_return(body: "17.8.0-pre\n")
+      end
+
       it_behaves_like "a request updating current_user"
 
       context "when user exists" do

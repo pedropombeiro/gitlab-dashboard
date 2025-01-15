@@ -9,7 +9,10 @@ data: {
 } %>
 
 <% if issue.milestone %>
-  <%= tag.span "(#{issue.milestone.title})" %>
+  <%= tag.nobr class: "small" do %>
+    <%= tag.i(class: %w[small bi bi-diamond]) %>
+    <%= tag.span issue.milestone.title %>
+  <% end %>
 <% end %>
 
 <div>
