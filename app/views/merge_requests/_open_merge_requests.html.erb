@@ -95,7 +95,7 @@
 
     <tbody>
       <% merge_requests.each do |mr| %>
-        <%= tag.tr(class: mr.detailedMergeStatus == "BLOCKED_STATUS" ? "opacity-50" : nil) do %>
+        <%= tag.tr(class: mr.blocked ? "opacity-50" : nil) do %>
           <!-- MR ID -->
           <th scope="row">
             <%= render "mr_relation", merge_request: mr %>
@@ -120,20 +120,18 @@
               title: mr.mergeStatusLabel,
               class: ["bg-#{mr.bootstrapClass[:mergeStatus]}"],
             ) %>
-            <% if mr.blockingMergeRequests&.visibleMergeRequests %>
-              <% open_blockers =
-                mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
-                  blocker.state == "opened"
-                end %>
+            <% open_blockers =
+              mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
+                blocker.state == "opened"
+              end %>
 
-              <% if open_blockers.any? %>
-                <%= render "shared/abbr_with_title",
-                content: tag.i(class: %w[fa-solid fa-road-barrier]),
-                class: "text-danger",
-                title:
-                  "This MR is blocked by #{pluralize(open_blockers.count, "merge request")}: " \
-                    "#{open_blockers.map { |mr| "!#{mr.iid}" }.join(", ")}" %>
-              <% end %>
+            <% if open_blockers&.any? %>
+              <%= render "shared/abbr_with_title",
+              content: tag.i(class: %w[fa-solid fa-road-barrier]),
+              class: "text-danger",
+              title:
+                "This MR is blocked by #{pluralize(open_blockers.count, "merge request")}: " \
+                  "#{open_blockers.map { |mr| "!#{mr.iid}" }.join(", ")}" %>
             <% end %>
           </td>
           <!-- Pipeline -->
@@ -226,7 +224,8 @@
           <% if any_milestones %>
             <!-- Milestone -->
             <td class="text-end">
-              <% milestone_mismatch = mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title) %>
+              <% milestone_mismatch =
+                mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title) %>
               <% milestone_class = milestone_mismatch ? "text-warning" : nil %>
 
               <%= tag.span mr.milestone.title, class: milestone_class %>

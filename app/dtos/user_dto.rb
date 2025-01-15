@@ -133,6 +133,10 @@ class UserDto
       end
 
       mr.mergeStatusLabel = open_merge_request_status_label(mr)
+      mr.blocked =
+        mr.detailedMergeStatus == "BLOCKED_STATUS" ||
+        mr.blockingMergeRequests.visibleMergeRequests.any? { |blocker_mr| blocker_mr.state == "opened" }
+
       mr.labels.nodes.each { |label| label.bootstrapClass = [] } # Use label's predefined colors
 
       mr.reviewers.nodes.delete_if(&:bot)
