@@ -3,7 +3,7 @@ class GitlabUser < ApplicationRecord
 
   scope :recently_active, -> { where(contacted_at: 4.hours.ago..) }
   scope :recent, -> { where(contacted_at: 1.day.ago..) }
-  scope :active, -> { where(contacted_at: CacheConcern::MR_CACHE_VALIDITY.ago..) }
+  scope :active, -> { where(contacted_at: 30.minutes.ago..) }
   scope :order_by_contacted_at_desc, -> { order(contacted_at: :desc) }
 
   class << self
