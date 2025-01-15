@@ -57,7 +57,7 @@
         },
       ) do %>
         <%= pluralize(number_with_delimiter(merge_requests.count), "merge request") %>
-        <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+        <%= tag.i(class: %w[small bi bi-info-circle]) %>
         <%= merge_rate_ok ? "↗" : "↘" %>
       <% end %>
       merged in the last week
@@ -76,7 +76,7 @@
           },
         ) do %>
           <%= distance_of_time_in_words(avg_time_to_merge) %>
-          <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+          <%= tag.i(class: %w[small bi bi-info-circle]) %>
           <%= merge_time_ok ? "↘" : "↗" %>
         <% end %>
       </div>
@@ -110,7 +110,7 @@
           ) do %>
             <%= monthly_merge_rate.round -%>
             per month
-            <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+            <%= tag.i(class: %w[small bi bi-info-circle]) %>
           <% end %>
         <% end %>
       </div>
@@ -129,7 +129,7 @@
             },
           ) do %>
             <%= distance_of_time_in_words(overall_avg_time_to_merge) %>
-            <%= tag.i(class: %w[small fa-solid fa-circle-info]) %>
+            <%= tag.i(class: %w[small bi bi-info-circle]) %>
           <% end %>
         </div>
       <% end %>
@@ -165,7 +165,7 @@
         <th scope="col">
           Associated Issue
           <%= tag.i(
-            class: %w[small fa-solid fa-circle-info],
+            class: %w[small bi bi-info-circle],
             data: {
               bs_toggle: "tooltip",
               bs_title: "Issue number is extracted from branch name, if present",
@@ -242,7 +242,7 @@
                       bs_toggle: "tooltip",
                       bs_title: milestone_mismatch_tooltip(mr),
                     } do %>
-                  <%= tag.i(class: %w[small fa-solid fa-circle-info]) if div_class %>
+                  <%= tag.i(class: %w[small bi bi-info-circle]) if div_class %>
                   <%= tag.i(class: %w[small bi bi-diamond]) %>
                   <%= tag.span mr.milestone.title %>
                 <% end %>

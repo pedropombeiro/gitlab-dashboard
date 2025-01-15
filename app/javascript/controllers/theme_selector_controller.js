@@ -20,10 +20,10 @@ export default class extends Controller {
 
     if (isDark) {
       this.element.setAttribute("data-bs-theme", "dark");
-      this.buttonTarget.innerHTML = '<i class="fa-regular fa-moon"></i>';
+      this.buttonTarget.innerHTML = '<i class="bi bi-moon-fill"></i>';
     } else {
       this.element.setAttribute("data-bs-theme", "light");
-      this.buttonTarget.innerHTML = '<i class="fa-regular fa-sun"></i>';
+      this.buttonTarget.innerHTML = '<i class="bi bi-sun-fill"></i>';
     }
   }
 

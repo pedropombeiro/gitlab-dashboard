@@ -28,7 +28,7 @@
               },
             ) do -%>
               <%= distance_of_time_in_words(avg_open_time) -%>
-              <%= tag.i(class: %w[small fa-solid fa-circle-info]) unless merge_time_ok -%>
+              <%= tag.i(class: %w[small bi bi-info-circle]) unless merge_time_ok -%>
             <% end %>
           <% end %>
         </div>
@@ -46,13 +46,7 @@
         <th scope="col">Updated&nbsp;↓</th>
         <th scope="col">Status</th>
         <th scope="col" class="text-center">
-          <%= tag.i(
-            class: %w[fa-solid fa-timeline],
-            data: {
-              bs_toggle: "tooltip",
-              bs_title: "Pipeline Status",
-            },
-          ) %>
+          Pipeline
         </th>
         <th scope="col">Title</th>
         <% if any_milestones %>
@@ -83,7 +77,7 @@
         <th scope="col">
           Associated Issue
           <%= tag.i(
-            class: %w[small fa-solid fa-circle-info],
+            class: %w[small bi bi-info-circle],
             data: {
               bs_toggle: "tooltip",
               bs_title: "Issue number is extracted from branch name, if present",
@@ -167,7 +161,7 @@
                 <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
                   <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", class: "text-decoration-none") do %>
                     <%= render "shared/abbr_with_title",
-                    content: tag.i(class: %w[fa-solid fa-triangle-exclamation]),
+                    content: tag.i(class: %w[bi bi-exclamation-triangle-fill]),
                     title: pipeline_failure_summary(pipeline),
                     class: "text-warning",
                     data: {
@@ -231,7 +225,7 @@
                       bs_toggle: "tooltip",
                       bs_title: milestone_mismatch_tooltip(mr),
                     } do %>
-                  <%= tag.i(class: %w[small fa-solid fa-circle-info]) if div_class %>
+                  <%= tag.i(class: %w[small bi bi-info-circle]) if div_class %>
                   <%= tag.i(class: %w[small bi bi-diamond]) %>
                   <%= tag.span mr.milestone.title %>
                 <% end %>
@@ -254,7 +248,7 @@
             </div>
             <% if mr.squashOnMerge %>
               <%= render "shared/abbr_with_title",
-              content: tag.i(class: %w[align-middle fa-solid fa-angles-down]),
+              content: tag.i(class: %w[align-middle bi bi-chevron-bar-down]),
               title: "MR set to squash on merge",
               class: "text-info" %>
             <% end %>
@@ -264,7 +258,7 @@
             <td class="text-center">
               <% if mr.conflicts %>
                 <%= render "shared/abbr_with_title",
-                content: tag.i(class: %w[fa-solid fa-burst]),
+                content: tag.i(class: %w[bi bi-exclamation-diamond-fill]),
                 class: "align-middle text-danger",
                 title: "MR branch has conflicts and should be rebased" %>
               <% end %>
