@@ -15,7 +15,7 @@ production:
     class: SendMetricsJob
     queue: background
     args: []
-    schedule: '* * * * *'
+    schedule: '*/5 * * * *'
   # periodic_command:
   #   command: "SoftDeletedRecord.due.delete_all"
   #   priority: 2
