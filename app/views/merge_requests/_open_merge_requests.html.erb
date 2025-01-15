@@ -226,8 +226,7 @@
                       bs_title: milestone_mismatch_tooltip(mr),
                     } do %>
                   <%= tag.i(class: %w[small bi bi-info-circle]) if div_class %>
-                  <%= tag.i(class: %w[small bi bi-diamond]) %>
-                  <%= tag.span mr.milestone.title %>
+                  <%= render("milestone", milestone: mr.milestone) %>
                 <% end %>
               <% end %>
             </td>

@@ -8,12 +8,9 @@ data: {
   bs_title: issue.titleHtml,
 } %>
 
-<% if issue.milestone %>
-  <%= tag.nobr class: "small" do %>
-    <%= tag.i(class: %w[small bi bi-diamond]) %>
-    <%= tag.span issue.milestone.title %>
-  <% end %>
-<% end %>
+<span class="small">
+  <%= render("milestone", milestone: issue.milestone) %>
+</span>
 
 <div>
   <%= render partial: "gitlab_label",
