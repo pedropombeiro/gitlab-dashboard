@@ -24,7 +24,9 @@ class GenerateNotificationsService
     cache_service.write(author_user.username, type, response) if response.errors.nil?
 
     dto = fetch_service.parse_dto(response, type)
-    check_changes(previous_dto, dto) if dto.errors.blank? && author_user.web_push_subscriptions.any?
+    if dto.errors.blank? && author_user.web_push_subscriptions.any?
+      check_changes(previous_dto, dto, response.next_scheduled_update_at)
+    end
 
     [response, dto]
   end
@@ -37,7 +39,7 @@ class GenerateNotificationsService
     @cache_service ||= MergeRequestsCacheService.new
   end
 
-  def check_changes(previous_dto, dto)
+  def check_changes(previous_dto, dto, next_scheduled_update_at)
     notifications = ComputeMergeRequestChangesService.new(type, previous_dto, dto).execute
     if notifications.pluck(:type).include?(:merge_request_merged)
       # Clear monthly MR count cache if an MR has been merged
@@ -49,13 +51,13 @@ class GenerateNotificationsService
       when :open
         cache_key = self.class.authored_mr_lists_cache_key(author_user.username, :merged)
         merged_response = Rails.cache.read(cache_key)
-        if merged_response && merged_response.next_scheduled_update_at > response.next_scheduled_update_at
+        if merged_response && merged_response.next_scheduled_update_at > next_scheduled_update_at
           Rails.cache.delete(cache_key)
         end
       when :merged
         cache_key = self.class.authored_mr_lists_cache_key(author_user.username, :open)
         open_response = Rails.cache.read(cache_key)
-        if open_response && open_response.next_scheduled_update_at > response.next_scheduled_update_at
+        if open_response && open_response.next_scheduled_update_at > next_scheduled_update_at
           Rails.cache.delete(cache_key)
         end
       end
