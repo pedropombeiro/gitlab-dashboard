@@ -92,7 +92,7 @@ class FetchMergeRequestsService
     project_versions = Sync do |task|
       project_full_paths.map do |project_full_path|
         task.async do
-          Rails.cache.fetch(self.class.project_version_cache_key(project_full_path), expires_in: 6.hours) do
+          Rails.cache.fetch(self.class.project_version_cache_key(project_full_path), expires_in: PROJECT_VERSION_VALIDITY) do
             gitlab_client.fetch_project_version(project_full_path).tap do |v|
               Rails.logger.info "#{project_full_path} = #{v}"
             end
