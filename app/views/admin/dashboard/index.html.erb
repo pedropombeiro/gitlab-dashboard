@@ -27,6 +27,12 @@
 
         <%= tag.tr do %>
           <%= tag.th scope: "row" do %>
+            <%= if user.contacted_at&.after?(30.minutes.ago)
+              tag.span class: "spinner-grow spinner-grow-sm text-success",
+                       aria: {
+                         hidden: "true",
+                       }
+            end %>
             <%= link_to user.username,
             merge_requests_path(author: user.username, referrer: request.fullpath),
             class: fg_class %>
