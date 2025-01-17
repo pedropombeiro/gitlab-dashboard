@@ -140,6 +140,7 @@
                 <%= tag.span(class: %W[badge badge-pill bg-#{mr.bootstrapClass[:pipeline]}]) do %>
                   <%= link_to pipeline_status(pipeline) || "??",
                   pipeline_web_url(pipeline),
+                  escape: false,
                   class: "text-light",
                   target: "_blank",
                   **(
