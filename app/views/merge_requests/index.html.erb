@@ -2,7 +2,7 @@
   Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
 <% if vapid_public_key.present? %>
   <%= tag.meta name: "web_push_public_key",
-           content: Base64.urlsafe_decode64(vapid_public_key).bytes %>
+           content: Base64.urlsafe_decode64(vapid_public_key).bytes.to_s %>
 <% end %>
 
 <%= tag.div class: "container-fluid m-0 p-0", data: {
