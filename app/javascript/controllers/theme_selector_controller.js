@@ -12,7 +12,7 @@ export default class extends Controller {
   }
 
   refreshTheme() {
-    if (this.element === null || this.buttonTarget === null) {
+    if (this.element === null) {
       return;
     }
 
@@ -20,10 +20,14 @@ export default class extends Controller {
 
     if (isDark) {
       this.element.setAttribute("data-bs-theme", "dark");
-      this.buttonTarget.innerHTML = '<i class="bi bi-moon-fill"></i>';
+      if (this.hasButtonTarget) {
+        this.buttonTarget.innerHTML = '<i class="bi bi-moon-fill"></i>';
+      }
     } else {
       this.element.setAttribute("data-bs-theme", "light");
-      this.buttonTarget.innerHTML = '<i class="bi bi-sun-fill"></i>';
+      if (this.hasButtonTarget) {
+        this.buttonTarget.innerHTML = '<i class="bi bi-sun-fill"></i>';
+      }
     }
   }
 
