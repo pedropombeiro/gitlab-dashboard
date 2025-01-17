@@ -20,6 +20,8 @@ class MergeRequestsController < MergeRequestsControllerBase
       redirect_to merge_requests_path(author: @user.username) and return
     end
 
+    handle_visit
+
     save_current_user(author) if safe_params.exclude?(:referrer)
 
     response = MergeRequestsCacheService.new.read(author, :open)
@@ -61,10 +63,23 @@ class MergeRequestsController < MergeRequestsControllerBase
     end.response.data.user
   end
 
+  def handle_visit
+    metric_source "custom_metrics"
+    metric_attributes(
+      username: author,
+      referrer: safe_params[:referrer],
+      path: request.path,
+      request_ip: request.remote_ip
+    )
+    increment_counter("user.visit")
+  end
+
   def handle_merge_requests_list(type)
     author = safe_params.expect(:author)
     user = graphql_user(author)
     render_404 and return unless user
+
+    handle_visit
 
     fetch_service = FetchMergeRequestsService.new(author)
     if safe_params.include?(:referrer)
