@@ -28,8 +28,9 @@ export default class extends Controller {
 
     document.addEventListener("visibilitychange", onVisibilityChange, false, { signal: this.controller.signal });
 
-    this.nextRefreshTimestamp = Date.now() + this.timeoutValue;
-    this.timeoutID = setTimeout(this.refresh.bind(this), this.timeoutValue);
+    timeoutValue = this.hasTimeoutValue ? this.timeoutValue : 60000;
+    this.nextRefreshTimestamp = Date.now() + timeoutValue;
+    this.timeoutID = setTimeout(this.refresh.bind(this), timeoutValue);
   }
 
   disconnect() {
@@ -45,9 +46,13 @@ export default class extends Controller {
       this.controller.abort();
     }
 
-    const element = document.getElementById(this.targetDomIdValue);
-    if (element) {
-      element.reload();
+    if (this.hasTargetDomIdValue) {
+      const element = document.getElementById(this.targetDomIdValue);
+      if (element) {
+        element.reload();
+      }
+    } else {
+      location.reload();
     }
   }
 }
