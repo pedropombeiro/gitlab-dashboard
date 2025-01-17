@@ -1,107 +1,112 @@
 <% content_for(:title) { "Admin Dashboard" } %>
 
-<div
-  data-controller="bootstrap-tooltip"
-  class="container my-3 shadow rounded p-4 bg-body bg-gradient text-body"
->
-  <table class="table table-hover">
-    <caption class="caption-top">
-      <%= pluralize(number_with_delimiter(@active_users.count), "user dashboard") %>
-      currently active, from a total of
-      <%= pluralize(number_with_delimiter(@users.count), "visited dashboard") %>
-    </caption>
+<%= tag.div data: {
+  controller: "auto-refresh",
+  auto_refresh_timeout_value: 30000
+} do %>
+  <div
+    data-controller="bootstrap-tooltip"
+    class="container my-3 shadow rounded p-4 bg-body bg-gradient text-body"
+  >
+    <table class="table table-hover">
+      <caption class="caption-top">
+        <%= pluralize(number_with_delimiter(@active_users.count), "user dashboard") %>
+        currently active, from a total of
+        <%= pluralize(number_with_delimiter(@users.count), "visited dashboard") %>
+      </caption>
 
-    <thead class="thead-dark">
-      <tr>
-        <th scope="col">User Handle</th>
-        <th scope="col">Created</th>
-        <th scope="col">Last Contacted ↓</th>
-        <th scope="col">Scheduled Update</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @recent_users.each do |user| %>
-        <% one_time_visitor =
-          user.contacted_at - user.created_at < CacheConcern::MR_CACHE_VALIDITY %>
-        <% fg_class = one_time_visitor ? %w[text-secondary] : nil %>
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col">User Handle</th>
+          <th scope="col">Created</th>
+          <th scope="col">Last Contacted ↓</th>
+          <th scope="col">Scheduled Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @recent_users.each do |user| %>
+          <% one_time_visitor =
+            user.contacted_at - user.created_at < CacheConcern::MR_CACHE_VALIDITY %>
+          <% fg_class = one_time_visitor ? %w[text-secondary] : nil %>
 
-        <%= tag.tr do %>
-          <%= tag.th scope: "row" do %>
-            <%= if user.contacted_at&.after?(30.minutes.ago)
-              tag.span class: "spinner-grow spinner-grow-sm text-success",
-                       aria: {
-                         hidden: "true",
-                       }
-            end %>
-            <%= link_to user.username,
-            merge_requests_path(author: user.username, referrer: request.fullpath),
-            class: fg_class %>
-            (<%= link_to "Profile",
-            "https://gitlab.com/#{user.username}",
-            class: fg_class,
-            target: "_blank" %>)
+          <%= tag.tr do %>
+            <%= tag.th scope: "row" do %>
+              <%= if user.contacted_at&.after?(30.minutes.ago)
+                tag.span class: "spinner-grow spinner-grow-sm text-success",
+                         aria: {
+                           hidden: "true",
+                         }
+              end %>
+              <%= link_to user.username,
+              merge_requests_path(author: user.username, referrer: request.fullpath),
+              class: fg_class %>
+              (<%= link_to "Profile",
+              "https://gitlab.com/#{user.username}",
+              class: fg_class,
+              target: "_blank" %>)
+            <% end %>
+            <%= tag.td class: fg_class do %>
+              <%= render "shared/relative_timestamp", timestamp: user.created_at %>
+            <% end %>
+            <%= tag.td class: fg_class do %>
+              <%= render "shared/relative_timestamp", timestamp: user.contacted_at %>
+            <% end %>
+            <%= tag.td class: fg_class do %>
+              <%= render "shared/relative_timestamp",
+              timestamp: user_cache_validity(user.username) %>
+            <% end %>
           <% end %>
-          <%= tag.td class: fg_class do %>
-            <%= render "shared/relative_timestamp", timestamp: user.created_at %>
-          <% end %>
-          <%= tag.td class: fg_class do %>
-            <%= render "shared/relative_timestamp", timestamp: user.contacted_at %>
-          <% end %>
-          <%= tag.td class: fg_class do %>
-            <%= render "shared/relative_timestamp",
-            timestamp: user_cache_validity(user.username) %>
-          <% end %>
-        <% end %>
 
-        <% if user.web_push_subscriptions.any? %>
-          <tr>
-            <td colspan="4" class="px-5">
-              <table class="table table-hover">
-                <caption class="caption-top">Web Push Subscriptions</caption>
+          <% if user.web_push_subscriptions.any? %>
+            <tr>
+              <td colspan="4" class="px-5">
+                <table class="table table-hover">
+                  <caption class="caption-top">Web Push Subscriptions</caption>
 
-                <thead class="thead-dark">
-                  <tr>
-                    <th scope="col">Created ↓</th>
-                    <th scope="col">Notified</th>
-                    <th scope="col">User Agent</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% user.web_push_subscriptions.each do |subscription| %>
+                  <thead class="thead-dark">
                     <tr>
-                      <td>
-                        <%= render "shared/relative_timestamp", timestamp: subscription.created_at %>
-                      </td>
-                      <td>
-                        <%= render "shared/relative_timestamp", timestamp: subscription.notified_at %>
-                      </td>
-                      <td>
-                        <%= tag.code subscription.user_agent %>
-                      </td>
+                      <th scope="col">Created ↓</th>
+                      <th scope="col">Notified</th>
+                      <th scope="col">User Agent</th>
                     </tr>
-                  <% end %>
-                </tbody>
-              </table>
-            </td>
-          </tr>
+                  </thead>
+                  <tbody>
+                    <% user.web_push_subscriptions.each do |subscription| %>
+                      <tr>
+                        <td>
+                          <%= render "shared/relative_timestamp", timestamp: subscription.created_at %>
+                        </td>
+                        <td>
+                          <%= render "shared/relative_timestamp", timestamp: subscription.notified_at %>
+                        </td>
+                        <td>
+                          <%= tag.code subscription.user_agent %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          <% end %>
         <% end %>
-      <% end %>
-    </tbody>
-  </table>
-</div>
-
-<div
-  data-controller="bootstrap-tooltip"
-  class="
-    container my-3 d-flex flex-row-reverse column-gap-3 align-items-baseline
-  "
->
-  <p class="lead">
-    Booted
-    <%= render "shared/relative_timestamp", timestamp: boot_timestamp %>
-  </p>
-
-  <div class="btn btn-secondary">
-    <%= link_to "Jobs", mission_control_jobs_path, class: "text-white" %>
+      </tbody>
+    </table>
   </div>
-</div>
+
+  <div
+    data-controller="bootstrap-tooltip"
+    class="
+      container my-3 d-flex flex-row-reverse column-gap-3 align-items-baseline
+    "
+  >
+    <p class="lead">
+      Booted
+      <%= render "shared/relative_timestamp", timestamp: boot_timestamp %>
+    </p>
+
+    <div class="btn btn-secondary">
+      <%= link_to "Jobs", mission_control_jobs_path, class: "text-white" %>
+    </div>
+  </div>
+<% end %>
