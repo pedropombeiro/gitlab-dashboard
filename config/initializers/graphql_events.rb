@@ -5,7 +5,7 @@ class GraphQLQueryEventPublisher
     name = event.payload[:operation_name].delete_prefix("GitlabClient__").delete_suffix("Query").underscore
 
     metric_source "graphql_metrics"
-    metric_attributes(name: name, **event.payload[:variables].slice("username"))
+    metric_attributes(name: name, **event.payload[:variables].slice("username", "fullPath"))
 
     increment_counter "graphql.query.count"
     histogram "graphql.query.duration", duration: event.duration
