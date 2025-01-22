@@ -43,10 +43,10 @@
             <%= emojify(reviewer.status&.message) %>
           </td>
           <!-- Local Hour -->
-          <td class="text-end">
-            <%= tag.div reviewer.timezone&.time_with_offset(Time.now.utc)&.to_fs(:time),
-                    class: reviewer.inWorkingHours ? nil : "text-secondary" %>
-          </td>
+          <%= tag.td class: (["text-end"] + (reviewer.inWorkingHours ? [nil] : ["text-secondary"]).compact) do %>
+            <%= tag.i(class: %W[fa-solid fa-moon]) unless reviewer.inWorkingHours %>
+            <%= tag.span reviewer.timezone&.time_with_offset(Time.now.utc)&.to_fs(:time) %>
+          <% end %>
           <!-- Requested MR reviews -->
           <td class="text-end">
             <% load_ok = reviewer.activeReviews.count < 3 %>
