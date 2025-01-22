@@ -28,10 +28,6 @@ class MergeRequestsController < MergeRequestsControllerBase
     fetch_service = FetchMergeRequestsService.new(author)
     @dto = fetch_service.parse_dto(response, :open)
 
-    metric_source "custom_metrics"
-    metric_attributes(username: author, referrer: safe_params[:referrer], request_ip: request.remote_ip)
-    increment_counter("user.visit")
-
     fresh_when(response)
   end
 
