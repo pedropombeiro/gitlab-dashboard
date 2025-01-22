@@ -69,6 +69,7 @@ class GroupReviewersDto
     reviewer.activeReviews[:count] = reviewer.activeReviews.nodes.count(&:approved)
     reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
     reviewer[:reviewLimit] = WORD_NUMERALS_TO_NUMBERS.fetch(reviewer.status.emoji&.to_sym, 5)
+    reviewer[:inactive] = reviewer.lastActivityOn.before?(3.days.ago) || reviewer.status.message.include?("OOO")
     reviewer[:timezone] = LocationLookupService.new.fetch_timezone(reviewer.location)
     local_time = reviewer[:timezone]&.time_with_offset(Time.now.utc)
     reviewer[:inWorkingHours] =
@@ -83,15 +84,19 @@ class GroupReviewersDto
 
   def reviewer_score(reviewer)
     message = reviewer.status.message
-    has_message = message && !message.include?("Verify reviews") && !message.include?("Please @")
+    has_message = message.present? && message.exclude?("Verify reviews") && message.exclude?("Please @")
     ooo = has_message && message.include?("OOO")
-    busy = reviewer.status.availability == "BUSY" && (!message || !message.include?("Verify reviews"))
+    busy = reviewer.status.availability == "BUSY" && (message.blank? || message.exclude?("Verify reviews"))
     active_reviews = reviewer.activeReviews.count.to_i
+    assigned_mrs = reviewer.assignedMergeRequests.count.to_i
 
-    (ooo ? 20 : 0) +
-      (busy ? 10 : 0) +
-      (has_message ? 5 : 0) +
-      ([0, (active_reviews + 1) - reviewer.reviewLimit].max * 3) +
-      (active_reviews + reviewer.assignedMergeRequests.count.to_i / 2)
+    [
+      (ooo ? 20 : 0) +
+        (busy ? 10 : 0) +
+        (has_message ? 5 : 0) +
+        ([0, (active_reviews + 1) - reviewer.reviewLimit].max * 3) +
+        (active_reviews + assigned_mrs / 2),
+      assigned_mrs
+    ]
   end
 end
