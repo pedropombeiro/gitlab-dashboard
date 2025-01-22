@@ -12,7 +12,12 @@
     </button>
     <ul class="dropdown-menu">
       <% links.each do |link| %>
-        <li><%= link_to(link[:name], link[:url], class: "dropdown-item", target: "_blank") %></li>
+        <li><%= link_to(
+            link[:name],
+            link[:url],
+            class: "dropdown-item",
+            target: URI.parse(link[:url]).absolute? ? "_blank" : nil,
+          ) %></li>
       <% end %>
     </ul>
   </div>
