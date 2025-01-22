@@ -69,7 +69,7 @@
                     class: load_ok ? "text-success" : "text-warning" %>
           </td>
           <% if Rails.env.development? %>
-            <td class="text-end" %>
+            <td class="text-end text-secondary" %>
               <%= tag.div reviewers_dto.send(:reviewer_score, reviewer) %>
             </td>
           <% end %>
