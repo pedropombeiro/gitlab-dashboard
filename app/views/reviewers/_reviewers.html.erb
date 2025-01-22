@@ -24,6 +24,7 @@
         <th scope="col" class="text-end">Local Hour</th>
         <th scope="col" class="text-end">Requested MR reviews</th>
         <th scope="col" class="text-end">Assigned MRs</th>
+        <%= tag.th "Score", scope: "col", class: "text-end" if Rails.env.development? %>
       </tr>
     </thead>
 
@@ -58,6 +59,11 @@
             <%= tag.div reviewer.assignedMergeRequests.count,
                     class: load_ok ? "text-success" : "text-warning" %>
           </td>
+          <% if Rails.env.development? %>
+            <td class="text-end" %>
+              <%= tag.div reviewers_dto.send(:reviewer_score, reviewer) %>
+            </td>
+          <% end %>
         <% end %>
       <% end %>
     </tbody>
