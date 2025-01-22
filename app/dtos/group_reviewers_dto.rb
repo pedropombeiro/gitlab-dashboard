@@ -69,7 +69,8 @@ class GroupReviewersDto
 
     reviewer.activeReviews[:count] = reviewer.activeReviews.nodes.count(&:approved)
     reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
-    reviewer[:reviewLimit] = WORD_NUMERALS_TO_NUMBERS.fetch(reviewer.status.emoji&.to_sym, 5)
+    reviewer[:reviewLimit] = review_limit(reviewer)
+    reviewer[:bootstrapClass] = bs_classes(reviewer)
     reviewer[:inactive] = reviewer.lastActivityOn.before?(3.days.ago) || is_ooo?(reviewer)
     reviewer[:timezone] = LocationLookupService.new.fetch_timezone(reviewer.location)
     local_time = reviewer[:timezone]&.time_with_offset(Time.now.utc)
@@ -93,6 +94,28 @@ class GroupReviewersDto
     false
   end
 
+  def review_limit(reviewer)
+    message = reviewer.status.message
+
+    review_limit = WORD_NUMERALS_TO_NUMBERS.fetch(reviewer.status.emoji&.to_sym, 5)
+    review_limit = 0 if message&.downcase&.include?("at capacity")
+
+    review_limit
+  end
+
+  def bs_classes(reviewer)
+    {}.tap do |bs_classes|
+      bs_classes[:requested_reviews_text] =
+        if reviewer.activeReviews.count < reviewer.reviewLimit
+          "text-success"
+        elsif reviewer.activeReviews.count == reviewer.reviewLimit
+          "text-warning"
+        else
+          "text-danger"
+        end
+    end
+  end
+
   def reviewer_score(reviewer)
     message = reviewer.status.message
     has_message =
@@ -104,7 +127,6 @@ class GroupReviewersDto
     active_reviews = reviewer.activeReviews.count.to_i
     assigned_mrs = reviewer.assignedMergeRequests.count.to_i
     review_limit = reviewer.reviewLimit
-    review_limit = 0 if message&.downcase&.include?("at capacity")
 
     [
       (is_ooo?(reviewer) ? 20 : 0) +

@@ -58,9 +58,7 @@
           <% end %>
           <!-- Requested MR reviews -->
           <td class="text-end">
-            <% load_ok = reviewer.activeReviews.count < 3 %>
-            <%= tag.div reviewer.activeReviews.count,
-                    class: load_ok ? "text-success" : "text-warning" %>
+            <%= tag.div reviewer.activeReviews.count, class: reviewer.bootstrapClass[:requested_reviews_text] %>
           </td>
           <!-- Assigned MRs -->
           <td class="text-end">
