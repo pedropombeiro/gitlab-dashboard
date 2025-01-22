@@ -5,10 +5,6 @@ class MergeRequestsControllerBase < ApplicationController
 
   private
 
-  def gitlab_client
-    @gitlab_client ||= GitlabClient.new
-  end
-
   def safe_params
     params.permit(:author, :referrer)
   end
@@ -24,13 +20,5 @@ class MergeRequestsControllerBase < ApplicationController
     end
 
     true
-  end
-
-  def render_404
-    respond_to do |format|
-      format.html { render file: Rails.public_path.join("404.html").to_s, layout: false, status: :not_found }
-      format.xml { head :not_found }
-      format.any { head :not_found }
-    end
   end
 end

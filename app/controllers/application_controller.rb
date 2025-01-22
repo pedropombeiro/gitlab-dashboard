@@ -17,4 +17,18 @@ class ApplicationController < ActionController::Base
     return unless session[:user_id]
     @current_user ||= GitlabUser.find_by_username!(session[:user_id])
   end
+
+  private
+
+  def gitlab_client
+    @gitlab_client ||= GitlabClient.new
+  end
+
+  def render_404
+    respond_to do |format|
+      format.html { render file: Rails.public_path.join("404.html").to_s, layout: false, status: :not_found }
+      format.xml { head :not_found }
+      format.any { head :not_found }
+    end
+  end
 end
