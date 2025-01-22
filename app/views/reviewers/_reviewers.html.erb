@@ -52,7 +52,7 @@
             <%= emojify(reviewer.status&.message) %>
           </td>
           <!-- Local Hour -->
-          <%= tag.td class: (["text-end"] + (reviewer.inWorkingHours ? [nil] : ["text-secondary"]).compact) do %>
+          <%= tag.td class: (["text-end", reviewer.inWorkingHours ? nil : "text-secondary"]).compact do %>
             <%= tag.i(class: %W[fa-solid fa-moon]) unless reviewer.inWorkingHours %>
             <%= tag.span reviewer.timezone&.time_with_offset(Time.now.utc)&.to_fs(:time) %>
           <% end %>
