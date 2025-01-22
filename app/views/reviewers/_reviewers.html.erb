@@ -40,7 +40,7 @@
           </th>
           <!-- Message -->
           <td>
-            <%= reviewer.status&.message %>
+            <%= emojify(reviewer.status&.message) %>
           </td>
           <!-- Local Hour -->
           <td class="text-end">
