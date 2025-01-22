@@ -22,23 +22,7 @@
     <% end %>
 
     <% links = Rails.application.config_for(:merge_requests)&.dig(:dashboard, :links) %>
-    <% if links.present? %>
-      <div class="btn-group d-none d-sm-inline">
-        <button
-          type="button"
-          class="btn btn-secondary dropdown-toggle"
-          data-bs-toggle="dropdown"
-          aria-expanded="false"
-        >
-          Links
-        </button>
-        <ul class="dropdown-menu">
-          <% links.each do |link| %>
-            <li><%= link_to(link[:name], link[:url], class: "dropdown-item", target: "_blank") %></li>
-          <% end %>
-        </ul>
-      </div>
-    <% end %>
+    <%= render "shared/links_button", links: links %>
 
     <div
       class="navbar-brand text-light d-flex align-items-center m-auto"

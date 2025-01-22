@@ -1,0 +1,5 @@
+development:
+  dashboard:
+    links:
+      - name: Verify maintainers
+        url: /reviewers?group_path=gitlab-org%2Fmaintainers%2Fcicd-verify
