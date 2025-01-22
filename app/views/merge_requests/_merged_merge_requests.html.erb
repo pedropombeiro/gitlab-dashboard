@@ -144,7 +144,7 @@
     <caption>
       <div class="d-flex justify-content-between align-items-baseline">
         <div></div>
-        <%= render "request_info",
+        <%= render "shared/request_info",
         request_duration: request_duration,
         updated_at: updated_at,
         next_update_at: next_update_at %>
@@ -189,7 +189,7 @@
             most_significant_only: true -%>
             by
             <br/>
-            <%= render "user_badge",
+            <%= render "shared/user_badge",
             user: mr.mergeUser,
             title: user_help_title(mr.mergeUser),
             bg_class: "bg-review-approved",
@@ -267,7 +267,7 @@
     <%= turbo_frame_tag params[:author],
     :merged_merge_requests_chart,
     loading: "lazy",
-    src: merged_merge_requests_chart_path(controller_params) do %>
+    src: merged_merge_requests_chart_path(merge_requests_controller_params) do %>
       <span class="d-flex align-items-center justify-content-center w-100 h-100">Initializing…</span>
     <% end %>
   </div>
