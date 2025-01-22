@@ -120,6 +120,17 @@ class GitlabClient
     res.body.strip.delete_suffix("-pre") if res.is_a?(Net::HTTPSuccess)
   end
 
+  def fetch_group_reviewers(group_path, format: :open_struct)
+    format_response(format) do
+      execute_query(
+        GroupReviewersQuery,
+        fullPath: group_path,
+        activeReviewsAfter: 1.month.ago,
+        activeAssignmentsAfter: 2.months.ago
+      )
+    end
+  end
+
   private
 
   GRAPHQL_RETRIABLE_ERRORS = [
@@ -161,6 +172,18 @@ class GitlabClient
         availability
         emoji
         message
+      }
+    }
+  GRAPHQL
+
+  ReviewerFragment = Client.parse <<-GRAPHQL
+    fragment on User {
+      ...#{name}::ExtendedUserFragment
+      bot
+      state
+      activeReviews: reviewRequestedMergeRequests(state: opened, approved: false, updatedAfter: $activeReviewsAfter) {
+        # count # approved: false filter is behind the `mr_approved_filter` ops FF, so we need to request the nodes for now
+        nodes { approved }
       }
     }
   GRAPHQL
@@ -241,12 +264,7 @@ class GitlabClient
   ReviewerQuery = Client.parse <<-GRAPHQL
     query($reviewer: String!, $activeReviewsAfter: Time) {
       user(username: $reviewer) {
-        ...#{name}::ExtendedUserFragment
-        bot
-        activeReviews: reviewRequestedMergeRequests(state: opened, approved: false, updatedAfter: $activeReviewsAfter) {
-          # count # approved: false filter is behind the `mr_approved_filter` ops FF, so we need to request the nodes for now
-          nodes { approved }
-        }
+        ...#{name}::ReviewerFragment
       }
     }
   GRAPHQL
@@ -361,6 +379,23 @@ class GitlabClient
         ) {
           count
           totalTimeToMerge
+        }
+      }
+    }
+  GRAPHQL
+
+  GroupReviewersQuery = Client.parse <<-GRAPHQL
+    query($fullPath: ID!, $activeReviewsAfter: Time, $activeAssignmentsAfter: Time) {
+      group(fullPath: $fullPath) {
+        groupMembers(accessLevels: [OWNER]) {
+          nodes {
+            user {
+              ...#{name}::ReviewerFragment
+              assignedMergeRequests(state: opened, updatedAfter: $activeAssignmentsAfter) {
+                count
+              }
+            }
+          }
         }
       }
     }

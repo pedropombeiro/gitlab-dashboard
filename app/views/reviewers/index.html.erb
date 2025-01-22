@@ -1,0 +1,51 @@
+<%= tag.div class: "container-fluid m-0 p-0" do %>
+  <% nav_bg_class = Rails.env.production? ? %w[bg-dark] : %w[bg-danger] %>
+
+  <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
+    <div
+      class="navbar-brand text-light d-flex align-items-center m-auto"
+      data-controller="bootstrap-tooltip"
+    >
+      <%= tag.span class: "mb-0 ms-2 fw-lighter d-flex flex-grow-1 justify-content-center" do %>
+        Reviewers Dashboard
+        <span class="collapse navbar-collapse">
+          &nbsp;for&nbsp;
+          <%= params[:group_path] %>
+        </span>
+      <% end %>
+    </div>
+
+    <%= tag.button(
+      class: %w[btn mx-2 text-light d-none d-sm-inline],
+      data: {
+        action: "theme-selector#switch",
+        theme_selector_target: "button",
+      },
+    ) %>
+
+    <%= link_to "Status",
+    "https://status.pombei.ro/sites/a268525c-738a-46c6-bb70-d96bf1c05e59",
+    class: "text-light mx-2 d-none d-sm-inline",
+    target: "_blank" %>
+
+    <%= link_to tag.i(class: %w[fa-brands fa-github]),
+    git_repo_url,
+    class: "text-light",
+    target: "_blank" %>
+  <% end %>
+
+  <%= tag.div(class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
+    <%= tag.div(id: "reviewers", class: %w[table-responsive shadow align-middle border rounded bg-gradient p-2 bg-body mt-5]) do %>
+      <%= turbo_frame_tag :reviewers, GroupReviewersDto.name.underscore, params[:group_path], src: reviewers_list_path(reviewers_controller_params) do %>
+        <%= tag.div(class: "d-flex align-items-center justify-content-center p-3 w-100 h-100") do %>
+          <span
+            class="spinner-border me-3 d-none d-sm-inline"
+            role="status"
+            aria-hidden="true"
+          ></span>
+          <span>Loading reviewers…</span>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

@@ -1,0 +1,541 @@
+verify:
+  data:
+    group:
+      groupMembers:
+        nodes:
+          - user:
+            __typename: UserCore
+            username: gitlab-infra-mgmt-bot
+            avatarUrl: "/uploads/-/system/user/avatar/13728016/avatar.png"
+            webUrl: https://gitlab.com/gitlab-infra-mgmt-bot
+            lastActivityOn: "2025-01-22"
+            jobTitle: Bot
+            location: ""
+            pronouns: it/its
+            status:
+            bot: false
+            activeReviews:
+              nodes: []
+            assignedMergeRequests:
+              count: 0
+          - user:
+            __typename: UserCore
+            username: rkadam3
+            avatarUrl: "/uploads/-/system/user/avatar/8198564/avatar.png"
+            webUrl: https://gitlab.com/rkadam3
+            lastActivityOn: "2025-01-22"
+            jobTitle: Senior Backend Engineer, Verify:Pipeline Authoring
+            location: Mumbai, India
+            pronouns: He/Him
+            status:
+              availability: NOT_SET
+              emoji: two
+              message: Please @mention me for my attention and answers.
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: true
+                - approved: true
+            assignedMergeRequests:
+              count: 3
+          - user:
+            __typename: UserCore
+            username: mfanGitLab
+            avatarUrl: "/uploads/-/system/user/avatar/13032948/avatar.png"
+            webUrl: https://gitlab.com/mfanGitLab
+            lastActivityOn: "2025-01-22"
+            jobTitle: Senior Software Engineer - Verify:Pipeline Execution
+            location: Vancouver, Canada
+            pronouns: ""
+            status:
+              availability: NOT_SET
+              emoji: two
+              message: ""
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 4
+          - user:
+            __typename: UserCore
+            username: tianwenchen
+            avatarUrl: https://secure.gravatar.com/avatar/0ba4620d3ca9c45aec9e787a8b83b8e64ef132b2c18a2b14c1525690f4a0600f?s=80&d=identicon
+            webUrl: https://gitlab.com/tianwenchen
+            lastActivityOn: "2025-01-22"
+            jobTitle: Senior Backend Engineer
+            location: ""
+            pronouns: He/They
+            status:
+              availability: NOT_SET
+              emoji: two
+              message: Please @tianwenchen
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 7
+          - user:
+            __typename: UserCore
+            username: hfyngvason
+            avatarUrl: "/uploads/-/system/user/avatar/4088036/avatar.png"
+            webUrl: https://gitlab.com/hfyngvason
+            lastActivityOn: "2025-01-21"
+            jobTitle: ""
+            location: Toronto, Canada
+            pronouns: ""
+            status:
+              availability: BUSY
+              emoji: red_circle
+              message: At capacity
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: true
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 7
+          - user:
+            __typename: UserCore
+            username: pedropombeiro
+            avatarUrl: "/uploads/-/system/user/avatar/1388762/avatar.png"
+            webUrl: https://gitlab.com/pedropombeiro
+            lastActivityOn: "2025-01-22"
+            jobTitle: Senior Backend Engineer - Verify:Runner Fleet
+            location: Freiburg Canton, Switzerland
+            pronouns: ""
+            status:
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: true
+                - approved: true
+            assignedMergeRequests:
+              count: 2
+          - user:
+            __typename: UserCore
+            username: avielle
+            avatarUrl: "/uploads/-/system/user/avatar/4059128/avatar.png"
+            webUrl: https://gitlab.com/avielle
+            lastActivityOn: "2025-01-22"
+            jobTitle: ""
+            location: Amsterdam, NL
+            pronouns: ""
+            status:
+              availability: BUSY
+              emoji: zero
+              message: Only available for Verify reviews
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: true
+                - approved: true
+                - approved: false
+                - approved: true
+                - approved: true
+            assignedMergeRequests:
+              count: 2
+          - user:
+            __typename: UserCore
+            username: oregand
+            avatarUrl: "/uploads/-/system/user/avatar/1646689/avatar.png"
+            webUrl: https://gitlab.com/oregand
+            lastActivityOn: "2025-01-22"
+            jobTitle: Engineering Manager, AI Framework
+            location: Amsterdam
+            pronouns: He/Him
+            status:
+              availability: BUSY
+              emoji: green_heart
+              message: "\U0001F483\U0001F3FB Please @ mention me, I exclusively use
+                todos."
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 1
+          - user:
+            __typename: UserCore
+            username: lauraXD
+            avatarUrl: "/uploads/-/system/user/avatar/3946912/avatar.png"
+            webUrl: https://gitlab.com/lauraXD
+            lastActivityOn: "2025-01-22"
+            jobTitle: Senior Backend Engineer
+            location: the shadows
+            pronouns: ""
+            status:
+              availability: BUSY
+              emoji: red_circle
+              message: "only available for PA/PE :) "
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: true
+            assignedMergeRequests:
+              count: 10
+          - user:
+            __typename: UserCore
+            username: iamricecake
+            avatarUrl: "/uploads/-/system/user/avatar/1758950/avatar.png"
+            webUrl: https://gitlab.com/iamricecake
+            lastActivityOn: "2025-01-22"
+            jobTitle: ""
+            location: Metro Manila, Philippines
+            pronouns: he/his/him
+            status:
+              availability: BUSY
+              emoji: speech_balloon
+              message: Catching up
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: true
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: false
+            assignedMergeRequests:
+              count: 0
+          - user:
+            __typename: UserCore
+            username: drew
+            avatarUrl: https://secure.gravatar.com/avatar/7d073366dd0a07ee869a24c15cc4e120858ccc0f3d0529e6151a6345cae36323?s=80&d=identicon
+            webUrl: https://gitlab.com/drew
+            lastActivityOn: "2025-01-22"
+            jobTitle: ""
+            location: ""
+            pronouns: he/him
+            status:
+              availability: NOT_SET
+              emoji: wave
+              message: ""
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: true
+                - approved: false
+                - approved: true
+                - approved: true
+                - approved: true
+            assignedMergeRequests:
+              count: 3
+          - user:
+            __typename: UserCore
+            username: allison.browne
+            avatarUrl: https://secure.gravatar.com/avatar/b92c9b135bd831dd22ea87a6b2432a3018a35a6a661301cf6cc5d9d9f802d45c?s=80&d=identicon
+            webUrl: https://gitlab.com/allison.browne
+            lastActivityOn: "2025-01-22"
+            jobTitle: Senior Backend Engineer
+            location: Buffalo, NY
+            pronouns: Any
+            status:
+              availability: NOT_SET
+              emoji: red_circle
+              message: At Capacity
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: false
+                - approved: true
+            assignedMergeRequests:
+              count: 2
+          - user:
+            __typename: UserCore
+            username: grzesiek
+            avatarUrl: "/uploads/-/system/user/avatar/263716/avatar.jpeg"
+            webUrl: https://gitlab.com/grzesiek
+            lastActivityOn: "2025-01-22"
+            jobTitle: Distinguished Engineer
+            location: Olsztyn, Poland
+            pronouns: ""
+            status:
+              availability: BUSY
+              emoji: bulb
+              message: ""
+            bot: false
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 1
+          - user:
+            __typename: UserCore
+            username: mbobin
+            avatarUrl: https://secure.gravatar.com/avatar/130da6066ec37628a1d76ab60715b7acb7f04f7efe9a42a768d877a48c480ac2?s=80&d=identicon
+            webUrl: https://gitlab.com/mbobin
+            lastActivityOn: "2025-01-22"
+            jobTitle: Sr. Backend Engineer, Verify (CI Platform)
+            location: Bucharest
+            pronouns: ""
+            status:
+              availability: NOT_SET
+              emoji: two
+              message: ""
+            bot: false
+            state: active
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 3
+          - user:
+            __typename: UserCore
+            username: fabiopitino
+            avatarUrl: https://secure.gravatar.com/avatar/47b04f2158623b2ec870de434961244425eb21caa5a979c1e04880cf8a203793?s=80&d=identicon
+            webUrl: https://gitlab.com/fabiopitino
+            lastActivityOn: "2025-01-22"
+            jobTitle: Principal Engineer, Verify
+            location: Dublin, Ireland
+            pronouns: he/him
+            status:
+              availability: NOT_SET
+              emoji: two
+              message: ""
+            bot: false
+            state: active
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: true
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 8
+          - user:
+            __typename: UserCore
+            username: furkanayhan
+            avatarUrl: "/uploads/-/system/user/avatar/514662/avatar.png"
+            webUrl: https://gitlab.com/furkanayhan
+            lastActivityOn: "2025-01-22"
+            jobTitle: Senior Backend Engineer - Verify (PA)
+            location: Amsterdam, Netherlands
+            pronouns: ""
+            status:
+              availability: BUSY
+              emoji: two
+              message: only Verify reviews
+            bot: false
+            state: active
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: true
+            assignedMergeRequests:
+              count: 2
+          - user:
+            __typename: UserCore
+            username: employment-bot
+            avatarUrl: https://secure.gravatar.com/avatar/4d5c7495520817e91455dfc86b4cb8ed8e2955e189981b43d2d2cedd0ee2366b?s=80&d=identicon
+            webUrl: https://gitlab.com/employment-bot
+            lastActivityOn: "2025-01-22"
+            jobTitle: ""
+            location: ""
+            pronouns:
+            status:
+              availability: NOT_SET
+              emoji: speech_balloon
+              message: Onboarding!
+            bot: false
+            state: active
+            activeReviews:
+              nodes: []
+            assignedMergeRequests:
+              count: 0
+          - user:
+            __typename: UserCore
+            username: rymai
+            avatarUrl: https://secure.gravatar.com/avatar/bc29098638f975e3a92a25321a047831f2f2e5e97be1c44b4e1446c8e87e17f2?s=80&d=identicon
+            webUrl: https://gitlab.com/rymai
+            lastActivityOn: "2025-01-22"
+            jobTitle: Principal Engineer, Tenant Scale
+            location: France
+            pronouns: he/him
+            status:
+              availability: NOT_SET
+              emoji: mountain_snow
+              message: OOO back on 2025-01-23
+            bot: false
+            state: active
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: true
+                - approved: true
+                - approved: true
+                - approved: true
+            assignedMergeRequests:
+              count: 8
+          - user:
+            __typename: UserCore
+            username: stanhu
+            avatarUrl: "/uploads/-/system/user/avatar/64248/stanhu.jpg"
+            webUrl: https://gitlab.com/stanhu
+            lastActivityOn: "2025-01-22"
+            jobTitle: ""
+            location: San Francisco, CA
+            pronouns: ""
+            status:
+            bot: false
+            state: active
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: true
+                - approved: false
+            assignedMergeRequests:
+              count: 16
+          - user:
+            __typename: UserCore
+            username: marin
+            avatarUrl: https://secure.gravatar.com/avatar/b340f25ed9ca8a7d793b9b024f91f480869bdd3dde71ef66650f34f443809f83?s=80&d=identicon
+            webUrl: https://gitlab.com/marin
+            lastActivityOn: "2025-01-22"
+            jobTitle: Sr. Director of Infrastructure, Platforms
+            location: ""
+            pronouns: ""
+            status:
+            bot: false
+            state: active
+            activeReviews:
+              nodes:
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: true
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: true
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+                - approved: false
+            assignedMergeRequests:
+              count: 0

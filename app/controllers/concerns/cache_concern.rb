@@ -9,6 +9,7 @@ module CacheConcern
   MR_CACHE_VALIDITY = 5.minutes
   REVIEWER_VALIDITY = 30.minutes
   MONTHLY_GRAPH_CACHE_VALIDITY = 3.hours
+  GROUP_REVIEWERS_CACHE_VALIDITY = 1.hour
   PROJECT_VERSION_VALIDITY = 6.hours
 
   LOCATION_VERSION = "v2"
@@ -49,6 +50,10 @@ module CacheConcern
 
     def last_authored_mr_lists_cache_key(user, type)
       "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/last_authored_#{type}_list/#{user_hash(user)}"
+    end
+
+    def group_reviewers_cache_key(group_full_path)
+      "#{REDIS_NAMESPACE}/group/#{calculate_hash(group_full_path)}/reviewers"
     end
 
     private

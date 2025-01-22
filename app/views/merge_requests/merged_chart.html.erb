@@ -3,7 +3,7 @@
   theme_selector_target: "chart",
   controller: "merged-merge-requests-chart",
   merged_merge_requests_chart_url_value:
-    monthly_merged_merge_request_stats_url(controller_params),
+    monthly_merged_merge_request_stats_url(merge_requests_controller_params),
 } %>
 
 <%= turbo_frame_tag(params[:author], :merged_merge_requests_chart) do %>

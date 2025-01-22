@@ -2,6 +2,9 @@ Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
   mount MissionControl::Jobs::Engine, at: "/jobs"
 
+  get "/reviewers", to: "reviewers#index", as: :reviewers
+  get "/reviewers/list", to: "reviewers#list", as: :reviewers_list
+
   get "/mrs", to: "merge_requests#index", as: :merge_requests
   get "/mrs/open_list", to: "merge_requests#open_list", as: :open_merge_requests_list
   get "/mrs/merged_list", to: "merge_requests#merged_list", as: :merged_merge_requests_list

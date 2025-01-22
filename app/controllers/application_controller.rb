@@ -4,6 +4,9 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
+  delegate :make_full_url, to: :gitlab_client
+  helper_method :make_full_url
+
   def save_current_user(username)
     session[:user_id] = username
     @current_user = username.present? ? GitlabUser.safe_find_or_create_by!(username: username) : nil

@@ -1,0 +1,65 @@
+<% reviewers = reviewers_dto.reviewers %>
+
+<% if reviewers.empty? %>
+  <p class="h4 fw-light text-sm-center p-2 text-secondary">🥱 No reviewers for the
+    <%= params[:group_path] %>
+    group 😴</p>
+<% else %>
+  <table class="table table-hover mb-0">
+    <caption class="mx-2">
+      <div class="d-flex justify-content-between align-items-baseline">
+        <div></div>
+
+        <%= render "shared/request_info",
+        request_duration: request_duration,
+        updated_at: updated_at,
+        next_update_at: next_update_at %>
+      </div>
+    </caption>
+
+    <thead>
+      <tr>
+        <th scope="col">Username</th>
+        <th scope="col">Message</th>
+        <th scope="col" class="text-end">Local Hour</th>
+        <th scope="col" class="text-end">Requested MR reviews</th>
+        <th scope="col" class="text-end">Assigned MRs</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <% reviewers.each do |reviewer| %>
+        <%= tag.tr(class: reviewer.lastActivityOn.before?(3.days.ago) ? "opacity-50" : nil) do %>
+          <!-- Username -->
+          <th scope="row">
+            <%= render "shared/user_badge",
+            user: reviewer,
+            title: group_reviewer_help_title(reviewer),
+            size: 24 %>
+          </th>
+          <!-- Message -->
+          <td>
+            <%= reviewer.status&.message %>
+          </td>
+          <!-- Local Hour -->
+          <td class="text-end">
+            <%= tag.div reviewer.timezone&.time_with_offset(Time.now.utc)&.to_fs(:time),
+                    class: reviewer.inWorkingHours ? nil : "text-secondary" %>
+          </td>
+          <!-- Requested MR reviews -->
+          <td class="text-end">
+            <% load_ok = reviewer.activeReviews.count < 3 %>
+            <%= tag.div reviewer.activeReviews.count,
+                    class: load_ok ? "text-success" : "text-warning" %>
+          </td>
+          <!-- Assigned MRs -->
+          <td class="text-end">
+            <% load_ok = reviewer.assignedMergeRequests.count < 3 %>
+            <%= tag.div reviewer.assignedMergeRequests.count,
+                    class: load_ok ? "text-success" : "text-warning" %>
+          </td>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+<% end %>

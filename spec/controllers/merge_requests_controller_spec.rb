@@ -140,7 +140,7 @@ RSpec.describe MergeRequestsController, type: :controller do
 
           expect(response).to have_http_status(:ok)
           expect(response).to render_template("layouts/application")
-          expect(response).to render_template("merge_requests/_user_image")
+          expect(response).to render_template("shared/_user_image")
 
           # Includes header with link to user's merge requests
           expect(response.body).to include(
