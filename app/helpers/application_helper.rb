@@ -31,13 +31,13 @@ module ApplicationHelper
 
     emojis = []
 
+    emojis << "🔴" if user_status.availability == "BUSY"
+
     emojis << if user_status.emoji == "speech_balloon" && user_status.message.scan(/:([\w+-]+):/).size == 1
       emojify(user_status.message)
     else
       user_emoji_character(user_status.emoji)
     end
-
-    emojis << "🔴" if user_status.availability == "BUSY"
 
     emojis.uniq.join(" ")
   end
