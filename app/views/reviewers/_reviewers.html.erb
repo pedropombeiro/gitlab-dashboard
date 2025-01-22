@@ -42,7 +42,7 @@
           <td>
             <%= render "shared/abbr_with_title",
               content: user_emojis(reviewer.status),
-              title: reviewer.status&.availability -%>
+              title: reviewer.status&.emoji -%>
 
             <% country_flag_classes = user_country_flag_classes(reviewer) %>
             <%= tag.i(class: country_flag_classes) if country_flag_classes %>
