@@ -20,6 +20,7 @@
     <thead>
       <tr>
         <th scope="col">Username</th>
+        <th scope="col">Status</th>
         <th scope="col">Message</th>
         <th scope="col" class="text-end">Local Hour</th>
         <th scope="col" class="text-end">Requested MR reviews</th>
@@ -36,8 +37,16 @@
             <%= render "shared/user_badge",
             user: reviewer,
             title: group_reviewer_help_title(reviewer),
-            size: 24 %>
+            size: 24, show_emojis: false %>
           </th>
+          <td>
+            <%= render "shared/abbr_with_title",
+              content: user_emojis(reviewer.status),
+              title: reviewer.status&.availability -%>
+
+            <% country_flag_classes = user_country_flag_classes(reviewer) %>
+            <%= tag.i(class: country_flag_classes) if country_flag_classes %>
+          </td>
           <!-- Message -->
           <td>
             <%= emojify(reviewer.status&.message) %>
