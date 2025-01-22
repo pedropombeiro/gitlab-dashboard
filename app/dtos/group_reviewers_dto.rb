@@ -26,7 +26,7 @@ class GroupReviewersDto
     @updated_at = response.updated_at
     return if @errors
 
-    @next_update_at = response.next_update_at
+    @next_update_at = CacheConcern::GROUP_REVIEWERS_CACHE_VALIDITY.after(response.updated_at)
 
     reviewers = response.response.data.group.groupMembers.nodes
     warmup_timezone_cache(reviewers)
