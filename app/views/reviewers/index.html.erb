@@ -3,7 +3,7 @@
 <%= tag.div class: "container-fluid m-0 p-0" do %>
   <% nav_bg_class = Rails.env.production? ? %w[bg-dark] : %w[bg-danger] %>
 
-  <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
+  <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-md fixed-top px-3] + nav_bg_class do %>
     <% links = Rails.application.config_for(:reviewers)&.dig(:dashboard, :links) %>
     <%= render "shared/links_button", links: links %>
 
