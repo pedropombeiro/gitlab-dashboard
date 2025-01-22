@@ -30,7 +30,7 @@
 
     <tbody>
       <% reviewers.each do |reviewer| %>
-        <%= tag.tr(class: reviewer.lastActivityOn.before?(3.days.ago) ? "opacity-50" : nil) do %>
+        <%= tag.tr(class: reviewer.inactive ? "opacity-50" : nil) do %>
           <!-- Username -->
           <th scope="row">
             <%= render "shared/user_badge",
