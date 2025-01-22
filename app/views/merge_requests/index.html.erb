@@ -1,3 +1,5 @@
+<% content_for(:title) { "GitLab MR Dashboard" } %>
+
 <% vapid_public_key =
   Rails.application.credentials.dig(:webpush, :vapid_public_key) %>
 <% if vapid_public_key.present? %>
