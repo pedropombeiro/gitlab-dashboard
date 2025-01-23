@@ -20,23 +20,7 @@
       <% end %>
     </div>
 
-    <%= tag.button(
-      class: %w[btn mx-2 text-light d-none d-sm-inline],
-      data: {
-        action: "theme-selector#switch",
-        theme_selector_target: "button",
-      },
-    ) %>
-
-    <%= link_to "Status",
-    "https://status.pombei.ro/sites/a268525c-738a-46c6-bb70-d96bf1c05e59",
-    class: "text-light mx-2 d-none d-sm-inline",
-    target: "_blank" %>
-
-    <%= link_to tag.i(class: %w[fa-brands fa-github]),
-    git_repo_url,
-    class: "text-light",
-    target: "_blank" %>
+    <%= render "shared/navbar_right_section" %>
   <% end %>
 
   <%= tag.div(class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
