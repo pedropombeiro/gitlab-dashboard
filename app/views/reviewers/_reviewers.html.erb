@@ -31,7 +31,7 @@
 
     <tbody>
       <% reviewers.each do |reviewer| %>
-        <%= tag.tr(class: reviewer.inactive ? "opacity-50" : nil) do %>
+        <%= tag.tr(style: "opacity: #{reviewer.opacity} !important;") do %>
           <!-- Username -->
           <th scope="row">
             <nobr data-controller="clipboard">
