@@ -8,6 +8,9 @@ class GroupReviewersDto
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :group_path, :reviewers
 
+  INACTIVE_OPACITY_FACTOR = 2
+  SCORE_OPACITY_FACTOR = 2
+  MIN_OPACITY = 0.3
   OOO_EMOJIS = %w[nauseated_face palm_tree thermometer].freeze
   WORD_NUMERALS_TO_NUMBERS = {
     zero: 0, one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9
@@ -71,11 +74,12 @@ class GroupReviewersDto
     reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
     reviewer[:reviewLimit] = review_limit(reviewer)
     reviewer[:bootstrapClass] = bs_classes(reviewer)
-    reviewer[:inactive] = reviewer.lastActivityOn.before?(3.days.ago) || is_ooo?(reviewer)
     reviewer[:timezone] = LocationLookupService.new.fetch_timezone(reviewer.location)
     local_time = reviewer[:timezone]&.time_with_offset(Time.now.utc)
     reviewer[:inWorkingHours] =
       local_time ? (local_time.change(hour: 8)..local_time.change(hour: 17)).cover?(local_time) : true
+
+    reviewer[:opacity] = reviewer_opacity(reviewer)
 
     reviewer
   end
@@ -116,6 +120,10 @@ class GroupReviewersDto
     end
   end
 
+  def inactive?(reviewer)
+    reviewer.lastActivityOn.before?(3.days.ago)
+  end
+
   def reviewer_score(reviewer)
     message = reviewer.status.message
     has_message =
@@ -123,18 +131,27 @@ class GroupReviewersDto
       message.exclude?("Verify reviews") &&
       message.exclude?("Please @") &&
       message.exclude?("@-mention")
+    ooo = is_ooo?(reviewer)
     busy = reviewer.status.availability == "BUSY" && (message.blank? || message.exclude?("Verify reviews"))
     active_reviews = reviewer.activeReviews.count.to_i
     assigned_mrs = reviewer.assignedMergeRequests.count.to_i
     review_limit = reviewer.reviewLimit
 
     [
-      (is_ooo?(reviewer) ? 20 : 0) +
+      (ooo ? 20 : 0) +
+        ((!ooo && inactive?(reviewer)) ? 10 : 0) +
         (busy ? 10 : 0) +
         (has_message ? 5 : 0) +
         ([0, (active_reviews + 1) - review_limit].max * 3) +
         (active_reviews + assigned_mrs / 2),
       assigned_mrs
     ]
+  end
+
+  def reviewer_opacity(reviewer)
+    score = reviewer_score(reviewer).first.to_f
+    score *= INACTIVE_OPACITY_FACTOR if inactive?(reviewer)
+
+    [1.0 - score * SCORE_OPACITY_FACTOR / 100, MIN_OPACITY].max
   end
 end
