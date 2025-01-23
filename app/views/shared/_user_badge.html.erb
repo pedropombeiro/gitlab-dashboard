@@ -16,6 +16,10 @@
     user.username,
     user.webUrl,
     target: "_blank",
+    data: {
+      clipboard_target: "source",
+      action: "clipboard#copy"
+    },
     class:
       %W[fw-normal] +
         (

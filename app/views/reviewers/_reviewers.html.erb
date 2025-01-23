@@ -34,10 +34,14 @@
         <%= tag.tr(class: reviewer.inactive ? "opacity-50" : nil) do %>
           <!-- Username -->
           <th scope="row">
-            <%= render "shared/user_badge",
-            user: reviewer,
-            title: group_reviewer_help_title(reviewer),
-            size: 24, show_emojis: false %>
+            <nobr data-controller="clipboard">
+              <%= render "shared/user_badge",
+              user: reviewer,
+              title: group_reviewer_help_title(reviewer),
+              size: 24, show_emojis: false %>
+
+              <%= render "shared/clipboard_button" %>
+            </nobr>
           </th>
           <td>
             <%= render "shared/abbr_with_title",
