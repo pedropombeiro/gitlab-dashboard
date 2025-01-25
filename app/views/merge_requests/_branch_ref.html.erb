@@ -2,7 +2,7 @@
   data-controller="clipboard"
   class="d-none text-truncate d-md-flex align-items-center"
 >
-  <i class="fa-solid fa-code-branch"></i>
+  <i class="fa-solid fa-code-branch" style="color: <%= branch_color(branch_name) %> !important;"></i>
   <%= tag.a(
     branch_name,
     class: %w[text-body text-decoration-none text-truncate mx-1 small],
