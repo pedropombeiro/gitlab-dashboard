@@ -1,5 +1,5 @@
 <%= render "link",
-title: "\##{issue.iid}",
+title: issue_badge(issue.iid),
 web_url: issue.webUrl,
 data: {
   bs_toggle: "tooltip",
