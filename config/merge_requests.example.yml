@@ -30,6 +30,35 @@ shared:
         "workflow::production": "primary"
         "workflow::post-deploy-db-staging": "info"
         "workflow::post-deploy-db-production": "success"
+    notification_rules:
+      - required_state: open
+        watched_labels:
+          - "pipeline::tier-1"
+          - "pipeline::tier-2"
+          - "pipeline::tier-3"
+      - required_label: backend
+        required_state: merged
+        watched_labels:
+          - "workflow::staging-canary"
+          - "workflow::canary"
+          - "workflow::staging"
+          - "workflow::production"
+      - required_label: frontend
+        required_state: merged
+        watched_labels:
+          - "workflow::staging-canary"
+          - "workflow::canary"
+          - "workflow::staging"
+          - "workflow::production"
+      - required_label: database
+        required_state: merged
+        watched_labels:
+          - "workflow::post-deploy-db-staging"
+          - "workflow::post-deploy-db-production"
+      - required_label: documentation
+        required_state: merged
+        watched_labels:
+          - "workflow::production"
 
 # production:
 #   dashboard:
