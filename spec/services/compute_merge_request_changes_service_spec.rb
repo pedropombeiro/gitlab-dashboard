@@ -35,15 +35,13 @@ RSpec.describe ComputeMergeRequestChangesService do
     let(:previous_response) { response }
     let(:new_response) { response }
     let(:type) { :open }
+    let(:previous_mrs) { previous_response.user.openMergeRequests.nodes }
 
     it { is_expected.to be_empty }
 
     context "when MR label changes" do
       before do
-        label = previous_response.user.openMergeRequests.nodes.first.labels.nodes.find do |label|
-          label.title.start_with?("pipeline::tier-")
-        end
-
+        label = previous_mrs.first.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
         label.title = "pipeline::tier-2"
       end
 
@@ -62,10 +60,7 @@ RSpec.describe ComputeMergeRequestChangesService do
 
       context "when a second MR label changes" do
         before do
-          label = previous_response.user.openMergeRequests.nodes.third.labels.nodes.find do |label|
-            label.title.start_with?("pipeline::tier-")
-          end
-
+          label = previous_mrs.third.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
           label.title = "pipeline::tier-1"
         end
 
@@ -94,92 +89,144 @@ RSpec.describe ComputeMergeRequestChangesService do
   describe "merged merge request changes" do
     let(:previous_response) { response }
     let(:new_response) { response }
+    let(:previous_mrs) { previous_response.user.mergedMergeRequests.nodes }
+    let(:new_mrs) { new_response.user.mergedMergeRequests.nodes }
     let(:type) { :merged }
+    let(:changed_mr_prev_version) { find_merge_request_with_labels(previous_mrs, mr_label_prefixes) }
+    let(:changed_mr) { new_mrs.find { |new_mr| new_mr.iid == changed_mr_prev_version.iid } }
 
     it { is_expected.to be_empty }
 
     context "when MR pipeline label changes" do
-      before do
-        mr = find_merge_request_with_labels(previous_response.user.mergedMergeRequests.nodes, "pipeline::tier-3")
-        label = mr.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
-        label.title = "pipeline::tier-2"
+      let(:mr_label_prefixes) { ["pipeline::tier-3"] }
+      let(:changed_mr_prev_version_label) do
+        changed_mr_prev_version.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
       end
 
-      it { is_expected.to be_empty }
+      before do
+        changed_mr_prev_version_label.title = "pipeline::tier-2"
+      end
+
+      it "does not generate notification" do
+        is_expected.to be_empty
+      end
+    end
+
+    context "when 'Pick into auto-deploy' label is added" do
+      let(:mr_label_prefixes) { %w[workflow::production backend] }
+
+      before do
+        changed_mr.labels.nodes <<
+          changed_mr.labels.nodes.last.dup.tap { |label| label.title = "Pick into auto-deploy" }
+      end
+
+      it "does not generate notification" do
+        is_expected.to be_empty
+      end
     end
 
     context "when MR workflow label changes" do
-      let(:changed_mr) do
-        find_merge_request_with_labels(previous_response.user.mergedMergeRequests.nodes, "workflow::production")
+      let(:new_label_title) { nil }
+      let(:changed_mr_label) { changed_mr.labels.nodes.find { |label| label.title.start_with?("workflow::") } }
+      let(:changed_mr_prev_version_label) do
+        changed_mr_prev_version.labels.nodes.find { |label| label.title.start_with?("workflow::") }
       end
 
       before do
-        label = changed_mr.labels.nodes.find { |label| label.title.start_with?("workflow::production") }
-        label.title = "workflow::staging"
+        changed_mr_prev_version_label.title = prev_label_title
+        changed_mr_label.title = new_label_title if new_label_title
       end
 
-      it "contains notification for MR with change label" do
-        is_expected.to contain_exactly(
-          a_hash_including(
-            body: a_string_starting_with("changed to production\n\n!"),
-            tag: an_instance_of(String),
-            title: "A merged merge request",
-            type: :label_change,
-            url: an_instance_of(String)
-          )
-        )
+      context "with backend MR" do
+        let(:mr_label_prefixes) { %w[workflow::production backend] }
+
+        context "when workflow label changes from staging to production" do
+          let(:prev_label_title) { "workflow::staging" }
+
+          it "contains notification for MR with change label" do
+            is_expected.to contain_exactly(
+              a_hash_including(
+                body: a_string_starting_with("changed to production\n\n!"),
+                tag: an_instance_of(String),
+                title: "A merged merge request",
+                type: :label_change,
+                url: an_instance_of(String)
+              )
+            )
+          end
+
+          context "and related issue is closed" do
+            let(:issue_state) { "closed" }
+
+            before do
+              dto.merged_merge_requests.items
+                .find { |mr| mr.iid == changed_mr_prev_version.iid }
+                .issue.state = issue_state
+            end
+
+            it "does not generate notification" do
+              is_expected.to be_empty
+            end
+          end
+        end
       end
 
-      context "and related issue is closed" do
-        let(:issue_state) { "closed" }
+      context "with documentation MR" do
+        let(:mr_label_prefixes) { %w[workflow::post-deploy-db-production documentation !backend] }
 
-        before do
-          dto.merged_merge_requests.items
-            .find { |mr| mr.iid == changed_mr.iid }
-            .issue.state = issue_state
+        context "when workflow label changes to from staging-canary to canary" do
+          let(:prev_label_title) { "workflow::staging-canary" }
+          let(:new_label_title) { "workflow::canary" }
+
+          it "does not generate notification" do
+            is_expected.to be_empty
+          end
+        end
+
+        context "when workflow label changes from post-deploy-db-staging to post-deploy-db-production" do
+          let(:prev_label_title) { "workflow::post-deploy-db-staging" }
+          let(:new_label_title) { "workflow::post-deploy-db-production" }
+
+          it "contains notification for MR with change label" do
+            is_expected.to contain_exactly(
+              a_hash_including(
+                body: a_string_starting_with("changed to post-deploy-db-production\n\n!"),
+                tag: an_instance_of(String),
+                title: "A merged merge request",
+                type: :label_change,
+                url: an_instance_of(String)
+              )
+            )
+          end
+        end
+      end
+
+      context "when MR workflow::post-db-deploy-* label changes" do
+        let(:mr_label_prefixes) { %w[workflow::post-deploy-db-production] }
+        let(:prev_label_title) { "workflow::post-db-deploy-staging" }
+
+        specify do
+          expect(changed_mr_prev_version.labels.nodes.find { |label| label.title.start_with?("database") }).to be_nil
         end
 
         it "does not generate notification" do
           is_expected.to be_empty
         end
-      end
-    end
 
-    context "when MR workflow::post-db-deploy-* label changes" do
-      let(:changed_mr) do
-        find_merge_request_with_labels(
-          previous_response.user.mergedMergeRequests.nodes, "workflow::post-deploy-db-production"
-        )
-      end
+        context "and MR is labeled with database" do
+          let(:mr_label_prefixes) { %w[workflow::post-deploy-db-production database] }
 
-      before do
-        label = changed_mr.labels.nodes.find { |label| label.title.start_with?("workflow::post-deploy-db") }
-        label.title = "workflow::post-db-deploy-staging"
-      end
-
-      specify do
-        expect(changed_mr.labels.nodes.find { |label| label.title.start_with?("database") }).to be_nil
-      end
-
-      it { is_expected.to be_empty }
-
-      context "and MR is labelled with database" do
-        let(:changed_mr) do
-          find_merge_request_with_labels(
-            previous_response.user.mergedMergeRequests.nodes, "workflow::post-deploy-db-production", "database"
-          )
-        end
-
-        it "contains notification for MR with change label" do
-          is_expected.to contain_exactly(
-            a_hash_including(
-              body: a_string_starting_with("changed to post-deploy-db-production\n\n!"),
-              tag: an_instance_of(String),
-              title: "A merged merge request",
-              type: :label_change,
-              url: an_instance_of(String)
+          it "contains notification for MR with change label" do
+            is_expected.to contain_exactly(
+              a_hash_including(
+                body: a_string_starting_with("changed to post-deploy-db-production\n\n!"),
+                tag: an_instance_of(String),
+                title: "A merged merge request",
+                type: :label_change,
+                url: an_instance_of(String)
+              )
             )
-          )
+          end
         end
       end
     end
@@ -189,9 +236,7 @@ RSpec.describe ComputeMergeRequestChangesService do
         dto.merged_merge_requests.items << response.user.openMergeRequests.nodes.delete(merged_mr)
       end
 
-      let(:merged_mr) do
-        response.user.openMergeRequests.nodes.last
-      end
+      let(:merged_mr) { response.user.openMergeRequests.nodes.last }
 
       it "contains notification for merged MR" do
         is_expected.to include(
@@ -209,12 +254,15 @@ RSpec.describe ComputeMergeRequestChangesService do
 
     private
 
-    def find_merge_request_with_labels(merge_requests, *label_prefixes)
+    def find_merge_request_with_labels(merge_requests, mr_label_prefixes)
       merge_requests.find do |mr|
-        label_prefixes.all? do |prefix|
-          mr.labels.nodes.any? do |label|
-            label.title.start_with?(prefix)
-          end
+        mr_label_prefixes.all? do |prefix|
+          negate = prefix.start_with?("!")
+          prefix.delete_prefix!("!") if negate
+
+          contains_label = mr.labels.nodes.any? { |label| label.title.start_with?(prefix) }
+
+          negate ? !contains_label : contains_label
         end
       end
     end

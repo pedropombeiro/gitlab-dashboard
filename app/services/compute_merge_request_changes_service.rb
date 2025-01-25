@@ -80,22 +80,66 @@ class ComputeMergeRequestChangesService
       previous_mr_version = previous_mrs.find { |prev_mr| prev_mr.iid == mr.iid }
       next if previous_mr_version.nil?
 
-      previous_labels = previous_mr_version.contextualLabels.map(&:webTitle)
-      labels = mr.contextualLabels.map(&:webTitle)
-      next if labels == previous_labels
+      mr_versions = [previous_mr_version, mr]
+      previous_ctx_labels, ctx_labels = mr_versions.map(&:contextualLabels)
+      next if ctx_labels.map(&:title) == previous_ctx_labels.map(&:title)
 
-      # Ignore post-deploy-db-* notifications if the MR is not a database MR
-      if mr.labels.nodes.none? { |label| label.webTitle == "database" }
-        labels.delete_if { |label| label.match?(%r{post-deploy-db-.+}) }
+      # Check workflow notification rules
+      if notification_rules.present? && rules_label_titles.intersect?(mr.labels.nodes.map(&:title))
+        previous_ctx_labels, ctx_labels = changed_labels_matching_rules(previous_mr_version, mr)
+        next if ctx_labels.nil?
       end
-
-      next if labels.blank?
 
       {
         mr: mr,
-        labels: labels,
-        previous_labels: previous_labels
+        previous_labels: previous_ctx_labels.map(&:webTitle),
+        labels: ctx_labels.map(&:webTitle)
       }
     end
+  end
+
+  def matching_notification_rules(mr, notification_rules)
+    label_titles = mr.labels.nodes.map(&:title)
+
+    notification_rules
+      .filter { |rule| rule.key?(:required_state) ? mr.state == rule[:required_state].to_sym : true }
+      .filter { |rule| rule.key?(:required_label) ? label_titles.include?(rule[:required_label]) : true }
+  end
+
+  def changed_labels_matching_rules(previous_mr_version, mr)
+    # Find relevant label titles
+    previous_label_titles = previous_mr_version.labels.nodes.map(&:title) & rules_label_titles
+    label_titles = mr.labels.nodes.map(&:title) & rules_label_titles
+    return if label_titles == previous_label_titles
+
+    matching_rules = matching_notification_rules(mr, notification_rules)
+    return if matching_rules.blank?
+
+    matching_rules_label_titles = matching_rules.pluck(:watched_labels).flatten.uniq
+    previous_label_titles &= matching_rules_label_titles
+    label_titles &= matching_rules_label_titles
+    return unless label_titles.any?
+
+    previous_rule_labels = labels_matching_rules(previous_mr_version, previous_label_titles)
+    rule_labels = labels_matching_rules(mr, label_titles)
+    return if rule_labels.map(&:title) == previous_rule_labels.map(&:title)
+
+    [previous_rule_labels, rule_labels]
+  end
+
+  def labels_matching_rules(mr, rules_label_titles)
+    mr.labels.nodes.filter { |label| rules_label_titles.include? label.title }
+  end
+
+  def config
+    @merge_requests_config ||= Rails.application.config_for(:merge_requests)
+  end
+
+  def notification_rules
+    @notification_rules ||= config.dig(:labels, :notification_rules)
+  end
+
+  def rules_label_titles
+    @rules_label_titles ||= notification_rules.pluck(:watched_labels).flatten.uniq
   end
 end

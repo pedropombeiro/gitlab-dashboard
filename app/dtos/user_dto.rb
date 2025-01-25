@@ -118,6 +118,7 @@ class UserDto
 
   def convert_open_merge_request(merge_request, open_merge_requests, issues_by_iid)
     convert_core_merge_request(merge_request, open_merge_requests, issues_by_iid, open_mrs_contextual_labels).tap do |mr|
+      mr.state = :open
       mr.bootstrapClass = {
         pipeline: pipeline_class(mr.headPipeline),
         mergeStatus: open_merge_request_status_class(mr)
@@ -159,6 +160,7 @@ class UserDto
       issues_by_iid,
       merged_mrs_contextual_labels
     ).tap do |mr|
+      mr.state = :merged
       mr.mergedAt = parse_graphql_time(mr.mergedAt)
       mr.mergeUser.lastActivityOn = parse_graphql_time(mr.mergeUser.lastActivityOn)
 
