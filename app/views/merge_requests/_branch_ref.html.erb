@@ -2,7 +2,15 @@
   data-controller="clipboard"
   class="d-none text-truncate d-md-flex align-items-center"
 >
-  <i class="fa-solid fa-code-branch" style="color: <%= branch_color(branch_name) %> !important;"></i>
+  <%= tag.i(
+    class: "fa-solid fa-code-branch",
+    style: "color: #{branch_color(branch_name)} !important;",
+    data: {
+      bs_toggle: "tooltip",
+      bs_custom_class: "x-wide-tooltip",
+      bs_title: "Each branch is always represented by the same color",
+    },
+  ) %>
   <%= tag.a(
     branch_name,
     class: %w[text-body text-decoration-none text-truncate mx-1 small],
