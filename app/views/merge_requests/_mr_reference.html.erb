@@ -1,6 +1,6 @@
 <nobr>
   <!-- Project avatar -->
-  <%= link_to make_full_url(merge_request.project.webUrl), target: "_blank", class: "text-decoration-none" do %>
+  <%= link_to make_full_url(merge_request.project.webUrl), target: "_blank", class: %W[text-decoration-none] + local_assigns.fetch(:link_class, []) do %>
     <% if merge_request.project.avatarUrl.present? %>
       <%= image_tag(
         make_full_url(merge_request.project.avatarUrl),
