@@ -6,9 +6,7 @@
   show_emojis: show_emojis,
   bg_class: "bg-review-#{reviewer.bootstrapClass[:badge]}",
   text_class: "text-review-#{reviewer.bootstrapClass[:badge]}" do %>
-  <%= tag.abbr(data: { bs_toggle: "tooltip", bs_title: reviewer.mergeRequestInteraction.reviewState }) do %>
-    <%= tag.i class: reviewer.bootstrapClass[:icon] %>
-  <% end %>
+  <%= tag.i class: reviewer.bootstrapClass[:icon] %>
   <% if show_emojis && reviewer.bootstrapClass[:activity_icon] %>
     <%= tag.i class: reviewer.bootstrapClass[:activity_icon] %>
   <% end %>
