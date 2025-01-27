@@ -13,6 +13,10 @@ module MergeRequestsHelper
     2.weeks
   end
 
+  def recommended_monthly_merge_rate
+    12
+  end
+
   def mr_list_panel_classes
     %w[
       table-responsive
