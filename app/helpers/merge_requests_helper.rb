@@ -33,6 +33,14 @@ module MergeRequestsHelper
     milestone_mismatch ? "text-warning" : nil
   end
 
+  def mttm_handbook_url
+    handbook_url("the handbook", "product/groups/product-analysis/engineering/metrics/#mean-time-to-merge-mttm")
+  end
+
+  def merged_mr_rates_handbook_url
+    handbook_url("the handbook", "product/groups/product-analysis/engineering/metrics/#merge-request-rates-mr-rates")
+  end
+
   def milestone_mismatch_tooltip(mr)
     return unless mr.milestone
 
@@ -63,5 +71,15 @@ module MergeRequestsHelper
       .compact
       .map(&:allowFailure)
       .include?(false)
+  end
+
+  private
+
+  def handbook_url(title, path)
+    tag.a(
+      "the handbook",
+      href: "https://handbook.gitlab.com/handbook/" + path,
+      target: "_blank"
+    )
   end
 end
