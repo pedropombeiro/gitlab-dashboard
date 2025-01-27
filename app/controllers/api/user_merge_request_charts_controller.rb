@@ -75,7 +75,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           data: series_values(user, ->(stats) { stats.count }).take(11)
         },
         {
-          label: "",
+          label: "MTD merged count",
           type: "bar",
           stack: "merged-count",
           order: 2,
