@@ -30,7 +30,7 @@
               },
             ) do -%>
               <%= distance_of_time_in_words(avg_open_time) -%>
-              <%= tag.i(class: %w[small bi bi-info-circle]) unless merge_time_ok -%>
+              <%= render("info_symbol") unless merge_time_ok -%>
             <% end %>
           <% end %>
         </div>
@@ -78,8 +78,8 @@
           Reviewers</th>
         <th scope="col">
           Issue
-          <%= tag.i(
-            class: %w[small bi bi-info-circle],
+          <%= render(
+            "info_symbol",
             data: {
               bs_toggle: "popover",
               bs_html: "true",
@@ -232,7 +232,7 @@
                       bs_toggle: "tooltip",
                       bs_title: milestone_mismatch_tooltip(mr),
                     } do %>
-                  <%= tag.i(class: %w[small bi bi-info-circle]) if div_class %>
+                  <%= render("info_symbol") if div_class %>
                   <%= render("milestone", milestone: mr.milestone) %>
                 <% end %>
               <% end %>
