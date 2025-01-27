@@ -40,10 +40,8 @@ export default class extends Controller {
           plugins: {
             legend: {
               labels: {
-                generateLabels: (chart) => {
-                  const items = Chart.defaults.plugins.legend.labels.generateLabels(chart);
-
-                  return items.filter(label => label.text && label.text.trim() !== "");
+                filter: (legendItem, _data) => {
+                  return legendItem.text.trim() !== "MTD merged count";
                 },
               },
             },
