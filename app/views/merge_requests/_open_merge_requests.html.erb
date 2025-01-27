@@ -22,9 +22,11 @@
             <%= tag.span(
               class: merge_time_ok ? nil : "text-warning",
               data: merge_time_ok ? nil : {
-                bs_toggle: "tooltip",
-                bs_title:
-                  "Merge requests have been open for longer than the recommended #{distance_of_time_in_words(mr_age_limit)}",
+                bs_toggle: "popover",
+                bs_title: "Mean Time To Merge (MTTM)",
+                bs_content:
+                "Merge requests have been open for longer than the recommended #{distance_of_time_in_words(mr_age_limit)}." \
+                "<br/>See #{mttm_handbook_url}.",
               },
             ) do -%>
               <%= distance_of_time_in_words(avg_open_time) -%>
@@ -79,10 +81,12 @@
           <%= tag.i(
             class: %w[small bi bi-info-circle],
             data: {
-              bs_toggle: "tooltip",
+              bs_toggle: "popover",
               bs_html: "true",
-              bs_custom_class: "wide-tooltip",
-              bs_title: "Issue number is extracted from branch name, if present.<br/>Each issue is always represented with the same color.",
+              bs_title: "Issue reference",
+              bs_content:
+                "Issue number is extracted from branch name, if present.<br/>" \
+                  "Each issue is always represented with the same color.",
             },
           ) %>
         </th>
