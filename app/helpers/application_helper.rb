@@ -80,10 +80,18 @@ module ApplicationHelper
   end
 
   def tooltip_from_hash(hash)
-    hash
-      .compact_blank
-      .map { |title, value| tag.div("#{tag.b(title)}: #{value}", class: "text-start", escape: false) }
-      .join
+    tag.table(
+      hash
+        .compact_blank
+        .map do |title, value|
+          cells = [
+            tag.td(tag.nobr(title, class: "me-1"), class: %W[text-end fw-bold align-text-top]),
+            tag.td(value, escape: false)
+          ]
+
+          tag.tr(cells.join, escape: false)
+        end.join
+    )
   end
 
   private
