@@ -81,8 +81,8 @@
           },
         ) do %>
           <%= distance_of_time_in_words(avg_time_to_merge) %>
-          <%= tag.i(class: %w[small bi bi-info-circle]) %>
-          <%= render("trend_indicator", trend: merge_rate_ok ? :down: :up) %>
+          <%= render("info_symbol") %>
+          <%= render("trend_indicator", trend: merge_rate_ok ? :down : :up) %>
         <% end %>
       </div>
     <% end %>
@@ -117,7 +117,7 @@
           ) do %>
             <%= monthly_merge_rate.round -%>
             per month
-            <%= tag.i(class: %w[small bi bi-info-circle]) %>
+            <%= render("info_symbol") %>
           <% end %>
         <% end %>
       </div>
@@ -139,7 +139,7 @@
             },
           ) do %>
             <%= distance_of_time_in_words(overall_avg_time_to_merge) %>
-            <%= tag.i(class: %w[small bi bi-info-circle]) %>
+            <%= render("info_symbol") %>
           <% end %>
         </div>
       <% end %>
@@ -174,8 +174,7 @@
         <% end %>
         <th scope="col">
           Issue
-          <%= tag.i(
-            class: %w[small bi bi-info-circle],
+          <%= render("info_symbol",
             data: {
               bs_toggle: "popover",
               bs_title: "Issue reference",
@@ -253,7 +252,7 @@
                       bs_toggle: "tooltip",
                       bs_title: milestone_mismatch_tooltip(mr),
                     } do %>
-                  <%= tag.i(class: %w[small bi bi-info-circle]) if div_class %>
+                  <%= render("info_symbol") if div_class %>
                   <%= render("milestone", milestone: mr.milestone) %>
                 <% end %>
               <% end %>
