@@ -18,3 +18,13 @@ document.addEventListener("turbo:frame-missing", async function (event) {
   }
   document.close();
 })
+
+// Allow table elements in Bootstrap tooltips
+const defaultAllowList = bootstrap.Tooltip.Default.allowList
+
+defaultAllowList.table = []
+defaultAllowList.tbody = []
+defaultAllowList.tr = []
+defaultAllowList.td = []
+defaultAllowList.nobr = []
+
