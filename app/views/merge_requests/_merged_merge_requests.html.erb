@@ -60,7 +60,7 @@
       ) do %>
         <%= pluralize(number_with_delimiter(merge_requests.count), "merge request") %>
         <%= tag.i(class: %w[small bi bi-info-circle]) %>
-        <%= tag.i(class: %w[small bi] + (merge_rate_ok ? %W[bi-arrow-up-right]: %w[bi-arrow-down-right])) %>
+        <%= render("trend_indicator", trend: merge_rate_ok ? :up : :down) %>
       <% end %>
       merged in the last week
     </div>
@@ -82,7 +82,7 @@
         ) do %>
           <%= distance_of_time_in_words(avg_time_to_merge) %>
           <%= tag.i(class: %w[small bi bi-info-circle]) %>
-          <%= tag.i(class: %w[small bi] + (merge_rate_ok ? %W[bi-arrow-down-right]: %w[bi-arrow-up-right])) %>
+          <%= render("trend_indicator", trend: merge_rate_ok ? :down: :up) %>
         <% end %>
       </div>
     <% end %>
