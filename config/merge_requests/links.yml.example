@@ -1,0 +1,4 @@
+# dashboard:
+#   links:
+#     - name: Release Management Grafana dashboard
+#       url: https://dashboards.gitlab.net/...
