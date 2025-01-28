@@ -70,6 +70,6 @@ module MrStatusOrnamentsConcern
   end
 
   def config
-    @@merge_requests_config ||= Rails.application.config_for(:merge_requests)
+    @@merge_requests_config ||= Rails.application.config.merge_requests
   end
 end

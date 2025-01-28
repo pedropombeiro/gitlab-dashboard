@@ -21,7 +21,7 @@
       <% end %>
     <% end %>
 
-    <% links = Rails.application.config_for(:merge_requests)&.dig(:dashboard, :links) %>
+    <% links = Rails.application.config.merge_requests&.dig(:dashboard, :links) %>
     <%= render "shared/links_button", links: links %>
 
     <div
