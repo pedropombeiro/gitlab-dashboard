@@ -36,33 +36,44 @@ RSpec.describe ComputeMergeRequestChangesService do
     let(:new_response) { response }
     let(:type) { :open }
     let(:previous_mrs) { previous_response.user.openMergeRequests.nodes }
+    let(:new_mrs) { new_response.user.openMergeRequests.nodes }
 
     it { is_expected.to be_empty }
 
     context "when MR label changes" do
-      before do
-        label = previous_mrs.first.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
-        label.title = "pipeline::tier-2"
-      end
-
-      it { is_expected.not_to be_empty }
-
-      it "contains notification for MR with change label" do
-        is_expected.to match [
-          a_hash_including(
-            body: "changed to pipeline::tier-3\n\n!173741: Clean up runner audit log code",
-            tag: "173741",
-            type: :label_change,
-            url: "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173741"
-          )
-        ]
-      end
-
-      context "when a second MR label changes" do
+      context "with old contextual label not existing" do
         before do
-          label = previous_mrs.third.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
-          label.title = "pipeline::tier-1"
+          previous_dto.open_merge_requests.items.third.tap do |changed_mr|
+            changed_mr.labels.nodes.delete_if { |label| label.title.start_with?("pipeline::tier-") }
+            changed_mr.contextualLabels.clear
+          end
+
+          dto.open_merge_requests.items.third.tap do |changed_mr|
+            changed_mr.labels.nodes.delete_if { |label| label.title.start_with?("pipeline::tier-") }
+            changed_mr.contextualLabels.clear
+          end
         end
+
+        it { is_expected.to be_empty }
+      end
+
+      context "with new label not being a watched label" do
+        before do
+          changed_mr = find_merge_request_with_labels(new_mrs, ["pipeline::tier-"])
+          changed_mr.labels.nodes <<
+            changed_mr.labels.nodes.last.dup.tap { |label| label.title = "Unwanted label" }
+        end
+
+        it { is_expected.to be_empty }
+      end
+
+      context "with new label being a watched label" do
+        before do
+          label = previous_mrs.first.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
+          label.title = "pipeline::tier-2"
+        end
+
+        it { is_expected.not_to be_empty }
 
         it "contains notification for MR with change label" do
           is_expected.to match [
@@ -71,16 +82,43 @@ RSpec.describe ComputeMergeRequestChangesService do
               tag: "173741",
               type: :label_change,
               url: "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173741"
-            ),
-            a_hash_including(
-              body: "changed to pipeline::tier-2\n\n!173789: Generate audit event per project association from runner",
-              tag: "173789",
-              timestamp: DateTime.parse("2024-11-27 10:51:59.000000000 +0000"),
-              title: "An open merge request",
-              type: :label_change,
-              url: "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173789"
             )
           ]
+        end
+
+        context "when MR was just created" do
+          before do
+            changed_mr_prev_version = find_merge_request_with_labels(previous_mrs, ["pipeline::tier-"])
+            previous_mrs.delete changed_mr_prev_version
+          end
+
+          it { is_expected.to be_empty }
+        end
+
+        context "when a second MR label changes" do
+          before do
+            label = previous_mrs.third.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }
+            label.title = "pipeline::tier-1"
+          end
+
+          it "contains notification for MR with change label" do
+            is_expected.to match [
+              a_hash_including(
+                body: "changed to pipeline::tier-3\n\n!173741: Clean up runner audit log code",
+                tag: "173741",
+                type: :label_change,
+                url: "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173741"
+              ),
+              a_hash_including(
+                body: "changed to pipeline::tier-2\n\n!173789: Generate audit event per project association from runner",
+                tag: "173789",
+                timestamp: DateTime.parse("2024-11-27 10:51:59.000000000 +0000"),
+                title: "An open merge request",
+                type: :label_change,
+                url: "https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173789"
+              )
+            ]
+          end
         end
       end
     end
@@ -251,21 +289,6 @@ RSpec.describe ComputeMergeRequestChangesService do
         )
       end
     end
-
-    private
-
-    def find_merge_request_with_labels(merge_requests, mr_label_prefixes)
-      merge_requests.find do |mr|
-        mr_label_prefixes.all? do |prefix|
-          negate = prefix.start_with?("!")
-          prefix.delete_prefix!("!") if negate
-
-          contains_label = mr.labels.nodes.any? { |label| label.title.start_with?(prefix) }
-
-          negate ? !contains_label : contains_label
-        end
-      end
-    end
   end
 
   private
@@ -288,5 +311,18 @@ RSpec.describe ComputeMergeRequestChangesService do
       labels: OpenStruct.new(nodes: []),
       contextualLabels: OpenStruct.new(nodes: [])
     )
+  end
+
+  def find_merge_request_with_labels(merge_requests, mr_label_prefixes)
+    merge_requests.find do |mr|
+      mr_label_prefixes.all? do |prefix|
+        negate = prefix.start_with?("!")
+        prefix.delete_prefix!("!") if negate
+
+        contains_label = mr.labels.nodes.any? { |label| label.title.start_with?(prefix) }
+
+        negate ? !contains_label : contains_label
+      end
+    end
   end
 end
