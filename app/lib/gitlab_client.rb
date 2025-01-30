@@ -7,8 +7,12 @@ class GitlabClient
   ACTIVE_REVIEWS_AGE_LIMIT = 1.week
   OPEN_MERGE_REQUESTS_MIN_ACTIVITY = 1.year
 
+  private_class_method def self.gitlab_token
+    @gitlab_token = ENV.fetch("GITLAB_TOKEN", Rails.application.credentials.gitlab_token)
+  end
+
   private_class_method def self.authorization
-    "Bearer #{Rails.application.credentials.gitlab_token}"
+    "Bearer #{gitlab_token}"
   end
 
   def self.gitlab_instance_url
