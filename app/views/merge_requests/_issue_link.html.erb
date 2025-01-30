@@ -1,20 +1,24 @@
-<%= render "link",
-title: issue_badge(issue.iid),
-web_url: issue.webUrl,
-data: {
-  bs_toggle: "tooltip",
-  bs_html: "true",
-  bs_custom_class: "x-wide-tooltip",
-  bs_title: issue.titleHtml,
-} %>
+<% if issue %>
+  <%= render "link",
+  title: issue_badge(issue.iid),
+  web_url: issue.webUrl,
+  data: {
+    bs_toggle: "tooltip",
+    bs_html: "true",
+    bs_custom_class: "x-wide-tooltip",
+    bs_title: issue.titleHtml,
+  } %>
 
-<span class="small">
-  <%= render("milestone", milestone: issue.milestone) %>
-</span>
+  <span class="small">
+    <%= render("milestone", milestone: issue.milestone) %>
+  </span>
 
-<div>
-  <%= render partial: "gitlab_label",
-  spacer_template: "space",
-  collection: issue.contextualLabels,
-  as: :label %>
-</div>
+  <div>
+    <%= render partial: "gitlab_label",
+    spacer_template: "space",
+    collection: issue.contextualLabels,
+    as: :label %>
+  </div>
+<% else %>
+  <span>N/A<span>
+<% end %>
