@@ -3,8 +3,6 @@
 module CacheConcern
   extend ActiveSupport::Concern
 
-  REDIS_NAMESPACE = "gitlab_dashboard"
-
   USER_CACHE_VALIDITY = 1.day
   MR_CACHE_VALIDITY = 5.minutes
   REVIEWER_VALIDITY = 30.minutes
@@ -16,47 +14,51 @@ module CacheConcern
 
   class_methods do
     def user_cache_key(username)
-      "#{REDIS_NAMESPACE}/user_info/#{user_info_version}/#{user_hash(username)}"
+      "#{redis_namespace}/user_info/#{user_info_version}/#{user_hash(username)}"
     end
 
     def location_info_cache_key(location)
-      "#{REDIS_NAMESPACE}/location/#{LOCATION_VERSION}/#{calculate_hash(location)}"
+      "#{redis_namespace}/location/#{LOCATION_VERSION}/#{calculate_hash(location)}"
     end
 
     def location_timezone_name_cache_key(location)
-      "#{REDIS_NAMESPACE}/location/#{LOCATION_VERSION}/#{calculate_hash(location)}/timezone_name"
+      "#{redis_namespace}/location/#{LOCATION_VERSION}/#{calculate_hash(location)}/timezone_name"
     end
 
     def project_issues_cache_key(issues)
       issue_iids = issues.map { |issue| issue.values.join("/") }.sort
-      "#{REDIS_NAMESPACE}/issues/#{project_issues_version}/#{calculate_hash(*issue_iids)}"
+      "#{redis_namespace}/issues/#{project_issues_version}/#{calculate_hash(*issue_iids)}"
     end
 
     def reviewer_cache_key(username)
-      "#{REDIS_NAMESPACE}/reviewer_info/#{reviewer_info_version}/#{user_hash(username)}"
+      "#{redis_namespace}/reviewer_info/#{reviewer_info_version}/#{user_hash(username)}"
     end
 
     def project_version_cache_key(project_full_path)
-      "#{REDIS_NAMESPACE}/project_version/#{calculate_hash(project_full_path)}"
+      "#{redis_namespace}/project_version/#{calculate_hash(project_full_path)}"
     end
 
     def authored_mr_lists_cache_key(user, type)
-      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/authored_#{type}_list/#{user_hash(user)}"
+      "#{redis_namespace}/merge_requests/#{merge_requests_version}/authored_#{type}_list/#{user_hash(user)}"
     end
 
     def monthly_merged_mr_lists_cache_key(user)
-      "#{REDIS_NAMESPACE}/merge_requests/#{monthly_merge_request_stats_version}/monthly_merged/#{user_hash(user)}"
+      "#{redis_namespace}/merge_requests/#{monthly_merge_request_stats_version}/monthly_merged/#{user_hash(user)}"
     end
 
     def last_authored_mr_lists_cache_key(user, type)
-      "#{REDIS_NAMESPACE}/merge_requests/#{merge_requests_version}/last_authored_#{type}_list/#{user_hash(user)}"
+      "#{redis_namespace}/merge_requests/#{merge_requests_version}/last_authored_#{type}_list/#{user_hash(user)}"
     end
 
     def group_reviewers_cache_key(group_full_path)
-      "#{REDIS_NAMESPACE}/group/#{calculate_hash(group_full_path)}/reviewers"
+      "#{redis_namespace}/group/#{calculate_hash(group_full_path)}/reviewers"
     end
 
     private
+
+    def redis_namespace
+      @redis_namespace ||= ENV.fetch("REDIS_NAMESPACE", "gitlab_dashboard")
+    end
 
     def value_as_string(obj)
       case obj
