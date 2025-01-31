@@ -23,7 +23,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
 
       {
         x: month.strftime("%Y-%m"),
-        y: fn.call(stats)
+        y: fn.is_a?(Proc) ? fn.call(stats) : fn
       }
     end.reverse
   end
@@ -63,7 +63,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           borderColor: "#FF6384A0",
           pointStyle: false,
           borderDash: [10, 5],
-          data: series_values(user, ->(stats) { overall_monthly_merge_ttm })
+          data: series_values(user, overall_monthly_merge_ttm)
         },
         {
           label: "Merged count",
@@ -94,7 +94,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           borderDash: [10, 5],
           borderColor: "#37A2EBA0",
           backgroundColor: "#37A2EBA0",
-          data: series_values(user, ->(stats) { monthly_merge_rate })
+          data: series_values(user, monthly_merge_rate)
         }
       ]
     }
