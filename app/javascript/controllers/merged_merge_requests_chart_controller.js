@@ -21,6 +21,11 @@ export default class extends Controller {
     try {
       const chartData = await this.fetchData();
 
+      chartData.datasets.find((dataset) => dataset.stack === "merged-count").backgroundColor = function (context) {
+        const index = context.dataIndex;
+        return index === context.dataset.data.length - 1 ? "#37A2EB60" : "#37A2EBA0";
+      };
+
       const canvas = document.createElement("canvas");
       this.chartTarget.replaceChildren(canvas);
 
@@ -35,15 +40,6 @@ export default class extends Controller {
             line: {
               pointStyle: "circle",
               tension: 0.5,
-            },
-          },
-          plugins: {
-            legend: {
-              labels: {
-                filter: (legendItem, _data) => {
-                  return legendItem.text.trim() !== "MTD merged count";
-                },
-              },
             },
           },
         },
