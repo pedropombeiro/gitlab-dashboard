@@ -33,7 +33,6 @@ shared:
     notification_rules:
       - required_state: open
         watched_labels:
-          - "pipeline::tier-1"
           - "pipeline::tier-2"
           - "pipeline::tier-3"
       - required_label: backend
