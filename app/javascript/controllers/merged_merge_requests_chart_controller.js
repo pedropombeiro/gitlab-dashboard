@@ -28,6 +28,7 @@ export default class extends Controller {
       new Chart(ctx, {
         type: "bar",
         data: chartData,
+        plugins: [ChartDataLabels],
         options: {
           height: "100%",
           aspectRatio: 3,
@@ -43,6 +44,44 @@ export default class extends Controller {
                 filter: (legendItem, _data) => {
                   return legendItem.text.trim() !== "MTD merged count";
                 },
+              },
+            },
+            datalabels: {
+              display: function (context) {
+                if (context === undefined || context.dataset.stack !== "merged-count") {
+                  return false;
+                }
+
+                function sortByY(data) {
+                  if (!Array.isArray(data)) {
+                    throw new Error("Input must be an array.");
+                  }
+
+                  if (data.length === 0) {
+                    return []; // Return empty array if input is empty
+                  }
+
+                  // Sort the array in descending order based on the y-value
+                  return [...data].sort((a, b) => b.y - a.y);
+                }
+
+                const dataPoints = context.dataset.data;
+                if (dataPoints.length >= 3) {
+                  const value = dataPoints[context.dataIndex].y;
+                  const sortedDataPoints = sortByY(dataPoints);
+                  if (sortedDataPoints !== undefined && value >= sortedDataPoints[2].y) {
+                    return true;
+                  }
+                }
+
+                return false;
+              },
+              color: "#fff",
+              font: {
+                weight: "bold",
+              },
+              formatter: function (value) {
+                return value.y;
               },
             },
           },

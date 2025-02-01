@@ -84,6 +84,10 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
             colorMin: "#37A2EBA0",
             lineStyle: "dotted",
             width: 2
+          },
+          datalabels: {
+            align: "start",
+            anchor: "end"
           }
         },
         {
