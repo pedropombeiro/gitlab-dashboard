@@ -22,7 +22,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
       stats = user["monthlyMergedMergeRequests#{index}"]
 
       {
-        x: month.strftime("%Y-%m"),
+        x: month.strftime("%b"),
         y: fn.is_a?(Proc) ? fn.call(stats) : fn
       }
     end.reverse
