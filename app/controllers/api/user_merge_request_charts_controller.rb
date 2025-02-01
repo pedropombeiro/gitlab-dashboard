@@ -72,11 +72,11 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           order: 2,
           backgroundColor: "#37A2EBA0",
           borderColor: "#37A2EB",
-          data: series_values(user, ->(stats) { stats.count }),
+          data: series_values(user, ->(stats) { stats.count }).take(11),
           trendlineLinear: {
             label: {
               color: "#000",
-              text: "Merged MRs 12-month trendline",
+              text: "Merged MRs 11-month trendline",
               display: true,
               percentage: true,
               offset: 10
@@ -85,6 +85,15 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
             lineStyle: "dotted",
             width: 2
           }
+        },
+        {
+          label: "MTD merged count",
+          type: "bar",
+          stack: "merged-count",
+          order: 2,
+          backgroundColor: "#37A2EB60",
+          borderColor: "#37A2EB",
+          data: series_values(user, ->(stats) { stats.count }).drop(11)
         },
         {
           label: "All-time average (#{monthly_merge_rate.round}/month)",
