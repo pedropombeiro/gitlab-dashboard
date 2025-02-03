@@ -290,7 +290,10 @@ class GitlabClient
             blockingMergeRequests {
               visibleMergeRequests {
                 iid
+                reference
                 state
+                sourceBranch
+                webUrl
               }
             }
             reviewers {

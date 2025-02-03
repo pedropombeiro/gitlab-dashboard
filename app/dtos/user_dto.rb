@@ -112,7 +112,9 @@ class UserDto
         end
       end
 
-      mr.upstreamMergeRequest = merge_requests.find { |target_mr| mr.targetBranch == target_mr.sourceBranch }
+      mr.upstreamMergeRequest =
+        merge_requests.find { |target_mr| mr.targetBranch == target_mr.sourceBranch } ||
+        mr.blockingMergeRequests&.visibleMergeRequests&.find { |target_mr| mr.targetBranch == target_mr.sourceBranch }
     end
   end
 

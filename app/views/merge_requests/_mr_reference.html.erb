@@ -1,14 +1,16 @@
 <nobr>
-  <!-- Project avatar -->
-  <%= link_to make_full_url(merge_request.project.webUrl), target: "_blank", class: %W[text-decoration-none] + local_assigns.fetch(:link_class, []) do %>
-    <% if merge_request.project.avatarUrl.present? %>
-      <%= image_tag(
-        make_full_url(merge_request.project.avatarUrl),
-        size: 16,
-        class: %w[rounded float-left],
-      ) %>
-    <% else %>
-      <%= image_tag("", size: 16, class: %w[invisible float-left]) %>
+  <% if merge_request.project %>
+    <!-- Project avatar -->
+    <%= link_to make_full_url(merge_request.project.webUrl), target: "_blank", class: %W[text-decoration-none] + local_assigns.fetch(:link_class, []) do %>
+      <% if merge_request.project.avatarUrl.present? %>
+        <%= image_tag(
+          make_full_url(merge_request.project.avatarUrl),
+          size: 16,
+          class: %w[rounded float-left],
+        ) %>
+      <% else %>
+        <%= image_tag("", size: 16, class: %w[invisible float-left]) %>
+      <% end %>
     <% end %>
   <% end %>
 
