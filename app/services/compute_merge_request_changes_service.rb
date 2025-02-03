@@ -61,13 +61,19 @@ class ComputeMergeRequestChangesService
 
   def merge_request_labels_change(title, changes)
     mr = changes[:mr]
+    mr_data = "#{mr.reference}: #{mr.titleHtml}"
 
-    merge_request_change(
-      mr,
+    hash = {
       type: :label_change,
       title: title,
-      body: "changed to #{changes[:labels].join(", ")}\n\n#{mr.reference}: #{mr.titleHtml}"
-    )
+      body: "changed to #{changes[:labels].join(", ")}\n\n#{mr_data}"
+    }
+
+    if changes[:previous_labels].any? && changes[:labels].empty?
+      hash[:body] = "is no longer labeled #{changes[:previous_labels].join(", ")}\n\n#{mr_data}"
+    end
+
+    merge_request_change(mr, **hash)
   end
 
   def changed_labels(previous_mrs, mrs)
