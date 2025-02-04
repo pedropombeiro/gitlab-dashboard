@@ -92,7 +92,7 @@ class GroupReviewersDto
     message = reviewer.status.message
 
     return true if message&.include?("OOO") || message&.include?("Out of office")
-    return true if OOO_EMOJIS.include?(reviewer.status.emoji)
+    return true if reviewer.status.emoji.in?(OOO_EMOJIS)
     return true if message&.match?(/\wsick\w/)
 
     false

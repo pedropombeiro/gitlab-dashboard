@@ -109,7 +109,7 @@ class ComputeMergeRequestChangesService
 
     notification_rules
       .filter { |rule| rule.key?(:required_state) ? mr.state == rule[:required_state].to_sym : true }
-      .filter { |rule| rule.key?(:required_label) ? label_titles.include?(rule[:required_label]) : true }
+      .filter { |rule| rule.key?(:required_label) ? rule[:required_label].in?(label_titles) : true }
   end
 
   def changed_labels_matching_rules(previous_mr_version, mr)
