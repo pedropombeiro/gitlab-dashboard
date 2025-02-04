@@ -90,11 +90,11 @@ class ComputeMergeRequestChangesService
       previous_ctx_labels, ctx_labels = mr_versions.map(&:contextualLabels)
       next if ctx_labels.map(&:title) == previous_ctx_labels.map(&:title)
 
-      # Check workflow notification rules
-      if notification_rules.present? && rules_label_titles.intersect?(mr.labels.nodes.map(&:title))
-        previous_ctx_labels, ctx_labels = changed_labels_matching_rules(previous_mr_version, mr)
-        next if ctx_labels.nil?
-      end
+      # Only process labels present in workflow notification rules
+      next if notification_rules.present? && !rules_label_titles.intersect?(mr.labels.nodes.map(&:title))
+
+      previous_ctx_labels, ctx_labels = changed_labels_matching_rules(previous_mr_version, mr)
+      next if ctx_labels.nil?
 
       {
         mr: mr,

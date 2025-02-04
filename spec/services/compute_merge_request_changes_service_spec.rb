@@ -37,6 +37,7 @@ RSpec.describe ComputeMergeRequestChangesService do
     let(:type) { :open }
     let(:previous_mrs) { previous_response.user.openMergeRequests.nodes }
     let(:new_mrs) { new_response.user.openMergeRequests.nodes }
+    let(:changed_mr) { new_mrs.find { |new_mr| new_mr.iid == changed_mr_prev_version.iid } }
 
     it { is_expected.to be_empty }
 
@@ -58,13 +59,20 @@ RSpec.describe ComputeMergeRequestChangesService do
       end
 
       context "with new label not being a watched label" do
+        let(:changed_mr_prev_version) { find_merge_request_with_labels(previous_mrs, ["pipeline::tier-2"]) }
+
         before do
-          changed_mr = find_merge_request_with_labels(new_mrs, ["pipeline::tier-"])
-          changed_mr.labels.nodes <<
-            changed_mr.labels.nodes.last.dup.tap { |label| label.title = "Unwanted label" }
+          set_mr_pipeline_tier_label(changed_mr_prev_version, "pipeline::tier-0")
+          set_mr_pipeline_tier_label(changed_mr, "pipeline::tier-1")
         end
 
         it { is_expected.to be_empty }
+
+        private
+
+        def set_mr_pipeline_tier_label(mr, value)
+          mr.labels.nodes.find { |label| label.title.start_with?("pipeline::tier-") }.title = value
+        end
       end
 
       context "with new label being a watched label" do
