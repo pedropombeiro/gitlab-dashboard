@@ -57,7 +57,7 @@ module MrStatusOrnamentsConcern
   private
 
   def waiting_for_others?(mr)
-    %w[UNREVIEWED UNAPPROVED REVIEW_STARTED].include?(mr.detailedMergeStatus)
+    mr.detailedMergeStatus.in?(%w[UNREVIEWED UNAPPROVED REVIEW_STARTED])
   end
 
   def returned_to_assignee?(mr)

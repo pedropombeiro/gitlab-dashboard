@@ -132,7 +132,7 @@ class UserDto
         mr.headPipeline[:outdated?] =
           mr.headPipeline.startedAt &&
           mr.headPipeline.finishedAt&.before?(PIPELINE_AGE_LIMIT.ago) &&
-          mr.contextualLabels.map(&:title).include?("pipeline::tier-3")
+          "pipeline::tier-3".in?(mr.contextualLabels.map(&:title))
       end
 
       mr.mergeStatusLabel = open_merge_request_status_label(mr)
