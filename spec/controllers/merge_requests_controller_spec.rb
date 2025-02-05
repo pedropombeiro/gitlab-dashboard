@@ -417,7 +417,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             )
             expect(response.body).to include(%(https://gitlab.com/uploads/-/system/project/avatar/278964/project_avatar.png))
             # Issues
-            expect(response.body).to include(%(>#506226</span></a>))
+            expect(response.body).to include(%r{>\s*#506226.*<img }m)
             # MR links
             expect(response.body).to include(%(>!173916</a>))
             # Failed job link from downstream pipeline
@@ -728,10 +728,10 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%(https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png))
             # Issues
             expect(response.body).to include(
-              %(<span class="badge rounded-pill text-white" style="background-color: #845EF7 !important;">#505810</span>)
+              %r{<span class="d-inline-flex align-items-center badge rounded-pill text-white" style="background-color: #845EF7 !important;">.*#505810.*<img}m
             )
             expect(response.body).to include(
-              %(<span class="badge rounded-pill text-white" style="background-color: #51CF66 !important;">#32804</span>)
+              %r{<span class="d-inline-flex align-items-center badge rounded-pill text-white" style="background-color: #51CF66 !important;">.*#32804.*<img}m
             )
             ## Issue from security MR should be found in canonical repo
             expect(response.body).to include(%(href="https://gitlab.com/gitlab-org/gitlab-runner/-/issues/32804"))

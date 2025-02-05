@@ -1,13 +1,23 @@
-<% if issue %>
+<% if issue&.iid %>
   <%= render "link",
-  title: issue_badge(issue.iid),
   web_url: issue.webUrl,
   data: {
     bs_toggle: "tooltip",
     bs_html: "true",
     bs_custom_class: "x-wide-tooltip",
     bs_title: issue.titleHtml,
-  } %>
+  } do %>
+    <% color = issue_color(issue.iid) %>
+
+    <%= tag.span(class: %W[d-inline-flex align-items-center badge rounded-pill #{color[:text_class]}], style: "background-color: #{color[:bg]} !important;") do %>
+      <%= "##{issue.iid}" -%>
+
+      <% identicon_opts = { seed: issue.iid, backgroundType: "gradientLinear", backgroundColor: color[:bg] } %>
+      <%= tag.img(
+        src: "https://api.dicebear.com/9.x/identicon/svg?#{identicon_opts.map { |k, v| "#{k}=#{v}" }.join(",") }",
+        width: 12, alt: "avatar", class: "ms-1") -%>
+    <% end %>
+  <% end %>
 
   <span class="small">
     <%= render("milestone", milestone: issue.milestone) %>
