@@ -1,5 +1,5 @@
 <nobr data-controller="clipboard">
-  <%= link_to title,
+  <%= link_to local_assigns[:title] || yield,
   web_url,
   **{
     data: {
