@@ -394,7 +394,7 @@ class GitlabClient
   GroupReviewersQuery = Client.parse <<-GRAPHQL
     query($fullPath: ID!, $activeReviewsAfter: Time, $activeAssignmentsAfter: Time) {
       group(fullPath: $fullPath) {
-        groupMembers(accessLevels: [OWNER]) {
+        groupMembers(relations: DIRECT) {
           nodes {
             user {
               ...#{name}::ReviewerFragment
