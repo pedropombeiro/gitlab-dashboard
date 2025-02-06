@@ -51,7 +51,7 @@ module CacheConcern
     end
 
     def group_reviewers_cache_key(group_full_path)
-      "#{redis_namespace}/group/#{calculate_hash(group_full_path)}/reviewers"
+      "#{redis_namespace}/group/#{calculate_hash(group_full_path)}/reviewers/#{group_reviewers_version}"
     end
 
     private
@@ -106,6 +106,10 @@ module CacheConcern
 
     def monthly_merge_request_stats_version
       @monthly_merge_request_stats_version ||= calculate_hash(GitlabClient::MonthlyMergeRequestsQuery)
+    end
+
+    def group_reviewers_version
+      @group_reviewers_version ||= calculate_hash(GitlabClient::GroupReviewersQuery)
     end
   end
 end
