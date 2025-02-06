@@ -10,6 +10,11 @@
     <% end %>
     <%= render "branch_ref", branch_name: target_branch %>
 
+    <% popover_content = {
+      "Rebase onto target branch:" => "git switch #{source_branch} && \\<br/>git rebase --interactive #{target_branch}",
+      "Push all branches:" => "git push origin -f #{source_branch} #{target_branch}",
+    } %>
+
     <%= tag.span(
         data: {
           bs_toggle: "popover",
@@ -17,14 +22,16 @@
           bs_title: "Useful commands",
           bs_custom_class: "x-wide-popover",
           bs_content: tag.ul do
-            tag.li(data: { controller: "clipboard" }) do
-              [
-                tag.span("Rebase onto target branch:"),
-                tag.br,
-                tag.code("git switch #{source_branch} && \\<br/>git rebase --interactive #{target_branch}", escape: false, data: { clipboard_target: "source" }),
-                render("shared/clipboard_button")
-              ].join
-            end
+            safe_join(popover_content.map do |name, snippet|
+              tag.li(data: { controller: "clipboard" }) do
+                safe_join([
+                  tag.span(name),
+                  tag.br,
+                  tag.code(snippet, escape: false, data: { clipboard_target: "source" }),
+                  render("shared/clipboard_button")
+                ])
+              end
+            end)
           end
         },
       ) do %>
