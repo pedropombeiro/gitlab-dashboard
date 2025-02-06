@@ -9,5 +9,26 @@
       &nbsp;
     <% end %>
     <%= render "branch_ref", branch_name: target_branch %>
+
+    <%= tag.span(
+        data: {
+          bs_toggle: "popover",
+          bs_html: "true",
+          bs_title: "Useful commands",
+          bs_custom_class: "x-wide-popover",
+          bs_content: tag.ul do
+            tag.li(data: { controller: "clipboard" }) do
+              [
+                tag.span("Rebase onto target branch:"),
+                tag.br,
+                tag.code("git switch #{source_branch} && \\<br/>git rebase --interactive #{target_branch}", escape: false, data: { clipboard_target: "source" }),
+                render("shared/clipboard_button")
+              ].join
+            end
+          end
+        },
+      ) do %>
+      <%= tag.i(class: %w[small bi bi-info-circle]) %>
+    <% end %>
   </div>
 <% end %>

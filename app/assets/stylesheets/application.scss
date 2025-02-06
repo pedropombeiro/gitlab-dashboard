@@ -24,6 +24,14 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
   --bs-tooltip-max-width: 800px !important;
 }
 
+.wide-popover {
+  --bs-popover-max-width: 400px !important;
+}
+
+.x-wide-popover {
+  --bs-popover-max-width: 800px !important;
+}
+
 .tooltip-inner {
   text-align: left;
 }
