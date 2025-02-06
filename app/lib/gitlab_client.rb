@@ -44,6 +44,11 @@ class GitlabClient
   def fetch_reviewer(username, format: :open_struct)
     format_response(format) do
       execute_query(ReviewerQuery, reviewer: username, activeReviewsAfter: ACTIVE_REVIEWS_AGE_LIMIT.ago)
+    end.tap do |response|
+      next if format == :yaml_fixture
+
+      reviewer = response.response.data.user
+      compute_active_reviews(reviewer)
     end
   end
 
@@ -132,6 +137,12 @@ class GitlabClient
         activeReviewsAfter: 1.month.ago,
         activeAssignmentsAfter: 2.months.ago
       )
+    end.tap do |response|
+      next if format == :yaml_fixture
+
+      response.response.data.group.groupMembers.nodes.flat_map(&:user).each do |reviewer|
+        compute_active_reviews(reviewer)
+      end
     end
   end
 
@@ -434,6 +445,13 @@ class GitlabClient
 
   def project_version_file_uri(project_web_url, branch)
     URI("#{project_web_url}/-/raw/#{branch}/VERSION")
+  end
+
+  def compute_active_reviews(reviewer)
+    # NOTE: This workaround is required because we can't filter on `active: true` reviews until
+    # the `mr_approved_filter` FF is removed or enabled
+    reviewer.activeReviews[:count] =
+      reviewer.activeReviews.delete_field!(:nodes).count { |review| !review.approved }
   end
 
   def make_serializable(obj)

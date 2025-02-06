@@ -128,13 +128,6 @@ class FetchMergeRequestsService
 
     open_merge_requests.flat_map { |mr| mr.reviewers.nodes }.each do |reviewer|
       reviewer.table.reverse_merge!(reviewers_hash[reviewer.username].table)
-
-      if reviewer.activeReviews.nodes
-        # NOTE: This is required because we can't filter on `active: true` reviews until
-        # the `mr_approved_filter` FF is removed or enabled
-        reviewer.activeReviews[:count] =
-          reviewer.activeReviews.delete_field!(:nodes).count { |review| !review.approved }
-      end
     end
   end
 end
