@@ -70,7 +70,11 @@ class GroupReviewersDto
 
     return if reviewer.bot || reviewer.status.nil? || reviewer.username.ends_with?("-bot")
 
-    reviewer.activeReviews[:count] = reviewer.activeReviews.nodes.count(&:approved)
+    # NOTE: This is required because we can't filter on `active: true` reviews until
+    # the `mr_approved_filter` FF is removed or enabled
+    reviewer.activeReviews[:count] =
+      reviewer.activeReviews.delete_field!(:nodes).count { |review| !review.approved }
+
     reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
     reviewer[:reviewLimit] = review_limit(reviewer)
     reviewer[:bootstrapClass] = bs_classes(reviewer)
