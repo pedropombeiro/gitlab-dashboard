@@ -59,7 +59,7 @@ group :development, :test do
   gem "standard"
   gem "standard-rails"
 
-  gem "rspec-rails", "~> 7.1.0"
+  gem "rspec-rails", "~> 7.1.1"
   gem "factory_bot", "~> 6.5"
   gem "factory_bot_rails", "~> 6.4"
 end
