@@ -11,7 +11,7 @@
     <%= render "branch_ref", branch_name: target_branch %>
 
     <% popover_content = {
-      "Rebase onto target branch:" => "git switch #{source_branch} && \\<br/>git rebase --interactive #{target_branch}",
+      "Rebase onto target branch:" => "git switch #{source_branch} && \\<br/>git rebase --interactive #{target_branch} && \\<br/>git switch -",
       "Push all branches:" =>
         "git push --force-with-lease --force-if-includes --no-verify #{source_branch} #{target_branch}",
     } %>
