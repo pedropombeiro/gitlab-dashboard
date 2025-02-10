@@ -728,10 +728,10 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%(https://gitlab.com/uploads/-/system/project/avatar/250833/runner.png))
             # Issues
             expect(response.body).to include(
-              %r{<span class="d-inline-flex align-items-center badge rounded-pill text-white" style="background-color: #845EF7 !important;">.*#505810.*<img}m
+              %r{<span class="d-inline-flex align-items-center badge rounded-pill text-white" style="background-color: #339AF0 !important;">.*#505810.*<img}m
             )
             expect(response.body).to include(
-              %r{<span class="d-inline-flex align-items-center badge rounded-pill text-white" style="background-color: #51CF66 !important;">.*#32804.*<img}m
+              %r{<span class="d-inline-flex align-items-center badge rounded-pill text-black" style="background-color: #FCC419 !important;">.*#32804.*<img}m
             )
             ## Issue from security MR should be found in canonical repo
             expect(response.body).to include(%(href="https://gitlab.com/gitlab-org/gitlab-runner/-/issues/32804"))
