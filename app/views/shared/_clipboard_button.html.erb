@@ -1,6 +1,6 @@
 <%= link_to(
   "#",
-  class: %w[me-2 float-right d-none d-sm-inline text-secondary text-decoration-none],
+  class: %w[me-2 float-right d-none d-sm-inline text-secondary text-decoration-none] + local_assigns.fetch(:class, []),
   aria: {
     hidden: "true",
   },

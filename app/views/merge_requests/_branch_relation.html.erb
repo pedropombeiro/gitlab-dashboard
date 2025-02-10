@@ -12,8 +12,7 @@
 
     <% popover_content = {
       "Rebase onto target branch:" => "git switch #{source_branch} && \\<br/>git rebase --interactive #{target_branch} && \\<br/>git switch -",
-      "Push all branches:" =>
-        "git push --force-with-lease --force-if-includes --no-verify #{source_branch} #{target_branch}",
+      "Push all branches:" => "git push --force-with-lease --force-if-includes --no-verify #{source_branch} #{target_branch}",
     } %>
 
     <%= tag.span(
@@ -24,12 +23,15 @@
           bs_custom_class: "x-wide-popover",
           bs_content: tag.ul do
             safe_join(popover_content.map do |name, snippet|
-              tag.li(data: { controller: "clipboard" }) do
+              tag.li(class: "mb-2") do
                 safe_join([
-                  tag.span(name),
-                  tag.br,
-                  tag.code(snippet, escape: false, data: { clipboard_target: "source" }),
-                  render("shared/clipboard_button")
+                  tag.div(name),
+                  tag.div(class: %w[border border-dark-subtle rounded px-2 mt-1 py-1 position-relative], data: { controller: "clipboard" }) do
+                    safe_join([
+                      tag.code(snippet, escape: false, data: { clipboard_target: "source" }),
+                      render("shared/clipboard_button", class: %w[position-absolute top-0 end-0 mt-1])
+                    ])
+                  end
                 ])
               end
             end)
