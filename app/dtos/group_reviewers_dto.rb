@@ -90,7 +90,7 @@ class GroupReviewersDto
   def is_ooo?(reviewer)
     message = reviewer.status.message
 
-    return true if message&.include?("OOO") || message&.include?("Out of office")
+    return true if message&.include?("OOO") || message&.include?("Out of office") || message&.include?("/pto-coverage/")
     return true if reviewer.status.emoji.in?(OOO_EMOJIS)
     return true if message&.match?(/\wsick\w/)
 
