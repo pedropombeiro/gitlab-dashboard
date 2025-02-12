@@ -11,9 +11,15 @@ dmeshcharakou:
       bot: false
       activeReviews:
         nodes:
-          - approved: true
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: dmeshcharakou
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 bucoleary:
   data:
@@ -30,7 +36,9 @@ bucoleary:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
 
 rutgerwessels:
   data:
@@ -47,8 +55,12 @@ rutgerwessels:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 halilcoban:
   data:
@@ -65,7 +77,9 @@ halilcoban:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
 
 hmehra:
   data:
@@ -80,10 +94,18 @@ hmehra:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
-          - approved: false
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 vshushlin:
   data:
@@ -101,8 +123,12 @@ vshushlin:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 cwiesner:
   data:
@@ -119,8 +145,12 @@ cwiesner:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 "aish.sub":
   data:
@@ -137,7 +167,9 @@ cwiesner:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
 
 akotte:
   data:
@@ -154,8 +186,12 @@ akotte:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 eugielimpin:
   data:
@@ -170,10 +206,18 @@ eugielimpin:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
-          - approved: false
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 emmaspark:
   data:
@@ -188,7 +232,9 @@ emmaspark:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
 
 mbobin:
   data:
@@ -205,9 +251,15 @@ mbobin:
       bot: false
       activeReviews:
         nodes:
-          - approved: false
-          - approved: false
-          - approved: false
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
+          - approvedBy:
+              nodes:
+                - username: someone
 
 GitLabDuo:
   data:
