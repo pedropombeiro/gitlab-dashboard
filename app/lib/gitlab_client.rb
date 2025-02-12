@@ -138,9 +138,12 @@ class GitlabClient
         activeAssignmentsAfter: 2.months.ago
       )
     end.tap do |response|
-      next if format == :yaml_fixture
+      group = response.response.data.group
 
-      response.response.data.group.groupMembers.nodes.flat_map(&:user).each do |reviewer|
+      next if format == :yaml_fixture
+      next if group.nil?
+
+      group.groupMembers.nodes.flat_map(&:user).each do |reviewer|
         compute_active_reviews(reviewer)
       end
     end
