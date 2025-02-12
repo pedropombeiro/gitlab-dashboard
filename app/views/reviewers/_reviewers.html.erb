@@ -62,17 +62,28 @@
           <% end %>
           <!-- Requested MR reviews -->
           <td class="text-end">
-            <%= tag.div reviewer.activeReviews.count, class: reviewer.bootstrapClass[:requested_reviews_text] %>
+            <nobr>
+              <%= tag.span reviewer.activeReviews.count,
+                           class: reviewer.bootstrapClass.fetch(:requested_reviews_text, []) + %w[me-1] %>
+              <%= link_to make_full_url("/dashboard/merge_requests/search?reviewer_username=#{reviewer.username}") do %>
+                <i class="bi bi-box-arrow-up-right small"></i>
+              <% end %>
+            </nobr>
           </td>
           <!-- Assigned MRs -->
           <td class="text-end">
             <% load_ok = reviewer.assignedMergeRequests.count < 3 %>
-            <%= tag.div reviewer.assignedMergeRequests.count,
-                    class: load_ok ? "text-success" : "text-warning" %>
+            <nobr>
+              <%= tag.span reviewer.assignedMergeRequests.count,
+                      class: load_ok ? "text-success" : "text-warning" %>
+              <%= link_to make_full_url("/dashboard/merge_requests/search?assignee_username=#{reviewer.username}") do %>
+                <i class="bi bi-box-arrow-up-right small"></i>
+              <% end %>
+            </nobr>
           </td>
           <% if Rails.env.development? %>
             <td class="text-end text-secondary" %>
-              <%= tag.div reviewers_dto.send(:reviewer_score, reviewer) %>
+              <%= tag.span reviewers_dto.send(:reviewer_score, reviewer) %>
             </td>
           <% end %>
         <% end %>

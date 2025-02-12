@@ -110,11 +110,11 @@ class GroupReviewersDto
     {}.tap do |bs_classes|
       bs_classes[:requested_reviews_text] =
         if reviewer.activeReviews.count < reviewer.reviewLimit
-          "text-success"
+          ["text-success"]
         elsif reviewer.activeReviews.count == reviewer.reviewLimit
-          "text-warning"
+          ["text-warning"]
         else
-          "text-danger"
+          ["text-danger"]
         end
     end
   end
