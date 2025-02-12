@@ -37,16 +37,17 @@
             <nobr data-controller="clipboard">
               <%= render "shared/user_badge",
               user: reviewer,
-              title: group_reviewer_help_title(reviewer),
-              size: 24, show_emojis: false %>
+              content: group_reviewer_help_content(reviewer),
+              size: 24,
+              show_emojis: false %>
 
               <%= render "shared/clipboard_button" %>
             </nobr>
           </th>
           <td>
             <%= render "shared/abbr_with_title",
-              content: user_emojis(reviewer.status),
-              title: reviewer.status&.emoji -%>
+            content: user_emojis(reviewer.status),
+            title: reviewer.status&.emoji -%>
 
             <% country_flag_classes = user_country_flag_classes(reviewer) %>
             <%= tag.i(class: country_flag_classes) if country_flag_classes %>
@@ -64,8 +65,9 @@
           <td class="text-end">
             <nobr>
               <%= tag.span reviewer.activeReviews.count,
-                           class: reviewer.bootstrapClass.fetch(:requested_reviews_text, []) + %w[me-1] %>
-              <%= link_to make_full_url("/dashboard/merge_requests/search?reviewer_username=#{reviewer.username}&not[approved_by_usernames][]=#{reviewer.username}"), target: "_blank" do %>
+                       class:
+                         reviewer.bootstrapClass.fetch(:requested_reviews_text, []) + %w[me-1] %>
+              <%= link_to reviewer_dashboard_url(reviewer.username), target: "_blank" do %>
                 <i class="bi bi-box-arrow-up-right small"></i>
               <% end %>
             </nobr>
@@ -75,8 +77,8 @@
             <% load_ok = reviewer.assignedMergeRequests.count < 3 %>
             <nobr>
               <%= tag.span reviewer.assignedMergeRequests.count,
-                      class: load_ok ? "text-success" : "text-warning" %>
-              <%= link_to make_full_url("/dashboard/merge_requests/search?assignee_username=#{reviewer.username}"), target: "_blank" do %>
+                       class: load_ok ? "text-success" : "text-warning" %>
+              <%= link_to assignee_dashboard_url(reviewer.username), target: "_blank" do %>
                 <i class="bi bi-box-arrow-up-right small"></i>
               <% end %>
             </nobr>
