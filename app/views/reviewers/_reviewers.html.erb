@@ -23,7 +23,7 @@
         <th scope="col">Status</th>
         <th scope="col">Message</th>
         <th scope="col" class="text-end">Local Hour</th>
-        <th scope="col" class="text-end">Requested MR reviews</th>
+        <th scope="col" class="text-end">Active MR reviews</th>
         <th scope="col" class="text-end">Assigned MRs</th>
         <%= tag.th "Score", scope: "col", class: "text-end" if Rails.env.development? %>
       </tr>
@@ -61,7 +61,7 @@
             <%= tag.i(class: %W[fa-solid fa-moon]) unless reviewer.inWorkingHours %>
             <%= tag.span reviewer.timezone&.time_with_offset(Time.now.utc)&.to_fs(:time) %>
           <% end %>
-          <!-- Requested MR reviews -->
+          <!-- Active MR reviews -->
           <td class="text-end">
             <nobr>
               <%= tag.span reviewer.activeReviews.count,
