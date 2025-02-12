@@ -63,7 +63,10 @@ module MergeRequestsHelper
 
   def merge_request_reviewer_help_title(reviewer)
     tooltip_from_hash(
-      State: humanized_enum(reviewer.mergeRequestInteraction.reviewState),
+      State: safe_join([
+        tag.span(humanized_enum(reviewer.mergeRequestInteraction.reviewState), class: "me-1"),
+        tag.i(class: [reviewer.bootstrapClass[:icon], "small"])
+      ]),
       **user_help_hash(reviewer),
       "Active reviews": safe_join([
         tag.span(reviewer.activeReviews.count.to_s),
