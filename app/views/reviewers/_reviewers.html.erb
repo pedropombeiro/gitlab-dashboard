@@ -65,7 +65,7 @@
             <nobr>
               <%= tag.span reviewer.activeReviews.count,
                            class: reviewer.bootstrapClass.fetch(:requested_reviews_text, []) + %w[me-1] %>
-              <%= link_to make_full_url("/dashboard/merge_requests/search?reviewer_username=#{reviewer.username}") do %>
+              <%= link_to make_full_url("/dashboard/merge_requests/search?reviewer_username=#{reviewer.username}"), target: "_blank" do %>
                 <i class="bi bi-box-arrow-up-right small"></i>
               <% end %>
             </nobr>
@@ -76,7 +76,7 @@
             <nobr>
               <%= tag.span reviewer.assignedMergeRequests.count,
                       class: load_ok ? "text-success" : "text-warning" %>
-              <%= link_to make_full_url("/dashboard/merge_requests/search?assignee_username=#{reviewer.username}") do %>
+              <%= link_to make_full_url("/dashboard/merge_requests/search?assignee_username=#{reviewer.username}"), target: "_blank" do %>
                 <i class="bi bi-box-arrow-up-right small"></i>
               <% end %>
             </nobr>
