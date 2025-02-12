@@ -57,15 +57,26 @@ module MergeRequestsHelper
     end
   end
 
-  def user_help_title(user)
+  def user_help_content(user)
     tooltip_from_hash(user_help_hash(user))
   end
 
   def merge_request_reviewer_help_title(reviewer)
     tooltip_from_hash(
       State: humanized_enum(reviewer.mergeRequestInteraction.reviewState),
-      "Active reviews": reviewer.activeReviews.count,
-      **user_help_hash(reviewer)
+      **user_help_hash(reviewer),
+      "Active reviews": safe_join([
+        tag.span(reviewer.activeReviews.count.to_s),
+        tag.a(
+          tag.i(class: "bi bi-box-arrow-up-right small"),
+          href: reviewer_dashboard_url(reviewer.username),
+          class: "ms-1", target: "_blank"
+        )
+      ]),
+      "Assigned MRs": tag.a(
+        tag.i(class: "bi bi-box-arrow-up-right small"),
+        href: assignee_dashboard_url(reviewer.username), target: "_blank"
+      )
     )
   end
 

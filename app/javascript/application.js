@@ -24,7 +24,9 @@ const defaultAllowList = bootstrap.Tooltip.Default.allowList
 
 defaultAllowList.a = ['target', 'href', 'title', 'rel', 'data-action', 'data-bs-toggle', 'data-bs-title']
 defaultAllowList.code = ['data-clipboard-target']
+defaultAllowList.i = []
 defaultAllowList.li = ['data-controller']
+defaultAllowList.span = []
 defaultAllowList.table = []
 defaultAllowList.tbody = []
 defaultAllowList.tr = []
