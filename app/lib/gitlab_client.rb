@@ -201,7 +201,13 @@ class GitlabClient
       state
       activeReviews: reviewRequestedMergeRequests(state: opened, approved: false, updatedAfter: $activeReviewsAfter) {
         # count # approved: false filter is behind the `mr_approved_filter` ops FF, so we need to request the nodes for now
-        nodes { approved }
+        nodes {
+          approvedBy {
+            nodes {
+              username
+            }
+          }
+        }
       }
     }
   GRAPHQL
@@ -454,7 +460,7 @@ class GitlabClient
     # NOTE: This workaround is required because we can't filter on `active: true` reviews until
     # the `mr_approved_filter` FF is removed or enabled
     reviewer.activeReviews[:count] =
-      reviewer.activeReviews.delete_field!(:nodes).count { |review| !review.approved }
+      reviewer.activeReviews.delete_field!(:nodes).count { |review| !reviewer.username.in?(review.approvedBy.nodes.flat_map(&:username)) }
   end
 
   def make_serializable(obj)
