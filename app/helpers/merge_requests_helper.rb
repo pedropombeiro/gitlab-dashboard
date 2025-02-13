@@ -61,6 +61,27 @@ module MergeRequestsHelper
     tooltip_from_hash(user_help_hash(user))
   end
 
+  def user_help_title(user)
+    tag.div(
+      safe_join([
+        render("shared/user_image", user: user, class: "me-1", size: 32),
+        tag.span(
+          safe_join([
+            link_to(
+              safe_join([
+                tag.span(user.username, class: "me-1", data: {clipboard_target: "source"}),
+                tag.i(class: "bi bi-box-arrow-up-right small")
+              ]),
+              user.webUrl, target: "_blank", rel: "noopener"
+            ),
+            render("shared/clipboard_button")
+          ]),
+          data: {controller: "clipboard"}
+        )
+      ])
+    )
+  end
+
   def merge_request_reviewer_help_content(reviewer)
     tooltip_from_hash(
       State: safe_join([
@@ -73,12 +94,12 @@ module MergeRequestsHelper
         tag.a(
           tag.i(class: "bi bi-box-arrow-up-right small"),
           href: reviewer_dashboard_url(reviewer.username),
-          class: "ms-1", target: "_blank"
+          class: "ms-1", target: "_blank", rel: "noopener"
         )
       ]),
       "Assigned MRs": tag.a(
         tag.i(class: "bi bi-box-arrow-up-right small"),
-        href: assignee_dashboard_url(reviewer.username), target: "_blank"
+        href: assignee_dashboard_url(reviewer.username), target: "_blank", rel: "noopener"
       )
     )
   end
@@ -97,7 +118,7 @@ module MergeRequestsHelper
     tag.a(
       "the handbook",
       href: "https://handbook.gitlab.com/handbook/" + path,
-      target: "_blank"
+      target: "_blank", rel: "noopener"
     )
   end
 end
