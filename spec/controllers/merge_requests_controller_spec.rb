@@ -147,7 +147,7 @@ RSpec.describe MergeRequestsController, type: :controller do
             %(<a href="javascript:void(0);" role="button" class="fw-normal">#{author}</a>)
           )
           expect(response.body).to include(
-            %(<a target="_blank" href="https://gitlab.example.com/#{author}"><span class="me-1">#{author}</span><i ).gsub('"', "&quot;")
+            %(<a target="_blank" rel="noopener" href="https://gitlab.example.com/#{author}"><span class="me-1" data-clipboard-target="source">#{author}</span><i ).gsub('"', "&quot;")
           )
           # and user's avatar
           expect(response.body).to include(

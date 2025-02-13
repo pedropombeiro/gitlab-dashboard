@@ -2,12 +2,9 @@
   class: local_assigns.key?(:bg_class) ? %W[badge shadow bg-gradient #{local_assigns[:bg_class]}] : nil,
   data: {
     bs_toggle: "popover",
-    bs_custom_class: "wide-popover",
+    bs_custom_class: "x-wide-popover",
     bs_html: "true",
-    bs_title: link_to(safe_join([
-      tag.span(user.username, class: "me-1"),
-      tag.i(class: "bi bi-box-arrow-up-right small")
-    ]), user.webUrl, target: "_blank"),
+    bs_title: user_help_title(user),
     bs_content: content
   }) do %>
   <%= link_to(
