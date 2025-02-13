@@ -61,7 +61,7 @@ module MergeRequestsHelper
     tooltip_from_hash(user_help_hash(user))
   end
 
-  def merge_request_reviewer_help_title(reviewer)
+  def merge_request_reviewer_help_content(reviewer)
     tooltip_from_hash(
       State: safe_join([
         tag.span(humanized_enum(reviewer.mergeRequestInteraction.reviewState), class: "me-1"),
