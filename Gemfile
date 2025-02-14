@@ -88,7 +88,7 @@ group :test do
   gem "rails-controller-testing"
 end
 
-gem "async", "~> 2.21"
+gem "async", "~> 2.23"
 gem "dartsass-rails", "~> 0.5.1"
 gem "graphql", "= 2.4.8" # Use 2.4.8 until https://github.com/rmosolgo/graphql-ruby/pull/5220 is merged
 gem "graphlient"
