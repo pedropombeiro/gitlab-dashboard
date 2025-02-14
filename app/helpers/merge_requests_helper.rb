@@ -69,7 +69,7 @@ module MergeRequestsHelper
           safe_join([
             link_to(
               safe_join([
-                tag.span(user.username, class: "me-1", data: {clipboard_target: "source"}),
+                tag.span(user.username, class: "h4 me-1", data: {clipboard_target: "source"}),
                 tag.i(class: "bi bi-box-arrow-up-right small")
               ]),
               user.webUrl, target: "_blank", rel: "noopener"
