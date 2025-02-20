@@ -180,9 +180,10 @@ GEM
     graphlient (0.8.0)
       faraday (~> 2.0)
       graphql-client
-    graphql (2.4.8)
+    graphql (2.4.10)
       base64
       fiber-storage
+      logger
     graphql-client (0.25.0)
       activesupport (>= 3.0)
       graphql (>= 1.13.0)
@@ -596,7 +597,7 @@ DEPENDENCIES
   gemoji (~> 4.1)
   geokit (~> 1.14)
   graphlient
-  graphql (= 2.4.8)
+  graphql (= 2.4.10)
   honeybadger (~> 5.26)
   hotwire-livereload (~> 2.0)
   importmap-rails
