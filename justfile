@@ -8,6 +8,7 @@ install:
     yarn install
 
 update:
+    bin/spring stop
     bundle update --bundler
     bundle update
     bin/importmap update
