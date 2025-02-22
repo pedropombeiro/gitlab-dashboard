@@ -74,7 +74,6 @@ group :development do
   gem "dockerfile-rails", ">= 1.6"
 
   gem "lefthook"
-  gem "ruby-lsp"
 end
 
 group :test do
