@@ -68,7 +68,7 @@ class GroupReviewersDto
   def convert_reviewer(reviewer)
     reviewer = reviewer.user
 
-    return if reviewer.bot || reviewer.status.nil? || reviewer.username.ends_with?("-bot")
+    return if reviewer.bot || reviewer.username.ends_with?("-bot")
 
     reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)
     reviewer[:reviewLimit] = review_limit(reviewer)
@@ -88,19 +88,19 @@ class GroupReviewersDto
   end
 
   def is_ooo?(reviewer)
-    message = reviewer.status.message
+    message = reviewer.status&.message
 
     return true if message&.include?("OOO") || message&.include?("Out of office") || message&.include?("/pto-coverage/")
-    return true if reviewer.status.emoji.in?(OOO_EMOJIS)
+    return true if reviewer.status&.emoji&.in?(OOO_EMOJIS)
     return true if message&.match?(/\wsick\w/)
 
     false
   end
 
   def review_limit(reviewer)
-    message = reviewer.status.message
+    message = reviewer.status&.message || ""
 
-    review_limit = WORD_NUMERALS_TO_NUMBERS.fetch(reviewer.status.emoji&.to_sym, 5)
+    review_limit = WORD_NUMERALS_TO_NUMBERS.fetch(reviewer.status&.emoji&.to_sym, 5)
     review_limit = 0 if message&.downcase&.include?("at capacity")
 
     review_limit
@@ -124,14 +124,14 @@ class GroupReviewersDto
   end
 
   def reviewer_score(reviewer)
-    message = reviewer.status.message
+    message = reviewer.status&.message
     has_message =
       message.present? &&
       message.exclude?("Verify reviews") &&
       message.exclude?("Please @") &&
       message.exclude?("@-mention")
     ooo = is_ooo?(reviewer)
-    busy = reviewer.status.availability == "BUSY" && (message.blank? || message.exclude?("Verify reviews"))
+    busy = reviewer.status&.availability == "BUSY" && (message.blank? || message.exclude?("Verify reviews"))
     active_reviews = reviewer.activeReviews.count.to_i
     assigned_mrs = reviewer.assignedMergeRequests.count.to_i
     review_limit = reviewer.reviewLimit
