@@ -23,10 +23,10 @@
           bs_custom_class: "x-wide-popover",
           bs_content: tag.ul do
             safe_join(popover_content.map do |name, snippet|
-              tag.li(class: "mb-2") do
+              tag.li(class: "mb-2", data: { controller: "clipboard" }) do
                 safe_join([
                   tag.div(name),
-                  tag.div(class: %w[border border-dark-subtle rounded px-2 mt-1 py-1 position-relative], data: { controller: "clipboard" }) do
+                  tag.div(class: %w[border border-dark-subtle rounded px-2 mt-1 py-1 position-relative]) do
                     safe_join([
                       tag.code(snippet, escape: false, data: { clipboard_target: "source" }),
                       render("shared/clipboard_button", class: %w[position-absolute top-0 end-0 mt-1])
