@@ -66,23 +66,23 @@
     </div>
 
     <% if merge_requests.count.positive? %>
-      <% merge_time_ok = avg_time_to_merge <= overall_avg_time_to_merge %>
+      <% merge_avg_ttm_ok = avg_time_to_merge <= overall_avg_time_to_merge %>
       <div>Merged on average after
         <%= tag.span(
-          class: merge_time_ok ? "text-success" : "text-warning",
+          class: merge_avg_ttm_ok ? "text-success" : "text-warning",
           data: {
             bs_toggle: "popover",
             bs_html: "true",
             bs_title: "Weekly MTTM against historical average",
             bs_content:
               "Merged requests this week took #{distance_of_time_in_words(avg_time_to_merge)} to be merged, " \
-              "#{merge_time_ok ? "at or below" : "above"} the historical average of #{distance_of_time_in_words(overall_avg_time_to_merge)}." \
+              "#{merge_avg_ttm_ok ? "at or below" : "above"} the historical average of #{distance_of_time_in_words(overall_avg_time_to_merge)}." \
               "<br/>See #{mttm_handbook_url}.",
           },
         ) do %>
           <%= distance_of_time_in_words(avg_time_to_merge) %>
           <%= render("info_symbol") %>
-          <%= render("trend_indicator", trend: merge_rate_ok ? :down : :up) %>
+          <%= render("trend_indicator", trend: merge_avg_ttm_ok ? :down : :up) %>
         <% end %>
       </div>
     <% end %>
