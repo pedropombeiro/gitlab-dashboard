@@ -119,7 +119,7 @@ GEM
       reline (>= 0.3.8)
     diff-lcs (1.6.0)
     docile (1.4.1)
-    dockerfile-rails (1.7.8)
+    dockerfile-rails (1.7.9)
       rails (>= 3.0.0)
     dotenv (3.1.7)
     drb (2.2.1)
@@ -159,28 +159,28 @@ GEM
     geokit (1.14.0)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    google-protobuf (4.29.3)
+    google-protobuf (4.30.0)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.29.3-aarch64-linux)
+    google-protobuf (4.30.0-aarch64-linux)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.29.3-arm64-darwin)
+    google-protobuf (4.30.0-arm64-darwin)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.29.3-x86-linux)
+    google-protobuf (4.30.0-x86-linux)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.29.3-x86_64-darwin)
+    google-protobuf (4.30.0-x86_64-darwin)
       bigdecimal
       rake (>= 13)
-    google-protobuf (4.29.3-x86_64-linux)
+    google-protobuf (4.30.0-x86_64-linux)
       bigdecimal
       rake (>= 13)
     graphlient (0.8.0)
       faraday (~> 2.0)
       graphql-client
-    graphql (2.4.10)
+    graphql (2.4.11)
       base64
       fiber-storage
       logger
@@ -215,7 +215,7 @@ GEM
     json (2.10.1)
     jwt (2.10.1)
       base64
-    kamal (2.5.2)
+    kamal (2.5.3)
       activesupport (>= 7.0)
       base64 (~> 0.2)
       bcrypt_pbkdf (~> 1.0)
@@ -319,7 +319,7 @@ GEM
       nio4r (~> 2.0)
     raabro (1.4.0)
     racc (1.8.1)
-    rack (3.1.10)
+    rack (3.1.11)
     rack-session (2.1.0)
       base64 (>= 0.1.0)
       rack (>= 3.0.0)
@@ -369,7 +369,7 @@ GEM
       psych (>= 4.0.0)
     redis (5.4.0)
       redis-client (>= 0.22.0)
-    redis-client (0.23.2)
+    redis-client (0.24.0)
       connection_pool
     regexp_parser (2.10.0)
     reline (0.6.0)
@@ -527,9 +527,9 @@ GEM
     timezone (1.3.28)
       ostruct (~> 0.6)
     traces (0.15.2)
-    turbo-rails (2.0.11)
-      actionpack (>= 6.0.0)
-      railties (>= 6.0.0)
+    turbo-rails (2.0.13)
+      actionpack (>= 7.1.0)
+      railties (>= 7.1.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (3.1.4)
