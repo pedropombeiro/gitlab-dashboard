@@ -45,6 +45,13 @@ module MergeRequestsPipelineHelper
     summary
   end
 
+  def pipeline_visualizer_web_url(pipeline)
+    return unless pipeline.path
+
+    path = pipeline.path.gsub("/-/pipelines", "/pipeline")
+    "https://pipeline-visualizer-gitlab-org-quality-engineeri-bcf92e4999c4df.gitlab.io#{path}"
+  end
+
   def pipeline_web_url(pipeline, focus_on_failed = false)
     return unless pipeline.path
 
