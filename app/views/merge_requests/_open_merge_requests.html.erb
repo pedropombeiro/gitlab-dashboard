@@ -165,6 +165,10 @@
                   ) %>
                 <% end %>
 
+                <%= link_to(pipeline_visualizer_web_url(pipeline), target: "_blank", class: "text-decoration-none") do %>
+                  <%= tag.i(class: %w[bi bi-bar-chart-steps]) %>
+                <% end %>
+
                 <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
                   <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", class: "text-decoration-none") do %>
                     <%= render "shared/abbr_with_title",
