@@ -88,7 +88,7 @@ group :test do
   gem "rails-controller-testing"
 end
 
-gem "async", "~> 2.21"
+gem "async", "~> 2.23"
 gem "dartsass-rails", "~> 0.5.1"
 gem "graphlient"
 gem "local_time", "~> 3.0"
