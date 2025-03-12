@@ -180,7 +180,7 @@ GEM
     graphlient (0.8.0)
       faraday (~> 2.0)
       graphql-client
-    graphql (2.4.12)
+    graphql (2.4.13)
       base64
       fiber-storage
       logger
