@@ -117,6 +117,9 @@ GEM
     debug (1.10.0)
       irb (~> 1.10)
       reline (>= 0.3.8)
+    debugbar (0.4.3)
+      actioncable
+      rails
     diff-lcs (1.6.0)
     docile (1.4.1)
     dockerfile-rails (1.7.9)
@@ -195,6 +198,9 @@ GEM
       actioncable (>= 7.0.0)
       listen (>= 3.0.0)
       railties (>= 7.0.0)
+    httplog (1.7.0)
+      rack (>= 2.0)
+      rainbow (>= 2.0.0)
     i18n (1.14.7)
       concurrent-ruby (~> 1.0)
     importmap-rails (2.1.0)
@@ -584,6 +590,7 @@ DEPENDENCIES
   capybara
   dartsass-rails (~> 0.5.1)
   debug
+  debugbar
   dockerfile-rails (>= 1.6)
   factory_bot (~> 6.5)
   factory_bot_rails (~> 6.4)
@@ -592,6 +599,7 @@ DEPENDENCIES
   graphlient
   honeybadger (~> 5.26)
   hotwire-livereload (~> 2.0)
+  httplog
   importmap-rails
   jbuilder
   jsbundling-rails (~> 1.3)
