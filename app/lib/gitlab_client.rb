@@ -149,8 +149,6 @@ class GitlabClient
     end
   end
 
-  private
-
   GRAPHQL_RETRIABLE_ERRORS = [
     Faraday::SSLError,
     Graphlient::Errors::ConnectionFailedError,
@@ -428,6 +426,8 @@ class GitlabClient
     }
   GRAPHQL
   # rubocop:enable Style/RedundantHeredocDelimiterQuotes
+
+  private
 
   def execute_query(query, **args)
     Rails.logger.debug { %(Executing #{query.operation_name} GraphQL query (args: #{args})...) }
