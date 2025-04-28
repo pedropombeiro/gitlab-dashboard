@@ -84,7 +84,7 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
   gem "webmock"
-  gem "shoulda-matchers", "~> 6.0"
+  gem "shoulda-matchers", "~> 6.5"
   gem "test-prof", "~> 1.4"
   gem "stub_env"
   gem "simplecov"
