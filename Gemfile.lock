@@ -75,7 +75,7 @@ GEM
     addressable (2.8.7)
       public_suffix (>= 2.0.2, < 7.0)
     ast (2.4.3)
-    async (2.23.1)
+    async (2.24.0)
       console (~> 1.29)
       fiber-annotation
       io-event (~> 1.9)
@@ -583,7 +583,7 @@ PLATFORMS
   x86_64-linux-musl
 
 DEPENDENCIES
-  async (~> 2.21)
+  async (~> 2.24)
   bootsnap
   brakeman
   capybara
