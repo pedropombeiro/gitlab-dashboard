@@ -1,0 +1,9 @@
+<%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
+
+<%= link_to mr.titleHtml.html_safe, mr.webUrl, target: "_blank" %>
+
+<div style="max-width: 26em">
+  <%= render "branch_relation",
+    source_branch: mr.sourceBranch,
+    target_branch: mr.targetBranch %>
+</div>

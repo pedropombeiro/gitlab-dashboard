@@ -5,7 +5,7 @@
     bs_toggle: "tooltip",
     bs_html: "true",
     bs_custom_class: "x-wide-tooltip",
-    bs_title: issue.titleHtml,
+    bs_title: issue.titleHtml.html_safe,
   } do %>
     <% color = issue_color(issue.iid) %>
 

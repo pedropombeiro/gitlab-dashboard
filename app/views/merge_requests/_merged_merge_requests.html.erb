@@ -233,14 +233,7 @@
           </td>
           <!-- Title -->
           <td>
-            <%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %>
-            <%= link_to mr.titleHtml, mr.webUrl, target: "_blank" %>
-
-            <div style="max-width: 26em">
-              <%= render "branch_relation",
-              source_branch: mr.sourceBranch,
-              target_branch: mr.targetBranch %>
-            </div>
+            <%= render "mr_title", mr: mr %>
           </td>
           <% if any_milestones %>
             <!-- Milestone -->
