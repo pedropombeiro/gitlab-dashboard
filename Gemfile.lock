@@ -133,9 +133,9 @@ GEM
       tzinfo
     factory_bot (6.5.3)
       activesupport (>= 6.1.0)
-    factory_bot_rails (6.4.4)
+    factory_bot_rails (6.5.0)
       factory_bot (~> 6.5)
-      railties (>= 5.0.0)
+      railties (>= 6.1.0)
     faraday (2.13.1)
       faraday-net_http (>= 2.0, < 3.5)
       json
@@ -603,7 +603,7 @@ DEPENDENCIES
   debugbar
   dockerfile-rails (>= 1.6)
   factory_bot (~> 6.5)
-  factory_bot_rails (~> 6.4)
+  factory_bot_rails (~> 6.5)
   gemoji (~> 4.1)
   geokit (~> 1.14)
   graphlient
