@@ -12,7 +12,7 @@
     web_push_unsubscribed_class: "d-initial",
     web_push_subscribed_class: "d-none"
   } do %>
-  <% nav_bg_class = Rails.env.production? ? %w[bg-dark] : %w[bg-danger] %>
+  <% nav_bg_class = Rails.env.production? ? %w[] : %w[bg-danger] %>
 
   <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
     <% if params.include?(:referrer) %>
@@ -28,7 +28,7 @@
       class="navbar-brand text-light d-flex align-items-center m-auto"
       data-controller="bootstrap-tooltip"
     >
-      <%= tag.span class: "mb-0 ms-2 fw-lighter d-flex flex-grow-1 justify-content-center" do %>
+      <%= tag.span class: "mb-0 ms-2 text-body fw-lighter d-flex flex-grow-1 justify-content-center" do %>
         <span class="d-sm-none me-2">
           <%= render "shared/user_image", user: @user, size: 24 %>
         </span>
@@ -40,7 +40,7 @@
       <% end %>
 
       <%= tag.button(
-        class: %w[btn mx-2 text-light],
+        class: %w[btn mx-2],
         data: {
           bs_toggle: "tooltip",
           bs_title: "Subscribe to web push notifications for MR events, such as MR merged, or workflow label changes",
