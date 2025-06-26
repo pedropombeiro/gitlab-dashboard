@@ -14,7 +14,7 @@
   } do %>
   <% nav_bg_class = Rails.env.production? ? %w[] : %w[bg-danger] %>
 
-  <%= tag.nav class: %w[navbar navbar-light bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
+  <%= tag.nav class: %w[navbar bg-body bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
     <% if params.include?(:referrer) %>
       <%= link_to(safe_url(params[:referrer]), class: %w[btn mx-2 text-light]) do %>
         <%= tag.i class: %w[fa-solid fa-home] %>
