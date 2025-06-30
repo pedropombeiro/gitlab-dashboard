@@ -122,7 +122,7 @@ GEM
       rails
     diff-lcs (1.6.2)
     docile (1.4.1)
-    dockerfile-rails (1.7.9)
+    dockerfile-rails (1.7.10)
       rails (>= 3.0.0)
     dotenv (3.1.8)
     drb (2.2.3)
