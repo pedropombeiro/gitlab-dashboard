@@ -25,7 +25,7 @@ module MrStatusOrnamentsConcern
   end
 
   def workflow_label_class(label_title)
-    class_name = config.dig(:labels, :workflow, :mappings).fetch(label_title&.to_sym, "secondary")
+    class_name = config.dig(:labels, :workflow, :mappings, label_title&.to_sym)&.fetch(:class, "secondary")
     return [] unless class_name
 
     %W[
@@ -46,12 +46,12 @@ module MrStatusOrnamentsConcern
     @@open_mrs_contextual_labels ||= config.dig(:labels, :open_merge_requests, :contextual)
   end
 
-  def workflow_label_ns
-    @@workflow_label_ns ||= config.dig(:labels, :workflow, :prefix)
-  end
-
   def workflow_labels
     @@workflow_labels ||= config.dig(:labels, :workflow, :mappings).keys
+  end
+
+  def convert_label(label)
+    config.dig(:labels, :workflow, :mappings, label.to_sym, :title)
   end
 
   private
