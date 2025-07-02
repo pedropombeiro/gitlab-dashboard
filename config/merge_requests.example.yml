@@ -22,25 +22,14 @@ shared:
       contextual:
         - "pipeline::"
     workflow:
+      prefix: "workflow::"
       mappings:
-        "workflow::staging-canary":
-          class: "info"
-          title: "staging-canary"
-        "workflow::canary":
-          class: "info"
-          title: "canary"
-        "workflow::staging":
-          class: "info"
-          title: "staging"
-        "workflow::production":
-          class: "primary"
-          title: "production"
-        "workflow::post-deploy-db-staging":
-          class: "info"
-          title: "post-deploy-db-staging"
-        "workflow::post-deploy-db-production":
-          class: "success"
-          title: "post-deploy-db-production"
+        "workflow::staging-canary": "info"
+        "workflow::canary": "info"
+        "workflow::staging": "info"
+        "workflow::production": "primary"
+        "workflow::post-deploy-db-staging": "info"
+        "workflow::post-deploy-db-production": "success"
     notification_rules:
       - required_state: open
         watched_labels:
