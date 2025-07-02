@@ -108,7 +108,7 @@ class UserDto
 
         mr.issue.contextualLabels.each do |label|
           label.bootstrapClass = [] # Use label's predefined colors
-          label.webTitle = convert_label(label.title)
+          label.webTitle = label.title.delete_prefix(workflow_label_ns)
         end
       end
 
@@ -168,7 +168,7 @@ class UserDto
 
       mr.labels.nodes.each do |label|
         label.bootstrapClass = workflow_label_class(label.title)
-        label.webTitle = convert_label(label.title)
+        label.webTitle = label.title.delete_prefix(workflow_label_ns)
       end
     end
   end
