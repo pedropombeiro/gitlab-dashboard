@@ -59,7 +59,7 @@ module MergeRequestsPipelineHelper
     failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }.presence
     failed_job_traces ||= pipeline.failedJobTraces.nodes
 
-    web_path = pipeline.path
+    web_path = nil
 
     # Try to make the user land in the most contextual page possible, depending on the state of the pipeline
     if failed_job_traces.one?
@@ -75,12 +75,15 @@ module MergeRequestsPipelineHelper
         web_path = failed_job_web_path(failed_job_traces.sole)
       end
     elsif failed_jobs.count.positive?
-      web_path += "/failures"
+      web_path = "#{pipeline.path}/failures"
     elsif pipeline.status == "RUNNING" && pipeline.runningJobs.count == 1
-      web_path = pipeline.runningJobs.nodes.sole.webPath
+      last_running_job = pipeline.runningJobs.nodes.sole
+      web_path =
+        last_running_job.webPath ||
+        last_running_job.downstreamPipeline.jobs.nodes.first&.webPath
     end
 
-    make_full_url(web_path)
+    make_full_url(web_path || pipeline.path)
   end
 
   private

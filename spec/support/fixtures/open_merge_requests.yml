@@ -124,6 +124,7 @@ one:
                 count: 225
                 nodes:
                   - webPath: "/gitlab-org/gitlab/-/jobs/8485257218"
+                    downstreamPipeline: null
               failedJobs:
                 count: 0
                 nodes: []
