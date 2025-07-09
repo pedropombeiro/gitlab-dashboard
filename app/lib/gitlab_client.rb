@@ -338,6 +338,13 @@ class GitlabClient
                 count
                 nodes {
                   webPath
+                  downstreamPipeline {
+                    jobs(statuses: RUNNING, first: 1, retried: false) {
+                      nodes {
+                        webPath
+                      }
+                    }
+                  }
                 }
               }
               failedJobs: jobs(statuses: FAILED, retried: false) {
