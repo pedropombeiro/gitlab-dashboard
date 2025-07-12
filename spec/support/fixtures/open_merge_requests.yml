@@ -15,6 +15,8 @@ one:
             reference: "!173741"
             sourceBranch: pedropombeiro/503315/cleanup-code
             targetBranch: master
+            notes:
+              nodes: []
             createdAt: "2024-11-25T16:11:04Z"
             updatedAt: "2024-11-27T14:03:27Z"
             assignees:
@@ -142,6 +144,8 @@ one:
             reference: "!174004"
             sourceBranch: pedropombeiro/446287/fix-flaky-test
             targetBranch: master
+            notes:
+              nodes: []
             createdAt: "2024-11-27T13:39:50Z"
             updatedAt: "2024-11-27T13:47:34Z"
             assignees:
@@ -272,6 +276,8 @@ one:
             reference: "!173789"
             sourceBranch: pedropombeiro/506226/create-audit-event-per-project
             targetBranch: master
+            notes:
+              nodes: []
             createdAt: "2024-11-25T21:54:46Z"
             updatedAt: "2024-11-27T10:51:59Z"
             assignees:
@@ -399,6 +405,8 @@ one:
             reference: "!173874"
             sourceBranch: pedropombeiro/481411/fix-flaky-test
             targetBranch: master
+            notes:
+              nodes: []
             createdAt: "2024-11-26T14:13:10Z"
             updatedAt: "2024-11-27T10:14:10Z"
             assignees:
@@ -534,6 +542,8 @@ one:
             reference: "!173916"
             sourceBranch: pedropombeiro/503315/log-last-contacted-time
             targetBranch: master
+            notes:
+              nodes: []
             createdAt: "2024-11-26T17:43:27Z"
             updatedAt: "2024-11-27T09:25:43Z"
             assignees:
@@ -662,6 +672,8 @@ one:
             reference: "!173886"
             sourceBranch: pedropombeiro/503315/1-add-bulk-delete-runner-audit-event
             targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
+            notes:
+              nodes: []
             createdAt: "2024-11-26T15:11:55Z"
             updatedAt: "2024-11-26T18:00:34Z"
             assignees:
@@ -786,6 +798,8 @@ one:
             reference: "!173885"
             sourceBranch: pedropombeiro/506385/add-create-runner-audit-event
             targetBranch: pedropombeiro/503315/0-fix-runner-audit-events
+            notes:
+              nodes: []
             createdAt: "2024-11-26T15:06:52Z"
             updatedAt: "2024-11-26T17:15:33Z"
             assignees:
@@ -912,6 +926,8 @@ one:
             reference: "!173639"
             sourceBranch: pedropombeiro/503315/0-fix-runner-audit-events
             targetBranch: master
+            notes:
+              nodes: []
             createdAt: "2024-11-24T23:30:47Z"
             updatedAt: "2024-11-26T15:50:51Z"
             assignees:
@@ -1034,6 +1050,8 @@ one:
             reference: "!171848"
             sourceBranch: pedropombeiro/502403/recreate-fk-from-partitioned-ci_runner_managers-to-ci_runners
             targetBranch: master
+            notes:
+              nodes: []
             createdAt: "2024-11-06T16:55:06Z"
             updatedAt: "2024-11-26T14:16:29Z"
             assignees:
@@ -1163,6 +1181,12 @@ one:
             reference: "!173007"
             sourceBranch: pedropombeiro/472974/save-taggings-to-ci_runner_taggings
             targetBranch: master
+            notes:
+              nodes:
+                - author:
+                    bot: false
+                    name: "Pedro Pombeiro"
+                  bodyHtml: "Test"
             createdAt: "2024-10-18T14:47:09Z"
             updatedAt: "2024-11-22T14:44:47Z"
             assignees:

@@ -236,6 +236,15 @@ class GitlabClient
       targetBranch
       createdAt
       updatedAt
+      notes(last: 1, filter: ONLY_COMMENTS) {
+        nodes {
+          author {
+            name
+            bot
+          }
+          bodyHtml
+        }
+      }
       assignees {
         nodes { ...#{name}::CoreUserFragment }
       }

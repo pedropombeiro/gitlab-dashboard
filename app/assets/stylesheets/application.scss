@@ -53,3 +53,28 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 
 .bg-review-unapproved { background-color: $orange-400 }
 .text-review-unapproved { color: $black }
+
+// Last comment
+.fade-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;             /* Limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+}
+
+.fade-text.expanded {
+  -webkit-line-clamp: unset;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.toggle-link {
+  cursor: pointer;
+  color: #0d6efd;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
