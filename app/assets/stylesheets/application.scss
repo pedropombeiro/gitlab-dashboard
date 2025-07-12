@@ -82,3 +82,29 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 .w-10 {
   width: 10% !important;
 }
+
+.gl-label {
+  display: inline-flex;
+  border-radius: 2rem;
+  font-size: 13px; /* increased from 12px */
+  font-weight: 500;
+  font-family: var(--bs-body-font-family);
+  line-height: 1.25; /* increased for vertical room */
+  color: var(--label-text, #333);
+  background-color: var(--label-bg, #eee);
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.gl-label-scope,
+.gl-label-text,
+.gl-label-text-scoped {
+  padding: 0.3em 0.5em; /* more padding */
+  display: inline-block;
+}
+
+.gl-label-scope {
+  background-color: var(--label-scope-bg, rgba(0, 0, 0, 0.1));
+  color: var(--label-scope-text, inherit);
+}
+
