@@ -33,6 +33,13 @@
       src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline/dist/chartjs-plugin-trendline.min.js"
     ></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+      function toggleParagraph(id, link) {
+        const para = document.getElementById(id);
+        para.classList.toggle('expanded');
+        link.textContent = para.classList.contains('expanded') ? 'Show Less' : 'Show More';
+      }
+    </script>
 
     <%= debugbar_head if defined?(Debugbar) %>
   </head>

@@ -51,6 +51,7 @@
           Pipeline
         </th>
         <th scope="col">Title</th>
+        <th scope="col" class="d-none d-xxl-table-cell">Last comment</th>
         <% if any_milestones %>
           <th scope="col" class="text-end">Milestone</th>
         <% end %>
@@ -217,6 +218,19 @@
           <!-- Title -->
           <td>
             <%= render "mr_title", mr: mr %>
+          </td>
+          <!-- Title -->
+          <td class="d-none d-xxl-table-cell">
+            <% last_comment = mr.notes.nodes.first %>
+            <% unless last_comment.nil? || last_comment.author.bot %>
+              <%= tag.figure id: "last_comment_#{mr.iid}", class: %w[fade-text mb-0] do %>
+                <%= tag.small(last_comment.bodyHtml, class: %w[mt-2 text-muted], escape: false) %>
+                <figcaption class="blockquote-footer mb-0">
+                  <%= tag.cite(last_comment.author.name, class: %w[mt-2 text-muted small]) %>
+                </figcaption>
+              <% end %>
+              <%= tag.div "Show More", class: "toggle-link", onclick: "toggleParagraph('last_comment_#{mr.iid}', this)" %>
+            <% end %>
           </td>
           <% if any_milestones %>
             <!-- Milestone -->
