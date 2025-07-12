@@ -74,7 +74,7 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 
 .toggle-link {
   cursor: pointer;
-  color: #0d6efd;
+  color: $blue-400;
   text-decoration: underline;
   font-size: 0.9rem;
 }
@@ -84,27 +84,74 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 }
 
 .gl-label {
-  display: inline-flex;
-  border-radius: 2rem;
-  font-size: 13px; /* increased from 12px */
-  font-weight: 500;
-  font-family: var(--bs-body-font-family);
-  line-height: 1.25; /* increased for vertical room */
-  color: var(--label-text, #333);
-  background-color: var(--label-bg, #eee);
+  font-size: 0.75rem;
+  line-height: 1rem;
+  border-radius: .75rem;
+  position: relative;
+  max-width: 100%;
+  align-items: center;
+  background-color: #fff;
   overflow: hidden;
-  white-space: nowrap;
+  display: inline-flex;
 }
 
-.gl-label-scope,
-.gl-label-text,
-.gl-label-text-scoped {
-  padding: 0.3em 0.5em; /* more padding */
+.gl-label:not(.gl-label-scoped) {
+  background-color: var(--label-background-color)
+}
+
+.gl-label:has(*:first-child:focus) {
+  box-shadow: inset 0 0 0 1px var(--label-background-color, #fff),0 0 0 1px #fff,0 0 0 3px $blue-400 !important;
+  outline: none !important
+}
+
+.gl-label-scoped {
+  box-shadow: 0 0 0 2px currentColor inset;
+}
+
+.gl-label-scoped .gl-label-text {
+  background-color: var(--label-background-color)
+}
+
+.gl-label-scoped .gl-label-text-scoped {
+  background-color: #000;
+  color: #fff;
+  box-shadow: var(--label-inset-border) !important;
+  padding-left: .25rem;
+  padding-right: .5rem;
+}
+
+.gl-label .gl-label-text, .gl-label .gl-label-text-scoped {
+  display: block;
+  padding: .125rem .375rem;
   display: inline-block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
-.gl-label-scope {
-  background-color: var(--label-scope-bg, rgba(0, 0, 0, 0.1));
-  color: var(--label-scope-text, inherit);
+.gl-label-text-light {
+  color: #fff;
+}
+
+.gl-label-text-dark {
+  color: #18171d;
+}
+
+.gl-label .gl-label-link {
+  display: flex;
+  font-weight: 400;
+  overflow: hidden;
+  color: inherit;
+  max-width: 100%;
+}
+
+.gl-label .gl-label-link-underline {
+  text-decoration: none;
+}
+
+.gl-label .gl-label-link-underline:hover .gl-label-text,.gl-label .gl-label-link-underline:hover .gl-label-text-scoped,.gl-label .gl-label-link-underline:focus .gl-label-text,.gl-label .gl-label-link-underline:focus .gl-label-text-scoped,.gl-label .gl-label-link-underline:focus:active .gl-label-text,.gl-label .gl-label-link-underline:focus:active .gl-label-text-scoped {
+  text-decoration: underline
 }
 
