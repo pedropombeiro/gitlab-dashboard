@@ -21,6 +21,7 @@ class GitlabClient
 
   Client = ::Graphlient::Client.new(
     "#{gitlab_instance_url}/api/graphql",
+    schema_path: "lib/assets/graphql/gitlab_graphql_schema.json",
     headers: {"Authorization" => authorization},
     http_options: {
       read_timeout: 30,

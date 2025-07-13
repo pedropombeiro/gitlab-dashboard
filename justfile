@@ -50,3 +50,7 @@ create-dockerfile:
 
 lint:
     rake standard
+
+dump-schema:
+    rails -e 'require("graphlient"); client = Graphlient::Client.new("https://gitlab.com/api/graphql", schema_path: "lib/assets/graphql/gitlab_graphql_schema.json"); client.schema.dump!'
+    cp -f lib/assets/graphql/gitlab_graphql_schema.json spec/support/fixtures/gitlab_graphql_schema.json
