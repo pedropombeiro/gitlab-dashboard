@@ -27,7 +27,7 @@ class ComputeMergeRequestChangesService
         mr,
         type: :merge_request_merged,
         title: "A merge request was merged",
-        body: "#{mr.reference}: #{mr.titleHtml}"
+        body: "#{mr.reference}: #{ActionController::Base.helpers.strip_tags(mr.titleHtml)}"
       )
     end
 
@@ -61,7 +61,7 @@ class ComputeMergeRequestChangesService
 
   def merge_request_labels_change(title, changes)
     mr = changes[:mr]
-    mr_data = "#{mr.reference}: #{mr.titleHtml}"
+    mr_data = "#{mr.reference}: #{ActionController::Base.helpers.strip_tags(mr.titleHtml)}"
 
     hash = {
       type: :label_change,
