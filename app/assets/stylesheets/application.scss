@@ -84,15 +84,22 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 }
 
 .gl-label {
-  font-size: 0.75rem;
-  line-height: 1rem;
-  border-radius: .75rem;
-  position: relative;
-  max-width: 100%;
   align-items: center;
   background-color: #fff;
   overflow: hidden;
-  display: inline-flex;
+  display: inline-flex
+}
+
+.gl-label {
+  border-radius: .75rem;
+  position: relative;
+  max-width: 100%
+}
+
+.gl-label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  box-shadow: var(--label-inset-border) !important
 }
 
 .gl-label:not(.gl-label-scoped) {
@@ -113,11 +120,13 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 }
 
 .gl-label-scoped .gl-label-text-scoped {
-  background-color: #000;
   color: #fff;
-  box-shadow: var(--label-inset-border) !important;
   padding-left: .25rem;
   padding-right: .5rem;
+
+	background-color: #000000;
+  box-shadow: var(--label-inset-border) !important;
+	border-radius: 0 0.75rem 0.75rem 0;
 }
 
 .gl-label .gl-label-text, .gl-label .gl-label-text-scoped {
