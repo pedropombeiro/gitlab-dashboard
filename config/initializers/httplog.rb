@@ -1,8 +1,5 @@
-require "httplog"
-
 HttpLog.configure do |config|
-  # Enable or disable all logging
-  config.enabled = true
+  config.enabled = Rails.env.development?
 
   # Tweak which parts of the HTTP cycle to log...
   config.log_connect = true
