@@ -51,7 +51,7 @@
           Pipeline
         </th>
         <th scope="col">Title</th>
-        <th scope="col" class="d-none d-xxl-table-cell w-10">Last comment</th>
+        <th scope="col" class="d-none d-xxl-table-cell last-comment-width">Last comment</th>
         <% if any_milestones %>
           <th scope="col" class="text-end">Milestone</th>
         <% end %>
@@ -220,7 +220,7 @@
             <%= render "mr_title", mr: mr %>
           </td>
           <!-- Last comment -->
-          <td class="d-none d-xxl-table-cell w-10">
+          <td class="d-none d-xxl-table-cell last-comment-width">
             <% last_comment = mr.notes.nodes.first %>
             <% unless last_comment.nil? || last_comment.author.bot %>
               <%= tag.figure id: "last_comment_#{mr.iid}", class: %w[fade-text mb-0] do %>

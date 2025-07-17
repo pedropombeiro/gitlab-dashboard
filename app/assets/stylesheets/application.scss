@@ -79,8 +79,9 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
   font-size: 0.9rem;
 }
 
-.w-10 {
+.last-comment-width {
   width: 10% !important;
+  max-width: 30em;
 }
 
 .gl-label {
