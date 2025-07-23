@@ -35,10 +35,7 @@ class LocationLookupService
 
         timezone.name
       rescue Timezone::Error::Base => exception
-        Honeybadger.notify(exception, {
-          tags: "warning, timezone",
-          context: {location: location}
-        })
+        Honeybadger.notify(exception, tags: "warning, timezone", context: {location: location})
 
         nil
       end
