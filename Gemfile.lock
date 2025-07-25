@@ -208,7 +208,7 @@ GEM
       actioncable (>= 7.0.0)
       listen (>= 3.0.0)
       railties (>= 7.0.0)
-    httplog (1.7.1)
+    httplog (1.7.2)
       rack (>= 2.0)
       rainbow (>= 2.0.0)
     i18n (1.14.7)
