@@ -201,7 +201,7 @@ GEM
       activesupport (>= 3.0)
       graphql (>= 1.13.0)
     hashdiff (1.2.0)
-    honeybadger (6.0.2)
+    honeybadger (6.0.3)
       logger
       ostruct
     hotwire-livereload (2.0.0)
