@@ -141,7 +141,7 @@
               <% pipeline = mr.headPipeline %>
 
               <% if pipeline %>
-                <% failed_jobs = pipeline.failedJobs.nodes %>
+                <% failed_jobs = pipeline.failedJobs.nodes.reject(&:allowFailure) %>
                 <% summary = pipeline_summary(pipeline) %>
 
                 <%= tag.span(class: %W[badge badge-pill bg-#{mr.bootstrapClass[:pipeline]}]) do %>
@@ -224,10 +224,19 @@
             <% last_comment = mr.notes.nodes.first %>
             <% unless last_comment.nil? || last_comment.author.bot %>
               <%= tag.figure id: "last_comment_#{mr.iid}", class: %w[fade-text mb-0] do %>
-                <%= tag.small(last_comment.bodyHtml.gsub('="/', "=\"#{File.join(GitlabClient.gitlab_instance_url, '')}"), class: %w[mt-2 mb-0 text-muted], escape: false) %>
+                <%= tag.small(
+                  last_comment.bodyHtml.gsub(
+                    '="/',
+                    "=\"#{File.join(GitlabClient.gitlab_instance_url, "")}",
+                  ),
+                  class: %w[mt-2 mb-0 text-muted],
+                  escape: false,
+                ) %>
                 <%= tag.cite("‐ #{last_comment.author.name}", class: %w[mt-2 text-muted small]) %>
               <% end %>
-              <%= tag.div "Show More", class: "toggle-link", onclick: "toggleParagraph('last_comment_#{mr.iid}', this)" %>
+              <%= tag.div "Show More",
+                      class: "toggle-link",
+                      onclick: "toggleParagraph('last_comment_#{mr.iid}', this)" %>
             <% end %>
           </td>
           <% if any_milestones %>
