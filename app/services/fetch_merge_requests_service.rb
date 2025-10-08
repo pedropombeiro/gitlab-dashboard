@@ -39,8 +39,15 @@ class FetchMergeRequestsService
         response.request_duration = raw_response.request_duration
         response.next_update_at = MergeRequestsCacheService.cache_validity.after(raw_response.updated_at)
         response.next_scheduled_update_at =
-          if type == :open && any_running_pipelines?(merge_requests_from_response(response, type))
-            5.minutes.from_now
+          if type == :open
+            mrs = merge_requests_from_response(response, type)
+            if any_mwps_pipelines?(mrs)
+              1.minute.from_now
+            elsif any_running_pipelines?(mrs)
+              5.minutes.from_now
+            else
+              30.minutes.from_now
+            end
           else
             30.minutes.from_now
           end
@@ -70,6 +77,13 @@ class FetchMergeRequestsService
     when :merged
       response.user.mergedMergeRequests.nodes
     end
+  end
+
+  def any_mwps_pipelines?(merge_requests)
+    merge_requests
+      .filter(&:autoMergeEnabled)
+      .filter_map(&:headPipeline)
+      .any? { |pipeline| pipeline.status == "PENDING" || (pipeline.startedAt.present? && pipeline.finishedAt.nil?) }
   end
 
   def any_running_pipelines?(merge_requests)
