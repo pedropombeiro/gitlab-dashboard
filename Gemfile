@@ -102,7 +102,7 @@ gem "web-push", "~> 3.0"
 gem "geokit", "~> 1.14"
 gem "timezone", "~> 1.3"
 
-gem "honeybadger", "~> 6.0"
+gem "honeybadger", "~> 6.1"
 
 gem "gemoji", "~> 4.1"
 
