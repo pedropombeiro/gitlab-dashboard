@@ -72,7 +72,7 @@ group :development do
 
   gem "debugbar"
 
-  gem "hotwire-livereload", "~> 2.0"
+  gem "hotwire-livereload", "~> 2.1"
   gem "spring"
 
   gem "dockerfile-rails", ">= 1.6"
