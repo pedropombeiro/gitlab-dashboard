@@ -8,7 +8,7 @@ class UserDto
   include ReviewerOrnamentsConcern
   include MergeRequestsParsingHelper
 
-  PIPELINE_AGE_LIMIT = 8.hours
+  PIPELINE_AGE_LIMIT = 16.hours
 
   attr_reader :errors, :updated_at, :next_update_at, :request_duration
   attr_reader :open_merge_requests, :merged_merge_requests, :type
