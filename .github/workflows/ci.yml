@@ -235,6 +235,8 @@ jobs:
 
       - name: Deploy
         uses: darnfish/watchtower-update@v4
+        if: steps.push.outputs.digest != ''
+        continue-on-error: true
         with:
           url: "${{ secrets.WATCHTOWER_URL }}"
           api_token: "${{ secrets.WATCHTOWER_API_TOKEN }}"
