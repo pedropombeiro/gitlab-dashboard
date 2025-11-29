@@ -57,7 +57,6 @@ RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSI
 
 # Install node modules
 COPY --link package.json yarn.lock .yarnrc.yml ./
-COPY --link .yarn/releases .yarn/releases
 RUN --mount=type=cache,id=bld-yarn-cache,target=/root/.yarn \
     YARN_CACHE_FOLDER=/root/.yarn yarn workspaces focus --all --production
 
