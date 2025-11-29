@@ -12,7 +12,7 @@ update:
     bundle update --bundler
     bundle update
     bin/importmap update
-    yarn upgrade
+    yarn up
 
 alias cache := toggle-cache
 
