@@ -1,28 +1,34 @@
-# syntax = docker/dockerfile:1
+# syntax=docker/dockerfile:1
+# check=error=true
 
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version and Gemfile
+# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
+# docker build -t demo .
+# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name demo demo
+
+# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
+
+# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.4.5
 FROM ruby:$RUBY_VERSION-alpine AS base
 
 # Rails app lives here
 WORKDIR /rails
 
-# Set production environment
-ENV BUNDLE_DEPLOYMENT="1" \
-  BUNDLE_PATH="/usr/local/bundle" \
-  BUNDLE_WITHOUT="development:test" \
-  RAILS_ENV="production"
-
 # Update gems and bundler
 RUN gem update --system --no-document && \
   gem install -N bundler
 
-# Install packages
+# Install base packages
 # hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
-  apk update && \
-  apk add --no-cache tzdata
+    apk update && \
+    apk add --no-cache curl jemalloc sqlite tzdata
 
+# Set production environment
+ENV BUNDLE_DEPLOYMENT="1" \
+    BUNDLE_PATH="/usr/local/bundle" \
+    BUNDLE_WITHOUT="development:test" \
+    RAILS_ENV="production"
 
 ############################################################################
 
@@ -44,17 +50,16 @@ FROM prebuild AS node
 ARG NODE_VERSION=25.2.1
 ARG YARN_VERSION=1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447
 ENV PATH=/usr/local/node/bin:$PATH
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.gz | tar xz -C /tmp/ && \
-  mkdir /usr/local/node && \
-  cp -rp /tmp/node-v${NODE_VERSION}-linux-x64-musl/* /usr/local/node/ && \
-  npm install -g yarn@$YARN_VERSION && \
-  rm -rf /tmp/node-v${NODE_VERSION}-linux-x64-musl
+    mkdir /usr/local/node && \
+    cp -rp /tmp/node-v${NODE_VERSION}-linux-x64-musl/* /usr/local/node/ && \
+    npm install -g yarn@$YARN_VERSION && \
+    rm -rf /tmp/node-v${NODE_VERSION}-linux-x64-musl
 
 # Install node modules
 COPY --link package.json yarn.lock ./
 RUN --mount=type=cache,id=bld-yarn-cache,target=/root/.yarn \
-  YARN_CACHE_FOLDER=/root/.yarn yarn install --frozen-lockfile --production=true
+    YARN_CACHE_FOLDER=/root/.yarn yarn install --production=true
 
 
 ############################################################################
@@ -100,7 +105,7 @@ ARG GIT_REPO_COMMIT_SHA="null"
 # hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add --no-cache curl jemalloc sqlite-dev sqlite-libs
+  apk add --no-cache sqlite-libs
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
@@ -108,22 +113,22 @@ COPY --from=build /rails /rails
 
 # Run and own only the runtime files as a non-root user for security
 ARG UID=1000 \
-  GID=1000
+    GID=1000
 RUN addgroup --system --gid "$GID" rails && \
-  adduser --system rails --uid "$UID" --ingroup rails --home /home/rails --shell /bin/sh rails && \
-  chown -R rails:rails db log storage tmp && \
-  echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
+    adduser --system rails --uid "$UID" --ingroup rails --home /home/rails --shell /bin/sh rails && \
+    chown -R rails:rails db log storage tmp && \
+    echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
 USER rails:rails
 
 # Deployment options
 ENV LD_PRELOAD="libjemalloc.so.2" \
-  MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
-  RUBY_YJIT_ENABLE="1"
+    MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true" \
+    RUBY_YJIT_ENABLE="1"
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/rails/bin/docker-entrypoint"]
 
-# Start the server by default, this can be overwritten at runtime
+# Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
 VOLUME /rails/storage
-CMD ["bundle", "exec", "./bin/rails", "server"]
+CMD ["./bin/thrust", "./bin/rails", "server"]

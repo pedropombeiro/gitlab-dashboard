@@ -4,8 +4,14 @@ export HONEYBADGER_ENV="$RAILS_ENV"
 export HONEYBADGER_REVISION="$(cat ./.git-sha)"
 curl -g "https://api.honeybadger.io/v1/deploys?deploy[environment]=${HONEYBADGER_ENV}&deploy[local_username]=${HONEYBADGER_USERNAME}&deploy[revision]=${HONEYBADGER_REVISION}&api_key=${HONEYBADGER_API_KEY}"
 
+# Enable jemalloc for reduced memory usage and latency.
+if [ -z "${LD_PRELOAD+x}" ]; then
+    LD_PRELOAD=$(find /usr/lib -name libjemalloc.so.2 -print -quit)
+    export LD_PRELOAD
+fi
+
 # If running the rails server then create or migrate existing database
-if [ "${*}" == "bundle exec thrust ./bin/rails server" ]; then
+if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
 fi
 
