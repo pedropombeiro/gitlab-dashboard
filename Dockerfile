@@ -52,7 +52,8 @@ ENV PATH=/usr/local/node/bin:$PATH
 RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.gz | tar xz -C /tmp/ && \
     mkdir /usr/local/node && \
     cp -rp /tmp/node-v${NODE_VERSION}-linux-x64-musl/* /usr/local/node/ && \
-    corepack enable && \
+    /usr/local/node/bin/npm install -g corepack && \
+    /usr/local/node/bin/corepack enable && \
     rm -rf /tmp/node-v${NODE_VERSION}-linux-x64-musl
 
 # Install node modules
