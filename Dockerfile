@@ -18,9 +18,10 @@ RUN gem update --system --no-document && \
   gem install -N bundler
 
 # Install packages
+# hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add tzdata
+  apk add --no-cache tzdata
 
 
 ############################################################################
@@ -29,9 +30,10 @@ RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
 FROM base AS prebuild
 
 # Install packages needed to build gems and node modules
+# hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add build-base curl gyp linux-headers openssl-dev pkgconfig yaml-dev
+  apk add --no-cache build-base curl gyp linux-headers openssl-dev pkgconfig yaml-dev
 
 
 ############################################################################
@@ -42,6 +44,7 @@ FROM prebuild AS node
 ARG NODE_VERSION=25.2.1
 ARG YARN_VERSION=1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447
 ENV PATH=/usr/local/node/bin:$PATH
+SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
 RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.gz | tar xz -C /tmp/ && \
   mkdir /usr/local/node && \
   cp -rp /tmp/node-v${NODE_VERSION}-linux-x64-musl/* /usr/local/node/ && \
@@ -82,6 +85,7 @@ COPY --link . .
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
+# hadolint ignore=DL3059
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
 ############################################################################
@@ -93,9 +97,10 @@ FROM base
 ARG GIT_REPO_COMMIT_SHA="null"
 
 # Install packages needed for deployment
+# hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add curl jemalloc sqlite-dev sqlite-libs
+  apk add --no-cache curl jemalloc sqlite-dev sqlite-libs
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
@@ -104,8 +109,8 @@ COPY --from=build /rails /rails
 # Run and own only the runtime files as a non-root user for security
 ARG UID=1000 \
   GID=1000
-RUN addgroup --system --gid $GID rails && \
-  adduser --system rails --uid $UID --ingroup rails --home /home/rails --shell /bin/sh rails && \
+RUN addgroup --system --gid "$GID" rails && \
+  adduser --system rails --uid "$UID" --ingroup rails --home /home/rails --shell /bin/sh rails && \
   chown -R rails:rails db log storage tmp && \
   echo ${GIT_REPO_COMMIT_SHA} >./.git-sha
 USER rails:rails
