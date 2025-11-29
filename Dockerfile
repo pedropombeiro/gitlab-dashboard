@@ -48,18 +48,18 @@ FROM prebuild AS node
 
 # Install JavaScript dependencies
 ARG NODE_VERSION=25.2.1
-ARG YARN_VERSION=1.22.19+sha1.4ba7fc5c6e704fce2066ecbfb0b0d8976fe62447
 ENV PATH=/usr/local/node/bin:$PATH
 RUN curl -sL https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.gz | tar xz -C /tmp/ && \
     mkdir /usr/local/node && \
     cp -rp /tmp/node-v${NODE_VERSION}-linux-x64-musl/* /usr/local/node/ && \
-    npm install -g yarn@$YARN_VERSION && \
+    corepack enable && \
     rm -rf /tmp/node-v${NODE_VERSION}-linux-x64-musl
 
 # Install node modules
-COPY --link package.json yarn.lock ./
+COPY --link package.json yarn.lock .yarnrc.yml ./
+COPY --link .yarn/releases .yarn/releases
 RUN --mount=type=cache,id=bld-yarn-cache,target=/root/.yarn \
-    YARN_CACHE_FOLDER=/root/.yarn yarn install --production=true
+    YARN_CACHE_FOLDER=/root/.yarn yarn workspaces focus --all --production
 
 
 ############################################################################

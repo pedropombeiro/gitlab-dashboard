@@ -44,3 +44,11 @@ storage
 config/secrets.yml
 config/environments/development/ssl/localhost.crt
 .rake_tasks
+
+# Yarn Berry
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
