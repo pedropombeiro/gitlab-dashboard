@@ -1,12 +1,16 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:best-practices",
+    ":automergeStableNonMajor",
+    ":automergeRequireAllStatusChecks",
+    ":enablePreCommit",
+    ":prImmediately",
+    "group:nodeJs",
+    "group:rubyOnRails",
+    "schedule:automergeNonOfficeHours",
+    "schedule:nonOfficeHours"
   ],
-  "schedule": [
-    "* 18-23 * * *"
-  ],
-  "automerge": true,
   "automergeType": "pr",
   "automergeStrategy": "squash",
   "enabledManagers": [
@@ -15,18 +19,6 @@
     "github-actions"
   ],
   "packageRules": [
-    {
-      "matchUpdateTypes": ["patch"],
-      "automerge": true
-    },
-    {
-      "matchUpdateTypes": ["minor"],
-      "automerge": false
-    },
-    {
-      "matchUpdateTypes": ["major"],
-      "automerge": false
-    },
     {
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["patch", "minor"],
