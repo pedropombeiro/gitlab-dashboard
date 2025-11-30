@@ -20,6 +20,6 @@
     "defaults"
   ],
   "devDependencies": {
-    "esbuild": "^0.27.0"
+    "esbuild": "0.27.0"
   }
 }
