@@ -187,6 +187,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      - name: Get current date
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v5
@@ -197,6 +201,7 @@ jobs:
           # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=raw,value=${{ steps.date.outputs.date }},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=ref,event=branch
             type=ref,event=pr
             type=sha
