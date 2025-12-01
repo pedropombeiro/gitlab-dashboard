@@ -7,6 +7,7 @@
     ":enablePreCommit",
     ":pinSkipCi",
     ":prImmediately",
+    ":separateMultipleMajorReleases",
     "group:nodeJs",
     "group:rubyOnRails",
     "schedule:automergeNonOfficeHours",
@@ -25,11 +26,17 @@
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true,
       "groupName": "GitHub Actions"
+    },
+    {
+      "automerge": true,
+      "automergeType": "branch",
+      "extends": [
+        "packages:linters",
+        "packages:test"
+      ]
     }
   ],
   "prConcurrentLimit": 10,
   "prHourlyLimit": 0,
-  "separateMajorMinor": true,
-  "separateMultipleMajor": true,
   "platformAutomerge": true
 }
