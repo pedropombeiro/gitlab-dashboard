@@ -1,12 +1,20 @@
-// Configure your import map in config/importmap.rb. Read more: https://github.com/rails/importmap-rails
 import "@hotwired/turbo-rails";
-//import * as bootstrap from "bootstrap";
+import * as bootstrap from "bootstrap";
 import "@fortawesome/fontawesome-free/js/all";
 import "./controllers";
 
 import LocalTime from "local-time";
 LocalTime.config.useFormat24 = true;
 LocalTime.start();
+
+import { Chart, registerables } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
+import "chartjs-plugin-trendline";
+
+Chart.register(...registerables, ChartDataLabels);
+
+// Make Chart.js available globally for inline scripts
+window.Chart = Chart;
 
 document.addEventListener("turbo:frame-missing", async function (event) {
   event.preventDefault();

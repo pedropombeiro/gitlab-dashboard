@@ -23,16 +23,9 @@
     <% end %>
     <%= stylesheet_link_tag :application,
     "data-turbo-track": Rails.env.production? ? "reload" : "" %>
-    <%= stylesheet_link_tag "https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.2.3/css/flag-icons.min.css",
-    "data-turbo-track": Rails.env.production? ? "reload" : "" %>
     <%= javascript_include_tag :application,
     "data-turbo-track": Rails.env.production? ? "reload" : "",
     type: "module" %>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script
-      src="https://cdn.jsdelivr.net/npm/chartjs-plugin-trendline/dist/chartjs-plugin-trendline.min.js"
-    ></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
     <script>
       function toggleParagraph(id, link) {
         const para = document.getElementById(id);
@@ -57,12 +50,6 @@
     gtag('config', '<%= ENV["GOOGLE_TAG_MEASUREMENT_ID"] %>');
     </script>
   <% end %>
-
-  <script
-    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
-    integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
-    crossorigin="anonymous"
-  ></script>
 
   <body class="bg-body bg-gradient min-vh-100" data-controller="theme-selector">
     <%= yield %>
