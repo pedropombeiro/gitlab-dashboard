@@ -22,12 +22,14 @@
   ],
   "packageRules": [
     {
+      "description": "Auto-merge non-breaking GitHub Actions updates (patch and minor versions only) as a grouped PR",
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true,
       "groupName": "GitHub Actions"
     },
     {
+      "description": "Auto-merge linter and test framework package updates directly to branch without creating a PR",
       "automerge": true,
       "automergeType": "branch",
       "extends": [
