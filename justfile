@@ -11,7 +11,6 @@ update:
     bin/spring stop
     bundle update --bundler
     bundle update
-    bin/importmap update
     yarn up
 
 alias cache := toggle-cache
