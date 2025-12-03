@@ -222,6 +222,36 @@ RSpec.describe MergeRequestsController, type: :controller do
           expect(response).to redirect_to action: :index, author: author
           expect(GitlabUser.find_by_username(author)).to be_nil
         end
+
+        context "with invalid assignee containing special characters" do
+          let(:params) { {assignee: "user<script>alert('xss')</script>"} }
+
+          it "renders 404 for invalid username format" do
+            request
+
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+
+        context "with invalid assignee containing SQL injection attempt" do
+          let(:params) { {assignee: "user'; DROP TABLE users--"} }
+
+          it "renders 404 for invalid username format" do
+            request
+
+            expect(response).to have_http_status(:not_found)
+          end
+        end
+
+        context "with invalid assignee that is too long" do
+          let(:params) { {assignee: "a" * 256} }
+
+          it "renders 404 for username exceeding length limit" do
+            request
+
+            expect(response).to have_http_status(:not_found)
+          end
+        end
       end
     end
   end

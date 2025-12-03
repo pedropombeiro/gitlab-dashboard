@@ -4,8 +4,13 @@ class MergeRequestsController < MergeRequestsControllerBase
   include Honeybadger::InstrumentationHelper
 
   def index
-    if params[:assignee].present?
-      return redirect_to merge_requests_path(author: params[:assignee], referrer: safe_params[:referrer])
+    if safe_params[:assignee].present?
+      validated_assignee = validate_username(safe_params[:assignee])
+      if validated_assignee
+        return redirect_to merge_requests_path(author: validated_assignee, referrer: safe_params[:referrer])
+      else
+        render_404 and return
+      end
     end
 
     return unless ensure_author
