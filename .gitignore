@@ -52,3 +52,6 @@ config/environments/development/ssl/localhost.crt
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Claude Code local settings
+.claude/settings.local.json
