@@ -2,8 +2,9 @@ $enable-gradients: true;
 $enable-shadows: true;
 
 @import '../../../node_modules/bootstrap/scss/bootstrap';
-@import '../../../node_modules/bootstrap-icons/font/bootstrap-icons.css';
-@import '../../../node_modules/flag-icons/css/flag-icons.min.css';
+
+// Bootstrap Icons and Flag Icons are loaded via CDN in the layout
+// due to complexity of managing font files and SVG assets with Propshaft
 
 body { background: $gray-200 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
 @if $enable-gradients {

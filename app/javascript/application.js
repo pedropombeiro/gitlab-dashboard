@@ -13,8 +13,12 @@ import "chartjs-plugin-trendline";
 
 Chart.register(...registerables, ChartDataLabels);
 
-// Make Chart.js available globally for inline scripts
+// Make Chart.js and plugins available globally for inline scripts
 window.Chart = Chart;
+window.ChartDataLabels = ChartDataLabels;
+
+// Make Bootstrap available globally
+window.bootstrap = bootstrap;
 
 document.addEventListener("turbo:frame-missing", async function (event) {
   event.preventDefault();
