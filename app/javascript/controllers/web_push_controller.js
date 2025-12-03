@@ -59,10 +59,12 @@ export default class extends Controller {
       });
 
       try {
+        const csrfToken = document.querySelector("meta[name=csrf-token]")?.content;
         const response = await fetch("/api/web_push_subscriptions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            "X-CSRF-Token": csrfToken,
           },
           body: JSON.stringify(subscription),
         });

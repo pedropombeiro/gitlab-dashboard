@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class Api::WebPushSubscriptionsController < ApplicationController
-  skip_before_action :verify_authenticity_token
   before_action :require_user
+  before_action :verify_origin
 
   def create
     params.expect(:endpoint, keys: [:auth, :p256dh])
@@ -29,8 +29,22 @@ class Api::WebPushSubscriptionsController < ApplicationController
 
   def require_user
     unless current_user
-      flash[:error] = "A user must be specified to access this section"
-      redirect_back(fallback_location: root_path)
+      head :unauthorized
+    end
+  end
+
+  def verify_origin
+    return if request.origin.blank?
+
+    allowed_origins = [
+      request.base_url,
+      "https://#{request.host}",
+      ("http://#{request.host}" if Rails.env.development?)
+    ].compact
+
+    unless allowed_origins.include?(request.origin)
+      Rails.logger.warn("Web push subscription rejected: invalid origin #{request.origin}")
+      head :forbidden
     end
   end
 end
