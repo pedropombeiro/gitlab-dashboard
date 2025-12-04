@@ -12,6 +12,8 @@
     web_push_unsubscribed_class: "d-initial",
     web_push_subscribed_class: "d-none"
   } do %>
+  <%= link_to "Skip to main content", "#main-content", class: "skip-link" %>
+
   <% nav_bg_class = Rails.env.production? ? %w[] : %w[bg-danger] %>
 
   <%= tag.nav class: %w[navbar bg-body bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
@@ -56,7 +58,7 @@
     <%= render "shared/navbar_right_section" %>
   <% end %>
 
-  <%= tag.div(class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
+  <%= tag.div(id: "main-content", class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
     <%= tag.div(id: "open_merge_requests", class: mr_list_panel_classes + %w[bg-body mt-5]) do %>
       <%= turbo_frame_tag @dto, :open_merge_requests, src: open_merge_requests_list_path(merge_requests_controller_params) do %>
         <% if @dto.has_content? %>

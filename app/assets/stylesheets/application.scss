@@ -15,6 +15,23 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
   }
 }
 
+// Accessibility: Skip navigation link
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: $primary;
+  color: white;
+  padding: 8px 12px;
+  text-decoration: none;
+  z-index: 1100; // Higher than Bootstrap's fixed navbar (1030)
+  border-radius: 0 0 4px 0;
+
+  &:focus {
+    top: 0;
+  }
+}
+
 // Chart theme variables
 :root {
   --chart-bg-color: #ffffff;
