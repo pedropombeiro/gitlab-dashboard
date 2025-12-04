@@ -16,9 +16,9 @@ class Badger {
         radius: 0.1, // Border radius, better used as % value + 4px base
         src: "", // Favicon source (dafaults to the <link> icon href),
         srcs: false,
-        onChange() { },
+        onChange() {},
       },
-      options,
+      options
     );
     this.canvas = document.createElement("canvas");
     this.ctx = this.canvas.getContext("2d");

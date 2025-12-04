@@ -2,25 +2,25 @@
 // Run that command whenever you add a new controller or create them with
 // ./bin/rails generate stimulus controllerName
 
-import { application } from "./application"
+import { application } from "./application";
 
-import AutoRefreshController from "./auto_refresh_controller"
-application.register("auto-refresh", AutoRefreshController)
+import AutoRefreshController from "./auto_refresh_controller";
+application.register("auto-refresh", AutoRefreshController);
 
-import BootstrapTooltipController from "./bootstrap_tooltip_controller"
-application.register("bootstrap-tooltip", BootstrapTooltipController)
+import BootstrapTooltipController from "./bootstrap_tooltip_controller";
+application.register("bootstrap-tooltip", BootstrapTooltipController);
 
-import ClipboardController from "./clipboard_controller"
-application.register("clipboard", ClipboardController)
+import ClipboardController from "./clipboard_controller";
+application.register("clipboard", ClipboardController);
 
-import MergedMergeRequestsChartController from "./merged_merge_requests_chart_controller"
-application.register("merged-merge-requests-chart", MergedMergeRequestsChartController)
+import MergedMergeRequestsChartController from "./merged_merge_requests_chart_controller";
+application.register("merged-merge-requests-chart", MergedMergeRequestsChartController);
 
-import ThemeSelectorController from "./theme_selector_controller"
-application.register("theme-selector", ThemeSelectorController)
+import ThemeSelectorController from "./theme_selector_controller";
+application.register("theme-selector", ThemeSelectorController);
 
-import UnreadBadgeController from "./unread_badge_controller"
-application.register("unread-badge", UnreadBadgeController)
+import UnreadBadgeController from "./unread_badge_controller";
+application.register("unread-badge", UnreadBadgeController);
 
-import WebPushController from "./web_push_controller"
-application.register("web-push", WebPushController)
+import WebPushController from "./web_push_controller";
+application.register("web-push", WebPushController);

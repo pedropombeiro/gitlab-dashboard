@@ -45,7 +45,7 @@ export default class extends Controller {
     }
   }
 
-  updateChartTheme(chartInstance, isDark) {
+  updateChartTheme(chartInstance, _isDark) {
     // Update chart options to use CSS variable colors
     const styles = getComputedStyle(document.documentElement);
     const textColor = styles.getPropertyValue("--chart-text-color").trim();
