@@ -190,7 +190,7 @@ jobs:
     needs: [changes, test]
     if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.deployment == 'true' }}
     permissions:
-      contents: read
+      contents: write
       packages: write
       id-token: write
       attestations: write
@@ -254,6 +254,19 @@ jobs:
           subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
+
+      - name: Create Git tag
+        if: steps.push.outputs.digest != '' && github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          TAG_NAME="v${{ steps.compute_date.outputs.date }}-${SHORT_SHA}"
+
+          git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
+          git push origin "$TAG_NAME"
+          echo "Created and pushed tag $TAG_NAME"
 
       - name: Deploy
         uses: darnfish/watchtower-update@40aa0445d8dc2e70a33bfed1e5052e4305a62b15 # v4
