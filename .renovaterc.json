@@ -18,7 +18,11 @@
   "enabledManagers": [
     "bundler",
     "npm",
-    "github-actions"
+    "github-actions",
+    "dockerfile",
+    "ruby-version",
+    "nodenv",
+    "regex"
   ],
   "packageRules": [
     {
@@ -36,6 +40,24 @@
         "packages:linters",
         "packages:test"
       ]
+    },
+    {
+      "description": "Group Docker base image updates",
+      "matchManagers": ["dockerfile"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "groupName": "Docker images",
+      "automerge": true
+    }
+  ],
+  "regexManagers": [
+    {
+      "description": "Update NODE_VERSION in Dockerfile",
+      "fileMatch": ["^Dockerfile$"],
+      "matchStrings": [
+        "ARG NODE_VERSION=(?<currentValue>.*?)\\n"
+      ],
+      "datasourceTemplate": "node-version",
+      "depNameTemplate": "node"
     }
   ],
   "prConcurrentLimit": 10,
