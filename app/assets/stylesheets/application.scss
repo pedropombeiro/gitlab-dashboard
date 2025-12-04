@@ -15,9 +15,19 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
   }
 }
 
-// Cheap dark mode for charts
-.dark-canvas {
-  filter: invert(1) hue-rotate(180deg);
+// Chart theme variables
+:root {
+  --chart-bg-color: #ffffff;
+  --chart-text-color: #212529;
+  --chart-grid-color: rgba(0, 0, 0, 0.1);
+  --chart-border-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-bs-theme="dark"] {
+  --chart-bg-color: #212529;
+  --chart-text-color: #dee2e6;
+  --chart-grid-color: rgba(255, 255, 255, 0.1);
+  --chart-border-color: rgba(255, 255, 255, 0.1);
 }
 
 .wide-tooltip {

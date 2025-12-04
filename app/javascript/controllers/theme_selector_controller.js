@@ -32,31 +32,37 @@ export default class extends Controller {
   }
 
   refreshChartsTheme(isDark) {
-    const fn = this.refreshChartTheme.bind(this);
-
-    fn(this.chartTarget, isDark);
-  }
-
-  refreshChartTheme(chart, isDark) {
-    const canvases = chart.getElementsByTagName("canvas");
-
-    if (canvases.length === 0) {
-      // Workaround: if the canvas isn't yet loaded, retry in a short while. This will lead to short periods of wrong
-      // styling, but its the best we can do for now.
-      const fn = this.refreshChartTheme.bind(this);
-      setTimeout(() => {
-        fn(chart, isDark);
-      }, 100);
-      return;
-    }
-
-    for (const canvas of canvases) {
-      if (isDark) {
-        canvas.classList.add("dark-canvas");
-      } else {
-        canvas.classList.remove("dark-canvas");
+    // Charts will automatically pick up theme changes via CSS variables
+    // Trigger a chart update if Chart.js instances are available
+    if (this.hasChartTarget && window.Chart) {
+      const canvases = this.chartTarget.getElementsByTagName("canvas");
+      for (const canvas of canvases) {
+        const chartInstance = window.Chart.getChart(canvas);
+        if (chartInstance) {
+          this.updateChartTheme(chartInstance, isDark);
+        }
       }
     }
+  }
+
+  updateChartTheme(chartInstance, isDark) {
+    // Update chart options to use CSS variable colors
+    const styles = getComputedStyle(document.documentElement);
+    const textColor = styles.getPropertyValue("--chart-text-color").trim();
+    const gridColor = styles.getPropertyValue("--chart-grid-color").trim();
+
+    if (chartInstance.options.scales) {
+      Object.values(chartInstance.options.scales).forEach((scale) => {
+        if (scale.ticks) scale.ticks.color = textColor;
+        if (scale.grid) scale.grid.color = gridColor;
+      });
+    }
+
+    if (chartInstance.options.plugins?.legend?.labels) {
+      chartInstance.options.plugins.legend.labels.color = textColor;
+    }
+
+    chartInstance.update();
   }
 
   toggleTheme() {
@@ -73,8 +79,9 @@ export default class extends Controller {
     this.refreshTheme();
   }
 
-  chartTargetConnected(chart) {
-    this.refreshChartTheme(chart, this.isDark());
+  chartTargetConnected(_chart) {
+    // Chart theme will be applied when theme is toggled
+    this.refreshChartsTheme(this.isDark());
   }
 
   buttonTargetConnected(_button) {

@@ -22,6 +22,11 @@ export default class extends Controller {
       const canvas = document.createElement("canvas");
       this.chartTarget.replaceChildren(canvas);
 
+      // Get theme colors from CSS variables
+      const styles = getComputedStyle(document.documentElement);
+      const textColor = styles.getPropertyValue("--chart-text-color").trim();
+      const gridColor = styles.getPropertyValue("--chart-grid-color").trim();
+
       const ctx = canvas.getContext("2d");
       new Chart(ctx, {
         type: "bar",
@@ -36,9 +41,20 @@ export default class extends Controller {
               tension: 0.5,
             },
           },
+          scales: {
+            x: {
+              ticks: { color: textColor },
+              grid: { color: gridColor },
+            },
+            y: {
+              ticks: { color: textColor },
+              grid: { color: gridColor },
+            },
+          },
           plugins: {
             legend: {
               labels: {
+                color: textColor,
                 filter: (legendItem, _data) => {
                   return legendItem.text.trim() !== "MTD merged count";
                 },
