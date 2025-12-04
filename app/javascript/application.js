@@ -1,5 +1,5 @@
 import "@hotwired/turbo-rails";
-import * as bootstrap from "bootstrap";
+import { Tooltip, Popover, Dropdown } from "bootstrap";
 import "@fortawesome/fontawesome-free/js/all";
 import "./controllers";
 
@@ -16,7 +16,7 @@ Chart.register(...registerables, ChartDataLabels);
 // Make libraries available globally BEFORE they're used
 window.Chart = Chart;
 window.ChartDataLabels = ChartDataLabels;
-window.bootstrap = bootstrap;
+window.bootstrap = { Tooltip, Popover, Dropdown };
 
 document.addEventListener("turbo:frame-missing", async function (event) {
   event.preventDefault();
@@ -30,7 +30,7 @@ document.addEventListener("turbo:frame-missing", async function (event) {
 });
 
 // Allow table elements in Bootstrap tooltips
-const defaultAllowList = bootstrap.Tooltip.Default.allowList;
+const defaultAllowList = Tooltip.Default.allowList;
 
 defaultAllowList.a = ["target", "href", "title", "rel", "data-action", "data-bs-toggle", "data-bs-title"];
 defaultAllowList.code = ["data-clipboard-target"];
