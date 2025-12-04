@@ -8,11 +8,14 @@ interface TurboFrameElement extends HTMLElement {
 // Connects to data-controller="auto-refresh"
 export default class AutoRefreshController extends Controller {
   static values = { timeout: Number, targetDomId: String };
+  static targets = ["liveRegion"];
 
   declare readonly hasTimeoutValue: boolean;
   declare readonly hasTargetDomIdValue: boolean;
+  declare readonly hasLiveRegionTarget: boolean;
   declare readonly timeoutValue: number;
   declare readonly targetDomIdValue: string;
+  declare readonly liveRegionTarget: HTMLElement;
 
   private controller = new AbortController();
   private nextRefreshTimestamp = 0;
@@ -53,6 +56,9 @@ export default class AutoRefreshController extends Controller {
       this.controller.abort();
     }
 
+    // Announce update to screen readers
+    this.announceUpdate();
+
     if (this.hasTargetDomIdValue) {
       const element = document.getElementById(this.targetDomIdValue) as TurboFrameElement | null;
       if (element && "reload" in element) {
@@ -61,5 +67,21 @@ export default class AutoRefreshController extends Controller {
     } else {
       location.reload();
     }
+  }
+
+  private announceUpdate(): void {
+    if (!this.hasLiveRegionTarget) {
+      return;
+    }
+
+    const timestamp = new Date().toLocaleTimeString();
+    this.liveRegionTarget.textContent = `Content updated at ${timestamp}`;
+
+    // Clear the message after a short delay to allow multiple announcements
+    setTimeout(() => {
+      if (this.hasLiveRegionTarget) {
+        this.liveRegionTarget.textContent = "";
+      }
+    }, 1000);
   }
 }

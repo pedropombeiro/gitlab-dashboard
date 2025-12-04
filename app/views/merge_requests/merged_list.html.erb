@@ -7,6 +7,9 @@
     auto_refresh_target_dom_id_value: dom_id(@dto, :merged_merge_requests),
     auto_refresh_timeout_value: (next_update_remaining_secs.clamp(10, 60) * 1000).round.to_i
   } do %>
+    <!-- ARIA live region for auto-refresh announcements -->
+    <div aria-live="polite" aria-atomic="true" class="visually-hidden" data-auto-refresh-target="liveRegion"></div>
+
     <div data-controller="bootstrap-tooltip">
       <%= render "merged_merge_requests",
       merge_requests_dto: @dto.merged_merge_requests,
