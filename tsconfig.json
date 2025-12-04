@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    // Target ES2022 for modern JavaScript features
+    "target": "ES2022",
+    "module": "ESNext",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+
+    // Module resolution
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+
+    // Emit
+    "noEmit": true, // esbuild handles compilation
+    "sourceMap": true,
+
+    // Type checking
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+
+    // Compatibility
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+
+    // For Stimulus
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false
+  },
+  "include": [
+    "app/javascript/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "app/assets/builds"
+  ]
+}

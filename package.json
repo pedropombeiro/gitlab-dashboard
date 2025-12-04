@@ -19,23 +19,28 @@
     "sass": "^1.80.6"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --minify --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",
-    "build:dev": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets",
+    "build": "esbuild app/javascript/*.* --bundle --minify --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.ts=ts --loader:.js=js",
+    "build:dev": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.ts=ts --loader:.js=js",
     "lint": "eslint app/javascript",
     "lint:fix": "eslint app/javascript --fix",
-    "format": "prettier --write 'app/javascript/**/*.js'",
-    "format:check": "prettier --check 'app/javascript/**/*.js'"
+    "format": "prettier --write 'app/javascript/**/*.{js,ts}'",
+    "format:check": "prettier --check 'app/javascript/**/*.{js,ts}'",
+    "typecheck": "tsc --noEmit"
   },
   "browserslist": [
     "defaults"
   ],
   "devDependencies": {
     "@eslint/js": "^9.39.1",
+    "@types/node": "^24.10.1",
+    "@typescript-eslint/eslint-plugin": "^8.48.1",
+    "@typescript-eslint/parser": "^8.48.1",
     "esbuild": "0.27.0",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.4",
     "postcss": "8.5.6",
-    "prettier": "^3.7.4"
+    "prettier": "^3.7.4",
+    "typescript": "^5.9.3"
   }
 }

@@ -2,12 +2,32 @@
  * Chart.js configuration utilities
  */
 
+import type { ChartOptions } from "chart.js";
+import type { Context } from "chartjs-plugin-datalabels";
+
+/**
+ * Theme color configuration
+ */
+export interface ThemeColors {
+  text: string;
+  grid: string;
+  bg: string;
+  border: string;
+}
+
+/**
+ * Data point with y-value
+ */
+interface DataPoint {
+  y: number;
+  [key: string]: unknown;
+}
+
 /**
  * Get theme colors from CSS variables
  * Checks the element with data-bs-theme attribute for proper theme context
- * @returns {Object} Theme color configuration
  */
-export function getThemeColors() {
+export function getThemeColors(): ThemeColors {
   // Find the element with the theme attribute (usually on body or a container)
   const themedElement = document.querySelector("[data-bs-theme]") || document.documentElement;
   const styles = getComputedStyle(themedElement);
@@ -22,10 +42,8 @@ export function getThemeColors() {
 
 /**
  * Sort data points by y-value in descending order
- * @param {Array} data - Array of data points with y values
- * @returns {Array} Sorted array
  */
-export function sortByY(data) {
+export function sortByY(data: DataPoint[]): DataPoint[] {
   if (!Array.isArray(data)) {
     throw new Error("Input must be an array.");
   }
@@ -40,34 +58,35 @@ export function sortByY(data) {
 /**
  * Determine if a data label should be displayed
  * Only show labels for the top 3 values in the merged-count stack
- * @param {Object} context - Chart.js context
- * @returns {boolean}
  */
-export function shouldDisplayDataLabel(context) {
+export function shouldDisplayDataLabel(context: Context): boolean {
   if (context === undefined || context.dataset.stack !== "merged-count") {
     return false;
   }
 
-  const dataPoints = context.dataset.data;
+  const dataPoints = context.dataset.data as unknown as DataPoint[];
   if (dataPoints.length < 3) {
     return false;
   }
 
-  const value = dataPoints[context.dataIndex].y;
-  const sortedDataPoints = sortByY(dataPoints);
+  const value = dataPoints[context.dataIndex]?.y;
+  if (value === undefined) {
+    return false;
+  }
 
-  return sortedDataPoints !== undefined && value >= sortedDataPoints[2].y;
+  const sortedDataPoints = sortByY(dataPoints);
+  const thirdHighest = sortedDataPoints[2];
+
+  return thirdHighest !== undefined && value >= thirdHighest.y;
 }
 
 /**
  * Create default chart options with theme support
- * @param {Object} customOptions - Custom options to merge
- * @returns {Object} Chart.js options object
  */
-export function createChartOptions(customOptions = {}) {
+export function createChartOptions(customOptions: Partial<ChartOptions> = {}): ChartOptions {
   const colors = getThemeColors();
 
-  const defaultOptions = {
+  const defaultOptions: ChartOptions = {
     responsive: true,
     maintainAspectRatio: true,
     scales: {
@@ -87,28 +106,31 @@ export function createChartOptions(customOptions = {}) {
     },
   };
 
-  return mergeDeep(defaultOptions, customOptions);
+  return mergeDeep(defaultOptions, customOptions) as ChartOptions;
 }
 
 /**
  * Deep merge two objects
- * @param {Object} target - Target object
- * @param {Object} source - Source object
- * @returns {Object} Merged object
  */
-function mergeDeep(target, source) {
+function mergeDeep<T extends Record<string, unknown>>(target: T, source: Partial<T>): T {
   const output = { ...target };
 
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach((key) => {
-      if (isObject(source[key])) {
+      const sourceValue = source[key as keyof T];
+      const targetValue = target[key as keyof T];
+
+      if (isObject(sourceValue)) {
         if (!(key in target)) {
-          Object.assign(output, { [key]: source[key] });
-        } else {
-          output[key] = mergeDeep(target[key], source[key]);
+          Object.assign(output, { [key]: sourceValue });
+        } else if (isObject(targetValue)) {
+          output[key as keyof T] = mergeDeep(
+            targetValue as Record<string, unknown>,
+            sourceValue as Record<string, unknown>
+          ) as T[keyof T];
         }
       } else {
-        Object.assign(output, { [key]: source[key] });
+        Object.assign(output, { [key]: sourceValue });
       }
     });
   }
@@ -118,9 +140,7 @@ function mergeDeep(target, source) {
 
 /**
  * Check if value is an object
- * @param {*} item - Value to check
- * @returns {boolean}
  */
-function isObject(item) {
-  return item && typeof item === "object" && !Array.isArray(item);
+function isObject(item: unknown): item is Record<string, unknown> {
+  return item !== null && typeof item === "object" && !Array.isArray(item);
 }

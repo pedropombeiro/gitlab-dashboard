@@ -1,18 +1,24 @@
 import { Controller } from "@hotwired/stimulus";
+import { Chart } from "chart.js";
 import { getThemeColors } from "../lib/chart_config";
 
 // Connects to data-controller="theme-selector"
-export default class extends Controller {
+export default class ThemeSelectorController extends Controller {
   static targets = ["button", "chart"];
 
-  isDark() {
+  declare readonly hasButtonTarget: boolean;
+  declare readonly hasChartTarget: boolean;
+  declare readonly buttonTarget: HTMLElement;
+  declare readonly chartTarget: HTMLElement;
+
+  isDark(): boolean {
     return (
       localStorage.theme === "dark" ||
       (!("theme" in localStorage) && window.matchMedia("(prefers-color-scheme: dark)").matches)
     );
   }
 
-  refreshTheme() {
+  refreshTheme(): void {
     if (this.element === null) {
       return;
     }
@@ -32,13 +38,13 @@ export default class extends Controller {
     }
   }
 
-  refreshChartsTheme(isDark) {
+  refreshChartsTheme(isDark: boolean): void {
     // Charts will automatically pick up theme changes via CSS variables
     // Trigger a chart update if Chart.js instances are available
-    if (this.hasChartTarget && window.Chart) {
+    if (this.hasChartTarget && typeof window.Chart !== "undefined") {
       const canvases = this.chartTarget.getElementsByTagName("canvas");
       for (const canvas of canvases) {
-        const chartInstance = window.Chart.getChart(canvas);
+        const chartInstance = Chart.getChart(canvas);
         if (chartInstance) {
           this.updateChartTheme(chartInstance, isDark);
         }
@@ -46,14 +52,14 @@ export default class extends Controller {
     }
   }
 
-  updateChartTheme(chartInstance, _isDark) {
+  updateChartTheme(chartInstance: Chart, _isDark: boolean): void {
     // Update chart options to use CSS variable colors
     const colors = getThemeColors();
 
     if (chartInstance.options.scales) {
       Object.values(chartInstance.options.scales).forEach((scale) => {
-        if (scale.ticks) scale.ticks.color = colors.text;
-        if (scale.grid) scale.grid.color = colors.grid;
+        if (scale?.ticks) scale.ticks.color = colors.text;
+        if (scale?.grid) scale.grid.color = colors.grid;
       });
     }
 
@@ -64,7 +70,7 @@ export default class extends Controller {
     chartInstance.update();
   }
 
-  toggleTheme() {
+  toggleTheme(): void {
     if (localStorage.theme === "dark") {
       localStorage.theme = "light";
     } else {
@@ -74,20 +80,20 @@ export default class extends Controller {
     this.refreshChartsTheme(this.isDark());
   }
 
-  connect() {
+  connect(): void {
     this.refreshTheme();
   }
 
-  chartTargetConnected(_chart) {
+  chartTargetConnected(_chart: Element): void {
     // Chart theme will be applied when theme is toggled
     this.refreshChartsTheme(this.isDark());
   }
 
-  buttonTargetConnected(_button) {
+  buttonTargetConnected(_button: Element): void {
     this.refreshTheme();
   }
 
-  switch(event) {
+  switch(event: Event): void {
     event.preventDefault();
 
     this.toggleTheme();

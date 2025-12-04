@@ -1,10 +1,12 @@
 import { Controller } from "@hotwired/stimulus";
 
 // Connects to data-controller="clipboard"
-export default class extends Controller {
+export default class ClipboardController extends Controller {
   static targets = ["source"];
 
-  copy(event) {
+  declare readonly sourceTarget: HTMLElement;
+
+  copy(event: Event): void {
     event.preventDefault();
 
     navigator.clipboard.writeText(this.sourceTarget.innerText);

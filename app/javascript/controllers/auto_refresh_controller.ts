@@ -1,14 +1,24 @@
 import { Controller } from "@hotwired/stimulus";
 
+// Turbo Frame element with reload method
+interface TurboFrameElement extends HTMLElement {
+  reload: () => void;
+}
+
 // Connects to data-controller="auto-refresh"
-export default class extends Controller {
+export default class AutoRefreshController extends Controller {
   static values = { timeout: Number, targetDomId: String };
 
-  controller = new AbortController();
-  nextRefreshTimestamp = 0;
-  timeoutID = 0;
+  declare readonly hasTimeoutValue: boolean;
+  declare readonly hasTargetDomIdValue: boolean;
+  declare readonly timeoutValue: number;
+  declare readonly targetDomIdValue: string;
 
-  connect() {
+  private controller = new AbortController();
+  private nextRefreshTimestamp = 0;
+  private timeoutID: ReturnType<typeof setTimeout> | 0 = 0;
+
+  connect(): void {
     const onVisibilityChange = () => {
       if (document.visibilityState !== "visible") {
         return;
@@ -30,11 +40,11 @@ export default class extends Controller {
     this.timeoutID = setTimeout(this.refresh.bind(this), timeoutValue);
   }
 
-  disconnect() {
+  disconnect(): void {
     this.controller.abort();
   }
 
-  refresh() {
+  refresh(): void {
     if (this.timeoutID !== 0) {
       // Avoid re-entry caused by visibility change happening when timeout expires
       clearTimeout(this.timeoutID);
@@ -44,8 +54,8 @@ export default class extends Controller {
     }
 
     if (this.hasTargetDomIdValue) {
-      const element = document.getElementById(this.targetDomIdValue);
-      if (element) {
+      const element = document.getElementById(this.targetDomIdValue) as TurboFrameElement | null;
+      if (element && "reload" in element) {
         element.reload();
       }
     } else {

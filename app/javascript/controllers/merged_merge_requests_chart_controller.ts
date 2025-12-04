@@ -1,24 +1,29 @@
 import { Controller } from "@hotwired/stimulus";
+import { Chart, type ChartConfiguration } from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels";
 import { createChartOptions, getThemeColors, shouldDisplayDataLabel } from "../lib/chart_config";
 
 // Connects to data-controller="merged-merge-requests-chart"
-export default class extends Controller {
+export default class MergedMergeRequestsChartController extends Controller {
   static values = { url: String };
   static targets = ["chart"];
 
-  chartInstance = null;
+  declare readonly urlValue: string;
+  declare readonly chartTarget: HTMLElement;
 
-  async fetchData() {
+  private chartInstance: Chart | null = null;
+
+  async fetchData(): Promise<ChartConfiguration["data"]> {
     const response = await fetch(this.urlValue);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const data = await response.json();
-    return data;
+    return data as ChartConfiguration["data"];
   }
 
-  async createChart() {
+  async createChart(): Promise<void> {
     // Show loading state
     this.chartTarget.innerHTML =
       '<div class="d-flex justify-content-center align-items-center p-5"><span class="spinner-border me-3" role="status"></span><span>Loading chart...</span></div>';
@@ -30,6 +35,10 @@ export default class extends Controller {
       this.chartTarget.replaceChildren(canvas);
 
       const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        throw new Error("Could not get canvas context");
+      }
+
       const colors = getThemeColors();
 
       const options = createChartOptions({
@@ -44,7 +53,7 @@ export default class extends Controller {
           legend: {
             labels: {
               color: colors.text,
-              filter: (legendItem, _data) => {
+              filter: (legendItem) => {
                 return legendItem.text.trim() !== "MTD merged count";
               },
             },
@@ -55,25 +64,26 @@ export default class extends Controller {
             font: {
               weight: "bold",
             },
-            formatter: (value) => value.y,
+            formatter: (value: { y: number }) => value.y,
           },
         },
       });
 
-      this.chartInstance = new Chart(ctx, {
+      const config: ChartConfiguration = {
         type: "bar",
         data: chartData,
         plugins: [ChartDataLabels],
         options,
-      });
+      };
+
+      this.chartInstance = new Chart(ctx, config);
     } catch (error) {
       console.error("Error creating chart:", error);
-      // Optionally display an error message to the user:
       this.chartTarget.innerHTML = "<p class='d-flex justify-content-center'>Error loading chart data.</p>";
     }
   }
 
-  connect() {
+  connect(): void {
     // Turbolinks preview restores the DOM except for painted <canvas>
     // since it uses cloneNode(true) - https://developer.mozilla.org/en-US/docs/Web/API/Node/
     //
@@ -83,18 +93,16 @@ export default class extends Controller {
     if (document.documentElement.hasAttribute("data-turbolinks-preview")) return;
     if (document.documentElement.hasAttribute("data-turbo-preview")) return;
 
-    this.createChart();
+    void this.createChart();
   }
 
-  disconnect() {
+  disconnect(): void {
     // Properly destroy Chart.js instance to prevent memory leaks
     if (this.chartInstance) {
       this.chartInstance.destroy();
       this.chartInstance = null;
     }
 
-    if (this.chartTarget !== null) {
-      this.chartTarget.replaceChildren();
-    }
+    this.chartTarget.replaceChildren();
   }
 }
