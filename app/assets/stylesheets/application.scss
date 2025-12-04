@@ -67,6 +67,7 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
   text-align: left;
 }
 
+// Review status badges with WCAG AA compliant color contrast
 .bg-review-unreviewed { background-color: $blue-500 }
 .text-review-unreviewed { color: $white }
 
@@ -76,10 +77,12 @@ body { background: $gray-200 !important; } /* Adding !important forces the brows
 .bg-review-requested-changes { background-color: $red-700 }
 .text-review-requested-changes { color: $white }
 
-.bg-review-reviewed { background-color: $yellow }
-.text-review-reviewed { color: $white }
+// Changed from $yellow to $yellow-500 for better contrast with white text
+.bg-review-reviewed { background-color: $yellow-500 }
+.text-review-reviewed { color: $black } // Changed to black for better contrast
 
-.bg-review-approved { background-color: $green-300 }
+// Changed from $green-300 to $green-600 for better contrast with white text
+.bg-review-approved { background-color: $green-600 }
 .text-review-approved { color: $white }
 
 .bg-review-unapproved { background-color: $orange-400 }
