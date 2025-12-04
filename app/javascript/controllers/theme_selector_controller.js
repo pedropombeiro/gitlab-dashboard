@@ -1,4 +1,5 @@
 import { Controller } from "@hotwired/stimulus";
+import { getThemeColors } from "../lib/chart_config";
 
 // Connects to data-controller="theme-selector"
 export default class extends Controller {
@@ -47,19 +48,17 @@ export default class extends Controller {
 
   updateChartTheme(chartInstance, _isDark) {
     // Update chart options to use CSS variable colors
-    const styles = getComputedStyle(document.documentElement);
-    const textColor = styles.getPropertyValue("--chart-text-color").trim();
-    const gridColor = styles.getPropertyValue("--chart-grid-color").trim();
+    const colors = getThemeColors();
 
     if (chartInstance.options.scales) {
       Object.values(chartInstance.options.scales).forEach((scale) => {
-        if (scale.ticks) scale.ticks.color = textColor;
-        if (scale.grid) scale.grid.color = gridColor;
+        if (scale.ticks) scale.ticks.color = colors.text;
+        if (scale.grid) scale.grid.color = colors.grid;
       });
     }
 
     if (chartInstance.options.plugins?.legend?.labels) {
-      chartInstance.options.plugins.legend.labels.color = textColor;
+      chartInstance.options.plugins.legend.labels.color = colors.text;
     }
 
     chartInstance.update();

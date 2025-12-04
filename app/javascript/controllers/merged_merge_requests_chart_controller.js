@@ -1,9 +1,12 @@
 import { Controller } from "@hotwired/stimulus";
+import { createChartOptions, getThemeColors, shouldDisplayDataLabel } from "../lib/chart_config";
 
 // Connects to data-controller="merged-merge-requests-chart"
 export default class extends Controller {
   static values = { url: String };
   static targets = ["chart"];
+
+  chartInstance = null;
 
   async fetchData() {
     const response = await fetch(this.urlValue);
@@ -16,90 +19,52 @@ export default class extends Controller {
   }
 
   async createChart() {
+    // Show loading state
+    this.chartTarget.innerHTML =
+      '<div class="d-flex justify-content-center align-items-center p-5"><span class="spinner-border me-3" role="status"></span><span>Loading chart...</span></div>';
+
     try {
       const chartData = await this.fetchData();
 
       const canvas = document.createElement("canvas");
       this.chartTarget.replaceChildren(canvas);
 
-      // Get theme colors from CSS variables
-      const styles = getComputedStyle(document.documentElement);
-      const textColor = styles.getPropertyValue("--chart-text-color").trim();
-      const gridColor = styles.getPropertyValue("--chart-grid-color").trim();
-
       const ctx = canvas.getContext("2d");
-      new Chart(ctx, {
+      const colors = getThemeColors();
+
+      const options = createChartOptions({
+        aspectRatio: 3,
+        datasets: {
+          line: {
+            pointStyle: "circle",
+            tension: 0.5,
+          },
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: colors.text,
+              filter: (legendItem, _data) => {
+                return legendItem.text.trim() !== "MTD merged count";
+              },
+            },
+          },
+          datalabels: {
+            display: shouldDisplayDataLabel,
+            color: "#fff",
+            font: {
+              weight: "bold",
+            },
+            formatter: (value) => value.y,
+          },
+        },
+      });
+
+      this.chartInstance = new Chart(ctx, {
         type: "bar",
         data: chartData,
         plugins: [ChartDataLabels],
-        options: {
-          height: "100%",
-          aspectRatio: 3,
-          datasets: {
-            line: {
-              pointStyle: "circle",
-              tension: 0.5,
-            },
-          },
-          scales: {
-            x: {
-              ticks: { color: textColor },
-              grid: { color: gridColor },
-            },
-            y: {
-              ticks: { color: textColor },
-              grid: { color: gridColor },
-            },
-          },
-          plugins: {
-            legend: {
-              labels: {
-                color: textColor,
-                filter: (legendItem, _data) => {
-                  return legendItem.text.trim() !== "MTD merged count";
-                },
-              },
-            },
-            datalabels: {
-              display: function (context) {
-                if (context === undefined || context.dataset.stack !== "merged-count") {
-                  return false;
-                }
-
-                function sortByY(data) {
-                  if (!Array.isArray(data)) {
-                    throw new Error("Input must be an array.");
-                  }
-
-                  if (data.length === 0) {
-                    return []; // Return empty array if input is empty
-                  }
-
-                  // Sort the array in descending order based on the y-value
-                  return [...data].sort((a, b) => b.y - a.y);
-                }
-
-                const dataPoints = context.dataset.data;
-                if (dataPoints.length >= 3) {
-                  const value = dataPoints[context.dataIndex].y;
-                  const sortedDataPoints = sortByY(dataPoints);
-                  if (sortedDataPoints !== undefined && value >= sortedDataPoints[2].y) {
-                    return true;
-                  }
-                }
-
-                return false;
-              },
-              color: "#fff",
-              font: {
-                weight: "bold",
-              },
-              formatter: function (value) {
-                return value.y;
-              },
-            },
-          },
-        },
+        options,
       });
     } catch (error) {
       console.error("Error creating chart:", error);
@@ -122,6 +87,12 @@ export default class extends Controller {
   }
 
   disconnect() {
+    // Properly destroy Chart.js instance to prevent memory leaks
+    if (this.chartInstance) {
+      this.chartInstance.destroy();
+      this.chartInstance = null;
+    }
+
     if (this.chartTarget !== null) {
       this.chartTarget.replaceChildren();
     }
