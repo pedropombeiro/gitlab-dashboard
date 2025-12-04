@@ -120,7 +120,7 @@ jobs:
         run: yarn install --immutable
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
-        run: yarn audit
+        run: yarn npm audit
 
   lint:
     runs-on: ubuntu-latest
