@@ -23,7 +23,7 @@ export default class extends Controller {
       this.refresh();
     };
 
-    document.addEventListener("visibilitychange", onVisibilityChange, false, { signal: this.controller.signal });
+    document.addEventListener("visibilitychange", onVisibilityChange, { signal: this.controller.signal });
 
     const timeoutValue = this.hasTimeoutValue ? this.timeoutValue : 60000;
     this.nextRefreshTimestamp = Date.now() + timeoutValue;
