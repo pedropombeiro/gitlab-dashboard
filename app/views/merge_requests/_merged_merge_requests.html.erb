@@ -161,29 +161,8 @@
       </div>
     </caption>
 
-    <thead>
-      <tr>
-        <th scope="col">ID</th>
-        <th scope="col">Merged&nbsp;↓</th>
-        <th scope="col">Merged After</th>
-        <th scope="col">Updated</th>
-        <th scope="col">Workflow Labels</th>
-        <th scope="col">Title</th>
-        <% if any_milestones %>
-          <th scope="col" class="text-end">Milestone</th>
-        <% end %>
-        <th scope="col">
-          Issue
-          <%= render("info_symbol",
-            data: {
-              bs_toggle: "popover",
-              bs_title: "Issue reference",
-              bs_content: "Issue number is extracted from branch name, if present.",
-            },
-          ) %>
-        </th>
-      </tr>
-    </thead>
+    <%= render "merge_requests/merged_mrs_table_header",
+      any_milestones: any_milestones %>
 
     <tbody>
       <% merge_requests.each do |mr| %>

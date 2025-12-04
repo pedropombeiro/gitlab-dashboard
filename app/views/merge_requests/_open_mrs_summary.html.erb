@@ -1,0 +1,40 @@
+<% merge_requests = local_assigns[:merge_requests] %>
+<% mr_age_limit = local_assigns[:mr_age_limit] %>
+<% mttm_handbook_url = local_assigns[:mttm_handbook_url] %>
+<% request_duration = local_assigns[:request_duration] %>
+<% updated_at = local_assigns[:updated_at] %>
+<% next_update_at = local_assigns[:next_update_at] %>
+
+<caption class="mx-2">
+  <div class="d-flex justify-content-between align-items-baseline">
+    <div class="lead">
+      <% if merge_requests.any? %>
+        <% avg_open_time =
+          ActiveSupport::Duration.build(
+            merge_requests.sum { |mr| Time.now - mr.createdAt } / merge_requests.count,
+          ) %>
+        <% merge_time_ok = avg_open_time < mr_age_limit %>
+
+        <%= pluralize(number_with_delimiter(merge_requests.count), "merge request") -%>, open for
+        <% if merge_requests.many? %>an average of<% end %>
+        <%= tag.span(
+          class: merge_time_ok ? nil : "text-warning",
+          data: merge_time_ok ? nil : {
+            bs_toggle: "popover",
+            bs_title: "Mean Time To Merge (MTTM)",
+            bs_content:
+            "Merge requests have been open for longer than the recommended #{distance_of_time_in_words(mr_age_limit)}." \
+            "<br/>See #{mttm_handbook_url}.",
+          },
+        ) do -%>
+          <%= distance_of_time_in_words(avg_open_time) -%>
+          <%= render("merge_requests/info_symbol") unless merge_time_ok -%>
+        <% end %>
+      <% end %>
+    </div>
+    <%= render "shared/request_info",
+    request_duration: request_duration,
+    updated_at: updated_at,
+    next_update_at: next_update_at %>
+  </div>
+</caption>

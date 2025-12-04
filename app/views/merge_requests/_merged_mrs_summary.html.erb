@@ -1,0 +1,79 @@
+<% merge_requests = local_assigns[:merge_requests] %>
+<% merged_merge_requests_tttm = local_assigns[:merged_merge_requests_tttm] %>
+<% merged_merge_requests_count = local_assigns[:merged_merge_requests_count] %>
+<% first_merged_merge_requests_timestamp = local_assigns[:first_merged_merge_requests_timestamp] %>
+<% merged_mr_rates_handbook_url = local_assigns[:merged_mr_rates_handbook_url] %>
+
+<% avg_time_to_merge =
+  (
+    if merge_requests.count.positive?
+      ActiveSupport::Duration.build(
+        merge_requests.sum { |mr| mr.mergedAt - mr.createdAt } /
+          merge_requests.count,
+      )
+    else
+      0
+    end
+  ) %>
+<% overall_avg_time_to_merge =
+  if merged_merge_requests_tttm
+    ActiveSupport::Duration.build(
+      merged_merge_requests_tttm / merged_merge_requests_count,
+    )
+  else
+    ActiveSupport::Duration.years(1000)
+  end %>
+<% since_first_mr =
+  ActiveSupport::Duration.build(
+    (
+      if first_merged_merge_requests_timestamp
+        Time.current - first_merged_merge_requests_timestamp
+      else
+        0
+      end
+    ),
+  ) %>
+<% monthly_merge_rate =
+  (
+    if since_first_mr.positive?
+      (merged_merge_requests_count.to_f / since_first_mr.in_months.to_f).round
+    else
+      0
+    end
+  ) %>
+
+<div class="d-flex justify-content-between align-items-end mx-2 mt-2">
+  <div>
+    <div class="lead">
+      <% merge_rate_ok = merge_requests.count / 1.week.in_days * 30 >= monthly_merge_rate %>
+      <%= tag.span(
+        class: merge_rate_ok ? "text-success" : "text-warning",
+        data: {
+          bs_toggle: "popover",
+          bs_html: "true",
+          bs_title: "Projected monthly merge rate against historical average",
+          bs_content:
+            "The projected monthly merge rate of #{(merge_requests.count / 1.week.in_days * 30).round} " \
+              "is #{merge_rate_ok ? "above" : "below"} the historical average of #{pluralize(monthly_merge_rate, "merge request")} " \
+              "merged per month.<br/>See #{merged_mr_rates_handbook_url}."
+        },
+      ) do %>
+        <%= pluralize(merge_requests.count, "merge request") -%> merged in the last week
+        <%= render("merge_requests/trend_indicator", merge_rate_ok: merge_rate_ok) -%>
+      <% end %>
+    </div>
+    <small class="text-secondary">
+      Mean time to merge is
+      <%= distance_of_time_in_words(avg_time_to_merge) -%> for the last week
+      <% if overall_avg_time_to_merge < ActiveSupport::Duration.years(1000) %>
+        vs. <%= distance_of_time_in_words(overall_avg_time_to_merge) -%> historically
+      <% end %>
+    </small>
+  </div>
+  <%= link_to(
+    "Show chart",
+    merged_mr_chart_path,
+    class: %w[btn btn-sm btn-outline-secondary ms-auto text-nowrap],
+    target: "_blank",
+  ) %>
+</div>

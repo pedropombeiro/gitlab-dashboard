@@ -1,0 +1,25 @@
+<% any_milestones = local_assigns[:any_milestones] %>
+
+<thead>
+  <tr>
+    <th scope="col">ID</th>
+    <th scope="col">Merged&nbsp;↓</th>
+    <th scope="col">Merged After</th>
+    <th scope="col">Updated</th>
+    <th scope="col">Workflow Labels</th>
+    <th scope="col">Title</th>
+    <% if any_milestones %>
+      <th scope="col" class="text-end">Milestone</th>
+    <% end %>
+    <th scope="col">
+      Issue
+      <%= render("merge_requests/info_symbol",
+        data: {
+          bs_toggle: "popover",
+          bs_title: "Issue reference",
+          bs_content: "Issue number is extracted from branch name, if present.",
+        },
+      ) %>
+    </th>
+  </tr>
+</thead>

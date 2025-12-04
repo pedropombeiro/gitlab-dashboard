@@ -1,0 +1,55 @@
+<% any_conflicts = local_assigns[:any_conflicts] %>
+<% any_milestones = local_assigns[:any_milestones] %>
+
+<thead>
+  <tr>
+    <th scope="col">ID</th>
+    <th scope="col">Created</th>
+    <th scope="col">Updated&nbsp;↓</th>
+    <th scope="col">Status</th>
+    <th scope="col" class="text-center">
+      Pipeline
+    </th>
+    <th scope="col">Title</th>
+    <th scope="col" class="d-none d-xxl-table-cell last-comment-width">Last comment</th>
+    <% if any_milestones %>
+      <th scope="col" class="text-end">Milestone</th>
+    <% end %>
+    <th scope="col" class="text-center"><%= tag.i(
+        class: %w[fa-solid fa-code-commit],
+        data: {
+          bs_toggle: "tooltip",
+          bs_title: "Commits",
+        },
+      ) %>
+    </th>
+    <% if any_conflicts %>
+      <th scope="col">Conflicts?</th>
+    <% end %>
+    <th scope="col" class="text-center">
+      <%= tag.i(
+        class: %w[fa-regular fa-thumbs-up],
+        data: {
+          bs_toggle: "tooltip",
+          bs_title: "Approvals",
+        },
+      ) %>
+    </th>
+    <th scope="col" class="text-center"><%= tag.i class: %w[fa-solid fa-magnifying-glass] %>
+      Reviewers</th>
+    <th scope="col">
+      Issue
+      <%= render(
+        "merge_requests/info_symbol",
+        data: {
+          bs_toggle: "popover",
+          bs_html: "true",
+          bs_title: "Issue reference",
+          bs_content:
+            "Issue number is extracted from branch name, if present.<br/>" \
+              "Each issue is always represented with the same color.",
+        },
+      ) %>
+    </th>
+  </tr>
+</thead>
