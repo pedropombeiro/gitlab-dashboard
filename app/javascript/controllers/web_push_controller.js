@@ -31,8 +31,6 @@ export default class extends Controller {
 
     // Request permission from the user to send notifications
     try {
-      console.log("Requesting permission for notifications");
-
       const permission = await Notification.requestPermission();
       if (permission === "granted") {
         setupSubscription();
@@ -40,7 +38,7 @@ export default class extends Controller {
         alert("Notifications declined");
       }
     } catch (error) {
-      console.log("Notifications error", error);
+      console.error("Notifications error", error);
     } finally {
       this.subscribeTarget.classList.add(this.subscribedClass);
     }
@@ -69,9 +67,7 @@ export default class extends Controller {
           body: JSON.stringify(subscription),
         });
 
-        if (response.ok) {
-          console.log("Subscription successfully saved on the server.");
-        } else {
+        if (!response.ok) {
           console.error("Error saving subscription on the server.");
         }
       } catch (error) {

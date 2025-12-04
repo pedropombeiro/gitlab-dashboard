@@ -16,8 +16,6 @@ export default class extends Controller {
   }
 
   async createChart() {
-    console.log("Creating chart from url", this.urlValue);
-
     try {
       const chartData = await this.fetchData();
 

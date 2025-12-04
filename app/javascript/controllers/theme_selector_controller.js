@@ -70,7 +70,6 @@ export default class extends Controller {
   }
 
   connect() {
-    console.log("Connecting theme-selector");
     this.refreshTheme();
   }
 

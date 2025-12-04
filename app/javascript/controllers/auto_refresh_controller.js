@@ -9,8 +9,6 @@ export default class extends Controller {
   timeoutID = 0;
 
   connect() {
-    console.log("Auto refresh controller connected to", this.targetDomIdValue);
-
     const onVisibilityChange = () => {
       if (document.visibilityState !== "visible") {
         return;
@@ -22,7 +20,6 @@ export default class extends Controller {
         return;
       }
 
-      console.log("Auto refreshing after page made visible");
       this.refresh();
     };
 
