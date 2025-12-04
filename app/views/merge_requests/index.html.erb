@@ -35,7 +35,8 @@
         Merge Requests Dashboard
         <span class="collapse navbar-collapse">
           &nbsp;for&nbsp;
-          <%= render "shared/user_badge", user: @user, content: user_help_content(@user), size: 24 %>
+          <% user_presenter = UserPresenter.new(@user, self) %>
+          <%= render "shared/user_badge", user: @user, user_presenter: user_presenter, content: user_presenter.help_content, size: 24 %>
         </span>
       <% end %>
 

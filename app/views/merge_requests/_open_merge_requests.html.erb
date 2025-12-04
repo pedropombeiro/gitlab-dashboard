@@ -243,11 +243,12 @@
             <!-- Milestone -->
             <td class="text-end">
               <% if mr.milestone %>
-                <% div_class = milestone_class(mr) %>
+                <% mr_presenter = MergeRequestPresenter.new(mr) %>
+                <% div_class = mr_presenter.milestone_class %>
                 <%= tag.div class: div_class,
                     data: {
                       bs_toggle: "tooltip",
-                      bs_title: milestone_mismatch_tooltip(mr),
+                      bs_title: mr_presenter.milestone_mismatch_tooltip,
                     } do %>
                   <%= render("info_symbol") if div_class %>
                   <%= render("milestone", milestone: mr.milestone) %>

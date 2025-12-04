@@ -1,10 +1,11 @@
+<% user_presenter = local_assigns.fetch(:user_presenter, UserPresenter.new(user, self)) %>
 <%= tag.span(
   class: local_assigns.key?(:bg_class) ? %W[badge shadow bg-gradient #{local_assigns[:bg_class]}] : nil,
   data: {
     bs_toggle: "popover",
     bs_custom_class: "x-wide-popover",
     bs_html: "true",
-    bs_title: user_help_title(user),
+    bs_title: user_presenter.help_title,
     bs_content: content
   }) do %>
   <%= link_to(
@@ -31,10 +32,10 @@
 
   <% if local_assigns.fetch(:show_emojis, true) %>
     <%= render "shared/abbr_with_title",
-    content: user_emojis(user.status),
+    content: user_presenter.emojis,
     title: user.status&.emoji -%>
 
-    <% country_flag_classes = user_country_flag_classes(user) %>
+    <% country_flag_classes = user_presenter.country_flag_classes %>
     <%= tag.i(class: country_flag_classes) if country_flag_classes %>
   <% end %>
 

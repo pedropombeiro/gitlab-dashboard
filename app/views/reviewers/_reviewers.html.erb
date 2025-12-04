@@ -35,9 +35,11 @@
           <!-- Username -->
           <th scope="row">
             <nobr data-controller="clipboard">
+              <% group_reviewer_presenter = GroupReviewerPresenter.new(reviewer, self) %>
               <%= render "shared/user_badge",
               user: reviewer,
-              content: group_reviewer_help_content(reviewer),
+              user_presenter: group_reviewer_presenter,
+              content: group_reviewer_presenter.help_content,
               size: 24,
               show_emojis: false %>
 

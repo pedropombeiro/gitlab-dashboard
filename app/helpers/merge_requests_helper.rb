@@ -29,32 +29,12 @@ module MergeRequestsHelper
     ]
   end
 
-  def milestone_class(mr)
-    MergeRequestPresenter.new(mr).milestone_class
-  end
-
   def mttm_handbook_url
     handbook_url("the handbook", "product/groups/product-analysis/engineering/metrics/#mean-time-to-merge-mttm")
   end
 
   def merged_mr_rates_handbook_url
     handbook_url("the handbook", "product/groups/product-analysis/engineering/metrics/#merge-request-rates-mr-rates")
-  end
-
-  def milestone_mismatch_tooltip(mr)
-    MergeRequestPresenter.new(mr).milestone_mismatch_tooltip
-  end
-
-  def user_help_content(user)
-    UserPresenter.new(user, self).help_content
-  end
-
-  def user_help_title(user)
-    UserPresenter.new(user, self).help_title
-  end
-
-  def merge_request_reviewer_help_content(reviewer)
-    ReviewerPresenter.new(reviewer, self).help_content
   end
 
   def any_failed_pipeline?(merge_requests)

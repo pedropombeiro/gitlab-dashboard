@@ -26,46 +26,6 @@ module ApplicationHelper
     (count == 1) ? noun.to_s : (plural_noun || noun.pluralize).to_s
   end
 
-  def user_emojis(user_status)
-    # For backwards compatibility when called with just status
-    # Prefer using UserPresenter.new(user).emojis
-    return unless user_status
-
-    emojis = []
-
-    emojis << "🔴" if user_status.availability == "BUSY"
-
-    emojis << if user_status.emoji == "speech_balloon" && user_status.message.scan(/:([\w+-]+):/).size == 1
-      emojify(user_status.message)
-    else
-      user_emoji_character(user_status.emoji)
-    end
-
-    emojis.uniq.join(" ")
-  end
-
-  def user_emoji_character(emoji_name)
-    Emoji.find_by_alias(emoji_name)&.raw if emoji_name
-  end
-
-  def emojify(text)
-    text&.gsub(/:([\w+-]+):/) do |match|
-      user_emoji_character(Regexp.last_match(1)) || match
-    end
-  end
-
-  def user_country_flag_classes(user)
-    UserPresenter.new(user).country_flag_classes
-  end
-
-  def format_location(user)
-    UserPresenter.new(user).formatted_location
-  end
-
-  def user_help_hash(user)
-    UserPresenter.new(user).help_hash
-  end
-
   def tooltip_from_hash(hash)
     tag.table(
       hash
@@ -79,14 +39,5 @@ module ApplicationHelper
           tag.tr(cells.join, escape: false)
         end.join
     )
-  end
-
-  private
-
-  def format_last_activity(last_activity_on)
-    return if last_activity_on.nil?
-    return "today" if last_activity_on.after?(1.day.ago)
-
-    "#{time_ago_in_words(last_activity_on)} ago"
   end
 end
