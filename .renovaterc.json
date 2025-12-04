@@ -62,6 +62,20 @@
       "automerge": false
     },
     {
+      "description": "Group all gem updates (except Rails) into a single PR",
+      "matchManagers": ["bundler"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "excludePackageNames": ["rails"],
+      "groupName": "Ruby gems",
+      "automerge": true
+    },
+    {
+      "description": "Separate major gem updates into individual PRs for review",
+      "matchManagers": ["bundler"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
       "description": "Ensure Yarn lockfile is updated (npm manager handles both npm and yarn)",
       "matchManagers": ["npm"],
       "rangeStrategy": "bump",
