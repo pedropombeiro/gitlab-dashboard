@@ -47,6 +47,14 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Docker images",
       "automerge": true
+    },
+    {
+      "description": "Ensure Yarn lockfile is updated (npm manager handles both npm and yarn)",
+      "matchManagers": ["npm"],
+      "rangeStrategy": "bump",
+      "lockFileMaintenance": {
+        "enabled": true
+      }
     }
   ],
   "regexManagers": [
