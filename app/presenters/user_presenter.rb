@@ -78,13 +78,13 @@ class UserPresenter
     )
   end
 
-  private
-
   def emojify(text)
     text&.gsub(/:([\w+-]+):/) do |match|
       emoji_character(Regexp.last_match(1)) || match
     end
   end
+
+  private
 
   def formatted_last_activity
     return if user.lastActivityOn.nil?

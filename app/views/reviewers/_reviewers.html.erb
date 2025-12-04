@@ -31,11 +31,11 @@
 
     <tbody>
       <% reviewers.each do |reviewer| %>
+        <% group_reviewer_presenter = GroupReviewerPresenter.new(reviewer, self) %>
         <%= tag.tr(style: "opacity: #{reviewer.opacity} !important;") do %>
           <!-- Username -->
           <th scope="row">
             <nobr data-controller="clipboard">
-              <% group_reviewer_presenter = GroupReviewerPresenter.new(reviewer, self) %>
               <%= render "shared/user_badge",
               user: reviewer,
               user_presenter: group_reviewer_presenter,
@@ -48,15 +48,15 @@
           </th>
           <td>
             <%= render "shared/abbr_with_title",
-            content: user_emojis(reviewer.status),
+            content: group_reviewer_presenter.emojis,
             title: reviewer.status&.emoji -%>
 
-            <% country_flag_classes = user_country_flag_classes(reviewer) %>
+            <% country_flag_classes = group_reviewer_presenter.country_flag_classes %>
             <%= tag.i(class: country_flag_classes) if country_flag_classes %>
           </td>
           <!-- Message -->
           <td style="max-width: 30em">
-            <%= emojify(reviewer.status&.message) %>
+            <%= group_reviewer_presenter.emojify(reviewer.status&.message) %>
           </td>
           <!-- Local Hour -->
           <%= tag.td class: (["text-end", reviewer.inWorkingHours ? nil : "text-secondary"]).compact do %>
