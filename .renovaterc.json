@@ -49,6 +49,19 @@
       "automerge": true
     },
     {
+      "description": "Group all npm package updates (dependencies and devDependencies) into a single PR",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["patch", "minor"],
+      "groupName": "npm dependencies",
+      "automerge": true
+    },
+    {
+      "description": "Separate major npm updates into individual PRs for review",
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false
+    },
+    {
       "description": "Ensure Yarn lockfile is updated (npm manager handles both npm and yarn)",
       "matchManagers": ["npm"],
       "rangeStrategy": "bump",
