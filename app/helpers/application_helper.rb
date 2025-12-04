@@ -27,6 +27,8 @@ module ApplicationHelper
   end
 
   def user_emojis(user_status)
+    # For backwards compatibility when called with just status
+    # Prefer using UserPresenter.new(user).emojis
     return unless user_status
 
     emojis = []
@@ -53,30 +55,15 @@ module ApplicationHelper
   end
 
   def user_country_flag_classes(user)
-    country_code = LocationLookupService.new.fetch_country_code(user.location)
-
-    %W[fi fis fi-#{country_code.downcase}] if country_code
+    UserPresenter.new(user).country_flag_classes
   end
 
   def format_location(user)
-    return if user.location.blank?
-
-    flag = tag.i(class: user_country_flag_classes(user))
-
-    "#{flag} #{user.location}"
+    UserPresenter.new(user).formatted_location
   end
 
   def user_help_hash(user)
-    timezone = LocationLookupService.new.fetch_timezone(user.location)
-
-    {
-      "Job Title": user.jobTitle,
-      Pronouns: user.pronouns,
-      Location: format_location(user),
-      "Local time": timezone&.time_with_offset(Time.now.utc)&.to_fs,
-      "Last activity": format_last_activity(user.lastActivityOn),
-      Message: [user_emoji_character(user.status&.emoji), emojify(user.status&.message)].compact.join(" ")
-    }
+    UserPresenter.new(user).help_hash
   end
 
   def tooltip_from_hash(hash)

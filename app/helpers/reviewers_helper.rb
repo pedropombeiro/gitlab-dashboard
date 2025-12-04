@@ -12,16 +12,6 @@ module ReviewersHelper
   end
 
   def group_reviewer_help_content(reviewer)
-    tooltip_from_hash(
-      **user_help_hash(reviewer),
-      "Active reviews": safe_join([
-        tag.span(reviewer.activeReviews.count.to_s),
-        tag.a(
-          tag.i(class: "bi bi-box-arrow-up-right small"),
-          href: reviewer_dashboard_url(reviewer.username),
-          class: "ms-1", target: "_blank"
-        )
-      ])
-    )
+    GroupReviewerPresenter.new(reviewer, self).help_content
   end
 end

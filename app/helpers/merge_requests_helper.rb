@@ -30,11 +30,7 @@ module MergeRequestsHelper
   end
 
   def milestone_class(mr)
-    return unless mr.milestone
-
-    milestone_mismatch = mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title)
-    milestone_mismatch ||= mr.project.version && !mr.project.version.start_with?(mr.milestone.title)
-    milestone_mismatch ? "text-warning" : nil
+    MergeRequestPresenter.new(mr).milestone_class
   end
 
   def mttm_handbook_url
@@ -46,62 +42,19 @@ module MergeRequestsHelper
   end
 
   def milestone_mismatch_tooltip(mr)
-    return unless mr.milestone
-
-    if mr.milestone.title != (mr.issue&.milestone&.title || mr.milestone.title)
-      return "Merge request is assigned to #{mr.milestone.title} but issue is assigned to #{mr.issue&.milestone&.title}"
-    end
-
-    if mr.project.version && !mr.project.version.start_with?(mr.milestone.title)
-      "Merge request is assigned to #{mr.milestone.title} but the active milestone for the project is #{mr.project.version}"
-    end
+    MergeRequestPresenter.new(mr).milestone_mismatch_tooltip
   end
 
   def user_help_content(user)
-    tooltip_from_hash(user_help_hash(user))
+    UserPresenter.new(user, self).help_content
   end
 
   def user_help_title(user)
-    tag.div(
-      safe_join([
-        render("shared/user_image", user: user, class: "me-1", size: 32),
-        tag.span(
-          safe_join([
-            link_to(
-              safe_join([
-                tag.span(user.username, class: "h4 me-1", data: {clipboard_target: "source"}),
-                tag.i(class: "bi bi-box-arrow-up-right small")
-              ]),
-              user.webUrl, target: "_blank", rel: "noopener"
-            ),
-            render("shared/clipboard_button")
-          ]),
-          data: {controller: "clipboard"}
-        )
-      ])
-    )
+    UserPresenter.new(user, self).help_title
   end
 
   def merge_request_reviewer_help_content(reviewer)
-    tooltip_from_hash(
-      State: safe_join([
-        tag.span(humanized_enum(reviewer.mergeRequestInteraction.reviewState), class: "me-1"),
-        tag.i(class: [reviewer.bootstrapClass[:icon], "small"])
-      ]),
-      **user_help_hash(reviewer),
-      "Active reviews": safe_join([
-        tag.span(reviewer.activeReviews.count.to_s),
-        tag.a(
-          tag.i(class: "bi bi-box-arrow-up-right small"),
-          href: reviewer_dashboard_url(reviewer.username),
-          class: "ms-1", target: "_blank", rel: "noopener"
-        )
-      ]),
-      "Assigned MRs": tag.a(
-        tag.i(class: "bi bi-box-arrow-up-right small"),
-        href: assignee_dashboard_url(reviewer.username), target: "_blank", rel: "noopener"
-      )
-    )
+    ReviewerPresenter.new(reviewer, self).help_content
   end
 
   def any_failed_pipeline?(merge_requests)
