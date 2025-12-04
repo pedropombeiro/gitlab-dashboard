@@ -38,7 +38,7 @@ export default class AutoRefreshController extends Controller {
 
     document.addEventListener("visibilitychange", onVisibilityChange, { signal: this.controller.signal });
 
-    const timeoutValue = this.hasTimeoutValue ? this.timeoutValue : 60000;
+    const timeoutValue = this.timeoutValue ?? 60000;
     this.nextRefreshTimestamp = Date.now() + timeoutValue;
     this.timeoutID = setTimeout(this.refresh.bind(this), timeoutValue);
   }

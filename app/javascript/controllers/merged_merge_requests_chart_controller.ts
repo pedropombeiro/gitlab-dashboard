@@ -98,10 +98,8 @@ export default class MergedMergeRequestsChartController extends Controller {
 
   disconnect(): void {
     // Properly destroy Chart.js instance to prevent memory leaks
-    if (this.chartInstance) {
-      this.chartInstance.destroy();
-      this.chartInstance = null;
-    }
+    this.chartInstance?.destroy();
+    this.chartInstance = null;
 
     this.chartTarget.replaceChildren();
   }

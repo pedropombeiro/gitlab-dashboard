@@ -36,10 +36,7 @@ export default class BootstrapTooltipController extends Controller {
 
     this.tooltips = [...tooltipTriggerList].map((tooltipTriggerEl) => {
       // Check if tooltip already exists and dispose it first
-      const existingTooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
-      if (existingTooltip) {
-        existingTooltip.dispose();
-      }
+      bootstrap.Tooltip.getInstance(tooltipTriggerEl)?.dispose();
 
       return new bootstrap.Tooltip(tooltipTriggerEl);
     });
@@ -50,10 +47,7 @@ export default class BootstrapTooltipController extends Controller {
 
     this.popovers = [...popoverTriggerList].map((popoverTriggerEl) => {
       // Check if popover already exists and dispose it first
-      const existingPopover = bootstrap.Popover.getInstance(popoverTriggerEl);
-      if (existingPopover) {
-        existingPopover.dispose();
-      }
+      bootstrap.Popover.getInstance(popoverTriggerEl)?.dispose();
 
       return new bootstrap.Popover(popoverTriggerEl, {
         html: true,
