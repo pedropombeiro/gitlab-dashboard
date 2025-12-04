@@ -59,8 +59,8 @@
   <% end %>
 
   <%= tag.div(id: "main-content", class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
-    <%= tag.div(id: "open_merge_requests", class: mr_list_panel_classes + %w[bg-body mt-5]) do %>
-      <%= turbo_frame_tag @dto, :open_merge_requests, src: open_merge_requests_list_path(merge_requests_controller_params) do %>
+    <%= tag.div(id: "open_merge_requests", class: mr_list_panel_classes + %w[bg-body mt-5], data: { controller: "turbo-frame-focus" }) do %>
+      <%= turbo_frame_tag @dto, :open_merge_requests, src: open_merge_requests_list_path(merge_requests_controller_params), data: { turbo_frame_focus_target: "frame" } do %>
         <% if @dto.has_content? %>
           <!-- Show last stored state, while we wait for the refreshed state
           -->
@@ -82,8 +82,8 @@
       <% end %>
     <% end %>
 
-    <%= tag.div(id: "merged_merge_requests", class: mr_list_panel_classes + %w[bg-tertiary mt-3 mt-sm-5 bg-opacity-10]) do %>
-      <%= turbo_frame_tag(@dto, :merged_merge_requests, loading: "lazy", src: merged_merge_requests_list_path(merge_requests_controller_params)) do %>
+    <%= tag.div(id: "merged_merge_requests", class: mr_list_panel_classes + %w[bg-tertiary mt-3 mt-sm-5 bg-opacity-10], data: { controller: "turbo-frame-focus" }) do %>
+      <%= turbo_frame_tag(@dto, :merged_merge_requests, loading: "lazy", src: merged_merge_requests_list_path(merge_requests_controller_params), data: { turbo_frame_focus_target: "frame" }) do %>
         <%= tag.div(class: "d-flex align-items-center justify-content-center p-3 w-100 h-100") do %>
           <span
             class="spinner-border me-3 d-none d-sm-inline"
