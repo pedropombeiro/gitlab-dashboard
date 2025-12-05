@@ -210,6 +210,7 @@ GEM
       actioncable (>= 7.0.0)
       listen (>= 3.0.0)
       railties (>= 7.0.0)
+    htmlcompressor (0.4.0)
     httplog (1.7.3)
       rack (>= 2.0)
       rainbow (>= 2.0.0)
@@ -616,6 +617,7 @@ DEPENDENCIES
   graphlient
   honeybadger (~> 6.1)
   hotwire-livereload (~> 2.0)
+  htmlcompressor
   httplog
   jbuilder
   jsbundling-rails (~> 1.3)
