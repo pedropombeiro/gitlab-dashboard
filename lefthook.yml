@@ -27,4 +27,9 @@ pre-commit:
     frontend-linter:
       glob:
         - "app/javascript/**/*.js"
+        - "app/javascript/**/*.ts"
       run: yarn lint:fix
+    prettier:
+      glob:
+        - "*.json"
+      run: yarn prettier --write {files}
