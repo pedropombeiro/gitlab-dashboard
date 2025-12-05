@@ -4,6 +4,8 @@ class ApplicationController < ActionController::Base
   # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
   allow_browser versions: :modern
 
+  rescue_from Graphlient::Errors::ServerError, with: :handle_gitlab_api_error if Rails.env.production?
+
   delegate :make_full_url, to: :gitlab_client
   helper_method :make_full_url
 
@@ -32,6 +34,25 @@ class ApplicationController < ActionController::Base
       format.html { render file: Rails.public_path.join("404.html").to_s, layout: false, status: :not_found }
       format.xml { head :not_found }
       format.any { head :not_found }
+    end
+  end
+
+  def handle_gitlab_api_error(exception)
+    Rails.logger.error("GitLab API Error: #{exception.message}")
+    Rails.logger.error("Status Code: #{exception.status_code}")
+    Rails.logger.error("Response: #{exception.response}")
+
+    @error_message = if Rails.env.production?
+      exception.response.to_s
+    else
+      exception.message
+    end
+    @status_code = exception.status_code || :bad_request
+
+    respond_to do |format|
+      format.html { render "errors/gitlab_api_error", status: @status_code, layout: false }
+      format.json { render json: {error: @error_message, status: @status_code}, status: @status_code }
+      format.any { head @status_code }
     end
   end
 end
