@@ -197,6 +197,13 @@ jobs:
         id: compute_date
         run: echo "date=$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
 
+      - name: Compute release tag
+        id: release_tag
+        run: |
+          SHORT_SHA="${GITHUB_SHA:0:7}"
+          TAG_NAME="v${{ steps.compute_date.outputs.date }}-${SHORT_SHA}"
+          echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
+
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
@@ -238,7 +245,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             "GIT_REPO_COMMIT_SHA=${{ github.sha }}"
-            "GIT_RELEASE_TAG=${{ github.ref_type == 'tag' && github.ref_name || format('{0}-{1}', github.ref_name, github.sha) }}"
+            "GIT_RELEASE_TAG=${{ steps.release_tag.outputs.tag }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -256,8 +263,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          TAG_NAME="v${{ steps.compute_date.outputs.date }}-${SHORT_SHA}"
+          TAG_NAME="${{ steps.release_tag.outputs.tag }}"
 
           git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
           git push origin "$TAG_NAME"
