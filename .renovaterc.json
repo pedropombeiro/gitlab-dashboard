@@ -15,15 +15,7 @@
   ],
   "automergeType": "pr",
   "automergeStrategy": "squash",
-  "enabledManagers": [
-    "bundler",
-    "npm",
-    "github-actions",
-    "dockerfile",
-    "ruby-version",
-    "nodenv",
-    "regex"
-  ],
+  "enabledManagers": ["bundler", "npm", "github-actions", "dockerfile", "ruby-version", "nodenv", "custom.regex"],
   "packageRules": [
     {
       "description": "Auto-merge non-breaking GitHub Actions updates (patch and minor versions only) as a grouped PR",
@@ -36,10 +28,7 @@
       "description": "Auto-merge linter and test framework package updates directly to branch without creating a PR",
       "automerge": true,
       "automergeType": "branch",
-      "extends": [
-        "packages:linters",
-        "packages:test"
-      ]
+      "extends": ["packages:linters", "packages:test"]
     },
     {
       "description": "Group Docker base image updates",
@@ -65,9 +54,9 @@
       "description": "Group all gem updates (except Rails) into a single PR",
       "matchManagers": ["bundler"],
       "matchUpdateTypes": ["patch", "minor"],
-      "excludePackageNames": ["rails"],
       "groupName": "Ruby gems",
-      "automerge": true
+      "automerge": true,
+      "matchPackageNames": ["!rails"]
     },
     {
       "description": "Separate major gem updates into individual PRs for review",
@@ -84,13 +73,12 @@
       }
     }
   ],
-  "regexManagers": [
+  "customManagers": [
     {
+      "customType": "regex",
       "description": "Update NODE_VERSION in Dockerfile",
-      "fileMatch": ["^Dockerfile$"],
-      "matchStrings": [
-        "ARG NODE_VERSION=(?<currentValue>.*?)\\n"
-      ],
+      "managerFilePatterns": ["/^Dockerfile$/"],
+      "matchStrings": ["ARG NODE_VERSION=(?<currentValue>.*?)\\n"],
       "datasourceTemplate": "node-version",
       "depNameTemplate": "node"
     }
