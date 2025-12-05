@@ -40,9 +40,7 @@ export default class TurboFrameFocusController extends Controller {
     }
 
     // Try to find a heading (h1-h6) or caption as the first focus target
-    const heading = this.frameTarget.querySelector(
-      "h1, h2, h3, h4, h5, h6, caption, .lead"
-    ) as HTMLElement | null;
+    const heading = this.frameTarget.querySelector("h1, h2, h3, h4, h5, h6, caption, .lead") as HTMLElement | null;
 
     if (heading) {
       // Make heading focusable if it isn't already
@@ -53,8 +51,7 @@ export default class TurboFrameFocusController extends Controller {
     }
 
     // Fallback to first interactive element
-    const focusableSelector =
-      'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
+    const focusableSelector = 'a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])';
     return this.frameTarget.querySelector(focusableSelector) as HTMLElement | null;
   }
 }
