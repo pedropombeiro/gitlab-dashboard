@@ -793,7 +793,7 @@ __metadata:
     autoprefixer: "npm:^10.4.20"
     bootstrap: "npm:^5.3.3"
     bootstrap-icons: "npm:^1.13.1"
-    chart.js: "npm:^4.4.7"
+    chart.js: "npm:^4.5.1"
     chartjs-plugin-datalabels: "npm:^2.2.0"
     chartjs-plugin-trendline: "npm:^3.2.0"
     esbuild: "npm:0.27.0"
@@ -960,7 +960,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^4.4.7":
+"chart.js@npm:^4.5.1":
   version: 4.5.1
   resolution: "chart.js@npm:4.5.1"
   dependencies:
