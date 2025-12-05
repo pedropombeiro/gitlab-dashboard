@@ -193,15 +193,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
-      - name: Get current date
-        id: compute_date
-        run: echo "date=$(date +'%Y.%m.%d')" >> $GITHUB_OUTPUT
-
       - name: Compute release tag
         id: release_tag
         run: |
+          DATE=$(date +'%Y.%m.%d')
           SHORT_SHA="${GITHUB_SHA:0:7}"
-          TAG_NAME="v${{ steps.compute_date.outputs.date }}-${SHORT_SHA}"
+          TAG_NAME="v${DATE}-${SHORT_SHA}"
           echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
 
       - name: Docker meta
