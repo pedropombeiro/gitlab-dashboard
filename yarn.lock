@@ -275,7 +275,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/fontawesome-free@npm:^7.0.0":
+"@fortawesome/fontawesome-free@npm:^7.1.0":
   version: 7.1.0
   resolution: "@fortawesome/fontawesome-free@npm:7.1.0"
   checksum: 10c0/3bcaf2c18f3b2ece0fb5640681f13051cb787d686ab444437b3605ba3dca9dce4c7c1f844d94b7ad011482ac20b2b387f3a4c33c2739b50c4425fe529ab7b050
@@ -289,7 +289,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@hotwired/turbo-rails@npm:^8.0.10":
+"@hotwired/turbo-rails@npm:^8.0.20":
   version: 8.0.20
   resolution: "@hotwired/turbo-rails@npm:8.0.20"
   dependencies:
@@ -783,17 +783,17 @@ __metadata:
   resolution: "app@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.39.1"
-    "@fortawesome/fontawesome-free": "npm:^7.0.0"
+    "@fortawesome/fontawesome-free": "npm:^7.1.0"
     "@hotwired/stimulus": "npm:^3.2.2"
-    "@hotwired/turbo-rails": "npm:^8.0.10"
+    "@hotwired/turbo-rails": "npm:^8.0.20"
     "@popperjs/core": "npm:^2.11.8"
     "@types/node": "npm:^24.10.1"
     "@typescript-eslint/eslint-plugin": "npm:^8.48.1"
     "@typescript-eslint/parser": "npm:^8.48.1"
-    autoprefixer: "npm:^10.4.20"
-    bootstrap: "npm:^5.3.3"
+    autoprefixer: "npm:^10.4.22"
+    bootstrap: "npm:^5.3.8"
     bootstrap-icons: "npm:^1.13.1"
-    chart.js: "npm:^4.4.7"
+    chart.js: "npm:^4.5.1"
     chartjs-plugin-datalabels: "npm:^2.2.0"
     chartjs-plugin-trendline: "npm:^3.2.0"
     esbuild: "npm:0.27.0"
@@ -801,11 +801,11 @@ __metadata:
     eslint-config-prettier: "npm:^10.1.8"
     eslint-plugin-prettier: "npm:^5.5.4"
     flag-icons: "npm:^7.5.0"
-    local-time: "npm:^3.0.2"
-    nodemon: "npm:^3.1.7"
+    local-time: "npm:^3.0.3"
+    nodemon: "npm:^3.1.11"
     postcss: "npm:8.5.6"
     prettier: "npm:^3.7.4"
-    sass: "npm:^1.80.6"
+    sass: "npm:^1.94.2"
     typescript: "npm:^5.9.3"
   languageName: unknown
   linkType: soft
@@ -817,7 +817,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"autoprefixer@npm:^10.4.20":
+"autoprefixer@npm:^10.4.22":
   version: 10.4.22
   resolution: "autoprefixer@npm:10.4.22"
   dependencies:
@@ -865,7 +865,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap@npm:^5.3.3":
+"bootstrap@npm:^5.3.8":
   version: 5.3.8
   resolution: "bootstrap@npm:5.3.8"
   peerDependencies:
@@ -960,7 +960,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^4.4.7":
+"chart.js@npm:^4.5.1":
   version: 4.5.1
   resolution: "chart.js@npm:4.5.1"
   dependencies:
@@ -1745,7 +1745,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"local-time@npm:^3.0.2":
+"local-time@npm:^3.0.3":
   version: 3.0.3
   resolution: "local-time@npm:3.0.3"
   checksum: 10c0/452f291576f44cceb1c2ffb014376aa6513d03ea0562a114591bb0d40be4e0a0de5f95334344d43c1d92e1511081bf030c8bec7d0ad87421c750b5ceef7cded6
@@ -1973,7 +1973,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:^3.1.7":
+"nodemon@npm:^3.1.11":
   version: 3.1.11
   resolution: "nodemon@npm:3.1.11"
   dependencies:
@@ -2222,7 +2222,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sass@npm:^1.80.6":
+"sass@npm:^1.94.2":
   version: 1.94.2
   resolution: "sass@npm:1.94.2"
   dependencies:
