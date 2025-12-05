@@ -55,3 +55,7 @@ config/environments/development/ssl/localhost.crt
 
 # Claude Code local settings
 .claude/settings.local.json
+
+# Git metadata files for deployment
+/.git-sha
+/.git-release-tag

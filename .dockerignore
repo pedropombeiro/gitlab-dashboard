@@ -56,6 +56,7 @@
 .DS_Store
 /.editorconfig
 /.git-sha
+/.git-release-tag
 /.projections.json
 /.ruby-lsp
 /Procfile.dev

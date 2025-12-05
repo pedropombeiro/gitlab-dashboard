@@ -238,6 +238,7 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           build-args: |
             "GIT_REPO_COMMIT_SHA=${{ github.sha }}"
+            "GIT_RELEASE_TAG=${{ github.ref_type == 'tag' && github.ref_name || format('{0}-{1}', github.ref_name, github.sha) }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

@@ -22,6 +22,10 @@ module ApplicationHelper
     repo_url
   end
 
+  def git_release_tag
+    GitlabDashboard::Application::GIT_RELEASE_TAG
+  end
+
   def pluralize_without_count(count, noun, plural_noun = nil)
     (count == 1) ? noun.to_s : (plural_noun || noun.pluralize).to_s
   end

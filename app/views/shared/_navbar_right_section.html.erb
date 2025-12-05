@@ -14,4 +14,6 @@ target: "_blank" %>
 <%= link_to tag.i(class: %w[fa-brands fa-github]),
 git_repo_url,
 class: "text-body",
-target: "_blank" %>
+target: "_blank",
+title: git_release_tag,
+data: { bs_toggle: "tooltip" } %>

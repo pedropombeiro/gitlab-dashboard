@@ -45,7 +45,8 @@ create-dockerfile:
     bin/rails generate dockerfile \
       --alpine --cache --compose --jemalloc --link --no-ci --parallel --sqlite3 --yjit \
       --add-build linux-headers openssl-dev \
-      --arg-deploy=GIT_REPO_COMMIT_SHA:null
+      --arg-deploy=GIT_REPO_COMMIT_SHA:null \
+      --arg-deploy=GIT_RELEASE_TAG:null
 
 lint:
     rake standard
