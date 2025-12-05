@@ -791,7 +791,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": "npm:^8.48.1"
     "@typescript-eslint/parser": "npm:^8.48.1"
     autoprefixer: "npm:^10.4.20"
-    bootstrap: "npm:^5.3.3"
+    bootstrap: "npm:^5.3.8"
     bootstrap-icons: "npm:^1.13.1"
     chart.js: "npm:^4.4.7"
     chartjs-plugin-datalabels: "npm:^2.2.0"
@@ -865,7 +865,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bootstrap@npm:^5.3.3":
+"bootstrap@npm:^5.3.8":
   version: 5.3.8
   resolution: "bootstrap@npm:5.3.8"
   peerDependencies:
