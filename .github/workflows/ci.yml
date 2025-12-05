@@ -214,7 +214,7 @@ jobs:
           # generate Docker tags based on the following events/attributes
           tags: |
             type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
-            type=raw,value=${{ steps.compute_date.outputs.date }},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
+            type=raw,value=${{ steps.release_tag.outputs.tag }},enable=${{ github.ref == format('refs/heads/{0}', 'main') }}
             type=ref,event=branch
             type=ref,event=pr
             type=sha
