@@ -275,7 +275,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@fortawesome/fontawesome-free@npm:^7.0.0":
+"@fortawesome/fontawesome-free@npm:^7.1.0":
   version: 7.1.0
   resolution: "@fortawesome/fontawesome-free@npm:7.1.0"
   checksum: 10c0/3bcaf2c18f3b2ece0fb5640681f13051cb787d686ab444437b3605ba3dca9dce4c7c1f844d94b7ad011482ac20b2b387f3a4c33c2739b50c4425fe529ab7b050
@@ -783,7 +783,7 @@ __metadata:
   resolution: "app@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.39.1"
-    "@fortawesome/fontawesome-free": "npm:^7.0.0"
+    "@fortawesome/fontawesome-free": "npm:^7.1.0"
     "@hotwired/stimulus": "npm:^3.2.2"
     "@hotwired/turbo-rails": "npm:^8.0.10"
     "@popperjs/core": "npm:^2.11.8"
