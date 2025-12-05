@@ -14,7 +14,7 @@
     "chartjs-plugin-datalabels": "^2.2.0",
     "chartjs-plugin-trendline": "^3.2.0",
     "flag-icons": "^7.5.0",
-    "local-time": "^3.0.2",
+    "local-time": "^3.0.3",
     "nodemon": "^3.1.7",
     "sass": "^1.80.6"
   },
