@@ -15,6 +15,12 @@ pre-push:
         - "{app,spec}/**/*.rb"
         - "*.erb"
       run: bin/bundle exec rspec
+    prettier:
+      glob:
+        - "app/javascript/**/*.js"
+        - "app/javascript/**/*.ts"
+        - "*.json"
+      run: prettier {push_files}
 
 pre-commit:
   parallel: true
@@ -23,7 +29,7 @@ pre-commit:
       glob:
         - "*.rb"
         - "*.erb"
-      run: bin/rake standard {files}
+      run: bin/rake standard {staged_files}
     frontend-linter:
       glob:
         - "app/javascript/**/*.js"
@@ -31,5 +37,7 @@ pre-commit:
       run: yarn lint:fix
     prettier:
       glob:
+        - "app/javascript/**/*.js"
+        - "app/javascript/**/*.ts"
         - "*.json"
-      run: yarn prettier --write {files}
+      run: prettier --write {staged_files}

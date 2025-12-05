@@ -23,8 +23,8 @@
     "build:dev": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.ts=ts --loader:.js=js",
     "lint": "eslint app/javascript",
     "lint:fix": "eslint app/javascript --fix",
-    "format": "prettier --write 'app/javascript/**/*.{js,ts}'",
-    "format:check": "prettier --check 'app/javascript/**/*.{js,ts}'",
+    "format": "prettier --write 'app/javascript/**/*.{js,ts}' '*.json'",
+    "format:check": "prettier --check 'app/javascript/**/*.{js,ts}' '*.json'",
     "typecheck": "tsc --noEmit"
   },
   "browserslist": [
