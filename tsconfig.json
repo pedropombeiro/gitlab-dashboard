@@ -32,11 +32,6 @@
     "experimentalDecorators": true,
     "useDefineForClassFields": false
   },
-  "include": [
-    "app/javascript/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "app/assets/builds"
-  ]
+  "include": ["app/javascript/**/*"],
+  "exclude": ["node_modules", "app/assets/builds"]
 }
