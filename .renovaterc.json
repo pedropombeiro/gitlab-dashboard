@@ -18,6 +18,13 @@
   "enabledManagers": ["bundler", "npm", "github-actions", "dockerfile", "ruby-version", "nodenv", "custom.regex"],
   "packageRules": [
     {
+      "description": "Disable digest-only updates for Docker and GitHub Actions updates",
+      "matchDatasources": ["docker", "github-actions"],
+      "digest": {
+        "enabled": false
+      }
+    },
+    {
       "description": "Auto-merge non-breaking GitHub Actions updates (patch and minor versions only) as a grouped PR",
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["patch", "minor"],
