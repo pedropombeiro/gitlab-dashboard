@@ -80,7 +80,7 @@ module MergeRequestsPipelineHelper
       last_running_job = pipeline.runningJobs.nodes.sole
       web_path =
         last_running_job.webPath ||
-        last_running_job.downstreamPipeline.jobs.nodes.first&.webPath
+        last_running_job.downstreamPipeline&.jobs&.nodes&.first&.webPath
     end
 
     make_full_url(web_path || pipeline.path)
