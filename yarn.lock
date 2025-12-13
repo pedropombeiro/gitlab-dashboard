@@ -570,7 +570,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^24.10.2":
+"@types/node@npm:^24.10.3":
   version: 24.10.3
   resolution: "@types/node@npm:24.10.3"
   dependencies:
@@ -786,7 +786,7 @@ __metadata:
     "@hotwired/stimulus": "npm:^3.2.2"
     "@hotwired/turbo-rails": "npm:^8.0.20"
     "@popperjs/core": "npm:^2.11.8"
-    "@types/node": "npm:^24.10.2"
+    "@types/node": "npm:^24.10.3"
     "@typescript-eslint/eslint-plugin": "npm:^8.49.0"
     "@typescript-eslint/parser": "npm:^8.49.0"
     autoprefixer: "npm:^10.4.22"
