@@ -55,7 +55,9 @@ jobs:
         with:
           filters: |
             js:
-              - "*.js"
+              - "**/*.js"
+              - "**/*.ts"
+              - "app/javascript/**"
               - "*.yml"
             ruby:
               - "**.rb"
@@ -73,9 +75,11 @@ jobs:
               - "public/**"
               - "vendor/**"
               - ".node-version"
+              - ".ruby-version"
               - "config.ru"
               - "Dockerfile"
               - "Gemfile.lock"
+              - "package.json"
               - "yarn.lock"
 
   scan_ruby:
