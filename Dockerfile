@@ -10,7 +10,7 @@
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 # ARG RUBY_VERSION=3.4.5
 # FROM ruby:$RUBY_VERSION-alpine AS base
-FROM ruby:3.4.7-alpine@sha256:885df0ba684eb6302aae26bb00575858b389256da6102c673a8a883be34a2c4c AS base
+FROM ruby:3.4.8-alpine@sha256:68dc5bd75d0e27917f60c09f055b1c33faf94d0e9cee8592b35d4134e92d04b4 AS base
 
 # Rails app lives here
 WORKDIR /rails
