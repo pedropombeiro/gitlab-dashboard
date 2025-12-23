@@ -16,7 +16,7 @@
     "flag-icons": "^7.5.0",
     "local-time": "^3.0.3",
     "nodemon": "^3.1.11",
-    "sass": "^1.97.0"
+    "sass": "^1.97.1"
   },
   "scripts": {
     "build": "esbuild app/javascript/*.* --bundle --minify --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.ts=ts --loader:.js=js",
