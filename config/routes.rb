@@ -18,6 +18,7 @@ Rails.application.routes.draw do
     as: :monthly_merged_merge_request_stats, defaults: {format: :json}
 
   post "/api/web_push_subscriptions", to: "api/web_push_subscriptions#create", as: :web_push_subscriptions
+  post "/api/heartbeat", to: "api/heartbeat#create", as: :heartbeat
 
   get "/admin/dashboard", to: "admin/dashboard#index", as: :admin_dashboard
 

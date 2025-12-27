@@ -1,6 +1,6 @@
 <% content_for(:title) { "Reviewers Dashboard" } %>
 
-<%= tag.div class: "container-fluid m-0 p-0" do %>
+<%= tag.div class: "container-fluid m-0 p-0", data: { controller: "heartbeat" } do %>
   <% nav_bg_class = Rails.env.production? ? %w[] : %w[bg-danger] %>
 
   <%= tag.nav class: %w[navbar bg-gradient navbar-expand-md fixed-top px-3] + nav_bg_class do %>

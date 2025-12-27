@@ -13,6 +13,9 @@ application.register("bootstrap-tooltip", BootstrapTooltipController);
 import ClipboardController from "./clipboard_controller";
 application.register("clipboard", ClipboardController);
 
+import HeartbeatController from "./heartbeat_controller";
+application.register("heartbeat", HeartbeatController);
+
 import MergedMergeRequestsChartController from "./merged_merge_requests_chart_controller";
 application.register("merged-merge-requests-chart", MergedMergeRequestsChartController);
 

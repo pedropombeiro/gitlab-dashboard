@@ -12,7 +12,7 @@
 <%= turbo_stream_from merge_request_stream_name(@user, :merged) %>
 
 <%= tag.div class: "container-fluid m-0 p-0", data: {
-    controller: "web-push",
+    controller: "web-push heartbeat",
     web_push_unsubscribed_class: "d-initial",
     web_push_subscribed_class: "d-none"
   } do %>
