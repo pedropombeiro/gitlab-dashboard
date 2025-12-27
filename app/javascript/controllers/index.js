@@ -19,6 +19,9 @@ application.register("merged-merge-requests-chart", MergedMergeRequestsChartCont
 import ThemeSelectorController from "./theme_selector_controller";
 application.register("theme-selector", ThemeSelectorController);
 
+import TurboFrameFocusController from "./turbo_frame_focus_controller";
+application.register("turbo-frame-focus", TurboFrameFocusController);
+
 import UnreadBadgeController from "./unread_badge_controller";
 application.register("unread-badge", UnreadBadgeController);
 
