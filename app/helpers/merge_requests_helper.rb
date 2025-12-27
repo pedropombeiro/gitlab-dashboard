@@ -9,6 +9,15 @@ module MergeRequestsHelper
     {author: params[:author], referrer: params[:referrer]}
   end
 
+  # Generates a consistent Turbo Stream name for broadcasting MR updates
+  # @param user [String, Object] GitLab username or user object
+  # @param type [Symbol] :open or :merged
+  # @return [String] Stream name like "user_pedropombeiro_open"
+  def merge_request_stream_name(user, type)
+    username = user.is_a?(String) ? user : user.username
+    "user_#{username}_#{type}"
+  end
+
   def mr_age_limit
     2.weeks
   end

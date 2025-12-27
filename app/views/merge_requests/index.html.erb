@@ -7,6 +7,10 @@
            content: Base64.urlsafe_decode64(vapid_public_key).bytes.to_s %>
 <% end %>
 
+<%# Subscribe to real-time Turbo Stream updates for this user %>
+<%= turbo_stream_from merge_request_stream_name(@user, :open) %>
+<%= turbo_stream_from merge_request_stream_name(@user, :merged) %>
+
 <%= tag.div class: "container-fluid m-0 p-0", data: {
     controller: "web-push",
     web_push_unsubscribed_class: "d-initial",

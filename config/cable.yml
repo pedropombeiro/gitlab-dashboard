@@ -1,9 +1,9 @@
-# Async adapter only works within the same process, so for manually triggering cable updates from a console,
-# and seeing results in the browser, you must do so from the web console (running inside the dev process),
-# not a terminal started via bin/rails console! Add "console" to any action or any ERB template view
-# to make the web console appear.
+# Redis adapter enables cross-process broadcasting, required for background jobs
+# to send real-time Turbo Stream updates to connected browsers
 development:
-  adapter: async
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/0" } %>
+  channel_prefix: gitlab_dashboard_development
 
 test:
   adapter: test
