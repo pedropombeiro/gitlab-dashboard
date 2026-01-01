@@ -10,8 +10,7 @@
     ":separateMultipleMajorReleases",
     "group:nodeJs",
     "group:rubyOnRails",
-    "schedule:automergeNonOfficeHours",
-    "schedule:nonOfficeHours"
+    "schedule:automergeNonOfficeHours"
   ],
   "automergeType": "pr",
   "automergeStrategy": "squash",
