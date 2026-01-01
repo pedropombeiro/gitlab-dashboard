@@ -10,12 +10,12 @@
     ":separateMultipleMajorReleases",
     "group:nodeJs",
     "group:rubyOnRails",
-    "schedule:automergeNonOfficeHours",
-    "schedule:nonOfficeHours"
+    "schedule:automergeNonOfficeHours"
   ],
   "automergeType": "pr",
   "automergeStrategy": "squash",
   "enabledManagers": ["bundler", "npm", "github-actions", "dockerfile", "ruby-version", "nodenv", "custom.regex"],
+  "lockFileMaintenance": { "enabled": true },
   "packageRules": [
     {
       "description": "Disable digest-only updates for Docker and GitHub Actions updates",
@@ -69,7 +69,10 @@
       "description": "Separate major gem updates into individual PRs for review",
       "matchManagers": ["bundler"],
       "matchUpdateTypes": ["major"],
-      "automerge": false
+      "automerge": false,
+      "lockFileMaintenance": {
+        "enabled": true
+      }
     },
     {
       "description": "Ensure Yarn lockfile is updated (npm manager handles both npm and yarn)",
