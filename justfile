@@ -9,8 +9,7 @@ install:
 
 update:
     bin/spring stop
-    bundle update --bundler
-    bundle update
+    bundle update --all
     yarn up
 
 alias cache := toggle-cache
