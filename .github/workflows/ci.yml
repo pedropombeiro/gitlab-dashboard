@@ -214,8 +214,12 @@ jobs:
         id: release_tag
         run: |
           DATE=$(date +'%Y.%m.%d')
-          SHORT_SHA="${GITHUB_SHA:0:7}"
-          TAG_NAME="v${DATE}-${SHORT_SHA}"
+          # Fetch all tags to check for existing tags today
+          git fetch --tags
+          # Count existing tags for today and increment
+          COUNT=$(git tag -l "v${DATE}.*" | wc -l)
+          NEXT=$((COUNT + 1))
+          TAG_NAME="v${DATE}.${NEXT}"
           echo "tag=${TAG_NAME}" >> $GITHUB_OUTPUT
 
       - name: Docker meta
