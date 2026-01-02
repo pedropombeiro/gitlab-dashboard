@@ -52,7 +52,7 @@ gem "rack-attack"
 gem "htmlcompressor"
 
 # See https://github.com/mperham/connection_pool/issues/210
-gem "connection_pool", "< 3"
+gem "connection_pool", "< 4"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
