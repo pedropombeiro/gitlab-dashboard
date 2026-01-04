@@ -2377,11 +2377,11 @@ __metadata:
   linkType: hard
 
 "ts-api-utils@npm:^2.2.0":
-  version: 2.3.0
-  resolution: "ts-api-utils@npm:2.3.0"
+  version: 2.4.0
+  resolution: "ts-api-utils@npm:2.4.0"
   peerDependencies:
     typescript: ">=4.8.4"
-  checksum: 10c0/9f2aadb8ac55926c79db03e37ee3b014135923d1705f6868b9e787e6b8822d2fd8e19df2f9002563f4e6268c994425ddaad61df24d0dad833a4be9f26f789213
+  checksum: 10c0/ed185861aef4e7124366a3f6561113557a57504267d4d452a51e0ba516a9b6e713b56b4aeaab9fa13de9db9ab755c65c8c13a777dba9133c214632cb7b65c083
   languageName: node
   linkType: hard
 
