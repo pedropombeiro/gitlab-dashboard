@@ -19,7 +19,7 @@ class MergeRequestBroadcaster
     stream_name = stream_name_for(author, type)
     target_id = ActionView::RecordIdentifier.dom_id(dto, "#{type}_merge_requests")
 
-    Rails.logger.info "[MergeRequestBroadcaster] Rendering template for #{author}/#{type}"
+    Rails.logger.debug { "[MergeRequestBroadcaster] Rendering template for #{author}/#{type}" }
 
     # Render the template manually, then broadcast as a Turbo Stream
     # Create a controller instance with proper params and request context
@@ -44,7 +44,7 @@ class MergeRequestBroadcaster
       html: html
     )
 
-    Rails.logger.info "[MergeRequestBroadcaster] Successfully broadcast to #{stream_name}"
+    Rails.logger.debug { "[MergeRequestBroadcaster] Successfully broadcast to #{stream_name}" }
   rescue => e
     Rails.logger.error "[MergeRequestBroadcaster] Failed to broadcast MR update for #{author} (#{type}): #{e.class} - #{e.message}"
     Rails.logger.error e.backtrace.join("\n")

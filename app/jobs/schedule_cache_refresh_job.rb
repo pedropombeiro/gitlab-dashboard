@@ -13,7 +13,7 @@ class ScheduleCacheRefreshJob < ApplicationJob
       types_needing_update = %i[open merged].select { |type| service.needs_scheduled_update?(author, type) }
 
       if types_needing_update.any?
-        Rails.logger.info "[ScheduleCacheRefreshJob] Enqueuing jobs for #{author}: #{types_needing_update.join(", ")}"
+        Rails.logger.debug { "[ScheduleCacheRefreshJob] Enqueuing jobs for #{author}: #{types_needing_update.join(", ")}" }
         types_needing_update.each { |type| MergeRequestsFetchJob.perform_later(author, type) }
       else
         Rails.logger.debug { "[ScheduleCacheRefreshJob] No updates needed for #{author} (cache still fresh)" }
