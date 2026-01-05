@@ -8,6 +8,11 @@ class MergeRequestsFetchJob < ApplicationJob
     response, dto = GenerateNotificationsService.new(author, type, fetch_service).execute
 
     # Broadcast real-time update to connected clients via Turbo Streams
-    MergeRequestBroadcaster.broadcast_update(author, type, dto) if response.errors.nil?
+    if response.errors.nil?
+      Rails.logger.info "[MergeRequestsFetchJob] Broadcasting update for #{author}/#{type}"
+      MergeRequestBroadcaster.broadcast_update(author, type, dto)
+    else
+      Rails.logger.warn "[MergeRequestsFetchJob] Skipping broadcast for #{author}/#{type} due to errors: #{response.errors}"
+    end
   end
 end

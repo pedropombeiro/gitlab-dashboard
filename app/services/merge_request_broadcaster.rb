@@ -11,10 +11,15 @@ class MergeRequestBroadcaster
   # @param type [Symbol] :open or :merged
   # @param dto [UserDto] The parsed DTO containing MR data
   def self.broadcast_update(author, type, dto)
-    return if dto.errors.present?
+    if dto.errors.present?
+      Rails.logger.warn "[MergeRequestBroadcaster] Skipping broadcast for #{author}/#{type} - DTO has errors: #{dto.errors}"
+      return
+    end
 
     stream_name = stream_name_for(author, type)
     target_id = ActionView::RecordIdentifier.dom_id(dto, "#{type}_merge_requests")
+
+    Rails.logger.info "[MergeRequestBroadcaster] Rendering template for #{author}/#{type}"
 
     # Render the template manually, then broadcast as a Turbo Stream
     # Create a controller instance with proper params and request context
@@ -29,6 +34,8 @@ class MergeRequestBroadcaster
       layout: false
     )
 
+    Rails.logger.info "[MergeRequestBroadcaster] Broadcasting to stream: #{stream_name}, target: #{target_id}, html size: #{html.bytesize} bytes"
+
     # Broadcast the rendered HTML directly as a Turbo Stream message
     # This uses the internal Turbo mechanism that matches turbo_stream_from
     Turbo::StreamsChannel.broadcast_replace_to(
@@ -36,9 +43,11 @@ class MergeRequestBroadcaster
       target: target_id,
       html: html
     )
+
+    Rails.logger.info "[MergeRequestBroadcaster] Successfully broadcast to #{stream_name}"
   rescue => e
-    Rails.logger.error("Failed to broadcast MR update for #{author} (#{type}): #{e.message}")
-    Rails.logger.error(e.backtrace.join("\n"))
+    Rails.logger.error "[MergeRequestBroadcaster] Failed to broadcast MR update for #{author} (#{type}): #{e.class} - #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
   end
 
   # Generates the Turbo Stream name for broadcasting
