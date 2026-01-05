@@ -4,8 +4,12 @@ class MergeRequestsFetchJob < ApplicationJob
   queue_as :background
 
   def perform(author, type)
+    Rails.logger.info "[MergeRequestsFetchJob] Starting job for #{author}/#{type}"
+
     fetch_service = FetchMergeRequestsService.new(author)
     response, dto = GenerateNotificationsService.new(author, type, fetch_service).execute
+
+    Rails.logger.info "[MergeRequestsFetchJob] Completed fetch for #{author}/#{type}, response.errors: #{response.errors.inspect}"
 
     # Broadcast real-time update to connected clients via Turbo Streams
     if response.errors.nil?
@@ -14,5 +18,11 @@ class MergeRequestsFetchJob < ApplicationJob
     else
       Rails.logger.warn "[MergeRequestsFetchJob] Skipping broadcast for #{author}/#{type} due to errors: #{response.errors}"
     end
+
+    Rails.logger.info "[MergeRequestsFetchJob] Job completed for #{author}/#{type}"
+  rescue => e
+    Rails.logger.error "[MergeRequestsFetchJob] Exception in job for #{author}/#{type}: #{e.class} - #{e.message}"
+    Rails.logger.error e.backtrace.join("\n")
+    raise
   end
 end
