@@ -16,9 +16,21 @@ class MergeRequestsCacheService
   def needs_scheduled_update?(author, type)
     response = read(author, type)
 
-    return true unless response&.next_scheduled_update_at
+    unless response&.next_scheduled_update_at
+      Rails.logger.debug { "[MergeRequestsCacheService] No cache found for #{author}/#{type}, needs update" }
+      return true
+    end
 
-    response.next_scheduled_update_at.past?
+    needs_update = response.next_scheduled_update_at.past?
+    time_until_update = (response.next_scheduled_update_at - Time.current).round
+
+    if needs_update
+      Rails.logger.debug { "[MergeRequestsCacheService] Cache expired for #{author}/#{type} (#{time_until_update}s ago)" }
+    else
+      Rails.logger.debug { "[MergeRequestsCacheService] Cache fresh for #{author}/#{type} (next update in #{time_until_update}s)" }
+    end
+
+    needs_update
   end
 
   def read(author, type)
