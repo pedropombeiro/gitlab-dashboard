@@ -20,20 +20,32 @@ export default class AutoRefreshController extends Controller {
   private controller = new AbortController();
   private nextRefreshTimestamp = 0;
   private timeoutID: ReturnType<typeof setTimeout> | 0 = 0;
+  private lastHiddenTimestamp = 0;
+
+  // Refresh if page has been hidden for more than 5 minutes
+  private readonly STALE_THRESHOLD = 300_000; // 5 minutes in milliseconds
 
   connect(): void {
     const onVisibilityChange = () => {
-      if (document.visibilityState !== "visible") {
-        return;
-      }
-      if (this.nextRefreshTimestamp === 0) {
-        return;
-      }
-      if (Date.now() < this.nextRefreshTimestamp) {
+      if (document.visibilityState === "hidden") {
+        // Track when page was hidden
+        this.lastHiddenTimestamp = Date.now();
         return;
       }
 
-      this.refresh();
+      // Page became visible
+      const timeSinceHidden = this.lastHiddenTimestamp > 0 ? Date.now() - this.lastHiddenTimestamp : 0;
+
+      // Refresh if:
+      // 1. Regular timeout expired, OR
+      // 2. Page was hidden for more than 5 minutes (might be stale)
+      const shouldRefresh =
+        this.nextRefreshTimestamp > 0 &&
+        (Date.now() >= this.nextRefreshTimestamp || timeSinceHidden >= this.STALE_THRESHOLD);
+
+      if (shouldRefresh) {
+        this.refresh();
+      }
     };
 
     document.addEventListener("visibilitychange", onVisibilityChange, { signal: this.controller.signal });
