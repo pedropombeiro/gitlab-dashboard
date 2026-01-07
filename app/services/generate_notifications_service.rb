@@ -24,6 +24,13 @@ class GenerateNotificationsService
     cache_service.write(author_user.username, type, response) if response.errors.nil?
 
     dto = fetch_service.parse_dto(response, type)
+
+    # Broadcast real-time update to all connected clients via Turbo Streams
+    if response.errors.nil?
+      Rails.logger.info "[GenerateNotificationsService] Broadcasting update for #{author_user.username}/#{type}"
+      MergeRequestBroadcaster.broadcast_update(author_user.username, type, dto)
+    end
+
     if dto.errors.blank? && author_user.web_push_subscriptions.any?
       check_changes(previous_dto, dto, response.next_scheduled_update_at)
     end
