@@ -17,9 +17,10 @@ class FetchMergeRequestsService
   end
 
   def execute(type)
-    Rails.cache.fetch(
-      self.class.authored_mr_lists_cache_key(author, type), expires_in: MergeRequestsCacheService.cache_validity
-    ) do
+    cache_key = self.class.authored_mr_lists_cache_key(author, type)
+    cache_existed = Rails.cache.exist?(cache_key)
+
+    response = Rails.cache.fetch(cache_key, expires_in: MergeRequestsCacheService.cache_validity) do
       raw_response =
         case type
         when :open
@@ -53,6 +54,11 @@ class FetchMergeRequestsService
           end
       end
     end
+
+    # Mark whether this data was freshly fetched (cache miss) or from cache (cache hit)
+    response.define_singleton_method(:freshly_fetched?) { !cache_existed }
+
+    response
   end
 
   def parse_dto(response, type)

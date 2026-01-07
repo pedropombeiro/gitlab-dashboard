@@ -26,9 +26,12 @@ class GenerateNotificationsService
     dto = fetch_service.parse_dto(response, type)
 
     # Broadcast real-time update to all connected clients via Turbo Streams
-    if response.errors.nil?
-      Rails.logger.info "[GenerateNotificationsService] Broadcasting update for #{author_user.username}/#{type}"
+    # Only broadcast if data was freshly fetched from GitLab (not from cache)
+    if response.errors.nil? && response.respond_to?(:freshly_fetched?) && response.freshly_fetched?
+      Rails.logger.info "[GenerateNotificationsService] Broadcasting update for #{author_user.username}/#{type} (fresh data)"
       MergeRequestBroadcaster.broadcast_update(author_user.username, type, dto)
+    elsif response.errors.nil?
+      Rails.logger.debug { "[GenerateNotificationsService] Skipping broadcast for #{author_user.username}/#{type} (cached data)" }
     end
 
     if dto.errors.blank? && author_user.web_push_subscriptions.any?
