@@ -9,6 +9,9 @@ class FetchMergeRequestsService
   include MergeRequestsParsingHelper
   include MergeRequestsPipelineHelper
 
+  # Result object wrapping the response and cache status
+  FetchResult = Struct.new(:response, :freshly_fetched?, keyword_init: true)
+
   attr_reader :author
   delegate :make_full_url, to: :gitlab_client
 
@@ -55,10 +58,8 @@ class FetchMergeRequestsService
       end
     end
 
-    # Mark whether this data was freshly fetched (cache miss) or from cache (cache hit)
-    response.define_singleton_method(:freshly_fetched?) { !cache_existed }
-
-    response
+    # Return result object with response and cache status
+    FetchResult.new(response: response, freshly_fetched?: !cache_existed)
   end
 
   def parse_dto(response, type)

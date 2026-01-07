@@ -81,7 +81,8 @@ class MergeRequestsController < MergeRequestsControllerBase
 
     fetch_service = FetchMergeRequestsService.new(author)
     if safe_params.include?(:referrer)
-      response = fetch_service.execute(type)
+      result = fetch_service.execute(type)
+      response = result.response
       @dto = fetch_service.parse_dto(response, type)
     else
       save_current_user(author)

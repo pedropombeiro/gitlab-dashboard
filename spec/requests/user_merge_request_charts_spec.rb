@@ -44,8 +44,9 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
         service = instance_double(FetchMergeRequestsService)
         response = double
         user_dto = double
+        fetch_result = FetchMergeRequestsService::FetchResult.new(response: response, freshly_fetched?: true)
 
-        allow(service).to receive(:execute).and_return(response)
+        allow(service).to receive(:execute).and_return(fetch_result)
         allow(service).to receive(:parse_dto).with(response, :merged).and_return(user_dto)
 
         allow(user_dto).to receive(:first_merged_merge_requests_timestamp).and_return(1.year.ago)
