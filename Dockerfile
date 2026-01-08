@@ -119,7 +119,7 @@ ARG UID=1000 \
 RUN addgroup --system --gid "$GID" rails && \
     adduser --system rails --uid "$UID" --ingroup rails --home /home/rails --shell /bin/sh rails && \
     chown -R rails:rails db log storage tmp && \
-    echo ${GIT_REPO_COMMIT_SHA} >./.git-sha && \
+    echo ${GIT_REPO_COMMIT_SHA} >./REVISION && \
     echo ${GIT_RELEASE_TAG} >./.git-release-tag
 USER rails:rails
 

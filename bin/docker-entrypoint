@@ -1,7 +1,7 @@
 #!/bin/sh -e
 
 export HONEYBADGER_ENV="$RAILS_ENV"
-export HONEYBADGER_REVISION="$(cat ./.git-sha)"
+export HONEYBADGER_REVISION="$(cat ./REVISION)"
 curl -g "https://api.honeybadger.io/v1/deploys?deploy[environment]=${HONEYBADGER_ENV}&deploy[local_username]=${HONEYBADGER_USERNAME}&deploy[revision]=${HONEYBADGER_REVISION}&api_key=${HONEYBADGER_API_KEY}"
 
 # Enable jemalloc for reduced memory usage and latency.

@@ -57,5 +57,5 @@ config/environments/development/ssl/localhost.crt
 .claude/settings.local.json
 
 # Git metadata files for deployment
-/.git-sha
+/REVISION
 /.git-release-tag

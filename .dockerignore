@@ -55,7 +55,7 @@
 # Ignore other files
 .DS_Store
 /.editorconfig
-/.git-sha
+/REVISION
 /.git-release-tag
 /.projections.json
 /.ruby-lsp
