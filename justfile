@@ -47,11 +47,21 @@ create-dockerfile:
       --arg-deploy=GIT_REPO_COMMIT_SHA:null \
       --arg-deploy=GIT_RELEASE_TAG:null
 
-fix:
-    lefthook run pre-commit --all-files --force
+fix *FILES='':
+    #!/usr/bin/env bash
+    if [ -n "{{FILES}}" ]; then \
+        lefthook run pre-commit --files {{FILES}} --force; \
+    else \
+        lefthook run pre-commit --all-files --force; \
+    fi
 
-lint:
-    lefthook run pre-push --all-files --force
+lint *FILES='':
+    #!/usr/bin/env bash
+    if [ -n "{{FILES}}" ]; then \
+        lefthook run pre-push --files {{FILES}} --force; \
+    else \
+        lefthook run pre-push --all-files --force; \
+    fi
 
 dump-schema:
     rails -e 'require("graphlient"); client = Graphlient::Client.new("https://gitlab.com/api/graphql", schema_path: "lib/assets/graphql/gitlab_graphql_schema.json"); client.schema.dump!'
