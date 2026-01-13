@@ -86,6 +86,7 @@ GEM
       traces (~> 0.18)
     base64 (0.3.0)
     bcrypt_pbkdf (1.1.2)
+    benchmark (0.5.0)
     bigdecimal (4.0.1)
     bindex (0.8.1)
     bootsnap (1.21.0)
@@ -211,7 +212,8 @@ GEM
       listen (>= 3.0.0)
       railties (>= 7.0.0)
     htmlcompressor (0.4.0)
-    httplog (1.7.3)
+    httplog (1.8.0)
+      benchmark
       rack (>= 2.0)
       rainbow (>= 2.0.0)
     i18n (1.14.8)
