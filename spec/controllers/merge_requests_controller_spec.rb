@@ -554,10 +554,10 @@ RSpec.describe MergeRequestsController, type: :controller do
             )
           ))
           .to_return do |request|
-          username = JSON.parse(request.body).dig(*%w[variables reviewer])
+            username = JSON.parse(request.body).dig(*%w[variables reviewer])
 
-          {body: reviewer_responses.fetch(username).to_json}
-        end
+            {body: reviewer_responses.fetch(username).to_json}
+          end
       end
 
       let!(:merged_mrs_request_stub) { create_merged_mrs_request_stub }

@@ -3,8 +3,8 @@ pre-push:
   commands:
     backend-linter:
       glob:
-        - "*.rb"
-        - "*.erb"
+        - "**/*.rb"
+        - "**/*.erb"
       run: bin/rake standard
     frontend-linter:
       glob:
@@ -13,7 +13,7 @@ pre-push:
     backend-specs:
       glob:
         - "{app,spec}/**/*.rb"
-        - "*.erb"
+        - "**/*.erb"
       run: bin/bundle exec rspec
     prettier:
       glob:
@@ -27,8 +27,8 @@ pre-commit:
   commands:
     backend-linter:
       glob:
-        - "*.rb"
-        - "*.erb"
+        - "**/*.rb"
+        - "**/*.erb"
       run: bin/rake standard {staged_files}
     frontend-linter:
       glob:
