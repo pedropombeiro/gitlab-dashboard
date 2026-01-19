@@ -210,6 +210,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
 
+      - name: Verify Node.js musl build availability
+        run: |
+          NODE_VERSION=$(cat .node-version)
+          MUSL_URL="https://unofficial-builds.nodejs.org/download/release/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64-musl.tar.gz"
+          echo "Checking for Node.js musl build at: ${MUSL_URL}"
+          if ! curl --output /dev/null --silent --head --fail "${MUSL_URL}"; then
+            echo "::error::Node.js v${NODE_VERSION} musl build is not yet available at ${MUSL_URL}"
+            echo "This typically happens when a new Node.js version is released but unofficial builds haven't been generated yet."
+            echo "Please wait for the musl build to become available, or revert to the previous Node.js version."
+            exit 1
+          fi
+          echo "Node.js v${NODE_VERSION} musl build is available"
+
       - name: Compute release tag
         id: release_tag
         run: |
