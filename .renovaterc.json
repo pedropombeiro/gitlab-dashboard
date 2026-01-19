@@ -81,6 +81,11 @@
       "lockFileMaintenance": {
         "enabled": true
       }
+    },
+    {
+      "description": "Delay Node.js updates to allow time for unofficial musl builds to be published",
+      "matchDepNames": ["node"],
+      "minimumReleaseAge": "3 days"
     }
   ],
   "customManagers": [
