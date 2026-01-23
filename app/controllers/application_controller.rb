@@ -26,7 +26,9 @@ class ApplicationController < ActionController::Base
   private
 
   def real_ip
-    request.headers["CF-Connecting-IP"] || request.remote_ip
+    request.headers["CF-Connecting-IP"] ||
+      request.headers["X-Forwarded-For"]&.split(",")&.first&.strip ||
+      request.remote_ip
   end
 
   def gitlab_client
