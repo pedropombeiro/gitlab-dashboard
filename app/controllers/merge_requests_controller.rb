@@ -67,7 +67,7 @@ class MergeRequestsController < MergeRequestsControllerBase
       username: author,
       referrer: safe_params[:referrer],
       path: request.path,
-      request_ip: request.remote_ip
+      request_ip: real_ip
     )
     increment_counter("user.visit")
   end

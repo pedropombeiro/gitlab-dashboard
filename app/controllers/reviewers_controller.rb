@@ -38,7 +38,7 @@ class ReviewersController < ApplicationController
 
   def submit_metrics
     metric_source "custom_metrics"
-    metric_attributes(path: request.path, group_path: request.query_parameters[:group_path], request_ip: request.remote_ip)
+    metric_attributes(path: request.path, group_path: request.query_parameters[:group_path], request_ip: real_ip)
     increment_counter("user.visit")
   end
 end

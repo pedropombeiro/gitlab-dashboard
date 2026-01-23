@@ -25,6 +25,10 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def real_ip
+    request.headers["CF-Connecting-IP"] || request.remote_ip
+  end
+
   def gitlab_client
     @gitlab_client ||= GitlabClient.new
   end
