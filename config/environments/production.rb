@@ -85,6 +85,36 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 
+  # Trust Cloudflare proxy IPs so ActionDispatch::RemoteIp correctly extracts the real client IP
+  # from X-Forwarded-For. This affects request.remote_ip, Honeybadger, Rack::Attack, etc.
+  # Cloudflare IP ranges: https://www.cloudflare.com/ips/
+  config.action_dispatch.trusted_proxies = ActionDispatch::RemoteIp::TRUSTED_PROXIES + [
+    # Cloudflare IPv4 ranges
+    IPAddr.new("173.245.48.0/20"),
+    IPAddr.new("103.21.244.0/22"),
+    IPAddr.new("103.22.200.0/22"),
+    IPAddr.new("103.31.4.0/22"),
+    IPAddr.new("141.101.64.0/18"),
+    IPAddr.new("108.162.192.0/18"),
+    IPAddr.new("190.93.240.0/20"),
+    IPAddr.new("188.114.96.0/20"),
+    IPAddr.new("197.234.240.0/22"),
+    IPAddr.new("198.41.128.0/17"),
+    IPAddr.new("162.158.0.0/15"),
+    IPAddr.new("104.16.0.0/13"),
+    IPAddr.new("104.24.0.0/14"),
+    IPAddr.new("172.64.0.0/13"),
+    IPAddr.new("131.0.72.0/22"),
+    # Cloudflare IPv6 ranges
+    IPAddr.new("2400:cb00::/32"),
+    IPAddr.new("2606:4700::/32"),
+    IPAddr.new("2803:f800::/32"),
+    IPAddr.new("2405:b500::/32"),
+    IPAddr.new("2405:8100::/32"),
+    IPAddr.new("2a06:98c0::/29"),
+    IPAddr.new("2c0f:f248::/32")
+  ]
+
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
     "gitlab-dashboard.onrender.com",
