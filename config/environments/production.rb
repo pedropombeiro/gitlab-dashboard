@@ -85,10 +85,12 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [:id]
 
-  # Trust Cloudflare proxy IPs so ActionDispatch::RemoteIp correctly extracts the real client IP
-  # from X-Forwarded-For. This affects request.remote_ip, Honeybadger, Rack::Attack, etc.
+  # Trust Cloudflare and Docker proxy IPs so ActionDispatch::RemoteIp correctly extracts the real
+  # client IP from X-Forwarded-For. This affects request.remote_ip, Honeybadger, Rack::Attack, etc.
   # Cloudflare IP ranges: https://www.cloudflare.com/ips/
   config.action_dispatch.trusted_proxies = ActionDispatch::RemoteIp::TRUSTED_PROXIES + [
+    # Docker network ranges (Traefik reverse proxy)
+    IPAddr.new("172.16.0.0/12"),
     # Cloudflare IPv4 ranges
     IPAddr.new("173.245.48.0/20"),
     IPAddr.new("103.21.244.0/22"),
