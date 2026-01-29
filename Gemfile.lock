@@ -204,7 +204,7 @@ GEM
       activesupport (>= 3.0)
       graphql (>= 1.13.0)
     hashdiff (1.2.1)
-    honeybadger (6.2.1)
+    honeybadger (6.3.0)
       logger
       ostruct
     hotwire-livereload (2.1.1)
@@ -557,7 +557,7 @@ GEM
       ostruct (~> 0.6)
     traces (0.18.2)
     tsort (0.2.0)
-    turbo-rails (2.0.22)
+    turbo-rails (2.0.23)
       actionpack (>= 7.1.0)
       railties (>= 7.1.0)
     tzinfo (2.0.6)
