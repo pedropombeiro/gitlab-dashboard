@@ -47,20 +47,20 @@ create-dockerfile:
       --arg-deploy=GIT_REPO_COMMIT_SHA:null \
       --arg-deploy=GIT_RELEASE_TAG:null
 
+[script('bash')]
 fix *FILES='':
-    #!/usr/bin/env bash
-    if [ -n "{{FILES}}" ]; then \
-        lefthook run pre-commit --files {{FILES}} --force; \
-    else \
-        lefthook run pre-commit --all-files --force; \
+    if [ -n "{{FILES}}" ]; then
+        lefthook run pre-commit --files {{FILES}} --force
+    else
+        lefthook run pre-commit --all-files --force
     fi
 
+[script('bash')]
 lint *FILES='':
-    #!/usr/bin/env bash
-    if [ -n "{{FILES}}" ]; then \
-        lefthook run pre-push --files {{FILES}} --force; \
-    else \
-        lefthook run pre-push --all-files --force; \
+    if [ -n "{{FILES}}" ]; then
+        lefthook run pre-push --files {{FILES}} --force
+    else
+        lefthook run pre-push --all-files --force
     fi
 
 dump-schema:
