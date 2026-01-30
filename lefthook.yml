@@ -4,6 +4,10 @@ pre-push:
     justfile-fmt:
       glob: "justfile"
       run: just --fmt --check --unstable
+    yamllint:
+      glob: "**/*.yml"
+      exclude: "config/dockerfile.yml"
+      run: yamllint {push_files}
     backend-linter:
       glob:
         - "**/*.rb"
@@ -31,6 +35,10 @@ pre-commit:
     justfile-fmt:
       glob: "justfile"
       run: just --fmt --unstable
+    yamllint:
+      glob: "**/*.yml"
+      exclude: "config/dockerfile.yml"
+      run: yamllint {staged_files}
     backend-linter:
       glob:
         - "**/*.rb"
