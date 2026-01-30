@@ -1,6 +1,9 @@
 pre-push:
   parallel: true
   commands:
+    justfile-fmt:
+      glob: "justfile"
+      run: just --fmt --check --unstable
     backend-linter:
       glob:
         - "**/*.rb"
@@ -25,6 +28,9 @@ pre-push:
 pre-commit:
   parallel: true
   commands:
+    justfile-fmt:
+      glob: "justfile"
+      run: just --fmt --unstable
     backend-linter:
       glob:
         - "**/*.rb"
