@@ -31,6 +31,8 @@ module GitlabDashboard
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
 
+    config.solid_queue.clear_finished_jobs_after = 1.week
+
     config.middleware.use Rack::Attack
   end
 end
