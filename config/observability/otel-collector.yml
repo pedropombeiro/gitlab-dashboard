@@ -21,6 +21,26 @@ processors:
         value: gitlab-dashboard
         action: upsert
 
+connectors:
+  # Generate metrics from spans (spanmetrics)
+  spanmetrics:
+    histogram:
+      explicit:
+        buckets: [5ms, 10ms, 25ms, 50ms, 100ms, 250ms, 500ms, 1s, 2.5s, 5s, 10s]
+    dimensions:
+      - name: http.method
+      - name: http.status_code
+      - name: http.route
+      - name: rpc.service
+      - name: rpc.method
+      - name: graphql.operation.name
+      - name: graphql.operation.type
+      - name: db.system
+      - name: db.operation
+    dimensions_cache_size: 1000
+    aggregation_temporality: AGGREGATION_TEMPORALITY_CUMULATIVE
+    metrics_flush_interval: 5s
+
 exporters:
   # Export traces to Tempo
   otlp/tempo:
@@ -28,11 +48,14 @@ exporters:
     tls:
       insecure: true
 
-  # Export metrics to Prometheus (via remote write)
-  prometheusremotewrite:
-    endpoint: http://prometheus:9090/api/v1/write
-    tls:
-      insecure: true
+  # Expose metrics for Prometheus to scrape (port 8889)
+  prometheus:
+    endpoint: "0.0.0.0:8889"
+    namespace: otel
+    send_timestamps: true
+    metric_expiration: 5m
+    resource_to_telemetry_conversion:
+      enabled: true
 
   # Export logs to Loki via OTLP HTTP
   otlphttp/loki:
@@ -49,12 +72,18 @@ service:
     traces:
       receivers: [otlp]
       processors: [batch, resource]
-      exporters: [otlp/tempo, debug]
+      exporters: [otlp/tempo, spanmetrics, debug]
+
+    # Metrics from spans via spanmetrics connector
+    metrics/spanmetrics:
+      receivers: [spanmetrics]
+      processors: [batch]
+      exporters: [prometheus]
 
     metrics:
       receivers: [otlp]
       processors: [batch, resource]
-      exporters: [prometheusremotewrite, debug]
+      exporters: [prometheus, debug]
 
     logs:
       receivers: [otlp]
