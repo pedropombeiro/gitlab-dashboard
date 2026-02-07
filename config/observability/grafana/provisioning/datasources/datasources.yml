@@ -32,7 +32,12 @@ datasources:
         spanStartTimeShift: "-1h"
         spanEndTimeShift: "1h"
         filterByTraceID: true
-        filterBySpanID: false
+        filterBySpanID: true
+        tags:
+          - key: "service.name"
+            value: "service"
+        customQuery: true
+        query: '{job="rails", trace_id="${__span.traceId}"}'
       tracesToMetrics:
         datasourceUid: prometheus
         spanStartTimeShift: "-1h"
