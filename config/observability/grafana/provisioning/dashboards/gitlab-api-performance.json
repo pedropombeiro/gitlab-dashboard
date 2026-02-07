@@ -85,7 +85,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -152,7 +154,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -219,7 +223,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -278,7 +284,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -291,7 +299,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "count(count by (graphql_operation_name) (traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", graphql_operation_name!=\"\"}))",
+          "expr": "count(count by (span_name) (traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}))",
           "legendFormat": "Operations",
           "range": true,
           "refId": "A"
@@ -378,7 +386,10 @@
       "id": 5,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -395,8 +406,8 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[$__rate_interval])) by (graphql_operation_name)",
-          "legendFormat": "{{graphql_operation_name}}",
+          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[$__rate_interval])) by (span_name)",
+          "legendFormat": "{{span_name}}",
           "range": true,
           "refId": "A"
         }
@@ -477,7 +488,10 @@
       "id": 6,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -494,8 +508,8 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[5m])) by (le, graphql_operation_name))",
-          "legendFormat": "p95 {{graphql_operation_name}}",
+          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[5m])) by (le, span_name))",
+          "legendFormat": "p95 {{span_name}}",
           "range": true,
           "refId": "A"
         }
@@ -583,10 +597,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(10, sum by (graphql_operation_name) (increase(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[$__range])))",
+          "expr": "topk(10, sum by (span_name) (increase(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[$__range])))",
           "format": "time_series",
           "instant": true,
-          "legendFormat": "{{graphql_operation_name}}",
+          "legendFormat": "{{span_name}}",
           "range": false,
           "refId": "A"
         }
@@ -682,10 +696,10 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "topk(10, histogram_quantile(0.95, sum by (le, graphql_operation_name) (rate(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[$__range]))))",
+          "expr": "topk(10, histogram_quantile(0.95, sum by (le, span_name) (rate(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[$__range]))))",
           "format": "time_series",
           "instant": true,
-          "legendFormat": "{{graphql_operation_name}}",
+          "legendFormat": "{{span_name}}",
           "range": false,
           "refId": "A"
         }
@@ -771,7 +785,10 @@
       "id": 9,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -870,7 +887,10 @@
       "id": 10,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -990,7 +1010,9 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "showHeader": true,
@@ -1019,7 +1041,12 @@
   ],
   "refresh": "30s",
   "schemaVersion": 39,
-  "tags": ["opentelemetry", "gitlab", "api", "performance"],
+  "tags": [
+    "opentelemetry",
+    "gitlab",
+    "api",
+    "performance"
+  ],
   "templating": {
     "list": []
   },
