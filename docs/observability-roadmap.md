@@ -57,11 +57,13 @@ Migrate business metrics from Honeybadger gauges to OpenTelemetry metrics:
 
 ### Enhanced Dashboards
 
-- [ ] Create GitLab API performance dashboard
-  - Request rate by endpoint
-  - Latency percentiles
-  - Error rate by error type
-  - Rate limiting events
+- [x] Create GitLab API performance dashboard
+  - Request rate by GraphQL operation
+  - Latency percentiles (p50, p95, p99)
+  - Error rate by operation
+  - Top operations by call count
+  - Slowest operations visualization
+  - Trace explorer for GitLab API calls
 - [ ] Create Background Jobs dashboard
   - Job throughput by type
   - Queue depth over time
