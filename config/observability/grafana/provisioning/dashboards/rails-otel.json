@@ -59,7 +59,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -125,7 +127,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -191,7 +195,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -249,7 +255,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -262,7 +270,7 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", rpc_service=\"gitlab\"}[$__rate_interval]))",
+          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[$__rate_interval]))",
           "legendFormat": "GitLab API Calls/sec",
           "refId": "A"
         }
@@ -349,7 +357,10 @@
       "id": 31,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -442,7 +453,10 @@
       "id": 32,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -596,7 +610,10 @@
       "id": 33,
       "options": {
         "legend": {
-          "calcs": ["mean", "sum"],
+          "calcs": [
+            "mean",
+            "sum"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -701,7 +718,10 @@
       "id": 5,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -718,8 +738,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.50, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", rpc_service=\"gitlab\"}[5m])) by (le, graphql_operation_name))",
-          "legendFormat": "{{graphql_operation_name}} p50",
+          "expr": "histogram_quantile(0.50, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[5m])) by (le, span_name))",
+          "legendFormat": "{{span_name}} p50",
           "refId": "A"
         },
         {
@@ -727,8 +747,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", rpc_service=\"gitlab\"}[5m])) by (le, graphql_operation_name))",
-          "legendFormat": "{{graphql_operation_name}} p95",
+          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[5m])) by (le, span_name))",
+          "legendFormat": "{{span_name}} p95",
           "refId": "B"
         }
       ],
@@ -800,7 +820,9 @@
       "id": 6,
       "options": {
         "legend": {
-          "calcs": ["sum"],
+          "calcs": [
+            "sum"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -817,8 +839,8 @@
             "type": "prometheus",
             "uid": "prometheus"
           },
-          "expr": "sum(increase(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", rpc_service=\"gitlab\"}[1m])) by (graphql_operation_name)",
-          "legendFormat": "{{graphql_operation_name}}",
+          "expr": "sum(increase(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_name=~\"gitlab.graphql.*\"}[1m])) by (span_name)",
+          "legendFormat": "{{span_name}}",
           "refId": "A"
         }
       ],
@@ -904,7 +926,10 @@
       "id": 34,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -997,7 +1022,10 @@
       "id": 35,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1090,7 +1118,10 @@
       "id": 36,
       "options": {
         "legend": {
-          "calcs": ["mean", "max"],
+          "calcs": [
+            "mean",
+            "max"
+          ],
           "displayMode": "table",
           "placement": "bottom",
           "showLegend": true
@@ -1199,7 +1230,9 @@
         "footer": {
           "countRows": false,
           "fields": "",
-          "reducer": ["sum"],
+          "reducer": [
+            "sum"
+          ],
           "show": false
         },
         "showHeader": true,
@@ -1229,7 +1262,11 @@
   ],
   "refresh": "10s",
   "schemaVersion": 39,
-  "tags": ["rails", "opentelemetry", "gitlab"],
+  "tags": [
+    "rails",
+    "opentelemetry",
+    "gitlab"
+  ],
   "templating": {
     "list": []
   },
