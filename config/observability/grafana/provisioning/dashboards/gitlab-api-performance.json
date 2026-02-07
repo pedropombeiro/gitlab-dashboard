@@ -992,7 +992,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "ns"
+                "value": "ms"
               }
             ]
           }
