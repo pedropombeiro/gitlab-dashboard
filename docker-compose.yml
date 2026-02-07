@@ -83,6 +83,16 @@ services:
     ports:
       - "3100:3100"
 
+  # Promtail - log shipping agent for Loki
+  promtail:
+    image: grafana/promtail:3.3.2
+    command: ["-config.file=/etc/promtail/promtail.yml"]
+    volumes:
+      - ./config/observability/promtail.yml:/etc/promtail/promtail.yml:ro
+      - ./log:/var/log/rails:ro
+    depends_on:
+      - loki
+
   # Grafana - visualization and dashboards
   grafana:
     image: grafana/grafana:11.4.0

@@ -30,9 +30,9 @@ This document tracks planned improvements and enhancement ideas for the observab
 
 ### Log Correlation
 
-- [ ] Add trace ID to Rails logger formatter
-- [ ] Configure log shipping to Loki with trace context
-- [ ] Verify trace-to-logs linking works in Grafana
+- [x] Add trace ID to Rails logger formatter
+- [x] Configure log shipping to Loki with trace context (Promtail)
+- [x] Verify trace-to-logs linking works in Grafana
 
 ## Medium-term
 

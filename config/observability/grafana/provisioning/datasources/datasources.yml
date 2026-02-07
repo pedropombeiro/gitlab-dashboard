@@ -53,7 +53,13 @@ datasources:
     editable: false
     jsonData:
       derivedFields:
+        # Match trace_id in text format: [trace_id=abc123 span_id=def456]
         - datasourceUid: tempo
-          matcherRegex: "trace_id=(\\w+)"
+          matcherRegex: "trace_id=([a-f0-9]+)"
+          name: TraceID
+          url: "$${__value.raw}"
+        # Match trace_id in JSON format: "trace_id":"abc123"
+        - datasourceUid: tempo
+          matcherRegex: '"trace_id":"([a-f0-9]+)"'
           name: TraceID
           url: "$${__value.raw}"

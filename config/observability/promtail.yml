@@ -1,0 +1,77 @@
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /tmp/positions.yaml
+
+clients:
+  - url: http://loki:3100/loki/api/v1/push
+
+scrape_configs:
+  # Rails application logs
+  - job_name: rails
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: rails
+          service: gitlab-dashboard
+          __path__: /var/log/rails/*.log
+
+    pipeline_stages:
+      # Parse the trace context from log lines
+      # Format: [timestamp] [severity] [trace_id=xxx span_id=xxx] message
+      - regex:
+          expression: '^\[(?P<timestamp>[^\]]+)\] \[(?P<level>\w+)\](?: \[trace_id=(?P<trace_id>[a-f0-9]+) span_id=(?P<span_id>[a-f0-9]+)\])? (?P<message>.*)$'
+
+      # Set timestamp from the log line
+      - timestamp:
+          source: timestamp
+          format: "2006-01-02T15:04:05.000Z07:00"
+
+      # Extract trace_id as a label for Loki (enables trace-to-logs correlation)
+      - labels:
+          level:
+          trace_id:
+          span_id:
+
+      # Keep the original message
+      - output:
+          source: message
+
+  # Also scrape JSON formatted logs (production)
+  - job_name: rails-json
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: rails-json
+          service: gitlab-dashboard
+          __path__: /var/log/rails/*.log
+
+    pipeline_stages:
+      # Try to parse as JSON
+      - json:
+          expressions:
+            timestamp: timestamp
+            level: level
+            message: message
+            trace_id: trace_id
+            span_id: span_id
+            service: service
+
+      # Set timestamp
+      - timestamp:
+          source: timestamp
+          format: "2006-01-02T15:04:05.000Z07:00"
+
+      # Extract labels
+      - labels:
+          level:
+          trace_id:
+          span_id:
+
+      # Output the message
+      - output:
+          source: message
