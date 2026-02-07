@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   web:
     build:
@@ -14,16 +12,101 @@ services:
       - "3000:3000"
     environment:
       - REDIS_URL=redis://redis-db:6379
+      # OpenTelemetry configuration
+      - OTEL_SERVICE_NAME=gitlab-dashboard
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_TRACES_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=otlp
+      - OTEL_LOGS_EXPORTER=otlp
     secrets:
       - source: RAILS_MASTER_KEY
         target: /rails/config/master.key
     depends_on:
       redis-db:
         condition: service_started
+      otel-collector:
+        condition: service_started
 
   redis-db:
     image: redis
+    ports:
+      - "6379:6379"
+
+  # OpenTelemetry Collector - receives telemetry and exports to backends
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.145.0
+    command: ["--config=/etc/otel-collector-config.yml"]
+    volumes:
+      - ./config/observability/otel-collector.yml:/etc/otel-collector-config.yml:ro
+    ports:
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+      - "8888:8888" # Prometheus metrics (collector)
+    depends_on:
+      - tempo
+      - prometheus
+      - loki
+
+  # Grafana Tempo - distributed tracing backend
+  tempo:
+    image: grafana/tempo:2.6.1
+    command: ["-config.file=/etc/tempo.yml"]
+    volumes:
+      - ./config/observability/tempo.yml:/etc/tempo.yml:ro
+      - tempo-data:/var/tempo
+    ports:
+      - "3200:3200" # Tempo HTTP API
+
+  # Prometheus - metrics storage
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-remote-write-receiver"
+      - "--enable-feature=exemplar-storage"
+    volumes:
+      - ./config/observability/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-data:/prometheus
+    ports:
+      - "9090:9090"
+
+  # Grafana Loki - log aggregation
+  loki:
+    image: grafana/loki:3.3.2
+    command: ["-config.file=/etc/loki/loki.yml"]
+    user: "0" # Run as root to avoid permission issues with volume
+    volumes:
+      - ./config/observability/loki.yml:/etc/loki/loki.yml:ro
+      - loki-data:/var/loki
+    ports:
+      - "3100:3100"
+
+  # Grafana - visualization and dashboards
+  grafana:
+    image: grafana/grafana:11.4.0
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - ./config/observability/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana-data:/var/lib/grafana
+    ports:
+      - "3001:3000"
+    depends_on:
+      - prometheus
+      - tempo
+      - loki
 
 secrets:
-  RAILS_MASTER_KEY
+  RAILS_MASTER_KEY:
     file: ./config/master.key
+
+volumes:
+  tempo-data:
+  prometheus-data:
+  loki-data:
+  grafana-data:

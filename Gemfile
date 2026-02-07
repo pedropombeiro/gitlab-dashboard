@@ -114,4 +114,18 @@ gem "gemoji", "~> 4.1"
 
 gem "retries", "~> 0.0.5"
 
-gem "prometheus_exporter"
+# OpenTelemetry Core
+gem "opentelemetry-sdk", "~> 1.4"
+gem "opentelemetry-exporter-otlp", "~> 0.29"
+
+# OpenTelemetry Auto-instrumentation
+gem "opentelemetry-instrumentation-rails", "~> 0.33"
+gem "opentelemetry-instrumentation-rack", "~> 0.25"
+gem "opentelemetry-instrumentation-action_pack", "~> 0.10"
+gem "opentelemetry-instrumentation-action_view", "~> 0.8"
+gem "opentelemetry-instrumentation-active_record", "~> 0.8"
+gem "opentelemetry-instrumentation-active_job", "~> 0.8"
+gem "opentelemetry-instrumentation-faraday", "~> 0.25"
+gem "opentelemetry-instrumentation-net_http", "~> 0.22"
+gem "opentelemetry-instrumentation-redis", "~> 0.26"
+gem "opentelemetry-instrumentation-concurrent_ruby", "~> 0.22"

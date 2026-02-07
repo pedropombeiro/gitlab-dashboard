@@ -1,0 +1,16 @@
+# Grafana Dashboard Provisioning
+# Auto-loads dashboards on startup
+
+apiVersion: 1
+
+providers:
+  - name: "GitLab Dashboard"
+    orgId: 1
+    folder: ""
+    folderUid: ""
+    type: file
+    disableDeletion: false
+    updateIntervalSeconds: 30
+    allowUiUpdates: true
+    options:
+      path: /etc/grafana/provisioning/dashboards

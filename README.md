@@ -8,6 +8,7 @@ for managing GitLab merge requests.
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Observability](#observability)
 - [License](#license)
 
 ## Features
@@ -25,31 +26,31 @@ for managing GitLab merge requests.
 
 1. Clone the repository:
 
-    ```sh
-    git clone https://github.com/pedropombeiro/gitlab-dashboard.git
-    cd gitlab-dashboard
-    ```
+   ```sh
+   git clone https://github.com/pedropombeiro/gitlab-dashboard.git
+   cd gitlab-dashboard
+   ```
 
 2. Install dependencies:
 
-    ```sh
-    bundle install
-    npm install
-    ```
+   ```sh
+   bundle install
+   npm install
+   ```
 
-    or, if you have `just` installed:
+   or, if you have `just` installed:
 
-    ```sh
-    just install
-    ```
+   ```sh
+   just install
+   ```
 
 3. Create and initialize the database:
 
-    ```sh
-    rails db:create
-    rails db:migrate
-    rails db:seed
-    ```
+   ```sh
+   rails db:create
+   rails db:migrate
+   rails db:seed
+   ```
 
 ## Usage
 
@@ -60,6 +61,31 @@ bin/dev
 ```
 
 Access the application at `http://localhost:3000`.
+
+## Observability
+
+This project includes OpenTelemetry instrumentation for distributed tracing, metrics, and logs correlation.
+
+### Quick Start (Local Development)
+
+Start the full observability stack with Docker Compose:
+
+```sh
+docker compose up
+```
+
+This starts the application along with:
+
+- **Grafana**: <http://localhost:3001> (admin/admin)
+- **Prometheus**: <http://localhost:9090>
+- **Tempo**: Trace storage (accessed via Grafana)
+- **Loki**: Log aggregation (accessed via Grafana)
+
+A pre-configured Rails dashboard is automatically available in Grafana.
+
+For detailed setup instructions, configuration options, and production deployment, see [docs/observability.md](docs/observability.md).
+
+For planned improvements and enhancement ideas, see [docs/observability-roadmap.md](docs/observability-roadmap.md).
 
 ## Contributing
 
