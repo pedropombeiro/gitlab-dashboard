@@ -4,6 +4,59 @@ require "async"
 require "ostruct"
 
 class GitlabClient
+  # Faraday middleware to track GitLab API rate limiting as OpenTelemetry span events
+  class RateLimitMiddleware < Faraday::Middleware
+    RATE_LIMIT_WARNING_THRESHOLD = 100
+
+    def on_complete(env)
+      return unless (span = current_span)&.context&.valid?
+
+      add_rate_limit_attributes(span, env.response_headers)
+    end
+
+    private
+
+    def current_span
+      OpenTelemetry::Trace.current_span
+    end
+
+    def add_rate_limit_attributes(span, headers)
+      # GitLab rate limit headers (case-insensitive)
+      limit = headers["ratelimit-limit"]&.to_i
+      remaining = headers["ratelimit-remaining"]&.to_i
+      reset_at = headers["ratelimit-reset"]&.to_i
+
+      return unless limit && remaining
+
+      # Add rate limit info as span attributes
+      span.set_attribute("http.ratelimit.limit", limit)
+      span.set_attribute("http.ratelimit.remaining", remaining)
+      span.set_attribute("http.ratelimit.reset_at", reset_at) if reset_at
+
+      # Add warning event if rate limit is getting low
+      if remaining <= RATE_LIMIT_WARNING_THRESHOLD
+        span.add_event("rate_limit_warning", attributes: {
+          "ratelimit.remaining" => remaining,
+          "ratelimit.limit" => limit,
+          "ratelimit.reset_at" => reset_at,
+          "ratelimit.percent_remaining" => (remaining.to_f / limit * 100).round(1)
+        })
+      end
+
+      # Add critical event if rate limit is exhausted
+      if remaining.zero?
+        span.add_event("rate_limit_exhausted", attributes: {
+          "ratelimit.limit" => limit,
+          "ratelimit.reset_at" => reset_at
+        })
+        span.status = OpenTelemetry::Trace::Status.error("Rate limit exhausted")
+      end
+    end
+  end
+
+  # Register middleware with Faraday
+  Faraday::Middleware.register_middleware(gitlab_rate_limit: RateLimitMiddleware)
+
   # OpenTelemetry tracer for custom instrumentation
   def self.tracer
     @tracer ||= OpenTelemetry.tracer_provider.tracer("gitlab_client", "1.0.0")
@@ -32,7 +85,12 @@ class GitlabClient
       write_timeout: 20
     },
     allow_dynamic_queries: false
-  )
+  ) do |client|
+    # Add rate limit tracking middleware to capture GitLab API rate limit headers
+    client.http do |http|
+      http.connection.builder.use(:gitlab_rate_limit)
+    end
+  end
 
   def make_full_url(path)
     return path if path.nil? || path.start_with?("http")

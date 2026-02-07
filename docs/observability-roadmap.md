@@ -24,7 +24,7 @@ This document tracks planned improvements and enhancement ideas for the observab
 
 ### Error and Retry Tracking
 
-- [ ] Track GitLab API rate limiting as span events
+- [x] Track GitLab API rate limiting as span events
 - [x] Record retry attempts in `execute_query` as span events
 - [x] Add error details to spans on GraphQL failures
 
