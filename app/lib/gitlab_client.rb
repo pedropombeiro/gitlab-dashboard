@@ -4,6 +4,10 @@ require "async"
 require "ostruct"
 
 class GitlabClient
+  # OpenTelemetry tracer for custom instrumentation
+  def self.tracer
+    @tracer ||= OpenTelemetry.tracer_provider.tracer("gitlab_client", "1.0.0")
+  end
   ACTIVE_REVIEWS_AGE_LIMIT = 1.week
   OPEN_MERGE_REQUESTS_MIN_ACTIVITY = 1.year
 
@@ -67,20 +71,30 @@ class GitlabClient
 
   def fetch_monthly_merged_merge_requests(author, format: :open_struct)
     format_response(format) do
-      Sync do |task|
-        12.times.map do |offset|
-          bom = offset.months.ago.beginning_of_month.to_date
-          eom = bom.next_month
+      self.class.tracer.in_span(
+        "gitlab.fetch_monthly_merged_merge_requests",
+        kind: :client,
+        attributes: {
+          "graphql.variable.author" => author,
+          "gitlab.months_count" => 12,
+          "gitlab.concurrent_queries" => true
+        }
+      ) do |span|
+        Sync do |task|
+          12.times.map do |offset|
+            bom = offset.months.ago.beginning_of_month.to_date
+            eom = bom.next_month
 
-          task.async do
-            execute_query(
-              MonthlyMergeRequestsQuery,
-              author: author,
-              mergedAfter: bom.to_fs,
-              mergedBefore: eom.to_fs
-            )
-          end
-        end.map(&:wait)
+            task.async do
+              execute_query(
+                MonthlyMergeRequestsQuery,
+                author: author,
+                mergedAfter: bom.to_fs,
+                mergedBefore: eom.to_fs
+              )
+            end
+          end.map(&:wait)
+        end
       end
     end.tap do |aggregate|
       next unless format == :open_struct
@@ -100,16 +114,26 @@ class GitlabClient
     project_full_paths = issue_iids.pluck(:project_full_path).uniq
 
     format_response(format) do
-      Sync do |task|
-        project_full_paths.map do |project_full_path|
-          task.async do
-            execute_query(
-              ProjectIssuesQuery,
-              projectFullPath: project_full_path,
-              issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
-            )
-          end
-        end.map(&:wait)
+      self.class.tracer.in_span(
+        "gitlab.fetch_issues",
+        kind: :client,
+        attributes: {
+          "gitlab.issues_count" => issue_iids.size,
+          "gitlab.projects_count" => project_full_paths.size,
+          "gitlab.concurrent_queries" => true
+        }
+      ) do |span|
+        Sync do |task|
+          project_full_paths.map do |project_full_path|
+            task.async do
+              execute_query(
+                ProjectIssuesQuery,
+                projectFullPath: project_full_path,
+                issueIids: issue_iids.filter { |h| h[:project_full_path] == project_full_path }.pluck(:issue_iid)
+              )
+            end
+          end.map(&:wait)
+        end
       end
     end.tap do |aggregate|
       next unless format == :open_struct
@@ -121,13 +145,30 @@ class GitlabClient
   end
 
   def fetch_project_version(project_web_url)
-    res = %w[master main].find do |branch|
-      uri = project_version_file_uri(project_web_url, branch)
-      res = Net::HTTP.get_response(uri)
-      break res unless res.is_a?(Net::HTTPNotFound)
-    end
+    self.class.tracer.in_span(
+      "gitlab.fetch_project_version",
+      kind: :client,
+      attributes: {
+        "project.web_url" => project_web_url,
+        "server.address" => URI.parse(self.class.gitlab_instance_url).host
+      }
+    ) do |span|
+      res = %w[master main].find do |branch|
+        uri = project_version_file_uri(project_web_url, branch)
+        span.add_event("fetch_attempt", attributes: {"branch" => branch, "uri" => uri.to_s})
+        res = Net::HTTP.get_response(uri)
+        break res unless res.is_a?(Net::HTTPNotFound)
+      end
 
-    res.body.strip.delete_suffix("-pre") if res.is_a?(Net::HTTPSuccess)
+      if res.is_a?(Net::HTTPSuccess)
+        version = res.body.strip.delete_suffix("-pre")
+        span.set_attribute("project.version", version)
+        version
+      else
+        span.set_attribute("http.response.status_code", res.code.to_i) if res.respond_to?(:code)
+        nil
+      end
+    end
   end
 
   def fetch_group_reviewers(group_path, format: :open_struct)
@@ -446,11 +487,52 @@ class GitlabClient
   private
 
   def execute_query(query, **args)
-    Rails.logger.debug { %(Executing #{query.operation_name} GraphQL query (args: #{args})...) }
+    operation_name = query.operation_name || "UnnamedQuery"
 
-    with_retries(max_tries: 2, rescue: GRAPHQL_RETRIABLE_ERRORS) do
-      Client.query(query, **args)
+    self.class.tracer.in_span(
+      "gitlab.graphql #{operation_name}",
+      kind: :client,
+      attributes: graphql_span_attributes(operation_name, args)
+    ) do |span|
+      Rails.logger.debug { %(Executing #{operation_name} GraphQL query (args: #{args})...) }
+
+      retry_count = 0
+      begin
+        with_retries(max_tries: 2, rescue: GRAPHQL_RETRIABLE_ERRORS) do |attempt|
+          if attempt > 1
+            retry_count = attempt - 1
+            span.add_event("retry", attributes: {"retry.attempt" => retry_count})
+          end
+          Client.query(query, **args)
+        end
+      rescue => e
+        span.record_exception(e)
+        span.status = OpenTelemetry::Trace::Status.error(e.message)
+        raise
+      end.tap do
+        span.set_attribute("graphql.retry_count", retry_count) if retry_count > 0
+      end
     end
+  end
+
+  def graphql_span_attributes(operation_name, args)
+    attrs = {
+      "graphql.operation.name" => operation_name,
+      "graphql.operation.type" => "query",
+      "rpc.system" => "graphql",
+      "rpc.service" => "gitlab",
+      "server.address" => URI.parse(self.class.gitlab_instance_url).host
+    }
+
+    # Add sanitized query variables as attributes (exclude sensitive data)
+    safe_keys = %w[username author reviewer fullPath projectFullPath mergedAfter mergedBefore updatedAfter]
+    args.each do |key, value|
+      next unless safe_keys.include?(key.to_s)
+
+      attrs["graphql.variable.#{key}"] = value.to_s
+    end
+
+    attrs
   end
 
   def format_response(format)

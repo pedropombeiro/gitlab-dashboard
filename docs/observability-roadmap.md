@@ -15,16 +15,18 @@ This document tracks planned improvements and enhancement ideas for the observab
 
 ### Custom Instrumentation for GitLab API
 
-- [ ] Add custom spans to `GitlabClient#execute_query` for GraphQL operation tracking
-- [ ] Include query name as span attribute
-- [ ] Track GraphQL variables (sanitized) as span attributes
-- [ ] Add MR IDs and project names as span attributes where available
+- [x] Add custom spans to `GitlabClient#execute_query` for GraphQL operation tracking
+- [x] Include query name as span attribute
+- [x] Track GraphQL variables (sanitized) as span attributes
+- [x] Add MR IDs and project names as span attributes where available
+- [x] Instrument `fetch_project_version` with custom spans
+- [x] Instrument async operations (`fetch_monthly_merged_merge_requests`, `fetch_issues`)
 
 ### Error and Retry Tracking
 
 - [ ] Track GitLab API rate limiting as span events
-- [ ] Record retry attempts in `execute_query` as span events
-- [ ] Add error details to spans on GraphQL failures
+- [x] Record retry attempts in `execute_query` as span events
+- [x] Add error details to spans on GraphQL failures
 
 ### Log Correlation
 
