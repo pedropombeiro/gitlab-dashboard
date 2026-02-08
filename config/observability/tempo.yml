@@ -42,12 +42,12 @@ metrics_generator:
   processor:
     service_graphs:
       dimensions:
-        - http.method
-        - http.status_code
+        - http.request.method
+        - http.response.status_code
     span_metrics:
       dimensions:
-        - http.method
-        - http.status_code
+        - http.request.method
+        - http.response.status_code
         - http.route
         - rpc.service
         - db.system

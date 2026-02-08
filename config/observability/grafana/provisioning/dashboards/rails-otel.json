@@ -620,8 +620,8 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_SERVER\", http_status_code!=\"\"}[$__rate_interval])) by (http_status_code)",
-          "legendFormat": "{{http_status_code}}",
+          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_SERVER\", http_response_status_code!=\"\"}[$__rate_interval])) by (http_response_status_code)",
+          "legendFormat": "{{http_response_status_code}}",
           "range": true,
           "refId": "A",
           "exemplar": true
