@@ -31,6 +31,19 @@ OpenTelemetry::SDK.configure do |c|
     "OpenTelemetry::Instrumentation::ActiveRecord" => {
       # Don't include full SQL in spans (security)
       db_statement: :obfuscate
+    },
+    # Use new OTel HTTP semantic conventions (semconv 1.21+)
+    # This changes attribute names:
+    #   http.method → http.request.method
+    #   http.status_code → http.response.status_code
+    "OpenTelemetry::Instrumentation::Rack" => {
+      use_new_semconv: true
+    },
+    "OpenTelemetry::Instrumentation::Faraday" => {
+      use_new_semconv: true
+    },
+    "OpenTelemetry::Instrumentation::Net::HTTP" => {
+      use_new_semconv: true
     }
   )
 end
