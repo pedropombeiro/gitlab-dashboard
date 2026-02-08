@@ -82,6 +82,20 @@ jobs:
               - "package.json"
               - "yarn.lock"
 
+      - name: Summarize change detection
+        if: always()
+        run: |
+          {
+            echo "## Change detection"
+            echo ""
+            echo "| Filter | Result |"
+            echo "| --- | --- |"
+            echo "| deployment | ${{ steps.filter.outputs.deployment }} |"
+            echo "| test | ${{ steps.filter.outputs.test }} |"
+            echo "| js | ${{ steps.filter.outputs.js }} |"
+            echo "| ruby | ${{ steps.filter.outputs.ruby }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
   scan_ruby:
     runs-on: ubuntu-latest
     needs: [changes]
@@ -98,7 +112,19 @@ jobs:
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
+        id: brakeman
         run: bin/brakeman --no-pager
+
+      - name: Summarize Brakeman scan
+        if: always()
+        run: |
+          {
+            echo "## Brakeman scan"
+            echo ""
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "| Brakeman | ${{ steps.brakeman.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   scan_js:
     runs-on: ubuntu-latest
@@ -122,7 +148,19 @@ jobs:
         run: yarn install --immutable
 
       - name: Scan for security vulnerabilities in JavaScript dependencies
+        id: audit
         run: yarn npm audit
+
+      - name: Summarize JavaScript audit
+        if: always()
+        run: |
+          {
+            echo "## JavaScript audit"
+            echo ""
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "| yarn npm audit | ${{ steps.audit.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   lint:
     runs-on: ubuntu-latest
@@ -139,9 +177,21 @@ jobs:
           bundler-cache: true
 
       - name: Lint code for consistent style
+        id: standardrb
         uses: standardrb/standard-ruby-action@v1
         with:
           autofix: false
+
+      - name: Summarize Ruby lint
+        if: always()
+        run: |
+          {
+            echo "## Ruby lint"
+            echo ""
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "| StandardRB | ${{ steps.standardrb.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   test:
     runs-on: ubuntu-latest
@@ -183,18 +233,32 @@ jobs:
         run: yarn install --immutable
 
       - name: Run tests
+        id: tests
         env:
           RAILS_ENV: test
           REDIS_URL: redis://localhost:6379/0
         run: bin/rails db:setup spec
 
       - name: Keep screenshots from failed system tests
+        id: screenshots
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         if: failure()
         with:
           name: screenshots
           path: ${{ github.workspace }}/tmp/capybara
           if-no-files-found: ignore
+
+      - name: Summarize tests
+        if: always()
+        run: |
+          {
+            echo "## Test run"
+            echo ""
+            echo "| Check | Result |"
+            echo "| --- | --- |"
+            echo "| RSpec | ${{ steps.tests.outcome }} |"
+            echo "| Screenshots artifact | ${{ steps.screenshots.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
 
   build-and-push-image:
     runs-on: ubuntu-latest
@@ -299,3 +363,19 @@ jobs:
           git tag -a "$TAG_NAME" -m "Release $TAG_NAME"
           git push origin "$TAG_NAME"
           echo "Created and pushed tag $TAG_NAME"
+
+      - name: Summarize image build
+        if: always()
+        run: |
+          TAGS="${{ steps.meta.outputs.tags }}"
+          TAGS=${TAGS//$'\n'/<br>}
+          {
+            echo "## Container image"
+            echo ""
+            echo "| Item | Value |"
+            echo "| --- | --- |"
+            echo "| Release tag | ${{ steps.release_tag.outputs.tag }} |"
+            echo "| Image tags | ${TAGS} |"
+            echo "| Digest | ${{ steps.push.outputs.digest }} |"
+            echo "| Build result | ${{ steps.push.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"

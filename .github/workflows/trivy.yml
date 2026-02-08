@@ -35,6 +35,7 @@ jobs:
           persist-credentials: false
 
       - name: Run Trivy vulnerability scanner
+        id: trivy
         uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
           scan-type: "config"
@@ -47,3 +48,17 @@ jobs:
         if: always()
         with:
           sarif_file: "trivy-results.sarif"
+
+      - name: Summarize Trivy scan
+        if: always()
+        run: |
+          {
+            echo "## Trivy security scan"
+            echo ""
+            echo "| Item | Value |"
+            echo "| --- | --- |"
+            echo "| Scan type | config |"
+            echo "| Scan ref | . |"
+            echo "| SARIF output | trivy-results.sarif |"
+            echo "| Scan result | ${{ steps.trivy.outcome }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
