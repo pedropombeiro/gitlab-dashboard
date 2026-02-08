@@ -108,6 +108,7 @@ just watch-ci            # Watch GitHub Actions CI runs
 **Location**: app/lib/gitlab_client.rb
 
 Core integration layer with GitLab's GraphQL API featuring:
+
 - Pre-compiled GraphQL queries for performance
 - Automatic retry logic for network failures
 - Response caching with configurable TTLs
@@ -117,6 +118,7 @@ Core integration layer with GitLab's GraphQL API featuring:
 #### Frontend (Hotwire)
 
 **Stimulus Controllers** (app/javascript/controllers/):
+
 - **auto_refresh_controller.js**: Polls for data updates, refreshes Turbo Frames based on schedule
 - **merged_merge_requests_chart_controller.js**: Renders Chart.js visualizations
 - **theme_selector_controller.js**: Manages light/dark theme switching
@@ -124,6 +126,7 @@ Core integration layer with GitLab's GraphQL API featuring:
 - **web_push_controller.js**: Manages push notification subscriptions
 
 **Asset Build**:
+
 - JavaScript: esbuild bundles from app/javascript/application.js to app/assets/builds/
 - CSS: Dart Sass compiles SCSS with Bootstrap customization
 - Asset delivery: Propshaft (modern, no sprockets)
@@ -131,11 +134,13 @@ Core integration layer with GitLab's GraphQL API featuring:
 ### Caching Strategy
 
 Multi-level caching with dynamic TTL:
+
 - **1 minute**: MRs with auto-merge enabled and pending pipelines
 - **5 minutes**: MRs with running pipelines
 - **30 minutes**: All other MRs
 
 Cache keys format:
+
 - `authored_mr_lists:{author}:{type}` (author-specific)
 - `reviewer:{username}` (reviewer-specific)
 - `project_version:{project_path}` (project-specific)
@@ -174,20 +179,22 @@ Cache keys format:
 ### Git Hooks (Lefthook)
 
 **Pre-commit** (parallel):
-- backend-linter: `bin/rake standard {staged_files}` (*.rb, *.erb)
-- frontend-linter: `yarn lint:fix` (*.js, *.ts)
-- prettier: `prettier --write {staged_files}` (*.js, *.ts, *.json)
+
+- backend-linter: `bin/rake standard {staged_files}` (_.rb, _.erb)
+- frontend-linter: `yarn lint:fix` (_.js, _.ts)
+- prettier: `prettier --write {staged_files}` (_.js, _.ts, \*.json)
 
 **Pre-push** (parallel):
-- backend-linter: `bin/rake standard` (*.rb, *.erb)
-- frontend-linter: `yarn lint` (*.js)
-- backend-specs: `bin/bundle exec rspec` ({app,spec}/**/*.rb, *.erb)
-- prettier: Check formatting (*.js, *.ts, *.json)
+
+- backend-linter: `bin/rake standard` (_.rb, _.erb)
+- frontend-linter: `yarn lint` (\*.js)
+- backend-specs: `bin/bundle exec rspec` ({app,spec}/\*_/_.rb, \*.erb)
+- prettier: Check formatting (_.js, _.ts, \*.json)
 
 ### Testing
 
 - **Framework**: RSpec with FactoryBot, Capybara, Selenium WebDriver
-- **Test files**: spec/**/*_spec.rb
+- **Test files**: spec/\*_/_\_spec.rb
 - **Mocking**: WebMock for HTTP stubbing
 - **Coverage**: Simplecov
 - **Fixtures**: spec/support/fixtures/ (includes gitlab_graphql_schema.json)
@@ -220,10 +227,12 @@ app/
 - **Error Tracking**: Honeybadger (config/honeybadger.yml)
 - **Metrics**: Prometheus Exporter (SendMetricsJob every 5 min)
 - **Logging**: HTTPLog for API requests, Rails logger for application logs
+- **Distributed Tracing**: OpenTelemetry → Tempo → Prometheus (see `.claude/docs/telemetry.md` for details)
 
 ## Renovate Bot
 
 Renovate Bot is configured in .renovaterc.json with:
+
 - Auto-merge for non-breaking updates (patch/minor)
 - Grouped PRs for GitHub Actions, npm dependencies, Ruby gems
 - Separate PRs for major version updates
