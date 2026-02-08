@@ -14,8 +14,10 @@ datasources:
     editable: false
     jsonData:
       httpMethod: POST
+      # Link exemplars to Tempo traces
+      # The spanmetrics connector uses 'trace_id' as the exemplar label
       exemplarTraceIdDestinations:
-        - name: traceID
+        - name: trace_id
           datasourceUid: tempo
 
   # Tempo for distributed tracing

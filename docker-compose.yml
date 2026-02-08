@@ -12,19 +12,19 @@ services:
       - "3000:3000"
     environment:
       - REDIS_URL=redis://redis-db:6379
-      # OpenTelemetry configuration
+      # OpenTelemetry configuration - send traces directly to Tempo
       - OTEL_SERVICE_NAME=gitlab-dashboard
-      - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://tempo:4318
       - OTEL_TRACES_EXPORTER=otlp
-      - OTEL_METRICS_EXPORTER=otlp
-      - OTEL_LOGS_EXPORTER=otlp
+      - OTEL_METRICS_EXPORTER=none
+      - OTEL_LOGS_EXPORTER=none
     secrets:
       - source: RAILS_MASTER_KEY
         target: /rails/config/master.key
     depends_on:
       redis-db:
         condition: service_started
-      otel-collector:
+      tempo:
         condition: service_started
 
   redis-db:
@@ -32,23 +32,7 @@ services:
     ports:
       - "6379:6379"
 
-  # OpenTelemetry Collector - receives telemetry and exports to backends
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.145.0
-    command: ["--config=/etc/otel-collector-config.yml"]
-    volumes:
-      - ./config/observability/otel-collector.yml:/etc/otel-collector-config.yml:ro
-    ports:
-      - "4317:4317" # OTLP gRPC
-      - "4318:4318" # OTLP HTTP
-      - "8888:8888" # Prometheus metrics (collector internal)
-      - "8889:8889" # Prometheus metrics (spanmetrics)
-    depends_on:
-      - tempo
-      - prometheus
-      - loki
-
-  # Grafana Tempo - distributed tracing backend
+  # Grafana Tempo - distributed tracing backend with span metrics generation
   tempo:
     image: grafana/tempo:2.6.1
     command: ["-config.file=/etc/tempo.yml"]
@@ -57,6 +41,10 @@ services:
       - tempo-data:/var/tempo
     ports:
       - "3200:3200" # Tempo HTTP API
+      - "4317:4317" # OTLP gRPC
+      - "4318:4318" # OTLP HTTP
+    depends_on:
+      - prometheus
 
   # Prometheus - metrics storage
   prometheus:

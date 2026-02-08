@@ -10,6 +10,7 @@ This document describes how to set up and use OpenTelemetry-based observability 
 - [Configuration](#configuration)
 - [Viewing Telemetry](#viewing-telemetry)
 - [Custom Instrumentation](#custom-instrumentation)
+- [Prometheus Exemplars](#prometheus-exemplars)
 - [Production Deployment](#production-deployment)
 - [Troubleshooting](#troubleshooting)
 
@@ -39,33 +40,35 @@ GitLab Dashboard uses [OpenTelemetry](https://opentelemetry.io/) for observabili
 ┌─────────────────────────────────────────────────────────────────────┐
 │                    docker compose environment                        │
 │                                                                     │
-│  ┌──────────────┐          ┌──────────────────────┐                │
-│  │   Rails App  │──OTLP───▶│   OTEL Collector     │                │
-│  │   (web)      │          │   :4317/:4318        │                │
-│  │   :3000      │          └──────────┬───────────┘                │
-│  └──────────────┘                     │                            │
-│         │                    ┌────────┼────────┐                   │
-│         │                    ▼        ▼        ▼                   │
-│         │            ┌───────────┐ ┌──────┐ ┌──────┐               │
-│         │            │ Prometheus│ │Tempo │ │ Loki │               │
-│         │            │   :9090   │ │:3200 │ │:3100 │               │
-│         │            └─────┬─────┘ └──┬───┘ └──┬───┘               │
-│         │                  │          │        │                   │
-│         │                  └──────────┴────────┘                   │
-│         │                            │                             │
-│  ┌──────▼──────┐              ┌──────▼──────┐                      │
-│  │   Redis     │              │   Grafana   │◀─── Browse here      │
-│  │   :6379     │              │   :3001     │                      │
-│  └─────────────┘              └─────────────┘                      │
+│  ┌──────────────┐                                                   │
+│  │   Rails App  │──OTLP───┐                                        │
+│  │   (web)      │         │                                        │
+│  │   :3000      │         │                                        │
+│  └──────────────┘         │                                        │
+│         │                 ▼                                        │
+│         │          ┌─────────────┐   remote    ┌───────────┐       │
+│         │          │    Tempo    │───write────▶│ Prometheus│       │
+│         │          │ :3200/:4318 │  (metrics)  │   :9090   │       │
+│         │          └──────┬──────┘             └─────┬─────┘       │
+│         │                 │                          │             │
+│  ┌──────▼──────┐   ┌──────▼──────┐            ┌──────▼──────┐      │
+│  │   Redis     │   │   Promtail  │───────────▶│    Loki     │      │
+│  │   :6379     │   │  (log ship) │            │   :3100     │      │
+│  └─────────────┘   └─────────────┘            └──────┬──────┘      │
+│                                                      │             │
+│                                               ┌──────▼──────┐      │
+│                                               │   Grafana   │◀─── Browse here
+│                                               │   :3001     │      │
+│                                               └─────────────┘      │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Components
 
-- **OpenTelemetry Collector**: Receives telemetry from the Rails app and routes it to appropriate backends
-- **Grafana Tempo**: Distributed tracing backend for storing and querying traces
-- **Prometheus**: Time-series database for metrics storage
+- **Grafana Tempo**: Distributed tracing backend that receives OTLP traces directly from the app, stores them, and generates span metrics with exemplars
+- **Prometheus**: Time-series database for metrics storage (receives span metrics from Tempo via remote_write)
 - **Grafana Loki**: Log aggregation system with trace correlation
+- **Promtail**: Log shipping agent that collects Rails logs and sends them to Loki
 - **Grafana**: Unified visualization dashboard for all telemetry data
 
 ## Local Development Setup
@@ -87,7 +90,7 @@ GitLab Dashboard uses [OpenTelemetry](https://opentelemetry.io/) for observabili
    - Rails application on `http://localhost:3000`
    - Grafana on `http://localhost:3001`
    - Prometheus on `http://localhost:9090`
-   - Additional backend services (Tempo, Loki, OTEL Collector)
+   - Additional backend services (Tempo, Loki)
 
 2. Access Grafana at `http://localhost:3001`
    - Default credentials: `admin` / `admin`
@@ -111,13 +114,13 @@ docker compose down -v
 
 ### Environment Variables
 
-| Variable                      | Default                      | Description             |
-| ----------------------------- | ---------------------------- | ----------------------- |
-| `OTEL_SERVICE_NAME`           | `gitlab-dashboard`           | Service name in traces  |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://otel-collector:4318` | OTLP collector endpoint |
-| `OTEL_TRACES_EXPORTER`        | `otlp`                       | Trace exporter type     |
-| `OTEL_METRICS_EXPORTER`       | `otlp`                       | Metrics exporter type   |
-| `OTEL_LOGS_EXPORTER`          | `otlp`                       | Logs exporter type      |
+| Variable                      | Default             | Description                                               |
+| ----------------------------- | ------------------- | --------------------------------------------------------- |
+| `OTEL_SERVICE_NAME`           | `gitlab-dashboard`  | Service name in traces                                    |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://tempo:4318` | OTLP endpoint (Tempo receives traces directly)            |
+| `OTEL_TRACES_EXPORTER`        | `otlp`              | Trace exporter type                                       |
+| `OTEL_METRICS_EXPORTER`       | `none`              | Metrics exporter (disabled, Tempo generates span metrics) |
+| `OTEL_LOGS_EXPORTER`          | `none`              | Logs exporter (disabled, Promtail ships logs)             |
 
 ### Disabling OpenTelemetry
 
@@ -227,6 +230,157 @@ histogram = meter.create_histogram('custom_duration_seconds', description: 'Dura
 histogram.record(duration, attributes: { 'operation' => 'example' })
 ```
 
+## Prometheus Exemplars
+
+Exemplars link Prometheus metrics to specific trace samples, enabling you to jump from a metric spike directly to a representative trace. This is invaluable for debugging latency spikes, error rate increases, or understanding outliers.
+
+### How Exemplars Work
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                         Exemplar Data Flow                              │
+│                                                                         │
+│  Rails App                   Tempo                    Prometheus        │
+│  ─────────                   ─────                    ───────────       │
+│  Spans with    ──OTLP──▶  metrics_generator ─remote─▶  Metrics with    │
+│  trace context            (generates metrics   write   exemplars        │
+│                            + exemplars from           (stored with      │
+│                            incoming traces)            trace_id)        │
+│                                                                         │
+│                                         Grafana                         │
+│                                         ───────                         │
+│                                         Queries metrics ──────┐         │
+│                                         with exemplars        │         │
+│                                                ▼              │         │
+│                                         Click exemplar ───────┘         │
+│                                         dot to jump to                  │
+│                                         Tempo trace                     │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+### Configuration
+
+Exemplars are enabled via three components:
+
+#### 1. Tempo Metrics Generator
+
+Tempo's metrics_generator processes incoming traces and generates span metrics with exemplars:
+
+```yaml
+# config/observability/tempo.yml
+metrics_generator:
+  processor:
+    span_metrics:
+      dimensions:
+        - http.method
+        - http.status_code
+        - http.route
+        - graphql.operation.name
+        - graphql.operation.type
+        # ... additional dimensions
+  registry:
+    external_labels:
+      source: tempo
+  storage:
+    path: /var/tempo/generator/wal
+    remote_write:
+      - url: http://prometheus:9090/api/v1/write
+        send_exemplars: true # Enable exemplar generation
+```
+
+This approach is simpler than using an OTel Collector with a spanmetrics connector, as Tempo handles both trace storage and span metrics generation in one component.
+
+#### 2. Prometheus Storage
+
+Prometheus must have exemplar storage enabled (already configured in docker-compose.yml):
+
+```yaml
+# docker-compose.yml
+prometheus:
+  command:
+    - "--enable-feature=exemplar-storage"
+```
+
+#### 3. Grafana Datasource
+
+The Prometheus datasource links exemplars to Tempo traces:
+
+```yaml
+# config/observability/grafana/provisioning/datasources/datasources.yml
+datasources:
+  - name: Prometheus
+    jsonData:
+      exemplarTraceIdDestinations:
+        - name: trace_id # Field name from spanmetrics
+          datasourceUid: tempo # Links to Tempo datasource
+```
+
+### Viewing Exemplars in Grafana
+
+1. **Open a panel** with histogram metrics (e.g., `otel_traces_spanmetrics_latency_bucket`)
+
+2. **Enable exemplars** in the panel:
+   - Edit the panel
+   - In the Query options, toggle "Exemplars" to ON
+   - Or add `$__exemplars()` to your PromQL query
+
+3. **View exemplar dots**: Small dots appear on the graph at points where traces were sampled
+
+4. **Click to trace**: Click any exemplar dot to jump directly to the corresponding trace in Tempo
+
+### Metrics with Exemplars
+
+The following metrics automatically include exemplars:
+
+| Metric                              | Description               | Use Case                    |
+| ----------------------------------- | ------------------------- | --------------------------- |
+| `traces_spanmetrics_latency_bucket` | Request latency histogram | Find slow request traces    |
+| `traces_spanmetrics_calls_total`    | Request count by status   | Find error traces (4xx/5xx) |
+
+### Available Dimensions for Filtering
+
+Exemplars inherit all configured spanmetrics dimensions, allowing you to filter for specific types of requests:
+
+| Dimension                   | Example Values              | Description            |
+| --------------------------- | --------------------------- | ---------------------- |
+| `http.method`               | GET, POST, PUT              | HTTP method            |
+| `http.status_code`          | 200, 404, 500               | Response status        |
+| `http.route`                | /merge_requests, /reviewers | Rails route            |
+| `graphql.operation.name`    | GetMergeRequests            | GraphQL operation      |
+| `graphql.operation.type`    | query, mutation             | GraphQL type           |
+| `graphql.variable.username` | john_doe                    | GitLab username filter |
+| `graphql.variable.fullPath` | gitlab-org/gitlab           | Project path           |
+| `rpc.service`               | gitlab                      | RPC service name       |
+| `db.system`                 | sqlite                      | Database type          |
+| `db.operation`              | SELECT, INSERT              | Database operation     |
+| `project.web_url`           | https://gitlab.com/...      | GitLab project URL     |
+
+### Example Queries
+
+```promql
+# Latency histogram with exemplars (99th percentile)
+histogram_quantile(0.99,
+  rate(traces_spanmetrics_latency_bucket{http_route="/merge_requests"}[5m])
+)
+
+# Error rate with exemplars
+rate(traces_spanmetrics_calls_total{http_status_code=~"5.."}[5m])
+
+# GraphQL operation latency
+histogram_quantile(0.95,
+  rate(traces_spanmetrics_latency_bucket{graphql_operation_name!=""}[5m])
+)
+```
+
+### Troubleshooting Exemplars
+
+| Issue                              | Solution                                                           |
+| ---------------------------------- | ------------------------------------------------------------------ |
+| No exemplar dots visible           | Enable "Exemplars" toggle in Grafana panel query options           |
+| Exemplars not linking to traces    | Verify `trace_id` field name in Grafana datasource config          |
+| Missing exemplars for some metrics | Exemplars only attach to histogram/counter observations from spans |
+| Old traces not found               | Tempo retention may have expired; check Tempo config               |
+
 ## Production Deployment
 
 ### Option 1: Self-Hosted with Kamal
@@ -235,22 +389,30 @@ Add observability services as Kamal accessories in `config/deploy.yml`:
 
 ```yaml
 accessories:
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib:0.115.0
-    host: your-server.example.com
-    port: 4318
-    volumes:
-      - /opt/otel/config.yml:/etc/otel-collector-config.yml:ro
-    cmd: --config=/etc/otel-collector-config.yml
-
   tempo:
     image: grafana/tempo:2.6.1
     host: your-server.example.com
+    port: 4318
     volumes:
       - /opt/tempo:/var/tempo
       - /opt/tempo/config.yml:/etc/tempo.yml:ro
     cmd: -config.file=/etc/tempo.yml
+
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    host: your-server.example.com
+    port: 9090
+    volumes:
+      - /opt/prometheus:/prometheus
+      - /opt/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    cmd: |
+      --config.file=/etc/prometheus/prometheus.yml
+      --storage.tsdb.path=/prometheus
+      --web.enable-remote-write-receiver
+      --enable-feature=exemplar-storage
 ```
+
+Note: The application sends traces directly to Tempo (no OTel Collector needed). Tempo generates span metrics with exemplars and pushes them to Prometheus via remote_write.
 
 ### Option 2: Managed Observability Backend
 
@@ -280,14 +442,13 @@ OTEL_EXPORTER_OTLP_HEADERS=Authorization=Bearer your-api-key
 
 1. **Check environment variable**: Ensure `OTEL_EXPORTER_OTLP_ENDPOINT` is set
 2. **Check logs**: Look for "OpenTelemetry initialized" in Rails logs
-3. **Verify collector**: Check OTEL Collector logs with `docker compose logs otel-collector`
+3. **Verify Tempo**: Check Tempo logs with `docker compose logs tempo`
 
 ### No Traces Appearing
 
 1. **Generate traffic**: Make some requests to the application
 2. **Wait for batching**: Traces are batched, may take a few seconds
-3. **Check collector**: Verify data flow through the collector
-4. **Check Tempo**: Ensure Tempo is receiving data (`docker compose logs tempo`)
+3. **Check Tempo**: Ensure Tempo is receiving data (`docker compose logs tempo`)
 
 ### Connection Errors
 
