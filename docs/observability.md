@@ -114,17 +114,36 @@ docker compose down -v
 
 ### Environment Variables
 
-| Variable                      | Default             | Description                                               |
-| ----------------------------- | ------------------- | --------------------------------------------------------- |
-| `OTEL_SERVICE_NAME`           | `gitlab-dashboard`  | Service name in traces                                    |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | `http://tempo:4318` | OTLP endpoint (Tempo receives traces directly)            |
-| `OTEL_TRACES_EXPORTER`        | `otlp`              | Trace exporter type                                       |
-| `OTEL_METRICS_EXPORTER`       | `none`              | Metrics exporter (disabled, Tempo generates span metrics) |
-| `OTEL_LOGS_EXPORTER`          | `none`              | Logs exporter (disabled, Promtail ships logs)             |
+| Variable                        | Default             | Description                                               |
+| ------------------------------- | ------------------- | --------------------------------------------------------- |
+| `OTEL_SERVICE_NAME`             | `gitlab-dashboard`  | Service name in traces                                    |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`   | `http://tempo:4318` | OTLP endpoint (Tempo receives traces directly)            |
+| `OTEL_TRACES_EXPORTER`          | `otlp`              | Trace exporter type                                       |
+| `OTEL_METRICS_EXPORTER`         | `none`              | Metrics exporter (disabled, Tempo generates span metrics) |
+| `OTEL_LOGS_EXPORTER`            | `none`              | Logs exporter (disabled, Promtail ships logs)             |
+| `OTEL_SEMCONV_STABILITY_OPT_IN` | (unset)             | HTTP semantic conventions selection                       |
 
 ### Disabling OpenTelemetry
 
 To run the application without OpenTelemetry instrumentation, simply don't set the `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable. The initializer checks for this variable and skips configuration if it's not present.
+
+### HTTP Semantic Conventions
+
+The Rack, Faraday, and Net::HTTP instrumentations use the `OTEL_SEMCONV_STABILITY_OPT_IN` environment variable to control HTTP semantic convention attributes.
+
+Recommended setting:
+
+```sh
+OTEL_SEMCONV_STABILITY_OPT_IN=http
+```
+
+Valid values:
+
+| Value         | Behavior                                                                  |
+| ------------- | ------------------------------------------------------------------------- |
+| (empty/unset) | Old attributes: `http.method`, `http.status_code`                         |
+| `http`        | New stable attributes: `http.request.method`, `http.response.status_code` |
+| `http/dup`    | Emits both old and new attributes (migration)                             |
 
 ### Sampling Configuration
 
