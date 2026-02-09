@@ -788,7 +788,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", span_name=~\"HTTP.*\"}[$__rate_interval])) by (http_request_method)",
+          "expr": "sum(rate(traces_spanmetrics_calls_total{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", http_request_method!=\"\"}[$__rate_interval])) by (http_request_method)",
           "legendFormat": "{{http_request_method}}",
           "range": true,
           "refId": "A"
@@ -887,7 +887,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", span_name=~\"HTTP.*\"}[5m])) by (le, http_request_method))",
+          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", http_request_method!=\"\"}[5m])) by (le, http_request_method))",
           "legendFormat": "p95 {{http_request_method}}",
           "range": true,
           "refId": "A"
@@ -898,7 +898,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", span_name=~\"HTTP.*\"}[5m])) by (le, http_request_method))",
+          "expr": "histogram_quantile(0.50, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", http_request_method!=\"\"}[5m])) by (le, http_request_method))",
           "legendFormat": "p50 {{http_request_method}}",
           "range": true,
           "refId": "B",
