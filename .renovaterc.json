@@ -18,6 +18,11 @@
   "lockFileMaintenance": { "enabled": true },
   "packageRules": [
     {
+      "description": "Prefix automerge updates in PR titles",
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "commitMessagePrefix": "`AUTOMERGE`: "
+    },
+    {
       "description": "Disable digest-only updates for Docker and GitHub Actions updates",
       "matchDatasources": ["docker", "github-actions"],
       "digest": {
@@ -29,27 +34,31 @@
       "matchManagers": ["github-actions"],
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true,
-      "groupName": "GitHub Actions"
+      "groupName": "GitHub Actions",
+      "commitMessagePrefix": "`AUTOMERGE`: "
     },
     {
       "description": "Auto-merge linter and test framework package updates directly to branch without creating a PR",
       "automerge": true,
       "automergeType": "branch",
-      "extends": ["packages:linters", "packages:test"]
+      "extends": ["packages:linters", "packages:test"],
+      "commitMessagePrefix": "`AUTOMERGE`: "
     },
     {
       "description": "Group Docker base image updates",
       "matchManagers": ["dockerfile"],
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Docker images",
-      "automerge": true
+      "automerge": true,
+      "commitMessagePrefix": "`AUTOMERGE`: "
     },
     {
       "description": "Group all npm package updates (dependencies and devDependencies) into a single PR",
       "matchManagers": ["npm"],
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "npm dependencies",
-      "automerge": true
+      "automerge": true,
+      "commitMessagePrefix": "`AUTOMERGE`: "
     },
     {
       "description": "Separate major npm updates into individual PRs for review",
@@ -63,7 +72,8 @@
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "Ruby gems",
       "automerge": true,
-      "matchPackageNames": ["!rails"]
+      "matchPackageNames": ["!rails"],
+      "commitMessagePrefix": "`AUTOMERGE`: "
     },
     {
       "description": "Separate major gem updates into individual PRs for review",
