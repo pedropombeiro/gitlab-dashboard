@@ -915,7 +915,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", span_name=~\"HTTP.*\"}[5m])) by (le, span_name))",
+          "expr": "histogram_quantile(0.95, sum(increase(traces_spanmetrics_latency_bucket{service=\"gitlab-dashboard\", span_kind=\"SPAN_KIND_CLIENT\", http_request_method!=\"\"}[5m])) by (le, span_name))",
           "legendFormat": "p95 {{span_name}}",
           "range": true,
           "refId": "A",
