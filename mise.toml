@@ -1,0 +1,80 @@
+[tools]
+ruby = "3.4.5"
+node = "25.2.1"
+"npm:prettier" = "latest"
+redis = "7.4.1"
+
+[env]
+_.file = ".env"
+
+# -------------------------------------------------------------------
+# Setup
+# -------------------------------------------------------------------
+
+[tasks.default]
+hide = true
+depends = ["install"]
+
+[tasks.install]
+description = "Install dependencies and set up the project"
+run = "mise install && bin/setup --skip-server && lefthook install && yarn install"
+
+[tasks.update]
+description = "Update Ruby and JS dependencies"
+run = "bin/spring stop && bundle update --all && yarn up"
+
+# -------------------------------------------------------------------
+# Development
+# -------------------------------------------------------------------
+
+[tasks.serve]
+description = "Start the development server"
+alias = "dev"
+run = "bin/dev"
+
+[tasks.open]
+description = "Open the app in a browser"
+run = "open https://localhost:3000"
+
+[tasks.toggle-cache]
+description = "Toggle Rails development caching"
+alias = "cache"
+run = "bin/rails dev:cache"
+
+[tasks.console]
+description = "Open a Rails console"
+raw = true
+run = "bin/rails console"
+
+# -------------------------------------------------------------------
+# Testing
+# -------------------------------------------------------------------
+
+[tasks.watch-ci]
+description = "Watch the latest CI run on GitHub"
+run = "gh run watch --repo=pedropombeiro/gitlab-dashboard"
+
+# -------------------------------------------------------------------
+# Build
+# -------------------------------------------------------------------
+
+[tasks.create-dockerfile]
+description = "Generate a Dockerfile via rails generate"
+run = """
+bin/rails generate dockerfile \
+  --alpine --cache --compose --jemalloc --link --no-ci --parallel --sqlite3 --yjit \
+  --add-build linux-headers openssl-dev \
+  --arg-deploy=GIT_REPO_COMMIT_SHA:null \
+  --arg-deploy=GIT_RELEASE_TAG:null
+"""
+
+# -------------------------------------------------------------------
+# Maintenance
+# -------------------------------------------------------------------
+
+[tasks.dump-schema]
+description = "Dump the GitLab GraphQL schema and copy to fixtures"
+run = [
+  """rails -e 'require("graphlient"); client = Graphlient::Client.new("https://gitlab.com/api/graphql", schema_path: "lib/assets/graphql/gitlab_graphql_schema.json"); client.schema.dump!'""",
+  "cp -f lib/assets/graphql/gitlab_graphql_schema.json spec/support/fixtures/gitlab_graphql_schema.json",
+]

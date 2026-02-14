@@ -1,4 +1,4 @@
-import type { Plugin } from "@opencode-ai/plugin"
+import type { Plugin } from "@opencode-ai/plugin";
 
 export const FixAfterEditPlugin: Plugin = async ({ $ }) => {
   return {
@@ -6,17 +6,17 @@ export const FixAfterEditPlugin: Plugin = async ({ $ }) => {
       // Check if this was a file modification tool
       if (input.tool === "edit" || input.tool === "write" || input.tool === "patch") {
         // Extract filePath from output.args (based on OpenCode plugin API)
-        const filePath = output?.args?.filePath
+        const filePath = output?.args?.filePath;
 
         if (filePath) {
           try {
-            // Run just fix on the modified file(s)
-            await $`just fix ${filePath}`
+            // Run mise fix on the modified file(s)
+            await $`mise run fix -- ${filePath}`;
           } catch {
             // Silently ignore errors
           }
         }
       }
     },
-  }
-}
+  };
+};

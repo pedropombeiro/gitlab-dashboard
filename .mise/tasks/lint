@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="Run pre-push linting hooks"
+#USAGE arg "[files]" var=#true help="Specific files to lint (default: all files)"
+
+set -euo pipefail
+
+eval "files=(${usage_files:-})"
+if [ ${#files[@]} -gt 0 ]; then
+  lefthook run pre-push --files "${files[@]}" --force
+else
+  lefthook run pre-push --all-files --force
+fi

@@ -1,9 +1,9 @@
 pre-push:
   parallel: true
   commands:
-    justfile-fmt:
-      glob: "justfile"
-      run: just --fmt --check --unstable
+    mise-fmt:
+      glob: "mise.toml"
+      run: mise fmt --check
     yamllint:
       glob: "**/*.yml"
       exclude: "config/dockerfile.yml"
@@ -32,9 +32,9 @@ pre-push:
 pre-commit:
   parallel: true
   commands:
-    justfile-fmt:
-      glob: "justfile"
-      run: just --fmt --unstable
+    mise-fmt:
+      glob: "mise.toml"
+      run: mise fmt
     yamllint:
       glob: "**/*.yml"
       exclude: "config/dockerfile.yml"

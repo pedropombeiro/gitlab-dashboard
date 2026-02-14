@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Show Rails routes, optionally filtered by pattern"
+#USAGE arg "[pattern]" help="Filter routes by grep pattern"
+
+set -euo pipefail
+
+if [ -n "${usage_pattern:-}" ]; then
+  bin/rails routes -g "$usage_pattern"
+else
+  bin/rails routes
+fi

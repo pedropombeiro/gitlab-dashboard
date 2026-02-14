@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+#MISE description="Build a Docker image for the project"
+#USAGE arg "[args]" var=#true help="Extra arguments passed to docker buildx build"
+
+set -euo pipefail
+
+project_name="$(basename "$(pwd)")"
+
+eval "args=(${usage_args:-})"
+docker buildx build --platform linux/amd64 -t "$project_name" "${args[@]+"${args[@]}"}" .

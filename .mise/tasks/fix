@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="Run pre-commit hooks to fix files"
+#USAGE arg "[files]" var=#true help="Specific files to fix (default: all files)"
+
+set -euo pipefail
+
+eval "files=(${usage_files:-})"
+if [ ${#files[@]} -gt 0 ]; then
+  lefthook run pre-commit --files "${files[@]}" --force
+else
+  lefthook run pre-commit --all-files --force
+fi

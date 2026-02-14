@@ -38,10 +38,10 @@ for managing GitLab merge requests.
    npm install
    ```
 
-   or, if you have `just` installed:
+   or, using mise:
 
    ```sh
-   just install
+   mise run install
    ```
 
 3. Create and initialize the database:

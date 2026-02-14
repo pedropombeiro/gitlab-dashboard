@@ -19,7 +19,7 @@ GitLab Dashboard is a Ruby on Rails 8.1 application that provides an intuitive i
 ### Setup & Installation
 
 ```bash
-just install              # Full setup: mise install, bin/setup, lefthook, yarn install
+mise run install          # Full setup: mise install, bin/setup, lefthook, yarn install
 bundle install            # Install Ruby dependencies
 yarn install              # Install JavaScript dependencies
 ```
@@ -27,25 +27,25 @@ yarn install              # Install JavaScript dependencies
 ### Development
 
 ```bash
-just serve               # Start development server (alias: just dev)
+mise run serve           # Start development server (alias: mise run dev)
 bin/dev                  # Start all development processes (web, CSS watch, JS watch)
-just open                # Open application at https://localhost:3000
-just toggle-cache        # Toggle Rails development cache (alias: just cache)
+mise run open            # Open application at https://localhost:3000
+mise run toggle-cache    # Toggle Rails development cache (alias: mise run cache)
 ```
 
 ### Testing
 
 ```bash
-just test                # Run all RSpec tests
-just test spec/path      # Run specific test file or directory
+mise run test            # Run all RSpec tests
+mise run test -- spec/path  # Run specific test file or directory
 bundle exec rspec        # Run RSpec directly
 ```
 
 ### Linting & Formatting
 
 ```bash
-just fix                 # Run pre-commit hooks on all files (lefthook)
-just lint                # Run pre-push hooks on all files (lefthook)
+mise run fix             # Run pre-commit hooks on all files (lefthook)
+mise run lint            # Run pre-push hooks on all files (lefthook)
 bin/rake standard        # Run Ruby linter (Standard)
 yarn lint                # Run JavaScript linter (ESLint)
 yarn lint:fix            # Auto-fix JavaScript linting issues
@@ -60,13 +60,13 @@ yarn build               # Production JavaScript build (minified)
 yarn build:dev           # Development JavaScript build (with sourcemaps)
 yarn typecheck           # Run TypeScript type checking
 bin/rails dartsass:build # Build CSS
-just clean               # Clean all build artifacts (alias: just clobber)
+mise run clean           # Clean all build artifacts (alias: mise run clobber)
 ```
 
 ### Updating Dependencies
 
 ```bash
-just update              # Update bundler, gems, and npm packages
+mise run update          # Update bundler, gems, and npm packages
 bundle update            # Update Ruby gems
 yarn up                  # Update npm packages
 ```
@@ -74,15 +74,15 @@ yarn up                  # Update npm packages
 ### Docker
 
 ```bash
-just build-docker        # Build Docker image for linux/amd64
-just create-dockerfile   # Regenerate Dockerfile with rails generate
+mise run build-docker    # Build Docker image for linux/amd64
+mise run create-dockerfile  # Regenerate Dockerfile with rails generate
 ```
 
 ### Other Utilities
 
 ```bash
-just dump-schema         # Dump GitLab GraphQL schema for testing
-just watch-ci            # Watch GitHub Actions CI runs
+mise run dump-schema     # Dump GitLab GraphQL schema for testing
+mise run watch-ci        # Watch GitHub Actions CI runs
 ```
 
 ## High-Level Architecture

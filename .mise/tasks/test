@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="Run RSpec tests"
+#USAGE arg "[args]" var=#true help="Arguments passed to rspec"
+
+set -euo pipefail
+
+eval "args=(${usage_args:-})"
+bundle exec rspec "${args[@]+"${args[@]}"}"

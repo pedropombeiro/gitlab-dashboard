@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+#MISE description="Tail a Rails log file"
+#USAGE arg "[env]" help="Rails environment (default: development)" default="development"
+
+set -euo pipefail
+
+tail -f "log/${usage_env}.log"

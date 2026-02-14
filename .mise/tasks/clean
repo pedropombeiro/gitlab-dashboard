@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+#MISE description="Remove all build artifacts"
+#MISE alias="clobber"
+#MISE confirm="Are you sure you want to remove all build artifacts?"
+
+set -euo pipefail
+
+rm -rf app/assets/builds/*
+bin/rails assets:clobber dartsass:clobber javascript:clobber
