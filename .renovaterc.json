@@ -20,7 +20,7 @@
     {
       "description": "Prefix automerge updates in PR titles",
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "commitMessagePrefix": "`AUTOMERGE`: "
+      "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
       "description": "Disable digest-only updates for Docker and GitHub Actions updates",
@@ -35,14 +35,14 @@
       "matchUpdateTypes": ["patch", "minor"],
       "automerge": true,
       "groupName": "GitHub Actions",
-      "commitMessagePrefix": "`AUTOMERGE`: "
+      "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
       "description": "Auto-merge linter and test framework package updates directly to branch without creating a PR",
       "automerge": true,
       "automergeType": "branch",
       "extends": ["packages:linters", "packages:test"],
-      "commitMessagePrefix": "`AUTOMERGE`: "
+      "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
       "description": "Group Docker base image updates",
@@ -50,7 +50,7 @@
       "matchUpdateTypes": ["minor", "patch"],
       "groupName": "Docker images",
       "automerge": true,
-      "commitMessagePrefix": "`AUTOMERGE`: "
+      "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
       "description": "Group all npm package updates (dependencies and devDependencies) into a single PR",
@@ -58,7 +58,7 @@
       "matchUpdateTypes": ["patch", "minor"],
       "groupName": "npm dependencies",
       "automerge": true,
-      "commitMessagePrefix": "`AUTOMERGE`: "
+      "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
       "description": "Separate major npm updates into individual PRs for review",
@@ -73,7 +73,7 @@
       "groupName": "Ruby gems",
       "automerge": true,
       "matchPackageNames": ["!rails"],
-      "commitMessagePrefix": "`AUTOMERGE`: "
+      "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
       "description": "Separate major gem updates into individual PRs for review",
