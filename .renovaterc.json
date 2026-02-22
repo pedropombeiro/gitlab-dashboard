@@ -19,7 +19,7 @@
   "packageRules": [
     {
       "description": "Prefix automerge updates in PR titles",
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": ["minor", "patch", "pin"],
       "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
