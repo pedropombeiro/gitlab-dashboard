@@ -299,7 +299,7 @@ GEM
       racc (~> 1.4)
     nokogiri (1.19.1-x86_64-linux-musl)
       racc (~> 1.4)
-    openssl (4.0.0)
+    openssl (4.0.1)
     opentelemetry-api (1.7.0)
     opentelemetry-common (0.23.0)
       opentelemetry-api (~> 1.0)
@@ -358,7 +358,7 @@ GEM
       opentelemetry-api (~> 1.0)
     ostruct (0.6.3)
     parallel (1.27.0)
-    parser (3.3.10.1)
+    parser (3.3.10.2)
       ast (~> 2.4.1)
       racc
     pp (0.6.3)
