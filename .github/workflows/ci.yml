@@ -115,7 +115,9 @@ jobs:
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         id: brakeman
-        run: bin/brakeman --no-pager
+        run: |
+          mkdir -p tmp
+          bin/brakeman --no-pager --format markdown --output tmp/brakeman.md
 
       - name: Summarize Brakeman scan
         if: always()
@@ -126,6 +128,14 @@ jobs:
             echo "| Check | Result |"
             echo "| --- | --- |"
             echo "| Brakeman | ${{ steps.brakeman.outcome }} |"
+            echo ""
+            echo "### Brakeman report"
+            echo ""
+            if [ -f tmp/brakeman.md ]; then
+              cat tmp/brakeman.md
+            else
+              echo "No Brakeman report was generated."
+            fi
           } >> "$GITHUB_STEP_SUMMARY"
 
   scan_js:
