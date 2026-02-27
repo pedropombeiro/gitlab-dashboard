@@ -63,6 +63,8 @@ jobs:
               - "**.rb"
               - "**.erb"
               - "**.yml"
+              - "Gemfile"
+              - "Gemfile.lock"
             test:
               - "spec/**"
             deployment:
