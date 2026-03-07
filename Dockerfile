@@ -40,7 +40,7 @@ FROM base AS prebuild
 # hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add --no-cache build-base curl gyp linux-headers openssl-dev pkgconfig yaml-dev
+  apk add --no-cache build-base curl gyp linux-headers openssl-dev pkgconfig postgresql-dev yaml-dev
 
 
 ############################################################################
@@ -107,7 +107,7 @@ ARG GIT_RELEASE_TAG="null"
 # hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add --no-cache sqlite-libs
+  apk add --no-cache postgresql-libs sqlite-libs
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"

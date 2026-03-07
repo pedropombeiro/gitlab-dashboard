@@ -6,6 +6,8 @@ gem "rails", "~> 8.1.1"
 gem "propshaft"
 # Use sqlite3 as the database for Active Record
 gem "sqlite3", ">= 2.1"
+# Use pg as the database for Active Record when DATABASE_URL points to PostgreSQL
+gem "pg", "~> 1.5"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 7"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
