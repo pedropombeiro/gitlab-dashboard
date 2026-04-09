@@ -9,7 +9,7 @@ gem "sqlite3", ">= 2.1"
 # Use pg as the database for Active Record when DATABASE_URL points to PostgreSQL
 gem "pg", "~> 1.5"
 # Use the Puma web server [https://github.com/puma/puma]
-gem "puma", "~> 7"
+gem "puma", "~> 8"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
