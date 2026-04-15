@@ -35,7 +35,7 @@ Rails.application.configure do
 
   # Log to production.log with the current request id as a default log tag.
   config.log_tags = [:request_id]
-  config.logger = ActiveSupport::Logger.new("log/#{Rails.env}.log")
+  config.logger = ActiveSupport::Logger.new("log/#{Rails.env}.log", 5, 100.megabytes)
     .tap { |logger| logger.formatter = ::Logger::Formatter.new }
     .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
 
