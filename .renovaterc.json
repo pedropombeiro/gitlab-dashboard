@@ -4,7 +4,6 @@
     "config:best-practices",
     ":automergeStableNonMajor",
     ":automergeRequireAllStatusChecks",
-    ":enablePreCommit",
     ":pinSkipCi",
     ":prImmediately",
     ":separateMultipleMajorReleases",

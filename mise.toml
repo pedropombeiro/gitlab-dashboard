@@ -3,6 +3,10 @@ ruby = "3.4.5"
 node = "25.2.1"
 "npm:prettier" = "latest"
 redis = "7.4.1"
+hk = "latest"
+pkl = "latest"
+typos = "latest"
+gitleaks = "latest"
 
 [env]
 _.file = ".env"
@@ -17,7 +21,7 @@ depends = ["install"]
 
 [tasks.install]
 description = "Install dependencies and set up the project"
-run = "mise install && bin/setup --skip-server && lefthook install && yarn install"
+run = "mise install && bin/setup --skip-server && git config --local core.hooksPath .hk-hooks && yarn install"
 
 [tasks.update]
 description = "Update Ruby and JS dependencies"

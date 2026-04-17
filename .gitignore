@@ -59,3 +59,6 @@ config/environments/development/ssl/localhost.crt
 # Git metadata files for deployment
 /REVISION
 /.git-release-tag
+
+# hk local developer overrides
+hk.local.pkl

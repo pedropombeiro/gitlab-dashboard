@@ -19,7 +19,7 @@ GitLab Dashboard is a Ruby on Rails 8.1 application that provides an intuitive i
 ### Setup & Installation
 
 ```bash
-mise run install          # Full setup: mise install, bin/setup, lefthook, yarn install
+mise run install          # Full setup: mise install, bin/setup, hk, yarn install
 bundle install            # Install Ruby dependencies
 yarn install              # Install JavaScript dependencies
 ```
@@ -44,8 +44,8 @@ bundle exec rspec        # Run RSpec directly
 ### Linting & Formatting
 
 ```bash
-mise run fix             # Run pre-commit hooks on all files (lefthook)
-mise run lint            # Run pre-push hooks on all files (lefthook)
+mise run fix             # Run pre-commit hooks on all files (hk)
+mise run lint            # Run pre-push hooks on all files (hk)
 bin/rake standard        # Run Ruby linter (Standard)
 yarn lint                # Run JavaScript linter (ESLint)
 yarn lint:fix            # Auto-fix JavaScript linting issues
@@ -176,20 +176,27 @@ Cache keys format:
 4. Hotwire Livereload provides auto-reload on file changes
 5. Spring preloader speeds up boot times
 
-### Git Hooks (Lefthook)
+### Git Hooks (hk)
 
-**Pre-commit** (parallel):
+**Pre-commit** (parallel, auto-fix + stash):
 
-- backend-linter: `bin/rake standard {staged_files}` (_.rb, _.erb)
-- frontend-linter: `yarn lint:fix` (_.js, _.ts)
-- prettier: `prettier --write {staged_files}` (_.js, _.ts, \*.json)
+- trailing-whitespace, newlines, check-merge-conflict (universal)
+- typos: spell checking
+- gitleaks: secret detection
+- mise: validate mise.toml
+- yamllint: `*.yml` files (excludes config/dockerfile.yml)
+- backend-linter: `standardrb {{files}}` (_.rb, _.erb)
+- frontend-linter: `yarn lint:fix` (app/javascript/\*\*/\_.{js,ts})
+- prettier: `yarn prettier --write {{files}}` (app/javascript/\*\*/\_.{js,ts}, \*.json)
 
-**Pre-push** (parallel):
+**Pre-push**:
 
-- backend-linter: `bin/rake standard` (_.rb, _.erb)
-- frontend-linter: `yarn lint` (\*.js)
-- backend-specs: `bin/bundle exec rspec` ({app,spec}/\*_/_.rb, \*.erb)
-- prettier: Check formatting (_.js, _.ts, \*.json)
+- mise-fmt: `mise fmt --check` (mise.toml)
+- yamllint: `*.yml` files (excludes config/dockerfile.yml)
+- backend-linter: `standardrb {{files}}` (_.rb, _.erb)
+- frontend-linter: `yarn lint` (app/javascript/\*\*/\*.js)
+- prettier: check formatting (app/javascript/\*\*/\_.{js,ts}, \*.json)
+- backend-specs: `bin/bundle exec rspec` ({app,spec}/\*\*/\_.rb, \*.erb)
 
 ### Testing
 

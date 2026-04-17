@@ -6,7 +6,7 @@ set -euo pipefail
 
 eval "files=(${usage_files:-})"
 if [ ${#files[@]} -gt 0 ]; then
-  lefthook run pre-push --files "${files[@]}" --force
+  hk run pre-push "${files[@]}"
 else
-  lefthook run pre-push --all-files --force
+  hk run pre-push --all
 fi

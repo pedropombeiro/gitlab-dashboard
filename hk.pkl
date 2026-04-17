@@ -1,0 +1,81 @@
+// hk configuration - https://hk.jdx.dev/
+amends "package://github.com/jdx/hk/releases/download/v1.42.0/hk@1.42.0#/Config.pkl"
+import "package://github.com/jdx/hk/releases/download/v1.42.0/hk@1.42.0#/Builtins.pkl"
+
+exclude = List("node_modules", ".yarn", "vendor", "tmp", "log", "storage", "public/assets")
+
+display_skip_reasons = List()
+terminal_progress = false
+
+local binary_excludes = List(
+    "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.ico",
+    "*.woff", "*.woff2", "*.ttf", "*.eot", "*.pdf", "*.zip"
+)
+
+hooks {
+    ["pre-commit"] {
+        fix = true
+        stash = "git"
+        steps {
+            ["trailing-whitespace"] = (Builtins.trailing_whitespace) {
+                exclude = binary_excludes
+            }
+            ["newlines"] = (Builtins.newlines) {
+                exclude = binary_excludes
+            }
+            ["check-merge-conflict"] = (Builtins.check_merge_conflict) {}
+            ["typos"] = (Builtins.typos) {
+                exclude = binary_excludes + List("yarn.lock", "Gemfile.lock")
+            }
+            ["gitleaks"] {
+                check = "scripts/quiet-on-success.sh gitleaks protect --no-banner --redact --log-level=error --staged"
+            }
+            ["mise"] = Builtins.mise
+            ["yamllint"] = (Builtins.yamllint) {
+                exclude = List("config/dockerfile.yml")
+            }
+            ["backend-linter"] {
+                glob = List("*.rb", "*.erb")
+                check = "standardrb {{files}}"
+                fix = "standardrb --fix {{files}}"
+            }
+            ["frontend-linter"] {
+                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts")
+                check = "yarn lint"
+                fix = "yarn lint:fix"
+            }
+            ["prettier"] {
+                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
+                check = "scripts/quiet-on-success.sh yarn prettier --check {{files}}"
+                fix = "scripts/quiet-on-success.sh yarn prettier --write {{files}}"
+            }
+        }
+    }
+    ["pre-push"] {
+        steps {
+            ["mise-fmt"] {
+                glob = List("mise.toml")
+                check = "mise fmt --check"
+            }
+            ["yamllint"] = (Builtins.yamllint) {
+                exclude = List("config/dockerfile.yml")
+            }
+            ["backend-linter"] {
+                glob = List("*.rb", "*.erb")
+                check = "standardrb {{files}}"
+            }
+            ["frontend-linter"] {
+                glob = List("app/javascript/**/*.js")
+                check = "yarn lint"
+            }
+            ["prettier"] {
+                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
+                check = "scripts/quiet-on-success.sh yarn prettier --check {{files}}"
+            }
+            ["backend-specs"] {
+                glob = List("app/**/*.rb", "spec/**/*.rb", "**/*.erb")
+                check = "scripts/quiet-on-success.sh bin/bundle exec rspec"
+            }
+        }
+    }
+}

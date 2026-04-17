@@ -19,6 +19,7 @@
     "sass": "^1.97.1"
   },
   "scripts": {
+    "prepare": "[ -n \"$CI\" ] && exit 0 || command -v hk >/dev/null && (hk install 2>/dev/null || git config --local core.hooksPath .hk-hooks) || echo 'Note: hk not found, skipping git hooks. Install mise to enable.'",
     "build": "esbuild app/javascript/*.* --bundle --minify --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.ts=ts --loader:.js=js",
     "build:dev": "esbuild app/javascript/*.* --bundle --sourcemap --format=esm --outdir=app/assets/builds --public-path=/assets --loader:.ts=ts --loader:.js=js",
     "lint": "eslint app/javascript",
