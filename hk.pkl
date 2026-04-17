@@ -12,20 +12,25 @@ local binary_excludes = List(
     "*.woff", "*.woff2", "*.ttf", "*.eot", "*.pdf", "*.zip"
 )
 
+local downloaded_files = List(
+    "lib/assets/graphql/gitlab_graphql_schema.json",
+    "spec/support/fixtures/gitlab_graphql_schema.json"
+)
+
 hooks {
     ["pre-commit"] {
         fix = true
         stash = "git"
         steps {
             ["trailing-whitespace"] = (Builtins.trailing_whitespace) {
-                exclude = binary_excludes
+                exclude = binary_excludes + downloaded_files
             }
             ["newlines"] = (Builtins.newlines) {
-                exclude = binary_excludes
+                exclude = binary_excludes + downloaded_files
             }
             ["check-merge-conflict"] = (Builtins.check_merge_conflict) {}
             ["typos"] = (Builtins.typos) {
-                exclude = binary_excludes + List("yarn.lock", "Gemfile.lock")
+                exclude = binary_excludes + List("yarn.lock", "Gemfile.lock") + downloaded_files
             }
             ["gitleaks"] {
                 check = "scripts/quiet-on-success.sh gitleaks protect --no-banner --redact --log-level=error --staged"
@@ -46,6 +51,7 @@ hooks {
             }
             ["prettier"] {
                 glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
+                exclude = downloaded_files
                 check = "scripts/quiet-on-success.sh yarn prettier --check {{files}}"
                 fix = "scripts/quiet-on-success.sh yarn prettier --write {{files}}"
             }
@@ -70,6 +76,7 @@ hooks {
             }
             ["prettier"] {
                 glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
+                exclude = downloaded_files
                 check = "scripts/quiet-on-success.sh yarn prettier --check {{files}}"
             }
             ["backend-specs"] {
