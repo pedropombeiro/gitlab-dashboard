@@ -265,7 +265,6 @@ GitLabDuo:
   data:
     user:
       __typename: UserCore
-      __typename: UserCore
       username: GitLabDuo
       avatarUrl: /uploads/-/system/user/avatar/21826781/duo-bot.png
       webUrl: https://gitlab.com/GitLabDuo
