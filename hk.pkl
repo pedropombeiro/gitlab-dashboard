@@ -9,7 +9,8 @@ terminal_progress = false
 
 local binary_excludes = List(
     "*.png", "*.jpg", "*.jpeg", "*.gif", "*.webp", "*.ico",
-    "*.woff", "*.woff2", "*.ttf", "*.eot", "*.pdf", "*.zip"
+    "*.woff", "*.woff2", "*.ttf", "*.eot", "*.pdf", "*.zip",
+    "*.enc", "*.svg"
 )
 
 local downloaded_files = List(

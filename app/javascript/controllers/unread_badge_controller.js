@@ -14,7 +14,7 @@ class Badger {
         size: 0.7, // 0..1 (Scale in respect to the favicon image size)
         position: "se", // Position inside favicon "n", "e", "s", "w", "ne", "nw", "se", "sw"
         radius: 0.1, // Border radius, better used as % value + 4px base
-        src: "", // Favicon source (dafaults to the <link> icon href),
+        src: "", // Favicon source (defaults to the <link> icon href),
         srcs: false,
         onChange() {},
       },
