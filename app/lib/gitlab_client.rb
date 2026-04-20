@@ -121,6 +121,12 @@ class GitlabClient
     end
   end
 
+  def fetch_linked_work_items(project_full_path, iid)
+    response = execute_query(MergeRequestLinkedWorkItemsQuery, projectFullPath: project_full_path, iid: iid)
+    data = make_serializable(response)
+    data.data.project&.mergeRequest&.linkedWorkItems
+  end
+
   def fetch_merged_merge_requests(author, format: :open_struct)
     format_response(format) do
       execute_query(MergedMergeRequestsQuery, author: author, mergedAfter: 1.week.ago)
@@ -384,6 +390,22 @@ class GitlabClient
             }
             labels {
               nodes { ...#{name}::CoreLabelFragment }
+            }
+          }
+        }
+      }
+    }
+  GRAPHQL
+
+  MergeRequestLinkedWorkItemsQuery = Client.parse <<-GRAPHQL
+    query($projectFullPath: ID!, $iid: String!) {
+      project(fullPath: $projectFullPath) {
+        mergeRequest(iid: $iid) {
+          linkedWorkItems {
+            linkType
+            workItem {
+              iid
+              namespace { fullPath }
             }
           }
         }

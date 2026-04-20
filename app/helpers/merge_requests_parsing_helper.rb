@@ -10,7 +10,14 @@ module MergeRequestsParsingHelper
   end
 
   def issue_iid_from_mr(mr)
-    match_data = MR_ISSUE_PATTERN.match(mr.sourceBranch)
+    work_item = linked_work_item(mr)&.workItem
+    return work_item.iid if work_item
+
+    issue_iid_from_branch(mr.sourceBranch)
+  end
+
+  def issue_iid_from_branch(source_branch)
+    match_data = MR_ISSUE_PATTERN.match(source_branch)
     match_data&.named_captures&.fetch("issue_id")
   end
 
@@ -20,19 +27,28 @@ module MergeRequestsParsingHelper
 
   private
 
+  def linked_work_item(mr)
+    items = Array.wrap(mr.try(:linkedWorkItems))
+    return if items.blank?
+    return items.first if items.length == 1
+
+    closing = items.select { |item| item.linkType == "CLOSES" }
+    closing.first if closing.length == 1
+  end
+
   def issue_references(mr)
-    refs = []
+    issue_iid = issue_iid_from_mr(mr)
+    return [] unless issue_iid
 
-    refs << {
-      project_full_path: mr.project.fullPath,
-      issue_iid: issue_iid_from_mr(mr)
-    }
+    work_item = linked_work_item(mr)&.workItem
+    project_full_path = work_item&.namespace&.fullPath || mr.project.fullPath
 
-    if mr.project.fullPath.include?(SECURITY_SUBGROUP)
+    refs = [{project_full_path: project_full_path, issue_iid: issue_iid}]
+
+    if project_full_path.include?(SECURITY_SUBGROUP)
       refs << {
-        # Take into account MRs in security projects which refer to issues in the canonical project
-        project_full_path: mr.project.fullPath.sub(SECURITY_SUBGROUP, ""),
-        issue_iid: issue_iid_from_mr(mr)
+        project_full_path: project_full_path.sub(SECURITY_SUBGROUP, ""),
+        issue_iid: issue_iid
       }
     end
 

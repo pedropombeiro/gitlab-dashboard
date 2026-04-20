@@ -32,6 +32,7 @@ class FetchMergeRequestsService
               .tap do |mrs|
                 fill_reviewers_info(mrs)
                 fill_project_milestone(mrs)
+                fill_linked_work_items(mrs)
               end
           end
         when :merged
@@ -126,6 +127,20 @@ class FetchMergeRequestsService
 
     open_merge_requests.flat_map { |mr| mr.project }.each do |project|
       project[:version] = project_versions_hash[project.webUrl]
+    end
+  end
+
+  def fill_linked_work_items(merge_requests)
+    mrs_without_branch_iid = merge_requests.reject { |mr| issue_iid_from_branch(mr.sourceBranch) }
+    return if mrs_without_branch_iid.empty?
+
+    Sync do |task|
+      mrs_without_branch_iid.map do |mr|
+        task.async do
+          linked_work_items = gitlab_client.fetch_linked_work_items(mr.project.fullPath, mr.iid)
+          mr.linkedWorkItems = linked_work_items || []
+        end
+      end.map(&:wait)
     end
   end
 
