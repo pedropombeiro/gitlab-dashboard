@@ -130,8 +130,6 @@ one:
               failedJobs:
                 count: 0
                 nodes: []
-              failedJobTraces:
-                nodes: []
           - iid: "174004"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/174004
             titleHtml: Fix flaky BulkDeleteRunnersService spec
@@ -262,8 +260,6 @@ one:
               failedJobs:
                 count: 0
                 nodes: []
-              failedJobTraces:
-                nodes: []
           - iid: "173789"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173789
             titleHtml: Generate audit event per project association from runner
@@ -388,11 +384,10 @@ one:
                 count: 1
                 nodes:
                   - name: e2e:test-product-analytics
-              failedJobTraces:
-                nodes:
-                  - name: e2e:test-product-analytics
+                    allowFailure: false
                     trace:
                     webPath: "/gitlab-org/gitlab/-/jobs/8482434590"
+                    downstreamPipeline:
           - iid: "173874"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173874
             titleHtml: Fix flaky test on set_runner_associated_projects_service_spec.rb
@@ -528,8 +523,6 @@ one:
               failedJobs:
                 count: 0
                 nodes: []
-              failedJobTraces:
-                nodes: []
           - iid: "173916"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173916
             titleHtml: Include last contacted time on audit log when runner is deleted
@@ -658,8 +651,6 @@ one:
               failedJobs:
                 count: 0
                 nodes: []
-              failedJobTraces:
-                nodes: []
           - iid: "173886"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173886
             titleHtml: Add audit event to BulkDeleteRunnersService
@@ -783,8 +774,6 @@ one:
                 nodes: []
               failedJobs:
                 count: 0
-                nodes: []
-              failedJobTraces:
                 nodes: []
           - iid: "173885"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173885
@@ -912,8 +901,6 @@ one:
               failedJobs:
                 count: 0
                 nodes: []
-              failedJobTraces:
-                nodes: []
           - iid: "173639"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173639
             titleHtml: Fix runner audit events
@@ -1035,8 +1022,6 @@ one:
                 nodes: []
               failedJobs:
                 count: 0
-                nodes: []
-              failedJobTraces:
                 nodes: []
           - iid: "171848"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/171848
@@ -1166,8 +1151,6 @@ one:
                 nodes: []
               failedJobs:
                 count: 0
-                nodes: []
-              failedJobTraces:
                 nodes: []
           - iid: "173007"
             webUrl: https://gitlab.com/gitlab-org/gitlab/-/merge_requests/173007
@@ -1319,9 +1302,7 @@ one:
                 count: 1
                 nodes:
                   - name: e2e:test-product-analytics
-              failedJobTraces:
-                nodes:
-                  - name: e2e:test-product-analytics
+                    allowFailure: false
                     trace:
                     webPath: "/gitlab-org/gitlab/-/jobs/8651090111"
                     downstreamPipeline:

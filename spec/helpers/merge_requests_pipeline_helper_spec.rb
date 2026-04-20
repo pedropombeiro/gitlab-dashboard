@@ -12,15 +12,13 @@ RSpec.describe MergeRequestsPipelineHelper do
 
   describe "#pipeline_web_url" do
     let(:pipeline) { double }
-    let(:failed_jobs) { double(count: 0) }
-    let(:failed_job_traces) { double(nodes: []) }
+    let(:failed_jobs) { double(count: 0, nodes: []) }
     let(:running_jobs) { double(count: 1) }
     let(:running_job) { double }
 
     before do
       allow(pipeline).to receive(:path).and_return("/gitlab-org/gitlab/-/pipelines/123")
       allow(pipeline).to receive(:failedJobs).and_return(failed_jobs)
-      allow(pipeline).to receive(:failedJobTraces).and_return(failed_job_traces)
       allow(pipeline).to receive(:status).and_return("RUNNING")
       allow(pipeline).to receive(:runningJobs).and_return(running_jobs)
       allow(running_jobs).to receive(:nodes).and_return([running_job])

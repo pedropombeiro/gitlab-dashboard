@@ -38,7 +38,7 @@ hooks {
             }
             ["mise"] = Builtins.mise
             ["yamllint"] = (Builtins.yamllint) {
-                exclude = List("config/dockerfile.yml")
+                exclude = List("config/dockerfile.yml", "spec/support/fixtures/*.yml")
             }
             ["backend-linter"] {
                 glob = List("*.rb", "*.erb")
@@ -65,7 +65,7 @@ hooks {
                 check = "mise fmt --check"
             }
             ["yamllint"] = (Builtins.yamllint) {
-                exclude = List("config/dockerfile.yml")
+                exclude = List("config/dockerfile.yml", "spec/support/fixtures/*.yml")
             }
             ["backend-linter"] {
                 glob = List("*.rb", "*.erb")

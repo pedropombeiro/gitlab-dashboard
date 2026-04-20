@@ -13,7 +13,7 @@ module MergeRequestsPipelineHelper
 
   def pipeline_failure_summary(pipeline)
     failed_jobs = pipeline.failedJobs
-    failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }
+    failed_job_traces = failed_jobs.nodes.select { |t| t.trace.present? }
 
     header = "#{pluralize(failed_jobs.count, "job")} #{pluralize_without_count(failed_jobs.count, "has", "have")} failed in the pipeline:"
 
@@ -33,7 +33,7 @@ module MergeRequestsPipelineHelper
   end
 
   def pipeline_summary(pipeline)
-    failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }
+    failed_job_traces = pipeline.failedJobs.nodes.select { |t| t.trace.present? }
 
     summary = nil
     if !failed_job_traces.many? && pipeline.status == "RUNNING"
@@ -56,8 +56,8 @@ module MergeRequestsPipelineHelper
     return unless pipeline.path
 
     failed_jobs = pipeline.failedJobs
-    failed_job_traces = pipeline.failedJobTraces.nodes.select { |t| t.trace.present? }.presence
-    failed_job_traces ||= pipeline.failedJobTraces.nodes
+    failed_job_traces = failed_jobs.nodes.select { |t| t.trace.present? }.presence
+    failed_job_traces ||= failed_jobs.nodes
 
     web_path = nil
 

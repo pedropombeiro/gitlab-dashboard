@@ -456,16 +456,11 @@ class GitlabClient
                   }
                 }
               }
-              failedJobs: jobs(statuses: FAILED, retried: false) {
+              failedJobs: jobs(statuses: FAILED, first: 10, retried: false) {
                 count
                 nodes {
                   name
                   allowFailure
-                }
-              }
-              failedJobTraces: jobs(statuses: FAILED, first: 2, retried: false) {
-                nodes {
-                  name
                   trace { htmlSummary }
                   webPath
                   downstreamPipeline {
