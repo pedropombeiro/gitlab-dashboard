@@ -10,6 +10,8 @@ gem "sqlite3", ">= 2.1"
 gem "pg", "~> 1.5"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "~> 8"
+# Automatically restart Puma workers that exceed memory thresholds [https://github.com/zombocom/puma_worker_killer]
+gem "puma_worker_killer"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
