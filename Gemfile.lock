@@ -87,6 +87,7 @@ GEM
     base64 (0.3.0)
     bcrypt_pbkdf (1.1.2)
     benchmark (0.5.0)
+    benchmark-ips (2.14.0)
     bigdecimal (4.1.2)
     bindex (0.8.1)
     bootsnap (1.24.1)
@@ -123,6 +124,24 @@ GEM
     debugbar (0.4.3)
       actioncable
       rails
+    derailed_benchmarks (2.2.1)
+      base64
+      benchmark-ips (~> 2)
+      bigdecimal
+      drb
+      get_process_mem
+      heapy (~> 0)
+      logger
+      memory_profiler (>= 0, < 2)
+      mini_histogram (>= 0.3.0)
+      mutex_m
+      ostruct
+      rack (>= 1)
+      rack-test
+      rake (> 10, < 14)
+      ruby-statistics (>= 4.0.1)
+      ruby2_keywords
+      thor (>= 0.19, < 2)
     diff-lcs (1.6.2)
     docile (1.4.1)
     dockerfile-rails (1.7.10)
@@ -209,6 +228,8 @@ GEM
       activesupport (>= 3.0)
       graphql (>= 1.13.0)
     hashdiff (1.2.1)
+    heapy (0.2.0)
+      thor
     honeybadger (6.5.5)
       logger
       ostruct
@@ -272,7 +293,9 @@ GEM
       net-smtp
     marcel (1.1.0)
     matrix (0.4.3)
+    memory_profiler (1.1.0)
     metrics (0.15.0)
+    mini_histogram (0.3.1)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
     minitest (6.0.5)
@@ -289,6 +312,7 @@ GEM
       stimulus-rails
       turbo-rails
     msgpack (1.8.0)
+    mutex_m (0.3.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
     net-imap (0.6.4)
@@ -528,6 +552,8 @@ GEM
       rubocop-performance (>= 1.24)
       rubocop-rails (>= 2.30)
     ruby-progressbar (1.13.0)
+    ruby-statistics (4.1.1)
+    ruby2_keywords (0.0.5)
     rubyzip (3.2.2)
     sass-embedded (1.99.0)
       google-protobuf (~> 4.31)
@@ -685,6 +711,7 @@ DEPENDENCIES
   dartsass-rails (~> 0.5.1)
   debug
   debugbar
+  derailed_benchmarks
   dockerfile-rails (>= 1.6)
   factory_bot (~> 6.5)
   factory_bot_rails (~> 6.4)

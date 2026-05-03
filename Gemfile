@@ -58,6 +58,9 @@ gem "htmlcompressor"
 # See https://github.com/mperham/connection_pool/issues/210
 gem "connection_pool", "< 3"
 
+# Memory profiling and leak detection [https://github.com/zombocom/derailed_benchmarks]
+gem "derailed_benchmarks", require: false
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
