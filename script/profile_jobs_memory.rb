@@ -2,11 +2,22 @@ require "get_process_mem"
 require "objspace"
 
 ITERATIONS = ENV.fetch("PROFILE_ITERATIONS", 20).to_i
-JOBS = [
-  -> { ScheduleCacheRefreshJob.perform_now },
-  -> { SendMetricsJob.perform_now },
-  -> { MergeRequestsFetchJob.perform_now(User.first&.username, :open) }
-].freeze
+JOB_NAME = ENV.fetch("PROFILE_JOB", "all")
+
+ALL_JOBS = {
+  "schedule_cache_refresh" => -> { ScheduleCacheRefreshJob.perform_now },
+  "send_metrics" => -> { SendMetricsJob.perform_now },
+  "merge_requests_fetch" => -> {
+    user = GitlabUser.first
+    MergeRequestsFetchJob.perform_now(user.username, :open) if user
+  }
+}.freeze
+
+JOBS = if JOB_NAME == "all"
+  ALL_JOBS.values
+else
+  [ALL_JOBS.fetch(JOB_NAME)]
+end
 
 def rss_mb
   GetProcessMem.new.mb
@@ -14,8 +25,9 @@ end
 
 def object_counts
   counts = Hash.new(0)
-  ObjectSpace.each_object { |o| counts[o.class] += 1 }
-  counts.sort_by { |_, v| -v }.first(20).to_h
+  class_of = Object.instance_method(:class)
+  ObjectSpace.each_object { |o| counts[class_of.bind_call(o)] += 1 }
+  counts.sort_by { |_, v| -v }.first(30).to_h
 end
 
 def gc_stats
@@ -32,7 +44,7 @@ def print_snapshot(label, rss, counts, gc)
   puts "RSS: #{rss.round(1)} MB"
   puts "GC:  count=#{gc[:count]}  live_slots=#{gc[:heap_live_slots]}  free_slots=#{gc[:heap_free_slots]}"
   puts "Top object counts:"
-  counts.each { |klass, n| puts "  #{klass.name.ljust(50)} #{n}" }
+  counts.each { |klass, n| puts "  #{klass.name.to_s.ljust(50)} #{n}" }
 end
 
 def compact_and_report(label)
@@ -44,7 +56,7 @@ end
 
 print_separator
 puts "SolidQueue job memory profiler"
-puts "Iterations: #{ITERATIONS}"
+puts "Job: #{JOB_NAME}  Iterations: #{ITERATIONS}"
 puts "PID: #{Process.pid}  Ruby: #{RUBY_VERSION}"
 print_separator
 
@@ -75,19 +87,19 @@ ITERATIONS.times do |i|
   step = current_rss - rss_history[-2]
 
   puts "\n=== iteration #{i + 1}/#{ITERATIONS} ==="
-  growth_sign = (growth >= 0) ? "+" : ""
-  step_sign = (step >= 0) ? "+" : ""
+  growth_sign = growth >= 0 ? "+" : ""
+  step_sign = step >= 0 ? "+" : ""
   puts "RSS: #{current_rss.round(1)} MB  (#{growth_sign}#{growth.round(1)} MB from baseline, #{step_sign}#{step.round(1)} MB from last)"
   puts "GC:  count=#{current_gc[:count]}  live_slots=#{current_gc[:heap_live_slots]}  free_slots=#{current_gc[:heap_free_slots]}"
 
   new_objects = current_counts.filter_map do |klass, n|
     diff = n - (baseline_counts[klass] || 0)
-    [klass, n, diff] if diff > 100
+    [klass, n, diff] if diff > 50
   end.sort_by { |_, _, d| -d }.first(15)
 
   if new_objects.any?
-    puts "Object growth vs baseline (>100 new):"
-    new_objects.each { |klass, n, diff| puts "  #{klass.name.ljust(50)} #{n}  (+#{diff})" }
+    puts "Object growth vs baseline (>50 new):"
+    new_objects.each { |klass, n, diff| puts "  #{klass.name.to_s.ljust(50)} #{n}  (+#{diff})" }
   end
 end
 
@@ -95,7 +107,7 @@ print_separator
 puts "\nSummary"
 puts "RSS history (MB): #{rss_history.map { |r| r.round(1) }.join(" -> ")}"
 total_growth = rss_history.last - rss_history.first
-total_sign = (total_growth >= 0) ? "+" : ""
+total_sign = total_growth >= 0 ? "+" : ""
 puts "Total growth: #{total_sign}#{total_growth.round(1)} MB over #{ITERATIONS} iterations"
 puts "Average growth per iteration: #{(total_growth / ITERATIONS).round(2)} MB"
 
