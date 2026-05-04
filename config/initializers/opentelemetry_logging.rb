@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require "active_support/tagged_logging"
 require "json"
 
 # OpenTelemetry Log Correlation
@@ -9,8 +10,18 @@ require "json"
 
 module OpenTelemetry
   module Logging
-    # Base formatter with shared trace context extraction
+    # Base formatter with shared trace context extraction.
+    #
+    # Tags (current_tags, push_tags, pop_tags, tagged, clear_tags!) are provided
+    # by ActiveSupport::TaggedLogging::Formatter, which stores them in a
+    # thread/fiber-local. A previous custom implementation stored tags as
+    # instance state on the formatter, which leaked memory across job
+    # invocations because Rails' ActiveJob log_tags integration calls
+    # push_tags but never pops in a guaranteed-balanced way across an entire
+    # job lifecycle.
     class BaseFormatter < ::Logger::Formatter
+      include ActiveSupport::TaggedLogging::Formatter
+
       private
 
       def trace_context
@@ -48,14 +59,6 @@ module OpenTelemetry
     # Human-readable formatter with trace context and TaggedLogging support
     # Format: [timestamp] [severity] [trace_id=xxx span_id=xxx] [tags] message
     class TextFormatter < BaseFormatter
-      # Support for ActiveSupport::TaggedLogging
-      attr_accessor :current_tags
-
-      def initialize
-        super
-        @current_tags = []
-      end
-
       def call(severity, timestamp, _progname, msg)
         ctx = trace_context
         trace_str = ctx.empty? ? "" : " [trace_id=#{ctx[:trace_id]} span_id=#{ctx[:span_id]}]"
@@ -63,42 +66,10 @@ module OpenTelemetry
 
         "[#{timestamp.utc.iso8601(3)}] [#{severity}]#{trace_str}#{tags_str} #{format_message(msg)}\n"
       end
-
-      # Required by ActiveSupport::TaggedLogging
-      def tagged(*tags)
-        new_tags = tags.flatten.compact
-        old_tags = current_tags
-        self.current_tags = old_tags + new_tags
-        yield self
-      ensure
-        self.current_tags = old_tags
-      end
-
-      def push_tags(*tags)
-        tags = tags.flatten.compact
-        current_tags.concat(tags)
-        tags
-      end
-
-      def pop_tags(count = 1)
-        current_tags.pop(count)
-      end
-
-      def clear_tags!
-        current_tags.clear
-      end
     end
 
     # Structured JSON formatter for log aggregation systems (Loki, etc.)
     class JsonFormatter < BaseFormatter
-      # Support for ActiveSupport::TaggedLogging
-      attr_accessor :current_tags
-
-      def initialize
-        super
-        @current_tags = []
-      end
-
       def call(severity, timestamp, _progname, msg)
         entry = {
           timestamp: timestamp.utc.iso8601(3),
@@ -108,33 +79,9 @@ module OpenTelemetry
           environment: Rails.env
         }.merge(trace_context)
 
-        entry[:tags] = current_tags if current_tags.any?
+        entry[:tags] = current_tags.dup if current_tags.any?
 
         "#{entry.to_json}\n"
-      end
-
-      # Required by ActiveSupport::TaggedLogging
-      def tagged(*tags)
-        new_tags = tags.flatten.compact
-        old_tags = current_tags
-        self.current_tags = old_tags + new_tags
-        yield self
-      ensure
-        self.current_tags = old_tags
-      end
-
-      def push_tags(*tags)
-        tags = tags.flatten.compact
-        current_tags.concat(tags)
-        tags
-      end
-
-      def pop_tags(count = 1)
-        current_tags.pop(count)
-      end
-
-      def clear_tags!
-        current_tags.clear
       end
     end
   end
