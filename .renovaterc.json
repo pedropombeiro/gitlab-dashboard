@@ -107,6 +107,9 @@
       "depNameTemplate": "node"
     }
   ],
+  "constraints": {
+    "yarn": "4.12.0"
+  },
   "prConcurrentLimit": 10,
   "prHourlyLimit": 0,
   "platformAutomerge": true
