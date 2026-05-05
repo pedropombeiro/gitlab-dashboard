@@ -87,8 +87,8 @@ ITERATIONS.times do |i|
   step = current_rss - rss_history[-2]
 
   puts "\n=== iteration #{i + 1}/#{ITERATIONS} ==="
-  growth_sign = growth >= 0 ? "+" : ""
-  step_sign = step >= 0 ? "+" : ""
+  growth_sign = (growth >= 0) ? "+" : ""
+  step_sign = (step >= 0) ? "+" : ""
   puts "RSS: #{current_rss.round(1)} MB  (#{growth_sign}#{growth.round(1)} MB from baseline, #{step_sign}#{step.round(1)} MB from last)"
   puts "GC:  count=#{current_gc[:count]}  live_slots=#{current_gc[:heap_live_slots]}  free_slots=#{current_gc[:heap_free_slots]}"
 
@@ -107,7 +107,7 @@ print_separator
 puts "\nSummary"
 puts "RSS history (MB): #{rss_history.map { |r| r.round(1) }.join(" -> ")}"
 total_growth = rss_history.last - rss_history.first
-total_sign = total_growth >= 0 ? "+" : ""
+total_sign = (total_growth >= 0) ? "+" : ""
 puts "Total growth: #{total_sign}#{total_growth.round(1)} MB over #{ITERATIONS} iterations"
 puts "Average growth per iteration: #{(total_growth / ITERATIONS).round(2)} MB"
 
