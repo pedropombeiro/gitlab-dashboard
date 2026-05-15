@@ -41,9 +41,14 @@ hooks {
                 exclude = List("config/dockerfile.yml", "spec/support/fixtures/*.yml")
             }
             ["backend-linter"] {
-                glob = List("*.rb", "*.erb")
+                glob = List("*.rb")
                 check = "standardrb {{files}}"
                 fix = "standardrb --fix {{files}}"
+            }
+            ["erb-linter"] {
+                glob = List("*.erb")
+                check = "bin/bundle exec erb_lint {{files}}"
+                fix = "bin/bundle exec erb_lint --autocorrect {{files}}"
             }
             ["frontend-linter"] {
                 glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts")
@@ -68,8 +73,12 @@ hooks {
                 exclude = List("config/dockerfile.yml", "spec/support/fixtures/*.yml")
             }
             ["backend-linter"] {
-                glob = List("*.rb", "*.erb")
+                glob = List("*.rb")
                 check = "standardrb {{files}}"
+            }
+            ["erb-linter"] {
+                glob = List("*.erb")
+                check = "bin/bundle exec erb_lint {{files}}"
             }
             ["frontend-linter"] {
                 glob = List("app/javascript/**/*.js")

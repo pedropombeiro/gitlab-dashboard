@@ -2,12 +2,12 @@
   "#",
   class: %w[me-2 float-right d-none d-sm-inline text-secondary text-decoration-none] + local_assigns.fetch(:class, []),
   aria: {
-    hidden: "true",
+    hidden: "true"
   },
   data: {
     action: "clipboard#copy",
     bs_toggle: "tooltip",
-    bs_title: "Click to copy",
+    bs_title: "Click to copy"
   }) do %>
   <%= tag.i(class: "bi bi-clipboard2") %>
 <% end %>

@@ -59,7 +59,7 @@
             <%= group_reviewer_presenter.emojify(reviewer.status&.message) %>
           </td>
           <!-- Local Hour -->
-          <%= tag.td class: (["text-end", reviewer.inWorkingHours ? nil : "text-secondary"]).compact do %>
+          <%= tag.td class: ([ "text-end", reviewer.inWorkingHours ? nil : "text-secondary" ]).compact do %>
             <%= tag.i(class: %W[fa-solid fa-moon]) unless reviewer.inWorkingHours %>
             <%= tag.span reviewer.timezone&.time_with_offset(Time.now.utc)&.to_fs(:time) %>
           <% end %>
@@ -86,9 +86,8 @@
             </nobr>
           </td>
           <% if Rails.env.development? %>
-            <td class="text-end text-secondary" %>
-              <%= tag.span reviewers_dto.send(:reviewer_score, reviewer) %>
-            </td>
+            <td class="text-end text-secondary"
+              <%= tag.span reviewers_dto.send(:reviewer_score, reviewer) %>>
           <% end %>
         <% end %>
       <% end %>

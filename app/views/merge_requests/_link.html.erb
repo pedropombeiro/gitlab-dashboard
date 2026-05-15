@@ -6,9 +6,9 @@
       clipboard_target: "source",
       bs_toggle: "tooltip",
       bs_custom_class: "x-wide-tooltip",
-      bs_title: web_url,
+      bs_title: web_url
     },
-    target: "_blank",
+    target: "_blank"
   }.deep_merge(local_assigns.except(:title, :web_url) || {}) -%>
 
   <%= render "shared/clipboard_button" %>

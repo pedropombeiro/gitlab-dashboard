@@ -77,7 +77,7 @@
             bs_content:
               "Merged requests this week took #{distance_of_time_in_words(avg_time_to_merge)} to be merged, " \
               "#{merge_avg_ttm_ok ? "at or below" : "above"} the historical average of #{distance_of_time_in_words(overall_avg_time_to_merge)}." \
-              "<br/>See #{mttm_handbook_url}.",
+              "<br/>See #{mttm_handbook_url}."
           },
         ) do %>
           <%= distance_of_time_in_words(avg_time_to_merge) %>
@@ -135,7 +135,7 @@
               (merge_time_ok ?
                 "Merged merge requests historically have taken less than #{distance_of_time_in_words(mr_age_limit)} to merge." :
                 "Merged merge requests historically have taken over #{distance_of_time_in_words(mr_age_limit)} to merge.") +
-              "<br/>See #{mttm_handbook_url}.",
+              "<br/>See #{mttm_handbook_url}."
             },
           ) do %>
             <%= distance_of_time_in_words(overall_avg_time_to_merge) %>
@@ -177,7 +177,7 @@
             timestamp: mr.mergedAt,
             most_significant_only: true -%>
             by
-            <br/>
+            <br>
             <% merge_user_presenter = UserPresenter.new(mr.mergeUser, self) %>
             <%= render "shared/user_badge",
             user: mr.mergeUser,
@@ -195,7 +195,7 @@
               data: {
                 bs_toggle: "tooltip",
                 bs_custom_class: "wide-tooltip",
-                bs_title: "#{mr.createdAt.utc.to_formatted_s(:long)} UTC",
+                bs_title: "#{mr.createdAt.utc.to_formatted_s(:long)} UTC"
               },
             ) %>
           </td>
@@ -225,7 +225,7 @@
                 <%= tag.div class: div_class,
                     data: {
                       bs_toggle: "tooltip",
-                      bs_title: mr_presenter.milestone_mismatch_tooltip,
+                      bs_title: mr_presenter.milestone_mismatch_tooltip
                     } do %>
                   <%= render("info_symbol") if div_class %>
                   <%= render("milestone", milestone: mr.milestone) %>
@@ -249,8 +249,7 @@
     style="height: 300px;"
     class="
       container-fluid d-flex justify-content-sm-center text-secondary mt-2 p-6
-    "
-  >
+    ">
     <%= turbo_frame_tag params[:author],
     :merged_merge_requests_chart,
     loading: "lazy",

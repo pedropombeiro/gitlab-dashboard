@@ -44,7 +44,7 @@
             <%= render(
               "label",
               title: mr.mergeStatusLabel,
-              class: ["bg-#{mr.bootstrapClass[:mergeStatus]}"],
+              class: [ "bg-#{mr.bootstrapClass[:mergeStatus]}" ],
             ) %>
             <% open_blockers =
               mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
@@ -82,8 +82,8 @@
                         data: {
                           bs_toggle: "tooltip",
                           bs_html: "true",
-                          bs_custom_class: "x-wide-tooltip",
-                        },
+                          bs_custom_class: "x-wide-tooltip"
+                        }
                       }
                     else
                       {}
@@ -103,7 +103,7 @@
                     class: "text-warning",
                     data: {
                       bs_html: "true",
-                      bs_custom_class: "x-wide-tooltip",
+                      bs_custom_class: "x-wide-tooltip"
                     } %>
                   <% end %>
                 <% end %>
@@ -114,7 +114,7 @@
                   title: pipeline.failureReason,
                   data: {
                     bs_html: "true",
-                    bs_custom_class: "x-wide-tooltip",
+                    bs_custom_class: "x-wide-tooltip"
                   } %>
                 <% end %>
                 <% if pipeline.startedAt %>
@@ -133,7 +133,7 @@
               <% end %>
             </nobr>
 
-            <br/>
+            <br>
 
             <%= render partial: "gitlab_label",
             spacer_template: "space",
@@ -173,7 +173,7 @@
                 <%= tag.div class: div_class,
                     data: {
                       bs_toggle: "tooltip",
-                      bs_title: mr_presenter.milestone_mismatch_tooltip,
+                      bs_title: mr_presenter.milestone_mismatch_tooltip
                     } do %>
                   <%= render("info_symbol") if div_class %>
                   <%= render("milestone", milestone: mr.milestone) %>
@@ -185,10 +185,10 @@
           <td class="text-center">
             <div>
               <%= tag.span(
-                class: %w[badge rounded-pill text-dark] + (mr.commitCount && mr.commitCount > 10 ? ["bg-warning"] : ["bg-info"]),
+                class: %w[badge rounded-pill text-dark] + (mr.commitCount && mr.commitCount > 10 ? [ "bg-warning" ] : [ "bg-info" ]),
                 data: {
                   bs_toggle: "tooltip",
-                  bs_title: pluralize(mr.commitCount, "commit"),
+                  bs_title: pluralize(mr.commitCount, "commit")
                 },
               ) do %>
                 <%= number_with_delimiter(mr.commitCount) %>
@@ -232,7 +232,7 @@
                          ),
                        data: {
                          bs_toggle: "tooltip",
-                         bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing",
+                         bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing"
                        } %>
             <% end %>
           </td>

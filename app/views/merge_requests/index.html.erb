@@ -32,8 +32,7 @@
 
     <div
       class="navbar-brand text-light d-flex align-items-center m-auto"
-      data-controller="bootstrap-tooltip"
-    >
+      data-controller="bootstrap-tooltip">
       <%= tag.span class: "mb-0 ms-2 text-body fw-lighter d-flex flex-grow-1 justify-content-center" do %>
         <span class="d-sm-none me-2">
           <%= render "shared/user_image", user: @user, size: 24 %>
@@ -78,8 +77,7 @@
             <span
               class="spinner-border me-3 d-none d-sm-inline"
               role="status"
-              aria-hidden="true"
-            ></span>
+              aria-hidden="true"></span>
             <span>Loading open merge requests…</span>
           <% end %>
         <% end %>
@@ -92,8 +90,7 @@
           <span
             class="spinner-border me-3 d-none d-sm-inline"
             role="status"
-            aria-hidden="true"
-          ></span>
+            aria-hidden="true"></span>
           <span>Loading merged merge requests…</span>
         <% end %>
       <% end %>

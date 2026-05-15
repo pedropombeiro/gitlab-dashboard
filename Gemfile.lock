@@ -88,6 +88,13 @@ GEM
     bcrypt_pbkdf (1.1.2)
     benchmark (0.5.0)
     benchmark-ips (2.14.0)
+    better_html (2.2.0)
+      actionview (>= 7.0)
+      activesupport (>= 7.0)
+      ast (~> 2.0)
+      erubi (~> 1.4)
+      parser (>= 2.4)
+      smart_properties
     bigdecimal (4.1.2)
     bindex (0.8.1)
     bootsnap (1.24.4)
@@ -150,6 +157,13 @@ GEM
     drb (2.2.3)
     ed25519 (1.4.0)
     erb (6.0.4)
+    erb_lint (0.9.0)
+      activesupport
+      better_html (>= 2.0.1)
+      parser (>= 2.7.1.4)
+      rainbow
+      rubocop (>= 1)
+      smart_properties
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
@@ -589,6 +603,7 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.13.2)
     simplecov_json_formatter (0.1.4)
+    smart_properties (1.17.0)
     solid_cable (3.0.12)
       actioncable (>= 7.2)
       activejob (>= 7.2)
@@ -713,6 +728,7 @@ DEPENDENCIES
   debugbar
   derailed_benchmarks
   dockerfile-rails (>= 1.6)
+  erb_lint
   factory_bot (~> 6.5)
   factory_bot_rails (~> 6.4)
   gemoji (~> 4.1)

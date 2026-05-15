@@ -1,0 +1,24 @@
+---
+EnableDefaultLinters: true
+linters:
+  ClosingErbTagIndent:
+    enabled: false
+  FinalNewline:
+    enabled: true
+  Rubocop:
+    enabled: true
+    rubocop_config:
+      inherit_from:
+        - .rubocop.yml
+      AllCops:
+        DisabledByDefault: false
+      Layout/TrailingEmptyLines:
+        Enabled: false
+      Layout/TrailingWhitespace:
+        Enabled: false
+      Layout/InitialIndentation:
+        Enabled: false
+      Lint/UselessAssignment:
+        Enabled: false
+      Naming/FileName:
+        Enabled: false
