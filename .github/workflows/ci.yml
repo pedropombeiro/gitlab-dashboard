@@ -212,7 +212,7 @@ jobs:
 
     services:
       redis:
-        image: redis:8.6.2-alpine@sha256:81b6f81d6a6c5b9019231a2e8eb10085e3a139a34f833dcc965a8a959b040b72
+        image: redis:8.8.0-alpine@sha256:cc4528bddf546d352dcb171aa39bf1650c23b85a463784e9e9dea16ece1d18e8
         ports:
           - 6379:6379
         options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
