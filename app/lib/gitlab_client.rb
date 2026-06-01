@@ -147,14 +147,13 @@ class GitlabClient
         Sync do |task|
           12.times.map do |offset|
             bom = offset.months.ago.beginning_of_month.to_date
-            eom = bom.next_month
 
             task.async do
               execute_query(
                 MonthlyMergeRequestsQuery,
                 author: author,
-                mergedAfter: bom.to_fs,
-                mergedBefore: eom.to_fs
+                mergedAfter: 1.day.before(bom).to_fs,
+                mergedBefore: bom.end_of_month.to_fs
               )
             end
           end.map(&:wait)

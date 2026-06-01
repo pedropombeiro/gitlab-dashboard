@@ -25,15 +25,14 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
       let!(:merged_mrs_request_stubs) do
         12.times.map do |offset|
           bom = Date.current.beginning_of_month - offset.months
-          eom = 1.month.after(bom)
 
           stub_request(:post, graphql_url)
             .with(body: hash_including(
               "operationName" => "GitlabClient__MonthlyMergeRequestsQuery",
               "variables" => {
                 "author" => author,
-                "mergedAfter" => bom.to_fs,
-                "mergedBefore" => eom.to_fs
+                "mergedAfter" => 1.day.before(bom).to_fs,
+                "mergedBefore" => bom.end_of_month.to_fs
               }
             ))
             .to_return_json(body: monthly_mr_stats_body[offset])
