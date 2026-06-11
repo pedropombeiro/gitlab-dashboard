@@ -291,6 +291,30 @@ RSpec.describe MergeRequestsController, type: :controller do
       end
     end
 
+    context "when the merge requests query returns a nil user" do
+      let(:author) { "garyh" }
+      let(:params) { {author: author} }
+
+      before do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including(
+            "operationName" => "GitlabClient__UserQuery",
+            "variables" => {username: author}
+          ))
+          .to_return_json(body: {data: {user: {username: author, avatarUrl: "", webUrl: ""}}})
+
+        stub_request(:post, graphql_url)
+          .with(body: hash_including("operationName" => "GitlabClient__OpenMergeRequestsQuery"))
+          .to_return_json(body: {data: {user: nil}})
+      end
+
+      it "does not raise and returns http success" do
+        expect { request }.not_to raise_error
+
+        expect(response).to have_http_status(:success)
+      end
+    end
+
     context "when author is known" do
       let_it_be(:issues) { YAML.load_file(file_fixture("issues.yml")) }
 

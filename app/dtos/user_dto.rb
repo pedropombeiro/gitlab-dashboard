@@ -15,10 +15,10 @@ class UserDto
   attr_reader :merged_merge_requests_count, :merged_merge_requests_tttm, :first_merged_merge_requests_timestamp
 
   def initialize(response, username, type, issues_by_iid)
-    @has_content = response.present?
+    @has_content = response.present? && response.user.present?
     @username = username
 
-    unless response
+    unless @has_content
       @open_merge_requests = MergeRequestCollectionDto.new([])
       @merged_merge_requests = MergeRequestCollectionDto.new([])
       return

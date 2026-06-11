@@ -79,6 +79,8 @@ class FetchMergeRequestsService
   end
 
   def merge_requests_from_response(response, type)
+    return [] unless response.user
+
     case type
     when :open
       response.user.openMergeRequests.nodes
