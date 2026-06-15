@@ -21,6 +21,7 @@
 
     <tbody>
       <% merge_requests.each do |mr| %>
+        <% mr_presenter = MergeRequestPresenter.new(mr) %>
         <%= tag.tr(class: mr.blocked ? "opacity-50" : nil) do %>
           <!-- MR ID -->
           <th scope="row">
@@ -168,7 +169,6 @@
             <!-- Milestone -->
             <td class="text-end">
               <% if mr.milestone %>
-                <% mr_presenter = MergeRequestPresenter.new(mr) %>
                 <% div_class = mr_presenter.milestone_class %>
                 <%= tag.div class: div_class,
                     data: {
@@ -232,7 +232,9 @@
                          ),
                        data: {
                          bs_toggle: "tooltip",
-                         bs_title: "#{pluralize(mr.approvalsLeft, "approval")} missing"
+                         bs_html: "true",
+                         bs_custom_class: "x-wide-tooltip",
+                         bs_title: mr_presenter.approvals_tooltip
                        } %>
             <% end %>
           </td>

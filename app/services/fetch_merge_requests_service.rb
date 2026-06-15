@@ -10,7 +10,7 @@ class FetchMergeRequestsService
   include MergeRequestsPipelineHelper
 
   # Result object wrapping the response and cache status
-  FetchResult = Struct.new(:response, :freshly_fetched?, keyword_init: true)
+  FetchResult = Struct.new(:response, :freshly_fetched?)
 
   attr_reader :author
   delegate :make_full_url, to: :gitlab_client
@@ -33,6 +33,7 @@ class FetchMergeRequestsService
                 fill_reviewers_info(mrs)
                 fill_project_milestone(mrs)
                 fill_linked_work_items(mrs)
+                fill_approval_state(mrs)
               end
           end
         when :merged
@@ -141,6 +142,19 @@ class FetchMergeRequestsService
         task.async do
           linked_work_items = gitlab_client.fetch_linked_work_items(mr.project.fullPath, mr.iid)
           mr.linkedWorkItems = linked_work_items || []
+        end
+      end.map(&:wait)
+    end
+  end
+
+  def fill_approval_state(open_merge_requests)
+    unapproved_mrs = open_merge_requests.reject(&:approved)
+    return if unapproved_mrs.empty?
+
+    Sync do |task|
+      unapproved_mrs.map do |mr|
+        task.async do
+          mr.approvalState = gitlab_client.fetch_approval_state(mr.project.fullPath, mr.iid)
         end
       end.map(&:wait)
     end

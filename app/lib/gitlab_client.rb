@@ -127,6 +127,12 @@ class GitlabClient
     data.data.project&.mergeRequest&.linkedWorkItems
   end
 
+  def fetch_approval_state(project_full_path, iid)
+    response = execute_query(MergeRequestApprovalStateQuery, projectFullPath: project_full_path, iid: iid)
+    data = make_serializable(response)
+    data.data.project&.mergeRequest&.approvalState
+  end
+
   def fetch_merged_merge_requests(author, format: :open_struct)
     format_response(format) do
       execute_query(MergedMergeRequestsQuery, author: author, mergedAfter: 1.week.ago)
@@ -405,6 +411,26 @@ class GitlabClient
             workItem {
               iid
               namespace { fullPath }
+            }
+          }
+        }
+      }
+    }
+  GRAPHQL
+
+  MergeRequestApprovalStateQuery = Client.parse <<-GRAPHQL
+    query($projectFullPath: ID!, $iid: String!) {
+      project(fullPath: $projectFullPath) {
+        mergeRequest(iid: $iid) {
+          approvalState {
+            rules {
+              name
+              type
+              approved
+              approvalsRequired
+              eligibleApprovers {
+                username
+              }
             }
           }
         }

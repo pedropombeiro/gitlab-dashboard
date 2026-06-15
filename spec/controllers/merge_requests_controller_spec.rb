@@ -360,6 +360,24 @@ RSpec.describe MergeRequestsController, type: :controller do
           end
       end
 
+      let!(:approval_state_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including("operationName" => "GitlabClient__MergeRequestApprovalStateQuery"))
+          .to_return do |request|
+            iid = JSON.parse(request.body).dig(*%w[variables iid])
+            rules =
+              if iid == "174004"
+                [{name: "/spec/", type: "CODE_OWNER", approved: false, approvalsRequired: 1,
+                  eligibleApprovers: Array.new(3) { |i| {username: "user#{i}"} }}]
+              else
+                [{name: "All Members", type: "ANY_APPROVER", approved: false, approvalsRequired: 0,
+                  eligibleApprovers: []}]
+              end
+
+            {body: {data: {project: {mergeRequest: {approvalState: {rules: rules}}}}}.to_json}
+          end
+      end
+
       let!(:issues_request_stub) do
         stub_request(:post, graphql_url)
           .with(body: hash_including(
@@ -496,6 +514,11 @@ RSpec.describe MergeRequestsController, type: :controller do
 
             # Blocked MRs
             expect(response.body).to include(%(This MR is blocked by 1 merge request: !173886))
+
+            # Code owner approval tooltip
+            expect(response.body).to include("Code owner approval needed:")
+            expect(response.body).to include("<li><code>/spec/</code>")
+            expect(response.body).to include("3 eligible approvers")
           end
         end
 
