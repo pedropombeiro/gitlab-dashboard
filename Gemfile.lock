@@ -595,8 +595,8 @@ GEM
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 4.0)
       websocket (~> 1.0)
-    shoulda-matchers (7.0.1)
-      activesupport (>= 7.1)
+    shoulda-matchers (8.0.1)
+      activesupport (>= 7.2)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -767,7 +767,7 @@ DEPENDENCIES
   rspec-rails (~> 8.0.0)
   rubocop-rails-omakase
   selenium-webdriver
-  shoulda-matchers (~> 7.0)
+  shoulda-matchers (~> 8.0)
   simplecov
   solid_cable
   solid_cache
