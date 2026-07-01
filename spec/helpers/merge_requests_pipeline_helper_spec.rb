@@ -63,5 +63,60 @@ RSpec.describe MergeRequestsPipelineHelper do
         expect(pipeline_web_url(pipeline)).to eq("https://gitlab.com/gitlab-org/gitlab/-/jobs/789")
       end
     end
+
+    context "when pipeline is FAILED with multiple failed jobs but only one is not allowed to fail" do
+      let(:failed_jobs) { double(count: 3, nodes: [allowed_job_1, allowed_job_2, blocking_job]) }
+      let(:allowed_job_1) { double(allowFailure: true) }
+      let(:allowed_job_2) { double(allowFailure: true) }
+      let(:downstream_pipeline) { double }
+      let(:downstream_jobs) { double }
+      let(:downstream_job) { double(webPath: "/gitlab-org/gitlab/-/jobs/999") }
+      let(:blocking_job) do
+        double(
+          allowFailure: false,
+          trace: double(present?: true),
+          webPath: "/gitlab-org/gitlab/-/jobs/blocking",
+          downstreamPipeline: downstream_pipeline
+        )
+      end
+
+      before do
+        allow(pipeline).to receive(:status).and_return("FAILED")
+        allow(downstream_pipeline).to receive(:jobs).and_return(downstream_jobs)
+        allow(downstream_jobs).to receive(:nodes).and_return([downstream_job])
+      end
+
+      it "links to the single blocking job in the downstream pipeline, not the failures page" do
+        expect(pipeline_web_url(pipeline)).to eq("https://gitlab.com/gitlab-org/gitlab/-/jobs/999")
+      end
+    end
+
+    context "when pipeline is FAILED with multiple non-allowed failures" do
+      let(:failed_jobs) { double(count: 2, nodes: [blocking_job_1, blocking_job_2]) }
+      let(:blocking_job_1) { double(allowFailure: false, trace: double(present?: true)) }
+      let(:blocking_job_2) { double(allowFailure: false, trace: double(present?: true)) }
+
+      before do
+        allow(pipeline).to receive(:status).and_return("FAILED")
+      end
+
+      it "links to the failures page" do
+        expect(pipeline_web_url(pipeline)).to eq("https://gitlab.com/gitlab-org/gitlab/-/pipelines/123/failures")
+      end
+    end
+
+    context "when pipeline is FAILED but all failed jobs are allowed to fail" do
+      let(:failed_jobs) { double(count: 2, nodes: [allowed_job_1, allowed_job_2]) }
+      let(:allowed_job_1) { double(allowFailure: true) }
+      let(:allowed_job_2) { double(allowFailure: true) }
+
+      before do
+        allow(pipeline).to receive(:status).and_return("FAILED")
+      end
+
+      it "falls back to the pipeline path" do
+        expect(pipeline_web_url(pipeline)).to eq("https://gitlab.com/gitlab-org/gitlab/-/pipelines/123")
+      end
+    end
   end
 end
