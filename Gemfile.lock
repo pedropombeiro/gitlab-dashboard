@@ -598,7 +598,7 @@ GEM
       websocket (~> 1.0)
     shoulda-matchers (8.0.1)
       activesupport (>= 7.2)
-    simplecov (1.0.0)
+    simplecov (1.0.1)
     smart_properties (1.17.0)
     solid_cable (4.0.0)
       actioncable (>= 7.2)
