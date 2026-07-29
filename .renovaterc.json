@@ -31,8 +31,8 @@
       "commitMessageSuffix": "- `AUTOMERGE`"
     },
     {
-      "description": "Disable digest-only updates for Docker and GitHub Actions updates",
-      "matchDatasources": ["docker", "github-actions"],
+      "description": "Disable digest-only updates for Docker images",
+      "matchDatasources": ["docker"],
       "digest": {
         "enabled": false
       }
