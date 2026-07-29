@@ -52,6 +52,7 @@ jobs:
       test: ${{ steps.filter.outputs.test }}
       js: ${{ steps.filter.outputs.js }}
       ruby: ${{ steps.filter.outputs.ruby }}
+      hooks: ${{ steps.filter.outputs.hooks }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
@@ -75,6 +76,12 @@ jobs:
               - "**.yml"
               - "Gemfile"
               - "Gemfile.lock"
+            # hk.pkl defines what the hooks job runs, so changing it must
+            # re-run those checks.
+            hooks:
+              - "hk.pkl"
+              - ".hk-hooks/**"
+              - "scripts/**"
             test:
               - "spec/**"
             deployment:
@@ -106,6 +113,7 @@ jobs:
             echo "| test | ${{ steps.filter.outputs.test }} |"
             echo "| js | ${{ steps.filter.outputs.js }} |"
             echo "| ruby | ${{ steps.filter.outputs.ruby }} |"
+            echo "| hooks | ${{ steps.filter.outputs.hooks }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
   scan_ruby:
@@ -273,7 +281,7 @@ jobs:
   hooks:
     runs-on: ubuntu-latest
     needs: [changes]
-    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.ruby == 'true' || needs.changes.outputs.js == 'true' }}
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.changes.outputs.ruby == 'true' || needs.changes.outputs.js == 'true' || needs.changes.outputs.hooks == 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
