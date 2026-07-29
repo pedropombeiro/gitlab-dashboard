@@ -10,7 +10,7 @@ module CacheConcern
   GROUP_REVIEWERS_CACHE_VALIDITY = 1.hour
   PROJECT_VERSION_VALIDITY = 6.hours
 
-  LOCATION_VERSION = "v2"
+  LOCATION_VERSION = "v3"
 
   class_methods do
     def user_cache_key(username)

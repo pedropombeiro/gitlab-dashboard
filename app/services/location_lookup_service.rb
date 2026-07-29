@@ -11,6 +11,10 @@ class LocationLookupService
     1.week
   end
 
+  def self.failure_cache_validity
+    15.minutes
+  end
+
   def fetch_timezones(locations)
     return unless timezone_configured?
 
@@ -54,9 +58,25 @@ class LocationLookupService
   def fetch_location_info(location)
     return if location.blank?
 
-    Rails.cache.fetch(self.class.location_info_cache_key(location), expires_in: self.class.cache_validity) do
-      Geokit::Geocoders::OSMGeocoder.geocode(location)
+    cache_key = self.class.location_info_cache_key(location)
+    cached = Rails.cache.read(cache_key)
+    return cached if cached
+
+    res = Geokit::Geocoders::OSMGeocoder.geocode(location)
+
+    if res.success?
+      Rails.cache.write(cache_key, res, expires_in: self.class.cache_validity)
+    else
+      Honeybadger.notify(
+        "Geocoding lookup failed",
+        tags: "warning, geocode",
+        context: {location: location}
+      )
+
+      Rails.cache.write(cache_key, res, expires_in: self.class.failure_cache_validity)
     end
+
+    res
   end
 
   def timezone_configured?
