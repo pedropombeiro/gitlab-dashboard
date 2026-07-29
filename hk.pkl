@@ -42,8 +42,8 @@ hooks {
             }
             ["backend-linter"] {
                 glob = List("*.rb")
-                check = "standardrb {{files}}"
-                fix = "standardrb --fix {{files}}"
+                check = "bin/bundle exec standardrb {{files}}"
+                fix = "bin/bundle exec standardrb --fix {{files}}"
             }
             ["erb-linter"] {
                 glob = List("*.erb")
@@ -80,7 +80,7 @@ hooks {
             }
             ["backend-linter"] {
                 glob = List("*.rb")
-                check = "standardrb {{files}}"
+                check = "bin/bundle exec standardrb {{files}}"
             }
             ["erb-linter"] {
                 glob = List("*.erb")
