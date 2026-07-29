@@ -55,6 +55,12 @@ hooks {
                 check = "yarn lint"
                 fix = "yarn lint:fix"
             }
+            // tsc --noEmit is whole-project, so it cannot take {{files}}: it runs
+            // across app/javascript whenever any TypeScript input changes.
+            ["typecheck"] {
+                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "tsconfig.json")
+                check = "yarn typecheck"
+            }
             ["prettier"] {
                 glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
                 exclude = downloaded_files
@@ -81,8 +87,12 @@ hooks {
                 check = "bin/bundle exec erb_lint {{files}}"
             }
             ["frontend-linter"] {
-                glob = List("app/javascript/**/*.js")
+                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts")
                 check = "yarn lint"
+            }
+            ["typecheck"] {
+                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "tsconfig.json")
+                check = "yarn typecheck"
             }
             ["prettier"] {
                 glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
