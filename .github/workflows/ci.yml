@@ -305,7 +305,10 @@ jobs:
           # Check, never fix: CI must fail on violations rather than silently
           # rewriting files.
           HK_FIX: "0"
-        run: hk run pre-commit --all
+        # --stash none because hk.pkl configures stash = "git", which needs a
+        # git identity to create the stash commit; runners have none. There are
+        # no unstaged changes to protect in CI, so stashing is pure overhead.
+        run: hk run pre-commit --all --stash none
 
       - name: Summarize hook checks
         if: always()
