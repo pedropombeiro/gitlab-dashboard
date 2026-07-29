@@ -1,12 +1,18 @@
 $enable-gradients: true;
 $enable-shadows: true;
 
-@import '../../../node_modules/bootstrap/scss/bootstrap';
+// Icon libraries are bundled from node_modules so Renovate's npm manager keeps them
+// up to date. The asset paths must be relative to the Propshaft load path (which
+// includes node_modules), not to the package's own directory, because Propshaft
+// resolves url() against the compiled stylesheet's location.
+@use "bootstrap-icons/font/bootstrap-icons" with (
+  $bootstrap-icons-font-dir: "bootstrap-icons/font/fonts"
+);
+@use "flag-icons/sass/flag-icons" with (
+  $flag-icons-path: "flag-icons/flags"
+);
 
-// Import icon libraries from CDN
-// Keep bootstrap-icons and flag-icons in package.json as devDependencies for Renovate version tracking
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css");
-@import url("https://cdn.jsdelivr.net/npm/flag-icons@7.5.0/css/flag-icons.min.css");
+@import '../../../node_modules/bootstrap/scss/bootstrap';
 
 body { background: $gray-200 !important; } /* Adding !important forces the browser to overwrite the default style applied by Bootstrap */
 @if $enable-gradients {
