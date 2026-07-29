@@ -21,9 +21,15 @@ on: # yamllint disable-line rule:truthy
       - "spec/**"
       - "vendor/**"
       - "**.yml"
+      - "**.ts"
       - "Dockerfile"
       - "Gemfile.lock"
       - "yarn.lock"
+      - "package.json"
+      - "tsconfig.json"
+      - "eslint.config.js"
+      - "hk.pkl"
+      - "mise.toml"
 
 env:
   REGISTRY: ghcr.io
@@ -59,6 +65,10 @@ jobs:
               - "**/*.ts"
               - "app/javascript/**"
               - "*.yml"
+              - "package.json"
+              - "tsconfig.json"
+              - "eslint.config.js"
+              - "yarn.lock"
             ruby:
               - "**.rb"
               - "**.erb"
