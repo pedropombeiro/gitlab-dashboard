@@ -2,7 +2,7 @@
 ruby = "3.4.10"
 node = "25.9.0"
 "npm:prettier" = "latest"
-redis = "8.8.1"
+redis = "8.10.0"
 hk = "latest"
 pkl = "latest"
 typos = "latest"
