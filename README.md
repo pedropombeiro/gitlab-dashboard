@@ -19,7 +19,7 @@ for managing GitLab merge requests.
 
 ### Prerequisites
 
-- Ruby version: 3.0.0 or higher
+- Ruby version: 4.0.0 or higher
 - System dependencies: Ensure you have Git and Node.js installed
 
 ### Setup

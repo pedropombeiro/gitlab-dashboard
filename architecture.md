@@ -9,7 +9,7 @@ GitLab Dashboard is a Ruby on Rails 8.1 application that provides an intuitive i
 ### Backend
 
 - **Framework**: Ruby on Rails 8.1
-- **Language**: Ruby 3.0+
+- **Language**: Ruby 4.0+
 - **Web Server**: Puma
 - **Database**: SQLite3 (multiple databases)
   - Primary database for application data
