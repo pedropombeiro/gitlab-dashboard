@@ -8,9 +8,9 @@
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
 # Make sure RUBY_VERSION matches the Ruby version in .ruby-version
-# ARG RUBY_VERSION=3.4.5
+# ARG RUBY_VERSION=4.0.6
 # FROM ruby:$RUBY_VERSION-alpine AS base
-FROM ruby:3.4.10-alpine@sha256:3e7efe489047feaad0ffac9d57a9d8d769a61a92c1e3a7515bee8df0a45e1698 AS base
+FROM ruby:4.0.6-alpine@sha256:6ec7aeb4f3f0b67a21fb73a83fc20a4055696e64b933229f68ec805a3de38fcc AS base
 
 # Rails app lives here
 WORKDIR /rails
