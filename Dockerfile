@@ -101,10 +101,17 @@ ARG GIT_REPO_COMMIT_SHA="null"
 ARG GIT_RELEASE_TAG="null"
 
 # Install packages needed for deployment
+#
+# liburing is needed at runtime even though nothing here links it directly:
+# postgresql-dev in the prebuild stage resolves to postgresql18-dev (Alpine 3.24
+# promoted PG18, first built --with-liburing), pulling in liburing-dev. io-event
+# then detects liburing.h and compiles its io_uring backend, leaving IO_Event.so
+# with a DT_NEEDED on liburing.so.2. Without it the extension fails to load
+# entirely -- not just io_uring -- and async degrades to select(2).
 # hadolint ignore=DL3018
 RUN --mount=type=cache,id=dev-apk-cache,sharing=locked,target=/var/cache/apk \
   apk update && \
-  apk add --no-cache postgresql-libs sqlite-libs
+  apk add --no-cache liburing postgresql-libs sqlite-libs
 
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"

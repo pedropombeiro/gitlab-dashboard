@@ -14,3 +14,5 @@ options:
     build:
     - linux-headers
     - openssl-dev
+    deploy:
+    - liburing
