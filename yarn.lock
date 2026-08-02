@@ -500,9 +500,9 @@ __metadata:
   linkType: hard
 
 "@rails/actioncable@npm:>=7.0":
-  version: 8.1.300
-  resolution: "@rails/actioncable@npm:8.1.300"
-  checksum: 10c0/144e6cc6d83e5bc56287ecd3c989c494915f0bf8593eedf7cbf4c10741fa2a1f75e4bcf7963b3e14114a70563a1dd64272580f81ed707b5fbb7e3734a3f3a6a8
+  version: 8.1.301
+  resolution: "@rails/actioncable@npm:8.1.301"
+  checksum: 10c0/50d395e012f23b7cbdd18ad42077baaf8f15fd2b3e55cdc93e0ae771c7d24ec0deeea97062e7e9549f0ebeae3f90d6a32ef7de909389d957f87e3384fe23501e
   languageName: node
   linkType: hard
 
@@ -697,11 +697,11 @@ __metadata:
   linkType: hard
 
 "acorn@npm:^8.16.0":
-  version: 8.17.0
-  resolution: "acorn@npm:8.17.0"
+  version: 8.18.0
+  resolution: "acorn@npm:8.18.0"
   bin:
     acorn: bin/acorn
-  checksum: 10c0/5dcefea5f8f023b6cc24cbe71fb5a8112b601d36c4fa07d14e4e6ffc2ee47383332c46b36c766d9437725aa6660156eae50efa0c838719823b50d7c327c4ed42
+  checksum: 10c0/be771be2135cc07910cf76f444ad514d7dcfd6d4a8026e597e93155275abc8ef61eee12211d52146e9d962874269b634f397464942087be013c89d0c54c5f8e5
   languageName: node
   linkType: hard
 
@@ -785,11 +785,11 @@ __metadata:
   linkType: hard
 
 "baseline-browser-mapping@npm:^2.10.44":
-  version: 2.11.4
-  resolution: "baseline-browser-mapping@npm:2.11.4"
+  version: 2.11.11
+  resolution: "baseline-browser-mapping@npm:2.11.11"
   bin:
     baseline-browser-mapping: dist/cli.cjs
-  checksum: 10c0/670e2817531db0485ef3065de01f468f833f6b070a358940aaf1b4b507534ff972f748da89d04a262723245f5e2b585e406504f97cd91334e98cc2cad0e8e763
+  checksum: 10c0/b3eb91b83541a95ea0aa23d34aecefff382cb6b989e88f3411ee1931968cbd4852b874020c788345a082b4090b9643d929e20542438a9c4dac95b74e9632fdb4
   languageName: node
   linkType: hard
 
@@ -816,12 +816,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"brace-expansion@npm:^5.0.5":
-  version: 5.0.8
-  resolution: "brace-expansion@npm:5.0.8"
+"brace-expansion@npm:^5.0.8":
+  version: 5.0.9
+  resolution: "brace-expansion@npm:5.0.9"
   dependencies:
     balanced-match: "npm:^4.0.2"
-  checksum: 10c0/73304caafd00fdc5b0168e693ac15bf25b6357dec76d1195fcd628fe2cf99c46f9c889a7ecfa3cfe236dbd2d5ce3e27a6ccc4370b46d475d0d19081e11f86019
+  checksum: 10c0/3dea38884a1c3c8b1c9c44a7402a0c76fca460f70cffb3127242b0b4cbf4472019e022ade021eec44838ff19f1dac2625dfd11dd459d7e1e055b0698a8d52fec
   languageName: node
   linkType: hard
 
@@ -875,9 +875,9 @@ __metadata:
   linkType: hard
 
 "chartjs-plugin-trendline@npm:^3.2.0":
-  version: 3.2.8
-  resolution: "chartjs-plugin-trendline@npm:3.2.8"
-  checksum: 10c0/32fa86f13ea7b5dc28c1379ad77e16f894f70a750e5c267ccde070c88883f142a8c63902f3f45721487c5999e94d31b0e946bea3370f81d29ad36fc8896639a6
+  version: 3.2.9
+  resolution: "chartjs-plugin-trendline@npm:3.2.9"
+  checksum: 10c0/53a630e0223908caa0d42887161cc2a5b58564759a3eb171e88697f7d862874986b871f97f5f188eb0af68751ac1c172fba5547248ef3143c9aa21e6aa305c7c
   languageName: node
   linkType: hard
 
@@ -954,9 +954,9 @@ __metadata:
   linkType: hard
 
 "electron-to-chromium@npm:^1.5.393":
-  version: 1.5.396
-  resolution: "electron-to-chromium@npm:1.5.396"
-  checksum: 10c0/2ac1d007acae6466649c2ada1f147fa205d980fc01bc602da00823b64a88b4286138a71c7b145f67dfa9103f69fd884bf706395a72886358d8f231a7011a39e5
+  version: 1.5.399
+  resolution: "electron-to-chromium@npm:1.5.399"
+  checksum: 10c0/5b2ab966e0748d00a2bc2dfd7eee203fe872ce2ca4478eea94f1ceda629172770378128cd6d20be4af8c21874ef250163cd47735e01f38f1182f4312d8c7e78b
   languageName: node
   linkType: hard
 
@@ -1308,9 +1308,9 @@ __metadata:
   linkType: hard
 
 "flatted@npm:^3.2.9":
-  version: 3.4.3
-  resolution: "flatted@npm:3.4.3"
-  checksum: 10c0/0b36eba483a68dda5a2c4dda9cab61dc1c57a3bd9bd6942d1c6fac9c94c86fb6295c7167f33f94f72b5a79ccf95bf5c2a0cf99f73888ef858252439e149bf24b
+  version: 3.4.4
+  resolution: "flatted@npm:3.4.4"
+  checksum: 10c0/a3a52a88ea5a4c333e5a1f097dcd87a037fa31c236a77cf46222c2aa4036ef895ab9bc76138a66d9dc22bdb3652128f9598cd26e7439561bf19f67276e2bc37e
   languageName: node
   linkType: hard
 
@@ -1510,11 +1510,11 @@ __metadata:
   linkType: hard
 
 "minimatch@npm:^10.2.1, minimatch@npm:^10.2.2, minimatch@npm:^10.2.4, minimatch@npm:^10.2.5":
-  version: 10.2.5
-  resolution: "minimatch@npm:10.2.5"
+  version: 10.2.6
+  resolution: "minimatch@npm:10.2.6"
   dependencies:
-    brace-expansion: "npm:^5.0.5"
-  checksum: 10c0/6bb058bd6324104b9ec2f763476a35386d05079c1f5fe4fbf1f324a25237cd4534d6813ecd71f48208f4e635c1221899bef94c3c89f7df55698fe373aaae20fd
+    brace-expansion: "npm:^5.0.8"
+  checksum: 10c0/4559a836243b98bd4d17ea9f7edae698717c76399eea7be374f3737f33164e4907f19e9726891ddeb122f750a5a7fa80d2ac43e851d6e5984dc4ff42ec127d3a
   languageName: node
   linkType: hard
 
