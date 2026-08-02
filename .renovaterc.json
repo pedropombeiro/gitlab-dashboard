@@ -111,6 +111,12 @@
       "allowedVersions": "<7"
     },
     {
+      "description": "Hold the redis gem at v5 until Rails ships Action Cable's redis-client-based adapter",
+      "matchManagers": ["bundler"],
+      "matchPackageNames": ["redis"],
+      "allowedVersions": "<6"
+    },
+    {
       "description": "Group all Ruby version references into a single PR",
       "matchDepNames": ["ruby"],
       "groupName": "Ruby"

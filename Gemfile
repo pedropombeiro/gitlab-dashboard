@@ -22,8 +22,8 @@ gem "jsbundling-rails", "~> 1.3"
 
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
-# Use Redis adapter to run Action Cable in production
-gem "redis", ">= 4.0.1"
+# Use Redis adapter to run Action Cable in production. Action Cable currently requires redis < 6.
+gem "redis", ">= 4.0.1", "< 6"
 
 # Use Active Model has_secure_password [https://guides.rubyonrails.org/active_model_basics.html#securepassword]
 # gem "bcrypt", "~> 3.1.7"

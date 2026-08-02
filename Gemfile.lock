@@ -505,8 +505,8 @@ GEM
       prism (>= 1.6.0)
       rbs (>= 4.0.0)
       tsort
-    redis (6.0.0)
-      redis-client (= 0.30.1)
+    redis (5.4.1)
+      redis-client (>= 0.22.0)
     redis-client (0.30.1)
       connection_pool
     regexp_parser (2.12.0)
@@ -754,7 +754,7 @@ DEPENDENCIES
   rack-attack
   rails (~> 8.1.1)
   rails-controller-testing
-  redis (>= 4.0.1)
+  redis (>= 4.0.1, < 6)
   retries (~> 0.0.5)
   rspec-rails (~> 8.0.0)
   rubocop-rails-omakase
