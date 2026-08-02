@@ -109,6 +109,11 @@
       "description": "Hold TypeScript at v6 until typescript-eslint supports TS 7 (typescript-eslint#10940)",
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<7"
+    },
+    {
+      "description": "Group all Ruby version references into a single PR",
+      "matchDepNames": ["ruby"],
+      "groupName": "Ruby"
     }
   ],
   "customManagers": [
