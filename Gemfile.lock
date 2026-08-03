@@ -231,7 +231,7 @@ GEM
     graphlient (0.8.0)
       faraday (~> 2.0)
       graphql-client
-    graphql (2.6.6)
+    graphql (2.6.7)
       base64
       fiber-storage
       logger
@@ -321,7 +321,7 @@ GEM
       railties (>= 7.1)
       stimulus-rails
       turbo-rails
-    msgpack (1.8.3)
+    msgpack (1.8.4)
     mutex_m (0.3.0)
     net-http (0.9.1)
       uri (>= 0.11.1)
@@ -691,7 +691,7 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
-    zeitwerk (2.8.2)
+    zeitwerk (2.8.3)
 
 PLATFORMS
   aarch64-linux
