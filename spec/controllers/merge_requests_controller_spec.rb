@@ -820,7 +820,9 @@ RSpec.describe MergeRequestsController, type: :controller do
 
             # Captions
             expect(response.body).to include(%r{A total of\s+1,311 merge requests})
-            expect(response.body).to include(%r{Merged on average after.*\(median .*\)}m)
+            expect(response.body).to include(
+              %r{Merged on average after\s+<span[^>]*>\s+6 days.*\(median 1 day\)}m
+            )
           end
         end
       end
