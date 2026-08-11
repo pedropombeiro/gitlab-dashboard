@@ -22,6 +22,28 @@ module MergeRequestsHelper
     2.weeks
   end
 
+  def mean_time_to_merge(merge_requests)
+    return 0 unless merge_requests.any?
+
+    ActiveSupport::Duration.build(
+      merge_requests.sum { |mr| mr.mergedAt - mr.createdAt } / merge_requests.count
+    )
+  end
+
+  def median_time_to_merge(merge_requests)
+    return 0 unless merge_requests.any?
+
+    durations = merge_requests.map { |mr| mr.mergedAt - mr.createdAt }.sort
+    middle = durations.length / 2
+    median = if durations.length.odd?
+      durations[middle]
+    else
+      (durations[middle - 1] + durations[middle]) / 2.0
+    end
+
+    ActiveSupport::Duration.build(median)
+  end
+
   def recommended_monthly_merge_rate
     12
   end

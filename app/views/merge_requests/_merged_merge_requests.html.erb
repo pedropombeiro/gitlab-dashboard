@@ -4,17 +4,8 @@
 <% first_merged_merge_requests_timestamp =
   local_assigns[:first_merged_merge_requests_timestamp] %>
 
-<% avg_time_to_merge =
-  (
-    if merge_requests.count.positive?
-      ActiveSupport::Duration.build(
-        merge_requests.sum { |mr| mr.mergedAt - mr.createdAt } /
-          merge_requests.count,
-      )
-    else
-      0
-    end
-  ) %>
+<% avg_time_to_merge = mean_time_to_merge(merge_requests) %>
+<% median_time_to_merge = median_time_to_merge(merge_requests) %>
 <% overall_avg_time_to_merge =
   if merged_merge_requests_tttm
     ActiveSupport::Duration.build(
@@ -52,7 +43,7 @@
           bs_toggle: "popover",
           bs_html: "true",
           bs_title: "Projected monthly merge rate against historical average",
-          bs_content:
+            bs_content:
             "The projected monthly merge rate of #{(merge_requests.count / 1.week.in_days * 30).round} " \
               "is #{merge_rate_ok ? "above" : "below"} the historical average of #{pluralize(monthly_merge_rate, "merge request")} " \
               "merged per month.<br/>See #{merged_mr_rates_handbook_url}."
@@ -74,8 +65,9 @@
             bs_toggle: "popover",
             bs_html: "true",
             bs_title: "Weekly MTTM against historical average",
-            bs_content:
-              "Merged requests this week took #{distance_of_time_in_words(avg_time_to_merge)} to be merged, " \
+          bs_content:
+              "Merged requests this week took #{distance_of_time_in_words(avg_time_to_merge)} to be merged " \
+              "(median #{distance_of_time_in_words(median_time_to_merge)}), " \
               "#{merge_avg_ttm_ok ? "at or below" : "above"} the historical average of #{distance_of_time_in_words(overall_avg_time_to_merge)}." \
               "<br/>See #{mttm_handbook_url}."
           },
@@ -84,6 +76,7 @@
           <%= render("info_symbol") %>
           <%= render("trend_indicator", trend: merge_avg_ttm_ok ? :down : :up) %>
         <% end %>
+        (median <%= distance_of_time_in_words(median_time_to_merge) %>)
       </div>
     <% end %>
   </div>
