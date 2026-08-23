@@ -145,6 +145,23 @@ Cache keys format:
 - `reviewer:{username}` (reviewer-specific)
 - `project_version:{project_path}` (project-specific)
 
+#### Geocoding lookups (LocationLookupService)
+
+Geocoding results are cached on two tiers, because Geokit reports "no such place"
+and "geocoder unreachable" identically (both yield a blank `GeoLoc`):
+
+- **1 week**: location resolved, or Nominatim answered normally but knows no such
+  place. The latter is a permanent answer, so it is cached for the full validity
+  and reported with `Honeybadger.event` rather than `Honeybadger.notify`.
+  Caching it briefly instead caused repeated error emails, since
+  `ScheduleCacheRefreshJob` re-queries every minute.
+- **15 minutes**: HTTP error, timeout, or connection failure. These are
+  transient, so they expire quickly and do raise `Honeybadger.notify`.
+
+`GeocodingResponseRecorder` (a Geokit net adapter) preserves the HTTP response so
+the two cases can be told apart. Timezone names are negatively cached on the same
+tiers, so unresolvable locations are not re-queried on every render.
+
 ### Background Jobs
 
 - **ScheduleCacheRefreshJob**: Runs every 1 minute (dev & prod), triggers cache refresh

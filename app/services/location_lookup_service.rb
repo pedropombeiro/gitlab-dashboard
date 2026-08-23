@@ -7,12 +7,22 @@ require "timezone"
 class LocationLookupService
   include CacheConcern
 
+  # Sentinel stored in the timezone name cache so that locations without a
+  # known timezone are negatively cached instead of re-queried on every call.
+  NO_TIMEZONE = ""
+
   def self.cache_validity
     1.week
   end
 
   def self.failure_cache_validity
     15.minutes
+  end
+
+  # Nominatim answering "no such place" is a permanent answer, so it is cached
+  # as long as a successful lookup. Only transport failures get the short TTL.
+  def self.validity_for(outcome)
+    (outcome == :failed) ? failure_cache_validity : cache_validity
   end
 
   def fetch_timezones(locations)
@@ -29,20 +39,19 @@ class LocationLookupService
     return if location.blank?
     return unless timezone_configured?
 
-    tzname =
-      Rails.cache.fetch(self.class.location_timezone_name_cache_key(location), expires_in: self.class.cache_validity) do
-        res = fetch_location_info(location)
-        return unless res.valid?
+    cache_key = self.class.location_timezone_name_cache_key(location)
+    cached_tzname = Rails.cache.read(cache_key)
+    return if cached_tzname == NO_TIMEZONE
+    return Timezone[cached_tzname] if cached_tzname
 
-        timezone = Timezone.lookup(res.latitude, res.longitude)
-        return unless timezone.valid?
+    result = fetch_location_info(location)
+    tzname = timezone_name(result.geolocation, location)
 
-        timezone.name
-      rescue Timezone::Error::Base => exception
-        Honeybadger.notify(exception, tags: "warning, timezone", context: {location: location})
-
-        nil
-      end
+    Rails.cache.write(
+      cache_key,
+      tzname || NO_TIMEZONE,
+      expires_in: self.class.validity_for(result.outcome)
+    )
 
     Timezone[tzname] if tzname
   end
@@ -50,7 +59,7 @@ class LocationLookupService
   def fetch_country_code(location)
     return if location.blank?
 
-    fetch_location_info(location)&.country_code
+    fetch_location_info(location)&.geolocation&.country_code
   end
 
   private
@@ -59,13 +68,31 @@ class LocationLookupService
     return if location.blank?
 
     cache_key = self.class.location_info_cache_key(location)
-    cached = Rails.cache.read(cache_key)
+    cached = LocationLookupResult.from_cache(Rails.cache.read(cache_key))
     return cached if cached
 
-    res = Geokit::Geocoders::OSMGeocoder.geocode(location)
+    result = geocode(location)
+    Rails.cache.write(
+      cache_key,
+      result.to_cache,
+      expires_in: self.class.validity_for(result.outcome)
+    )
 
-    if res.success?
-      Rails.cache.write(cache_key, res, expires_in: self.class.cache_validity)
+    result
+  end
+
+  def geocode(location)
+    recorded = GeocodingResponseRecorder.record { Geokit::Geocoders::OSMGeocoder.geocode(location) }
+    geolocation = recorded.value
+
+    if geolocation.success?
+      LocationLookupResult.new(geolocation, :resolved)
+    elsif recorded.http_success?
+      # Nominatim replied normally but knows no such place: never going to
+      # resolve, so report it without raising an error notification.
+      Honeybadger.event("Geocoding lookup returned no results", location: location)
+
+      LocationLookupResult.new(geolocation, :unresolvable)
     else
       Honeybadger.notify(
         "Geocoding lookup failed",
@@ -73,10 +100,19 @@ class LocationLookupService
         context: {location: location}
       )
 
-      Rails.cache.write(cache_key, res, expires_in: self.class.failure_cache_validity)
+      LocationLookupResult.new(geolocation, :failed)
     end
+  end
 
-    res
+  def timezone_name(geolocation, location)
+    return unless geolocation.valid?
+
+    timezone = Timezone.lookup(geolocation.latitude, geolocation.longitude)
+    timezone.name if timezone.valid?
+  rescue Timezone::Error::Base => exception
+    Honeybadger.notify(exception, tags: "warning, timezone", context: {location: location})
+
+    nil
   end
 
   def timezone_configured?
