@@ -162,6 +162,27 @@ RSpec.describe GitlabClient do
     end
   end
 
+  describe "#fetch_group_reviewers" do
+    let_it_be(:group_reviewers_response_body) { YAML.load_file(file_fixture("group_reviewers.yml")) }
+
+    subject(:fetch_group_reviewers) do
+      client.fetch_group_reviewers("gitlab-org")
+    end
+
+    before do
+      stub_request(:post, graphql_url)
+        .with(body: hash_including("operationName" => "GitlabClient__GroupReviewersQuery"))
+        .to_return_json(body: group_reviewers_response_body["verify"])
+    end
+
+    it "skips members without users and counts reviews not approved by the reviewer" do
+      reviewers = fetch_group_reviewers.response.data.group.groupMembers.nodes
+
+      expect(reviewers.first.user.activeReviews.count).to eq(1)
+      expect(reviewers.second.user).to be_nil
+    end
+  end
+
   describe "#fetch_merged_merge_requests" do
     let(:author) { "user.1" }
 

@@ -60,14 +60,15 @@ class GroupReviewersDto
   end
 
   def warmup_timezone_cache(reviewers)
-    locations = reviewers.map(&:location).compact_blank.uniq
+    locations = reviewers.filter_map { |member| member.user&.location }.compact_blank.uniq
 
     location_lookup_service.fetch_timezones(locations)
   end
 
-  def convert_reviewer(reviewer)
-    reviewer = reviewer.user
+  def convert_reviewer(member)
+    reviewer = member.user
 
+    return unless reviewer
     return if reviewer.bot || reviewer.username.ends_with?("-bot")
 
     reviewer.lastActivityOn = parse_graphql_time(reviewer.lastActivityOn)

@@ -254,7 +254,7 @@ class GitlabClient
       next if format == :yaml_fixture
       next if group.nil?
 
-      group.groupMembers.nodes.flat_map(&:user).each do |reviewer|
+      group.groupMembers.nodes.filter_map(&:user).each do |reviewer|
         compute_active_reviews(reviewer)
       end
     end
