@@ -111,6 +111,8 @@ class GitlabClient
       next if format == :yaml_fixture
 
       reviewer = response.response.data.user
+      next if reviewer.nil?
+
       compute_active_reviews(reviewer)
     end
   end

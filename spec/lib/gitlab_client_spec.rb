@@ -175,11 +175,37 @@ RSpec.describe GitlabClient do
         .to_return_json(body: group_reviewers_response_body["verify"])
     end
 
-    it "skips members without users and counts reviews not approved by the reviewer" do
-      reviewers = fetch_group_reviewers.response.data.group.groupMembers.nodes
+    it "does not raise when a group member has no user" do
+      expect { fetch_group_reviewers }.not_to raise_error
+    end
 
-      expect(reviewers.first.user.activeReviews.count).to eq(1)
-      expect(reviewers.second.user).to be_nil
+    it "counts only reviews not already approved by the reviewer" do
+      reviewers = fetch_group_reviewers.response.data.group.groupMembers.nodes
+        .filter_map(&:user)
+        .to_h { |user| [user.username, user.activeReviews.count] }
+
+      expect(reviewers).to include(
+        "gitlab-infra-mgmt-bot" => 0,
+        "rkadam3" => 1,
+        "mfanGitLab" => 4,
+        "pedropombeiro" => 0,
+        "grzesiek" => 8
+      )
+    end
+  end
+
+  describe "#fetch_reviewer" do
+    subject(:fetch_reviewer) { client.fetch_reviewer("ghost") }
+
+    before do
+      stub_request(:post, graphql_url)
+        .with(body: hash_including("operationName" => "GitlabClient__ReviewerQuery"))
+        .to_return_json(body: {data: {user: nil}})
+    end
+
+    it "does not raise when the user is not visible" do
+      expect { fetch_reviewer }.not_to raise_error
+      expect(fetch_reviewer.response.data.user).to be_nil
     end
   end
 

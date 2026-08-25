@@ -175,11 +175,14 @@ class FetchMergeRequestsService
 
     reviewers_hash =
       reviewers_info
-        .map { |response| response.response.data.user }
+        .filter_map { |response| response.response.data.user }
         .to_h { |reviewer| [reviewer.username, reviewer] }
 
     open_merge_requests.flat_map { |mr| mr.reviewers.nodes }.each do |reviewer|
-      reviewer.table.reverse_merge!(reviewers_hash[reviewer.username].table)
+      reviewer_info = reviewers_hash[reviewer.username]
+      next if reviewer_info.nil?
+
+      reviewer.table.reverse_merge!(reviewer_info.table)
     end
   end
 end
