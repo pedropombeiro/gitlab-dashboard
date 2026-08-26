@@ -157,6 +157,29 @@ RSpec.describe ReviewersController, type: :controller do
           # Review counts are colour-coded against each reviewer's limit
           expect(response.body).to match(/text-(success|warning|danger)/)
         end
+
+        context "in development, where the score column is shown" do
+          before do
+            allow(Rails.env).to receive(:development?).and_return(true)
+          end
+
+          it "renders the score in a closed cell" do
+            request
+
+            expect(response).to have_http_status(:ok)
+            expect(response.body).to include(%(<th scope="col" class="text-end">Score</th>))
+            expect(response.body).to match(
+              %r{<td class="text-end text-secondary">\s*<span>\[\d+, \d+\]</span>\s*</td>}
+            )
+
+            # Every row must close each cell it opens.
+            rows = response.body.scan(%r{<tr[^>]*>.*?</tr>}m)
+            expect(rows).not_to be_empty
+            rows.each do |row|
+              expect(row.scan("<td").size).to eq(row.scan("</td>").size)
+            end
+          end
+        end
       end
     end
   end

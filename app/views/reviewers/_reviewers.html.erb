@@ -85,9 +85,11 @@
               <% end %>
             </nobr>
           </td>
+          <!-- Score -->
           <% if Rails.env.development? %>
-            <td class="text-end text-secondary"
-              <%= tag.span reviewers_dto.send(:reviewer_score, reviewer) %>>
+            <%= tag.td class: %w[text-end text-secondary] do %>
+              <%= tag.span reviewers_dto.send(:reviewer_score, reviewer) %>
+            <% end %>
           <% end %>
         <% end %>
       <% end %>
