@@ -31,7 +31,7 @@ class MergeRequestsControllerBase < ApplicationController
   end
 
   def ensure_author
-    unless author || Rails.application.credentials.gitlab_token
+    unless author || GitlabClient.token?
       render(status: :network_authentication_required, plain: "Please configure GITLAB_TOKEN to use default user")
       return false
     end
