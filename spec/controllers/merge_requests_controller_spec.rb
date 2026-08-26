@@ -166,11 +166,18 @@ RSpec.describe MergeRequestsController, type: :controller do
       context "when author is not specified" do
         let(:params) { nil }
 
-        it "returns network_authentication_required" do
-          request
+        context "and no token is configured" do
+          before do
+            stub_env("GITLAB_TOKEN", nil)
+            allow(Rails.application.credentials).to receive(:gitlab_token).and_return(nil)
+          end
 
-          expect(response).to have_http_status(:network_authentication_required)
-          expect(GitlabUser.find_by_username(author)).to be_nil
+          it "returns network_authentication_required" do
+            request
+
+            expect(response).to have_http_status(:network_authentication_required)
+            expect(GitlabUser.find_by_username(author)).to be_nil
+          end
         end
 
         context "when GITLAB_TOKEN is specified" do
@@ -209,6 +216,28 @@ RSpec.describe MergeRequestsController, type: :controller do
               expect(response).to redirect_to action: :index, author: "user.1"
               expect(GitlabUser.find_by_username(author)).to be_nil
             end
+          end
+        end
+
+        context "when GITLAB_TOKEN is set via environment variable" do
+          before do
+            stub_env("GITLAB_TOKEN", "secret-token")
+          end
+
+          let!(:user_request_stub) do
+            stub_request(:post, graphql_url)
+              .with(body: hash_including(
+                "operationName" => "GitlabClient__CurrentUserQuery",
+                "variables" => {}
+              ))
+              .to_return_json(body: user_response_body)
+          end
+
+          it "redirects to author derived from the token" do
+            request
+
+            expect(response).to redirect_to action: :index, author: author
+            expect(GitlabUser.find_by_username(author)).to be_nil
           end
         end
       end

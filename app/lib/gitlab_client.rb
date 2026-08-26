@@ -68,6 +68,10 @@ class GitlabClient
     @gitlab_token = ENV.fetch("GITLAB_TOKEN", Rails.application.credentials.gitlab_token)
   end
 
+  def self.token?
+    gitlab_token.present?
+  end
+
   private_class_method def self.authorization
     "Bearer #{gitlab_token}"
   end
