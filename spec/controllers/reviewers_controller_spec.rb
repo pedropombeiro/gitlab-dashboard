@@ -59,12 +59,105 @@ RSpec.describe ReviewersController, type: :controller do
 
     let(:format) { nil }
 
+    # Just after the lastActivityOn values in the fixture, so that the activity
+    # and scoring paths in the DTO see realistic timestamps.
     around do |example|
-      travel_to Time.utc(2024, 11, 20) do
+      travel_to Time.utc(2025, 1, 22, 12) do
         example.run
       end
     end
 
-    pending "todo"
+    let_it_be(:group_reviewers_response_body) { YAML.load_file(file_fixture("group_reviewers.yml")) }
+
+    let(:group_path) { "gitlab-org" }
+    let(:params) { {group_path: group_path} }
+
+    let!(:group_reviewers_request_stub) do
+      stub_request(:post, graphql_url)
+        .with(body: hash_including(
+          "operationName" => "GitlabClient__GroupReviewersQuery",
+          "variables" => hash_including("fullPath" => group_path)
+        ))
+        .to_return_json(body: group_reviewers_response_body["verify"])
+    end
+
+    context "when the group is not found" do
+      let!(:group_reviewers_request_stub) do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including("operationName" => "GitlabClient__GroupReviewersQuery"))
+          .to_return_json(body: {data: {group: nil}})
+      end
+
+      it "returns http not_found" do
+        request
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when the group is known" do
+      it "returns http success" do
+        request
+
+        expect(response).to have_http_status :success
+      end
+
+      it "responds to html by default" do
+        request
+
+        expect(response.content_type).to eq "text/html; charset=utf-8"
+      end
+
+      context "when called twice" do
+        it "calls api twice" do
+          2.times { perform_request }
+
+          expect(group_reviewers_request_stub).to have_been_requested.twice
+        end
+
+        context "with cache enabled", :with_cache do
+          it "only calls api once" do
+            2.times { perform_request }
+
+            expect(response).to have_http_status :success
+            expect(group_reviewers_request_stub).to have_been_requested.once
+          end
+        end
+      end
+
+      context "with render_views" do
+        render_views
+
+        before do
+          stub_request(:get, %r{^https://nominatim\.openstreetmap\.org/search\?addressdetails=1})
+            .to_return(status: :not_found)
+        end
+
+        it "renders the actual template" do
+          request
+
+          expect(response).to have_http_status(:ok)
+          expect(response).to render_template("reviewers/_reviewers")
+
+          expect(response.body).to include(
+            %(<turbo-frame id="reviewers_group_reviewers_dto_#{group_path}">)
+          )
+
+          # Human reviewers are listed, bots are filtered out
+          expect(response.body).to include("rkadam3")
+          expect(response.body).not_to include("gitlab-infra-mgmt-bot")
+          expect(response.body).not_to include("employment-bot")
+
+          # Active review counts link to the reviewer's dashboard, excluding
+          # merge requests they already approved
+          expect(response.body).to include(
+            ERB::Util.html_escape("not[approved_by_usernames][]=rkadam3")
+          )
+
+          # Review counts are colour-coded against each reviewer's limit
+          expect(response.body).to match(/text-(success|warning|danger)/)
+        end
+      end
+    end
   end
 end
