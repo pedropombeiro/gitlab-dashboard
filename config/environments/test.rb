@@ -5,11 +5,15 @@
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
-  if ENV["CI"].present?
-    config.active_record.encryption.primary_key = "test"
-    config.active_record.encryption.deterministic_key = "test"
-    config.active_record.encryption.key_derivation_salt = "test"
-  end
+
+  # Dummy Active Record encryption keys for the test environment. These are
+  # throwaway values, so set them unconditionally: gating them on CI meant a
+  # fresh local `bundle exec rspec` failed with "Missing Active Record
+  # encryption credential" for any spec touching an encrypted attribute.
+  #
+  config.active_record.encryption.primary_key = "test"
+  config.active_record.encryption.deterministic_key = "test"
+  config.active_record.encryption.key_derivation_salt = "test"
 
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
