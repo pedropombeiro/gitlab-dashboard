@@ -231,7 +231,7 @@ GEM
     graphlient (0.9.0)
       faraday (~> 2.0)
       graphql-client
-    graphql (2.6.9)
+    graphql (2.6.10)
       base64
       fiber-storage
       logger
@@ -330,7 +330,7 @@ GEM
       net-protocol
     net-pop (0.1.2)
       net-protocol
-    net-protocol (0.2.2)
+    net-protocol (0.3.0)
       timeout
     net-scp (4.1.0)
       net-ssh (>= 2.6.5, < 8.0.0)
