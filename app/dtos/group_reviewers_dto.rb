@@ -121,7 +121,7 @@ class GroupReviewersDto
   end
 
   def inactive?(reviewer)
-    reviewer.lastActivityOn.before?(3.days.ago)
+    reviewer.lastActivityOn.nil? || reviewer.lastActivityOn.before?(3.days.ago)
   end
 
   def reviewer_score(reviewer)

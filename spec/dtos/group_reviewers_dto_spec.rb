@@ -7,6 +7,7 @@ RSpec.describe GroupReviewersDto do
   let_it_be(:group_reviewers_response_body) { YAML.load_file(file_fixture("group_reviewers.yml")) }
 
   let(:group_path) { "gitlab-org" }
+  let(:graphql_response_body) { group_reviewers_response_body["verify"] }
 
   # The DTO consumes the response after GitlabClient has folded activeReviews
   # into a count, so go through the client rather than the raw fixture.
@@ -17,7 +18,7 @@ RSpec.describe GroupReviewersDto do
   before do
     stub_request(:post, graphql_url)
       .with(body: hash_including("operationName" => "GitlabClient__GroupReviewersQuery"))
-      .to_return_json(body: group_reviewers_response_body["verify"])
+      .to_return_json(body: graphql_response_body)
 
     allow_any_instance_of(LocationLookupService).to receive(:fetch_timezones)
     allow_any_instance_of(LocationLookupService).to receive(:fetch_timezone)
@@ -36,5 +37,23 @@ RSpec.describe GroupReviewersDto do
       .with(a_collection_including("Mumbai, India", "Vancouver, Canada"))
 
     dto
+  end
+
+  context "when a reviewer has no recorded activity" do
+    let(:graphql_response_body) do
+      group_reviewers_response_body["verify"].deep_dup.tap do |body|
+        reviewer = body.dig("data", "group", "groupMembers", "nodes").find do |member|
+          member.dig("user", "username") == "rkadam3"
+        end
+        reviewer["user"]["lastActivityOn"] = nil
+      end
+    end
+
+    it "treats the reviewer as inactive" do
+      reviewer = dto.reviewers.find { |candidate| candidate.username == "rkadam3" }
+
+      expect(reviewer.lastActivityOn).to be_nil
+      expect(dto.send(:inactive?, reviewer)).to be(true)
+    end
   end
 end
