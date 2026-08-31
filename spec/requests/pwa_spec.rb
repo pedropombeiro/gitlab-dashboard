@@ -32,7 +32,31 @@ RSpec.describe "PWA", type: :request do
 
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("application/json")
-      expect(response.parsed_body).to include("id" => "gitlab-mr-dashboard")
+      expect(response.parsed_body).to include(
+        "id" => "gitlab-mr-dashboard",
+        "start_url" => "/"
+      )
+    end
+
+    it "uses the author in the app identity and launch URL" do
+      get "/manifest", params: {author: "pedropombeiro"}
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to include(
+        "id" => "gitlab-mr-dashboard-pedropombeiro",
+        "start_url" => "/mrs?author=pedropombeiro",
+        "scope" => "/"
+      )
+    end
+
+    it "discards an invalid author" do
+      get "/manifest", params: {author: "invalid/user"}
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body).to include(
+        "id" => "gitlab-mr-dashboard",
+        "start_url" => "/"
+      )
     end
 
     it "renders the manifest with the JSON extension" do

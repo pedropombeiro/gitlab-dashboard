@@ -1,5 +1,5 @@
 {
-  "id": "gitlab-mr-dashboard",
+  "id": <%== "gitlab-mr-dashboard#{"-#{@author}" if @author}".to_json %>,
   "name": "GitLab MR Dashboard",
   "short_name": "MR Dashboard",
   "icons": [
@@ -15,7 +15,7 @@
       "purpose": "maskable"
     }
   ],
-  "start_url": "/",
+  "start_url": <%== (@author ? merge_requests_path(author: @author) : "/").to_json %>,
   "display": "standalone",
   "scope": "/",
   "categories": ["developer", "developer tools", "productivity", "utilities"],
