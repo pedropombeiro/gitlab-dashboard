@@ -55,4 +55,29 @@ RSpec.describe GenerateNotificationsService, "#execute" do
       execute
     end
   end
+
+  context "when sending a notification" do
+    let(:fetch_result) { FetchMergeRequestsService::FetchResult.new(response: response, freshly_fetched?: true) }
+    let(:failed_job) { double(allowFailure: false) }
+    let(:merge_request) { double(headPipeline: double(failedJobs: double(nodes: [failed_job]))) }
+    let(:previous_dto) { instance_double(UserDto, open_merge_requests: double(items: [])) }
+    let(:dto) { instance_double(UserDto, errors: [], open_merge_requests: double(items: [merge_request])) }
+    before { create(:web_push_subscription, gitlab_user: user) }
+
+    before do
+      allow(fetch_service).to receive(:execute).and_return(fetch_result)
+      allow(fetch_service).to receive(:parse_dto).and_return(previous_dto, dto)
+      allow(MergeRequestBroadcaster).to receive(:broadcast_update)
+      notification = {title: "Pipeline failed", body: "A blocking job failed"}
+      allow(ComputeMergeRequestChangesService).to receive(:new)
+        .and_return(instance_double(ComputeMergeRequestChangesService, execute: [notification]))
+    end
+
+    it "includes the attention-needed count" do
+      expect_any_instance_of(WebPushSubscription).to receive(:publish)
+        .with(hash_including(type: "push_notification", payload: hash_including(appBadgeCount: 1)))
+
+      execute
+    end
+  end
 end

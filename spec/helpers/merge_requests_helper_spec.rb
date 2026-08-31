@@ -39,4 +39,25 @@ RSpec.describe MergeRequestsHelper do
       expect(median_time_to_merge(merge_requests)).to eq(1.day)
     end
   end
+
+  describe "attention-needed helpers" do
+    def merge_request(*allow_failure_values)
+      jobs = allow_failure_values.map { |allow_failure| double(allowFailure: allow_failure) }
+      double(headPipeline: double(failedJobs: double(nodes: jobs)))
+    end
+
+    it "counts merge requests with blocking failed jobs" do
+      merge_requests = [merge_request(false, false), merge_request(true), merge_request(false, true)]
+
+      expect(attention_needed_merge_requests_count(merge_requests)).to eq(2)
+      expect(any_failed_pipeline?(merge_requests)).to be(true)
+    end
+
+    it "ignores allowed failures and missing pipelines" do
+      merge_requests = [merge_request(true), double(headPipeline: nil)]
+
+      expect(attention_needed_merge_requests_count(merge_requests)).to eq(0)
+      expect(any_failed_pipeline?(merge_requests)).to be(false)
+    end
+  end
 end

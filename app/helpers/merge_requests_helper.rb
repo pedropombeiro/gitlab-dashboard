@@ -69,11 +69,13 @@ module MergeRequestsHelper
   end
 
   def any_failed_pipeline?(merge_requests)
-    merge_requests
-      .flat_map { |mr| mr.headPipeline&.failedJobs&.nodes }
-      .compact
-      .map(&:allowFailure)
-      .include?(false)
+    attention_needed_merge_requests_count(merge_requests).positive?
+  end
+
+  def attention_needed_merge_requests_count(merge_requests)
+    merge_requests.count do |mr|
+      mr.headPipeline&.failedJobs&.nodes&.any? { |job| !job.allowFailure }
+    end
   end
 
   private

@@ -4,6 +4,7 @@ require "async"
 
 class GenerateNotificationsService
   include CacheConcern
+  include MergeRequestsHelper
   include WebPushConcern
 
   def initialize(author, type, fetch_service)
@@ -52,6 +53,10 @@ class GenerateNotificationsService
 
   def check_changes(previous_dto, dto, next_scheduled_update_at)
     notifications = ComputeMergeRequestChangesService.new(type, previous_dto, dto).execute
+    app_badge_count = if type == :open
+      attention_needed_merge_requests_count(dto.open_merge_requests.items)
+    end
+
     if notifications.pluck(:type).include?(:merge_request_merged)
       # Clear monthly MR count cache if an MR has been merged
       Rails.cache.delete(self.class.monthly_merged_mr_lists_cache_key(author_user.username))
@@ -74,10 +79,10 @@ class GenerateNotificationsService
       end
     end
 
-    notifications.each { |notification| notify_user(**notification) }
+    notifications.each { |notification| notify_user(**notification, app_badge_count: app_badge_count) }
   end
 
-  def notify_user(title:, body:, icon: nil, badge: nil, url: nil, **message)
+  def notify_user(title:, body:, icon: nil, badge: nil, url: nil, app_badge_count: nil, **message)
     icon ||= ActionController::Base.helpers.asset_url("apple-touch-icon-180x180.png")
     badge ||= ActionController::Base.helpers.asset_url("apple-touch-icon-120x120.png")
 
@@ -85,13 +90,14 @@ class GenerateNotificationsService
       type: "push_notification",
       payload: {
         title: title,
+        appBadgeCount: app_badge_count,
         options: {
           badge: badge,
           body: body,
           data: url ? {url: url} : nil,
           icon: icon
         }.compact.merge(message)
-      }
+      }.compact
     })
   end
 end

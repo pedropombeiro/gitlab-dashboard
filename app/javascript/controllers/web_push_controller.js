@@ -11,7 +11,9 @@ export default class extends Controller {
     if ("Notification" in window) {
       switch (Notification.permission) {
         case "granted":
-          // send to server
+          navigator.serviceWorker
+            ?.register("/service-worker.js")
+            .catch((error) => console.warn("Unable to register the service worker.", error));
           return;
         case "denied":
           // do nothing?

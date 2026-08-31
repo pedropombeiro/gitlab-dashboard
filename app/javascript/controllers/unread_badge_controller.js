@@ -28,7 +28,7 @@ class Badger {
     this.srcs = this.srcs || this.faviconELs;
   }
 
-  faviconELs = document.querySelectorAll("link[rel$=icon]");
+  faviconELs = document.querySelectorAll('link[rel="icon"]');
 
   _drawIcon() {
     this.ctx.clearRect(0, 0, this.faviconSize, this.faviconSize);
@@ -154,6 +154,7 @@ var badger = new Badger(badgerOptions);
 // Connects to data-controller="unread-badge"
 export default class extends Controller {
   static values = {
+    attentionCount: Number,
     count: Number,
     problem: Boolean,
   };
@@ -161,6 +162,11 @@ export default class extends Controller {
   connect() {
     badger.value = this.countValue;
     badger.problem = this.problemValue;
+    this.updateAppBadge(this.attentionCountValue);
+  }
+
+  attentionCountValueChanged(value, _previousValue) {
+    this.updateAppBadge(value);
   }
 
   countValueChanged(value, _previousValue) {
@@ -169,5 +175,12 @@ export default class extends Controller {
 
   problemValueChanged(value, _previousValue) {
     badger.problem = value;
+  }
+
+  updateAppBadge(count) {
+    if (!("setAppBadge" in navigator)) return;
+
+    const update = count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge();
+    update.catch((error) => console.warn("Unable to update the app badge.", error));
   }
 }
