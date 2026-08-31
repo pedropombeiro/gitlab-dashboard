@@ -19,6 +19,13 @@ local downloaded_files = List(
 )
 
 hooks {
+    ["commit-msg"] {
+        steps {
+            ["conventional-commit"] {
+                check = "scripts/validate-conventional-commit.sh {{commit_msg_file}}"
+            }
+        }
+    }
     ["pre-commit"] {
         fix = true
         stash = "git"
