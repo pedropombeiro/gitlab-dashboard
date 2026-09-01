@@ -1,4 +1,6 @@
 module ApplicationHelper
+  GITHUB_REPO_URL = "https://github.com/pedropombeiro/gitlab-dashboard"
+
   def safe_url(url)
     uri = URI.parse(url)
 
@@ -14,16 +16,21 @@ module ApplicationHelper
   end
 
   def git_repo_url
-    repo_url = "https://github.com/pedropombeiro/gitlab-dashboard"
-    commit_sha = GitlabDashboard::Application::GIT_COMMIT_SHA
+    return "#{GITHUB_REPO_URL}/releases/tag/#{git_release_tag}" if git_release_tag
+    return "#{GITHUB_REPO_URL}/commit/#{git_commit_sha}" if git_commit_sha
 
-    return "#{repo_url}/commit/#{commit_sha}" if commit_sha.present?
-
-    repo_url
+    GITHUB_REPO_URL
   end
 
   def git_release_tag
-    GitlabDashboard::Application::GIT_RELEASE_TAG
+    deployment_metadata(GitlabDashboard::Application::GIT_RELEASE_TAG)
+  end
+
+  def git_repo_link_title
+    return "Release #{git_release_tag}" if git_release_tag
+    return "Commit #{git_commit_sha.first(7)}" if git_commit_sha
+
+    nil
   end
 
   def pluralize_without_count(count, noun, plural_noun = nil)
@@ -43,5 +50,15 @@ module ApplicationHelper
           tag.tr(cells.join, escape: false)
         end.join
     )
+  end
+
+  private
+
+  def git_commit_sha
+    deployment_metadata(GitlabDashboard::Application::GIT_COMMIT_SHA)
+  end
+
+  def deployment_metadata(value)
+    value.presence unless value == "null"
   end
 end
