@@ -79,5 +79,61 @@ RSpec.describe GenerateNotificationsService, "#execute" do
 
       execute
     end
+
+    context "when fetching merged merge requests" do
+      let(:type) { :merged }
+      let(:previous_dto) { instance_double(UserDto) }
+      let(:dto) { instance_double(UserDto, errors: []) }
+      let(:open_response) { double("OpenResponse", errors: nil) }
+      let(:open_dto) { instance_double(UserDto, errors: [], open_merge_requests: double(items: [merge_request])) }
+
+      before do
+        allow_any_instance_of(MergeRequestsCacheService).to receive(:read) do |_instance, _author, read_type|
+          open_response if read_type == :open
+        end
+        allow(fetch_service).to receive(:parse_dto) do |source, parse_type|
+          if parse_type == :open
+            open_dto
+          elsif source.nil?
+            previous_dto
+          else
+            dto
+          end
+        end
+      end
+
+      it "includes the attention-needed count from the cached open merge requests" do
+        expect_any_instance_of(WebPushSubscription).to receive(:publish)
+          .with(hash_including(type: "push_notification", payload: hash_including(appBadgeCount: 1)))
+
+        execute
+      end
+
+      context "without cached open merge requests" do
+        let(:open_response) { nil }
+
+        it "sends the notification without an app badge count" do
+          expect_any_instance_of(WebPushSubscription).to receive(:publish)
+            .with(hash_including(type: "push_notification", payload: hash_excluding(:appBadgeCount)))
+
+          execute
+        end
+      end
+    end
+
+    context "without notification changes" do
+      let(:type) { :merged }
+
+      before do
+        allow(ComputeMergeRequestChangesService).to receive(:new)
+          .and_return(instance_double(ComputeMergeRequestChangesService, execute: []))
+      end
+
+      it "does not read open merge requests for the badge count" do
+        expect_any_instance_of(MergeRequestsCacheService).not_to receive(:read).with(author, :open)
+
+        execute
+      end
+    end
   end
 end

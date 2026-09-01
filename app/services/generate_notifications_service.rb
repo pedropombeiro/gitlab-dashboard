@@ -53,9 +53,7 @@ class GenerateNotificationsService
 
   def check_changes(previous_dto, dto, next_scheduled_update_at)
     notifications = ComputeMergeRequestChangesService.new(type, previous_dto, dto).execute
-    app_badge_count = if type == :open
-      attention_needed_merge_requests_count(dto.open_merge_requests.items)
-    end
+    app_badge_count = notification_app_badge_count(dto) if notifications.any?
 
     if notifications.pluck(:type).include?(:merge_request_merged)
       # Clear monthly MR count cache if an MR has been merged
@@ -80,6 +78,23 @@ class GenerateNotificationsService
     end
 
     notifications.each { |notification| notify_user(**notification, app_badge_count: app_badge_count) }
+  end
+
+  def notification_app_badge_count(dto)
+    open_dto = dto
+    unless type == :open
+      open_response = cache_service.read(author_user.username, :open)
+      return unless open_response && open_response.errors.nil?
+
+      open_dto = fetch_service.parse_dto(open_response, :open)
+    end
+
+    return if open_dto.errors.present?
+
+    attention_needed_merge_requests_count(open_dto.open_merge_requests.items)
+  rescue => e
+    Rails.logger.warn "[GenerateNotificationsService] Unable to compute app badge count: #{e.class} - #{e.message}"
+    nil
   end
 
   def notify_user(title:, body:, icon: nil, badge: nil, url: nil, app_badge_count: nil, **message)
