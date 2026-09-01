@@ -11,6 +11,7 @@ module CacheConcern
   PROJECT_VERSION_VALIDITY = 6.hours
 
   LOCATION_VERSION = "v3"
+  MONTHLY_MERGE_REQUEST_STATS_VERSION = "v2"
 
   class_methods do
     def user_cache_key(username)
@@ -105,7 +106,8 @@ module CacheConcern
     end
 
     def monthly_merge_request_stats_version
-      @monthly_merge_request_stats_version ||= calculate_hash(GitlabClient::MonthlyMergeRequestsQuery)
+      @monthly_merge_request_stats_version ||=
+        calculate_hash(MONTHLY_MERGE_REQUEST_STATS_VERSION, GitlabClient::MonthlyMergeRequestsQuery)
     end
 
     def group_reviewers_version

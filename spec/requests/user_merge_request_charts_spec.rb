@@ -31,7 +31,7 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
               "operationName" => "GitlabClient__MonthlyMergeRequestsQuery",
               "variables" => {
                 "author" => author,
-                "mergedAfter" => 1.day.before(bom).to_fs,
+                "mergedAfter" => bom.to_fs,
                 "mergedBefore" => bom.end_of_month.to_fs
               }
             ))

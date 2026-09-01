@@ -164,7 +164,7 @@ class GitlabClient
               execute_query(
                 MonthlyMergeRequestsQuery,
                 author: author,
-                mergedAfter: 1.day.before(bom).to_fs,
+                mergedAfter: bom.to_fs,
                 mergedBefore: bom.end_of_month.to_fs
               )
             end
