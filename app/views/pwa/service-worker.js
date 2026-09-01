@@ -1,20 +1,24 @@
 // Add a service worker for processing Web Push notifications:
 //
-self.addEventListener("push", async (event) => {
-  const { type, payload } = await event.data.json();
-  switch (type) {
-    case "push_notification": {
-      const { title, options, appBadgeCount } = payload;
-      const updates = [self.registration.showNotification(title, options)];
+self.addEventListener("push", (event) => {
+  event.waitUntil(
+    (async () => {
+      const { type, payload } = await event.data.json();
+      switch (type) {
+        case "push_notification": {
+          const { title, options, appBadgeCount } = payload;
+          const updates = [self.registration.showNotification(title, options)];
 
-      if (typeof appBadgeCount === "number" && "setAppBadge" in navigator) {
-        updates.push(appBadgeCount > 0 ? navigator.setAppBadge(appBadgeCount) : navigator.clearAppBadge());
+          if (typeof appBadgeCount === "number" && "setAppBadge" in navigator) {
+            updates.push(appBadgeCount > 0 ? navigator.setAppBadge(appBadgeCount) : navigator.clearAppBadge());
+          }
+
+          await Promise.all(updates);
+          break;
+        }
       }
-
-      event.waitUntil(Promise.all(updates));
-      break;
-    }
-  }
+    })(),
+  );
 });
 
 self.addEventListener("notificationclick", function (event) {
