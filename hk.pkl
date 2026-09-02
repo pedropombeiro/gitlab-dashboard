@@ -54,7 +54,7 @@ hooks {
             }
             ["erb-linter"] {
                 glob = List("*.erb")
-                check = "bin/bundle exec erb_lint {{files}}"
+                check = "scripts/quiet-on-success.sh bin/bundle exec erb_lint {{files}}"
                 fix = "bin/bundle exec erb_lint --autocorrect {{files}}"
             }
             ["frontend-linter"] {
@@ -91,7 +91,7 @@ hooks {
             }
             ["erb-linter"] {
                 glob = List("*.erb")
-                check = "bin/bundle exec erb_lint {{files}}"
+                check = "scripts/quiet-on-success.sh bin/bundle exec erb_lint {{files}}"
             }
             ["frontend-linter"] {
                 glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts")
