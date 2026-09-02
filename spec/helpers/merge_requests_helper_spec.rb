@@ -50,6 +50,7 @@ RSpec.describe MergeRequestsHelper do
       merge_requests = [merge_request(false, false), merge_request(true), merge_request(false, true)]
 
       expect(attention_needed_merge_requests_count(merge_requests)).to eq(2)
+      expect(attention_needed?(merge_requests.first)).to be(true)
       expect(any_failed_pipeline?(merge_requests)).to be(true)
     end
 
@@ -57,6 +58,7 @@ RSpec.describe MergeRequestsHelper do
       merge_requests = [merge_request(true), double(headPipeline: nil)]
 
       expect(attention_needed_merge_requests_count(merge_requests)).to eq(0)
+      expect(attention_needed?(merge_requests.first)).to be(false)
       expect(any_failed_pipeline?(merge_requests)).to be(false)
     end
   end

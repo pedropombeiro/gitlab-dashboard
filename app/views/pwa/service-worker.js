@@ -1,5 +1,11 @@
 // Add a service worker for processing Web Push notifications:
 //
+self.addEventListener("install", () => self.skipWaiting());
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(self.clients.claim());
+});
+
 self.addEventListener("push", (event) => {
   event.waitUntil(
     (async () => {

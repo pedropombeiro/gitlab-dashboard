@@ -8,6 +8,8 @@ RSpec.describe "PWA", type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.media_type).to eq("text/javascript")
       expect(response.body).to include("pushsubscriptionchange", "navigator.setAppBadge")
+      expect(response.body).to include('self.addEventListener("install"', "self.skipWaiting()")
+      expect(response.body).to include('self.addEventListener("activate"', "self.clients.claim()")
       expect(response.body).to match(/self\.addEventListener\("push", \(event\) => \{\s+event\.waitUntil\(/)
     end
 

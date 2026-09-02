@@ -41,6 +41,43 @@ RSpec.describe ComputeMergeRequestChangesService do
 
     it { is_expected.to be_empty }
 
+    context "when a pipeline gains a blocking failed job" do
+      let(:previous_mr) { previous_dto.open_merge_requests.items.first }
+      let(:changed_mr) { dto.open_merge_requests.items.first }
+      let(:failed_job) { double(name: "rspec", allowFailure: false) }
+
+      before do
+        previous_mr.headPipeline.failedJobs.nodes.clear
+        changed_mr.headPipeline.failedJobs.nodes.replace([failed_job])
+      end
+
+      it "generates one pipeline failure notification" do
+        expect(execute).to contain_exactly(
+          a_hash_including(
+            type: :pipeline_failed,
+            title: "A merge request pipeline failed",
+            body: a_string_including(failed_job.name),
+            tag: changed_mr.iid,
+            url: changed_mr.webUrl
+          )
+        )
+      end
+
+      context "when the failed job is allowed to fail" do
+        let(:failed_job) { double(name: "rspec", allowFailure: true) }
+
+        it { is_expected.to be_empty }
+      end
+
+      context "when the previous pipeline also required attention" do
+        before do
+          previous_mr.headPipeline.failedJobs.nodes << double(name: "rspec", allowFailure: false)
+        end
+
+        it { is_expected.to be_empty }
+      end
+    end
+
     context "when MR label changes" do
       context "with old contextual label not existing" do
         before do

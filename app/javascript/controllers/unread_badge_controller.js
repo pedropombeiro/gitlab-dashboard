@@ -153,6 +153,8 @@ var badger = new Badger(badgerOptions);
 
 // Connects to data-controller="unread-badge"
 export default class extends Controller {
+  static targets = ["settingsHint"];
+
   static values = {
     attentionCount: Number,
     count: Number,
@@ -181,6 +183,14 @@ export default class extends Controller {
     if (!("setAppBadge" in navigator)) return;
 
     const update = count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge();
-    update.catch((error) => console.warn("Unable to update the app badge.", error));
+    this.settingsHintTarget?.classList.toggle("d-none", count <= 0 || !this.isIOSHomeScreenApp());
+    update.catch((error) => {
+      if (error.name === "NotAllowedError") this.settingsHintTarget?.classList.remove("d-none");
+      console.warn("Unable to update the app badge.", error);
+    });
+  }
+
+  isIOSHomeScreenApp() {
+    return /iPad|iPhone|iPod/.test(navigator.userAgent) && navigator.standalone === true;
   }
 }

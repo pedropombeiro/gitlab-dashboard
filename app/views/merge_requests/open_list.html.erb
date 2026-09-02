@@ -17,6 +17,12 @@
           unread_badge_count_value: @dto.open_merge_requests.items.count,
           unread_badge_problem_value: any_failed_pipeline?(@dto.open_merge_requests.items)
         }) do %>
+        <%= tag.div(
+          "Badge missing? Enable Badges in Settings > Notifications > MR Dashboard.",
+          class: %w[alert alert-info py-2 mb-2 d-none],
+          role: "status",
+          data: { unread_badge_target: "settingsHint" }
+        ) %>
         <%= render "open_merge_requests",
         merge_requests_dto: @dto.open_merge_requests,
         updated_at: @dto.updated_at,

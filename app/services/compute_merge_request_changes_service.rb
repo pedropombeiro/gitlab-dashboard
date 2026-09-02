@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ComputeMergeRequestChangesService
+  include MergeRequestsHelper
+
   def initialize(type, previous_dto, dto)
     @type = type
     @previous_dto = previous_dto
@@ -32,6 +34,16 @@ class ComputeMergeRequestChangesService
     end
 
     # Open MR changes
+    newly_failed_pipelines(previous_open_mrs, open_mrs).each do |mr|
+      failed_job_names = mr.headPipeline.failedJobs.nodes.reject(&:allowFailure).map(&:name)
+      mr_changes << merge_request_change(
+        mr,
+        type: :pipeline_failed,
+        title: "A merge request pipeline failed",
+        body: "#{mr.reference}: #{failed_job_names.to_sentence} failed"
+      )
+    end
+
     changed_labels(previous_open_mrs, open_mrs).each do |change|
       mr_changes << merge_request_labels_change("An open merge request", change)
     end
@@ -74,6 +86,15 @@ class ComputeMergeRequestChangesService
     end
 
     merge_request_change(mr, **hash)
+  end
+
+  def newly_failed_pipelines(previous_mrs, mrs)
+    return [] if previous_mrs.blank?
+
+    mrs.select do |mr|
+      previous_mr = previous_mrs.find { |candidate| candidate.iid == mr.iid }
+      previous_mr && !attention_needed?(previous_mr) && attention_needed?(mr)
+    end
   end
 
   def changed_labels(previous_mrs, mrs)

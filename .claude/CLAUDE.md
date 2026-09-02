@@ -122,8 +122,10 @@ Core integration layer with GitLab's GraphQL API featuring:
 - **auto_refresh_controller.js**: Polls for data updates, refreshes Turbo Frames based on schedule
 - **merged_merge_requests_chart_controller.js**: Renders Chart.js visualizations
 - **theme_selector_controller.js**: Manages light/dark theme switching
-- **unread_badge_controller.js**: Manages notification badges
+- **unread_badge_controller.js**: Updates the favicon and installed app badge from open merge request data
 - **web_push_controller.js**: Manages push notification subscriptions
+
+On iOS and iPadOS, background app badge updates can run only while the service worker handles a visible Web Push notification. `ScheduleSubscribedUsersCacheRefreshJob` refreshes subscribed users whose dashboard hasn't been open recently every 15 minutes, so pipeline failure notifications can update the badge while the PWA is closed.
 
 **Asset Build**:
 

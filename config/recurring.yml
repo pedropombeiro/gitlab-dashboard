@@ -11,6 +11,11 @@ production:
     queue: background
     args: []
     schedule: "* * * * *"
+  subscribed_users_cache_refresh:
+    class: ScheduleSubscribedUsersCacheRefreshJob
+    queue: background
+    args: []
+    schedule: "*/15 * * * *"
   periodic_metrics_refresh:
     class: SendMetricsJob
     queue: background

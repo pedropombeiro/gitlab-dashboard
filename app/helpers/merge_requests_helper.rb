@@ -73,9 +73,11 @@ module MergeRequestsHelper
   end
 
   def attention_needed_merge_requests_count(merge_requests)
-    merge_requests.count do |mr|
-      mr.headPipeline&.failedJobs&.nodes&.any? { |job| !job.allowFailure }
-    end
+    merge_requests.count { |mr| attention_needed?(mr) }
+  end
+
+  def attention_needed?(merge_request)
+    merge_request.headPipeline&.failedJobs&.nodes&.any? { |job| !job.allowFailure } || false
   end
 
   private

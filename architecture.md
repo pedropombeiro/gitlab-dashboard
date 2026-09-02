@@ -477,8 +477,11 @@ The application is deployed using Kamal, which manages:
 
 The application includes PWA support:
 
-- Service worker for offline capabilities
+- Service worker for Web Push notifications and app icon badge updates
 - Web app manifest for installability
+- The foreground app updates the badge from the current open merge request data.
+- Background badge updates run while the service worker handles a visible push notification. iOS and iPadOS don't support silent badge-only pushes.
+- A 15-minute scheduled job refreshes data for users with Web Push subscriptions whose dashboard hasn't been open recently.
 - Available routes:
   - `/manifest`: PWA manifest
   - `/service-worker`: Service worker script
