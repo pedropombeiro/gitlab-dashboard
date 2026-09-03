@@ -183,14 +183,11 @@ export default class extends Controller {
     if (!("setAppBadge" in navigator)) return;
 
     const update = count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge();
-    this.settingsHintTarget?.classList.toggle("d-none", count <= 0 || !this.isIOSHomeScreenApp());
     update.catch((error) => {
-      if (error.name === "NotAllowedError") this.settingsHintTarget?.classList.remove("d-none");
+      if (error.name === "NotAllowedError" && this.hasSettingsHintTarget) {
+        this.settingsHintTarget.classList.remove("d-none");
+      }
       console.warn("Unable to update the app badge.", error);
     });
-  }
-
-  isIOSHomeScreenApp() {
-    return /iPad|iPhone|iPod/.test(navigator.userAgent) && navigator.standalone === true;
   }
 }

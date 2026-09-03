@@ -481,6 +481,7 @@ The application includes PWA support:
 - Web app manifest for installability
 - The foreground app updates the badge from the current open merge request data.
 - Background badge updates run while the service worker handles a visible push notification. iOS and iPadOS don't support silent badge-only pushes.
+- iOS and iPadOS don't support silent notifications, and notification tags don't collapse related notifications. The app therefore clears a recovered pipeline's stale badge when the user next opens the PWA instead of sending a second notification.
 - A 15-minute scheduled job refreshes data for users with Web Push subscriptions whose dashboard hasn't been open recently.
 - Available routes:
   - `/manifest`: PWA manifest

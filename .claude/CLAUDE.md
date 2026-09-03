@@ -125,7 +125,7 @@ Core integration layer with GitLab's GraphQL API featuring:
 - **unread_badge_controller.js**: Updates the favicon and installed app badge from open merge request data
 - **web_push_controller.js**: Manages push notification subscriptions
 
-On iOS and iPadOS, background app badge updates can run only while the service worker handles a visible Web Push notification. `ScheduleSubscribedUsersCacheRefreshJob` refreshes subscribed users whose dashboard hasn't been open recently every 15 minutes, so pipeline failure notifications can update the badge while the PWA is closed.
+On iOS and iPadOS, background app badge updates can run only while the service worker handles a visible Web Push notification. `ScheduleSubscribedUsersCacheRefreshJob` refreshes subscribed users whose dashboard hasn't been open recently every 15 minutes, so pipeline failure notifications can update the badge while the PWA is closed. iOS and iPadOS don't support silent notifications, and notification tags don't collapse related notifications. To avoid a second alert, a recovered pipeline's stale badge clears when the user next opens the PWA.
 
 **Asset Build**:
 
