@@ -22,6 +22,12 @@ RSpec.describe ScheduleSubscribedUsersCacheRefreshJob do
     expect(cache_service).not_to have_received(:needs_scheduled_update?).with(active_subscribed_user.username, anything)
   end
 
+  it "does not use distinct when ordering subscribed users" do
+    relation = GitlabUser.subscribed.order_by_contacted_at_desc.select(:username)
+
+    expect(relation.to_sql).not_to include("DISTINCT")
+  end
+
   it "enqueues stale lists" do
     allow(cache_service).to receive(:needs_scheduled_update?).with(subscribed_user.username, :open).and_return(true)
     allow(MergeRequestsFetchJob).to receive(:perform_later)

@@ -6,9 +6,8 @@ class ScheduleSubscribedUsersCacheRefreshJob < ApplicationJob
   def perform(*_args)
     service = MergeRequestsCacheService.new
     usernames = GitlabUser
-      .joins(:web_push_subscriptions)
+      .subscribed
       .where.not(id: GitlabUser.recently_active.select(:id))
-      .distinct
       .order_by_contacted_at_desc
       .limit(10)
       .pluck(:username)
