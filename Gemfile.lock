@@ -241,7 +241,7 @@ GEM
     hashdiff (1.2.1)
     heapy (0.2.0)
       thor
-    honeybadger (6.9.1)
+    honeybadger (6.9.2)
       logger
       ostruct
     hotwire-livereload (2.1.1)
@@ -398,7 +398,7 @@ GEM
       opentelemetry-instrumentation-base (~> 0.25)
     opentelemetry-instrumentation-faraday (0.33.0)
       opentelemetry-instrumentation-base (~> 0.25)
-    opentelemetry-instrumentation-net_http (0.29.0)
+    opentelemetry-instrumentation-net_http (0.29.1)
       opentelemetry-instrumentation-base (~> 0.25)
     opentelemetry-instrumentation-rack (0.31.1)
       opentelemetry-instrumentation-base (~> 0.25)
