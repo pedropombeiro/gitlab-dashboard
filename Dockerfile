@@ -7,7 +7,7 @@
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
-FROM ruby:4.0.6-alpine@sha256:6ec7aeb4f3f0b67a21fb73a83fc20a4055696e64b933229f68ec805a3de38fcc AS base
+FROM ruby:4.0.7-alpine@sha256:16ef69ead5a9c94cdce60bbb8e605f6ae159ef0240c2e3d1e56357b669c0c5a8 AS base
 
 # Rails app lives here
 WORKDIR /rails
