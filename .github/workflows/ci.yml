@@ -82,6 +82,8 @@ jobs:
             hooks:
               - "hk.pkl"
               - ".hk-hooks/**"
+              - ".mise/**"
+              - "mise.toml"
               - "scripts/**"
             test:
               - "spec/**"

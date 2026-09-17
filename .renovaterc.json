@@ -106,6 +106,12 @@
       "minimumReleaseAge": "3 days"
     },
     {
+      "description": "mise installs Redis from conda-forge, whose builds can lag the GitHub releases the mise manager tracks",
+      "matchManagers": ["mise"],
+      "matchDepNames": ["redis"],
+      "enabled": false
+    },
+    {
       "description": "Hold TypeScript at v6 until typescript-eslint supports TS 7 (typescript-eslint#10940)",
       "matchPackageNames": ["typescript"],
       "allowedVersions": "<7"
@@ -130,6 +136,16 @@
       "matchStrings": ["ARG NODE_VERSION=(?<currentValue>.*?)\\n"],
       "datasourceTemplate": "node-version",
       "depNameTemplate": "node"
+    },
+    {
+      "customType": "regex",
+      "description": "Update the mise Redis pin from conda-forge",
+      "managerFilePatterns": ["/^mise\\.toml$/"],
+      "matchStrings": ["redis = \"(?<currentValue>.*?)\"\\n"],
+      "datasourceTemplate": "conda",
+      "depNameTemplate": "redis",
+      "packageNameTemplate": "conda-forge/redis-server",
+      "versioningTemplate": "semver"
     }
   ],
   "prConcurrentLimit": 10,
