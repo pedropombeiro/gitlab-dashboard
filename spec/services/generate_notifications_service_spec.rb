@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe GenerateNotificationsService, "#execute" do
+  include ActiveSupport::Testing::TimeHelpers
+
   subject(:execute) { service.execute }
 
   let(:service) { described_class.new(user, type, fetch_service) }
@@ -117,6 +119,48 @@ RSpec.describe GenerateNotificationsService, "#execute" do
             .with(hash_including(type: "push_notification", payload: hash_excluding(:appBadgeCount)))
 
           execute
+        end
+      end
+    end
+
+    context "when a merge request was merged" do
+      let(:type) { :merged }
+      let(:merged_at) { Time.zone.local(2026, 8, 31, 23, 30) }
+      let(:merged_mr) { double(iid: "42", mergedAt: merged_at) }
+      let(:other_mr) { double(iid: "7", mergedAt: Time.zone.local(2026, 7, 10)) }
+      let(:previous_dto) { instance_double(UserDto) }
+      let(:dto) { instance_double(UserDto, errors: [], merged_merge_requests: double(items: [merged_mr, other_mr])) }
+      let(:notification) { {type: :merge_request_merged, title: "Merged", body: "!42", tag: "42"} }
+
+      before do
+        allow(fetch_service).to receive(:parse_dto).and_return(previous_dto, dto)
+        allow(ComputeMergeRequestChangesService).to receive(:new)
+          .and_return(instance_double(ComputeMergeRequestChangesService, execute: [notification]))
+        allow_any_instance_of(WebPushSubscription).to receive(:publish)
+        allow(Rails.cache).to receive(:delete).and_call_original
+      end
+
+      def stats_cache_key(month)
+        described_class.monthly_merged_mr_stats_cache_key(author, month)
+      end
+
+      around { |example| travel_to(Time.zone.local(2026, 9, 25)) { example.run } }
+
+      it "clears only the cached stats for the month the merge request was merged in" do
+        execute
+
+        expect(Rails.cache).to have_received(:delete).with(stats_cache_key(Date.new(2026, 8, 1)))
+        expect(Rails.cache).not_to have_received(:delete).with(stats_cache_key(Date.new(2026, 9, 1)))
+        expect(Rails.cache).not_to have_received(:delete).with(stats_cache_key(Date.new(2026, 7, 1)))
+      end
+
+      context "when the merge timestamp is missing" do
+        let(:merged_at) { nil }
+
+        it "clears the current month's cached stats" do
+          execute
+
+          expect(Rails.cache).to have_received(:delete).with(stats_cache_key(Date.new(2026, 9, 1)))
         end
       end
     end

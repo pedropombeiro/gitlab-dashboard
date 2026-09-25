@@ -55,12 +55,9 @@ class GenerateNotificationsService
     notifications = ComputeMergeRequestChangesService.new(type, previous_dto, dto).execute
     app_badge_count = notification_app_badge_count(dto) if notifications.any?
 
-    if notifications.pluck(:type).include?(:merge_request_merged)
-      # Clear the monthly MR stats cache if an MR has been merged. Only the current month can change,
-      # but also clear the previous one in case the merge happened around the month boundary.
-      [Date.current, 1.month.ago.to_date].each do |month|
-        Rails.cache.delete(self.class.monthly_merged_mr_stats_cache_key(author_user.username, month))
-      end
+    merged_notifications = notifications.select { |notification| notification[:type] == :merge_request_merged }
+    if merged_notifications.any?
+      clear_monthly_merged_mr_stats(dto, merged_notifications)
 
       # Clear merged MRs cache if its next scheduled update is too far in the future,
       # since an MR might just have been merged and moved out of the open MRs list
@@ -81,6 +78,21 @@ class GenerateNotificationsService
     end
 
     notifications.each { |notification| notify_user(**notification, app_badge_count: app_badge_count) }
+  end
+
+  # Clear only the cached stats for the months in which the newly detected MRs were merged.
+  # Falls back to the current month if the merge timestamps aren't available.
+  def clear_monthly_merged_mr_stats(dto, merged_notifications)
+    merged_iids = merged_notifications.pluck(:tag)
+    months = dto.merged_merge_requests.items
+      .select { |mr| mr.iid.in?(merged_iids) }
+      .filter_map { |mr| mr.mergedAt&.to_date&.beginning_of_month }
+      .uniq
+      .presence || [Date.current.beginning_of_month]
+
+    months.each do |month|
+      Rails.cache.delete(self.class.monthly_merged_mr_stats_cache_key(author_user.username, month))
+    end
   end
 
   def notification_app_badge_count(dto)
