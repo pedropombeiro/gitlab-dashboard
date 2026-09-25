@@ -18,6 +18,53 @@ local downloaded_files = List(
     "spec/support/fixtures/gitlab_graphql_schema.json"
 )
 
+local linters = new Mapping<String, Step> {
+    ["trailing-whitespace"] = (Builtins.trailing_whitespace) {
+        exclude = binary_excludes + downloaded_files
+    }
+    ["newlines"] = (Builtins.newlines) {
+        exclude = binary_excludes + downloaded_files
+    }
+    ["check-merge-conflict"] = (Builtins.check_merge_conflict) {}
+    ["typos"] = (Builtins.typos) {
+        exclude = binary_excludes + List("yarn.lock", "Gemfile.lock") + downloaded_files
+    }
+    ["gitleaks"] {
+        check = "scripts/quiet-on-success.sh gitleaks protect --no-banner --redact --log-level=error --staged"
+    }
+    ["mise"] = Builtins.mise
+    ["yamllint"] = (Builtins.yamllint) {
+        exclude = List("config/dockerfile.yml", "spec/support/fixtures/*.yml")
+    }
+    ["backend-linter"] {
+        glob = List("*.rb")
+        check = "bin/bundle exec standardrb {{files}}"
+        fix = "bin/bundle exec standardrb --fix {{files}}"
+    }
+    ["erb-linter"] {
+        glob = List("*.erb")
+        check = "scripts/quiet-on-success.sh bin/bundle exec erb_lint {{files}}"
+        fix = "bin/bundle exec erb_lint --autocorrect {{files}}"
+    }
+    ["frontend-linter"] {
+        glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts")
+        check = "yarn lint"
+        fix = "yarn lint:fix"
+    }
+    // tsc --noEmit is whole-project, so it cannot take {{files}}: it runs
+    // across app/javascript whenever any TypeScript input changes.
+    ["typecheck"] {
+        glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "tsconfig.json")
+        check = "yarn typecheck"
+    }
+    ["prettier"] {
+        glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
+        exclude = downloaded_files
+        check = "scripts/quiet-on-success.sh yarn prettier --check {{files}}"
+        fix = "scripts/quiet-on-success.sh yarn prettier --write {{files}}"
+    }
+}
+
 hooks {
     ["commit-msg"] {
         steps {
@@ -29,52 +76,14 @@ hooks {
     ["pre-commit"] {
         fix = true
         stash = "git"
-        steps {
-            ["trailing-whitespace"] = (Builtins.trailing_whitespace) {
-                exclude = binary_excludes + downloaded_files
-            }
-            ["newlines"] = (Builtins.newlines) {
-                exclude = binary_excludes + downloaded_files
-            }
-            ["check-merge-conflict"] = (Builtins.check_merge_conflict) {}
-            ["typos"] = (Builtins.typos) {
-                exclude = binary_excludes + List("yarn.lock", "Gemfile.lock") + downloaded_files
-            }
-            ["gitleaks"] {
-                check = "scripts/quiet-on-success.sh gitleaks protect --no-banner --redact --log-level=error --staged"
-            }
-            ["mise"] = Builtins.mise
-            ["yamllint"] = (Builtins.yamllint) {
-                exclude = List("config/dockerfile.yml", "spec/support/fixtures/*.yml")
-            }
-            ["backend-linter"] {
-                glob = List("*.rb")
-                check = "bin/bundle exec standardrb {{files}}"
-                fix = "bin/bundle exec standardrb --fix {{files}}"
-            }
-            ["erb-linter"] {
-                glob = List("*.erb")
-                check = "scripts/quiet-on-success.sh bin/bundle exec erb_lint {{files}}"
-                fix = "bin/bundle exec erb_lint --autocorrect {{files}}"
-            }
-            ["frontend-linter"] {
-                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts")
-                check = "yarn lint"
-                fix = "yarn lint:fix"
-            }
-            // tsc --noEmit is whole-project, so it cannot take {{files}}: it runs
-            // across app/javascript whenever any TypeScript input changes.
-            ["typecheck"] {
-                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "tsconfig.json")
-                check = "yarn typecheck"
-            }
-            ["prettier"] {
-                glob = List("app/javascript/**/*.js", "app/javascript/**/*.ts", "*.json")
-                exclude = downloaded_files
-                check = "scripts/quiet-on-success.sh yarn prettier --check {{files}}"
-                fix = "scripts/quiet-on-success.sh yarn prettier --write {{files}}"
-            }
-        }
+        steps = linters
+    }
+    // Used by `mise run fix`. Fixes files in place without stashing, so it
+    // covers unstaged edits and leaves other in-progress changes untouched.
+    ["fix"] {
+        fix = true
+        stash = "none"
+        steps = linters
     }
     ["pre-push"] {
         steps {

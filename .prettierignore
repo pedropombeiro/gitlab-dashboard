@@ -1,0 +1,3 @@
+# Downloaded GraphQL schemas, kept as fetched
+lib/assets/graphql/gitlab_graphql_schema.json
+spec/support/fixtures/gitlab_graphql_schema.json
