@@ -297,7 +297,6 @@ class GitlabClient
     fragment on User {
       ...#{name}::ExtendedUserFragment
       bot
-      state
     }
   GRAPHQL
 
@@ -328,15 +327,6 @@ class GitlabClient
       targetBranch
       createdAt
       updatedAt
-      notes(last: 1, filter: ONLY_COMMENTS) {
-        nodes {
-          author {
-            name
-            bot
-          }
-          bodyHtml
-        }
-      }
       assignees {
         nodes { ...#{name}::CoreUserFragment }
       }
@@ -440,6 +430,15 @@ class GitlabClient
         openMergeRequests: authoredMergeRequests(state: opened, sort: UPDATED_DESC, updatedAfter: $updatedAfter) {
           nodes {
             ...#{name}::CoreMergeRequestFragment
+            notes(last: 1, filter: ONLY_COMMENTS) {
+              nodes {
+                author {
+                  name
+                  bot
+                }
+                bodyHtml
+              }
+            }
             approved
             approvalsRequired
             approvalsLeft
@@ -492,7 +491,6 @@ class GitlabClient
                 }
               }
               failedJobs: jobs(statuses: FAILED, first: 10, retried: false) {
-                count
                 nodes {
                   name
                   allowFailure
