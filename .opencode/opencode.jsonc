@@ -1,0 +1,22 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  // Format files edited by OpenCode, mirroring the fix steps in hk.pkl.
+  // Each command runs on the edited file only, without stashing other changes.
+  "formatter": {
+    "rubocop": { "disabled": true },
+    "htmlbeautifier": { "disabled": true },
+    "shfmt": { "disabled": true },
+    "standardrb": {
+      "command": ["bin/bundle", "exec", "standardrb", "--fix", "$FILE"],
+    },
+    "prettier": {
+      // Use the project's pinned Prettier instead of OpenCode's cached copy.
+      "command": ["yarn", "prettier", "--write", "$FILE"],
+      "extensions": [".js", ".ts", ".json"],
+    },
+    "erb_lint": {
+      "command": ["bin/bundle", "exec", "erb_lint", "--autocorrect", "$FILE"],
+      "extensions": [".erb"],
+    },
+  },
+}
