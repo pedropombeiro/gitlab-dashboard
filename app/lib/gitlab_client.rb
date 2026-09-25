@@ -111,13 +111,6 @@ class GitlabClient
   def fetch_reviewer(username, format: :open_struct)
     format_response(format) do
       execute_query(ReviewerQuery, reviewer: username, activeReviewsAfter: ACTIVE_REVIEWS_AGE_LIMIT.ago)
-    end.tap do |response|
-      next if format == :yaml_fixture
-
-      reviewer = response.response.data.user
-      next if reviewer.nil?
-
-      compute_active_reviews(reviewer)
     end
   end
 
@@ -254,15 +247,6 @@ class GitlabClient
         activeReviewsAfter: 1.month.ago,
         activeAssignmentsAfter: 2.months.ago
       )
-    end.tap do |response|
-      group = response.response.data.group
-
-      next if format == :yaml_fixture
-      next if group.nil?
-
-      group.groupMembers.nodes.filter_map(&:user).each do |reviewer|
-        compute_active_reviews(reviewer)
-      end
     end
   end
 
@@ -314,15 +298,6 @@ class GitlabClient
       ...#{name}::ExtendedUserFragment
       bot
       state
-      activeReviews: reviewRequestedMergeRequests(state: opened, updatedAfter: $activeReviewsAfter) {
-        nodes {
-          approvedBy {
-            nodes {
-              username
-            }
-          }
-        }
-      }
     }
   GRAPHQL
 
@@ -448,6 +423,13 @@ class GitlabClient
     query($reviewer: String!, $activeReviewsAfter: Time) {
       user(username: $reviewer) {
         ...#{name}::ReviewerFragment
+        activeReviews: reviewRequestedMergeRequests(
+          state: opened,
+          updatedAfter: $activeReviewsAfter,
+          not: {approvedBy: [$reviewer]}
+        ) {
+          count
+        }
       }
     }
   GRAPHQL
@@ -579,6 +561,15 @@ class GitlabClient
           nodes {
             user {
               ...#{name}::ReviewerFragment
+              # A fragment can't pass each member's username to `not.approvedBy`, so filter by
+              # this reviewer's state instead. Every state except APPROVED counts as active.
+              activeReviews: reviewRequestedMergeRequests(
+                state: opened,
+                updatedAfter: $activeReviewsAfter,
+                reviewStates: [UNREVIEWED, REVIEWED, REQUESTED_CHANGES, UNAPPROVED, REVIEW_STARTED]
+              ) {
+                count
+              }
               assignedMergeRequests(state: opened, updatedAfter: $activeAssignmentsAfter) {
                 count
               }
@@ -658,13 +649,6 @@ class GitlabClient
 
   def project_version_file_uri(project_web_url, branch)
     URI("#{project_web_url}/-/raw/#{branch}/VERSION")
-  end
-
-  def compute_active_reviews(reviewer)
-    reviewer.activeReviews[:count] =
-      reviewer.activeReviews.delete_field!(:nodes)
-        .map { |review| review.approvedBy.nodes.flat_map(&:username) }
-        .count { |approved_by| approved_by.exclude?(reviewer.username) }
   end
 
   def make_serializable(obj)

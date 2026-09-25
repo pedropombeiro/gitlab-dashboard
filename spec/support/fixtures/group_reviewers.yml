@@ -16,7 +16,7 @@ verify:
               status:
               bot: false
               activeReviews:
-                nodes: []
+                count: 0
               assignedMergeRequests:
                 count: 0
           - user:
@@ -34,17 +34,7 @@ verify:
                 message: Please @mention me for my attention and answers.
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: rkadam3
-                  - approvedBy:
-                      nodes:
-                        - username: rkadam3
+                count: 1
               assignedMergeRequests:
                 count: 3
           - user:
@@ -62,27 +52,7 @@ verify:
                 message: ""
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: mfanGitLab
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: mfanGitLab
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 4
               assignedMergeRequests:
                 count: 4
           - user:
@@ -100,13 +70,7 @@ verify:
                 message: Please @tianwenchen
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 2
               assignedMergeRequests:
                 count: 7
           - user:
@@ -124,27 +88,7 @@ verify:
                 message: At capacity
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: hfyngvason
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: hfyngvason
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 4
               assignedMergeRequests:
                 count: 7
           - user:
@@ -159,14 +103,7 @@ verify:
               status:
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: pedropombeiro
-                  - approvedBy:
-                      nodes:
-                        - username: pedropombeiro
+                count: 0
               assignedMergeRequests:
                 count: 2
           - user:
@@ -184,26 +121,7 @@ verify:
                 message: Only available for Verify reviews
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: avielle
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: avielle
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: avielle
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: avielle
+                count: 1
               assignedMergeRequests:
                 count: 2
           - user:
@@ -222,19 +140,7 @@ verify:
                   todos."
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 4
               assignedMergeRequests:
                 count: 1
           - user:
@@ -252,14 +158,7 @@ verify:
                 message: "only available for PA/PE :) "
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: lauraXD
+                count: 1
               assignedMergeRequests:
                 count: 10
           - user:
@@ -277,31 +176,7 @@ verify:
                 message: Catching up
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: iamricecake
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: iamricecake
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: iamricecake
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 4
               assignedMergeRequests:
                 count: 0
           - user:
@@ -319,26 +194,7 @@ verify:
                 message: ""
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: drew
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: drew
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: drew
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: drew
+                count: 1
               assignedMergeRequests:
                 count: 3
           - user:
@@ -356,17 +212,7 @@ verify:
                 message: At Capacity
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: allison.browne
+                count: 2
               assignedMergeRequests:
                 count: 2
           - user:
@@ -384,47 +230,7 @@ verify:
                 message: ""
               bot: false
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: grzesiek
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: grzesiek
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: grzesiek
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: grzesiek
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 8
               assignedMergeRequests:
                 count: 1
           - user:
@@ -443,16 +249,7 @@ verify:
               bot: false
               state: active
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 3
               assignedMergeRequests:
                 count: 3
           - user:
@@ -471,30 +268,7 @@ verify:
               bot: false
               state: active
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: fabiopitino
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: fabiopitino
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 5
               assignedMergeRequests:
                 count: 8
           - user:
@@ -513,23 +287,7 @@ verify:
               bot: false
               state: active
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: furkanayhan
+                count: 4
               assignedMergeRequests:
                 count: 2
           - user:
@@ -548,7 +306,7 @@ verify:
               bot: false
               state: active
               activeReviews:
-                nodes: []
+                count: 0
               assignedMergeRequests:
                 count: 0
           - user:
@@ -567,26 +325,7 @@ verify:
               bot: false
               state: active
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: rymai
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: rymai
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: rymai
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: rymai
+                count: 1
               assignedMergeRequests:
                 count: 8
           - user:
@@ -602,17 +341,7 @@ verify:
               bot: false
               state: active
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: stanhu
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 2
               assignedMergeRequests:
                 count: 16
           - user:
@@ -628,316 +357,7 @@ verify:
               bot: false
               state: active
               activeReviews:
-                nodes:
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                        - username: marin
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
-                  - approvedBy:
-                      nodes:
-                        - username: someone
+                count: 91
               assignedMergeRequests:
                 count: 0
           - user:

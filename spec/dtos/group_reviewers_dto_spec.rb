@@ -9,8 +9,6 @@ RSpec.describe GroupReviewersDto do
   let(:group_path) { "gitlab-org" }
   let(:graphql_response_body) { group_reviewers_response_body["verify"] }
 
-  # The DTO consumes the response after GitlabClient has folded activeReviews
-  # into a count, so go through the client rather than the raw fixture.
   let(:response) { GitlabClient.new.fetch_group_reviewers(group_path) }
 
   subject(:dto) { described_class.new(response, group_path) }

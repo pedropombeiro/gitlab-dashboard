@@ -10,16 +10,7 @@ dmeshcharakou:
       status:
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: dmeshcharakou
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 2
 
 bucoleary:
   data:
@@ -35,10 +26,7 @@ bucoleary:
         message: ""
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 1
 
 rutgerwessels:
   data:
@@ -54,13 +42,7 @@ rutgerwessels:
         message: ""
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 2
 
 halilcoban:
   data:
@@ -76,10 +58,7 @@ halilcoban:
         message: ""
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 1
 
 hmehra:
   data:
@@ -93,19 +72,7 @@ hmehra:
       status:
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 4
 
 vshushlin:
   data:
@@ -122,13 +89,7 @@ vshushlin:
           use todos!
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 2
 
 cwiesner:
   data:
@@ -144,13 +105,7 @@ cwiesner:
         message: ""
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 2
 
 "aish.sub":
   data:
@@ -166,10 +121,7 @@ cwiesner:
         message: ""
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 1
 
 akotte:
   data:
@@ -185,13 +137,7 @@ akotte:
         message: ""
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 2
 
 eugielimpin:
   data:
@@ -205,19 +151,7 @@ eugielimpin:
       status:
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 4
 
 emmaspark:
   data:
@@ -231,10 +165,7 @@ emmaspark:
       status:
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 1
 
 mbobin:
   data:
@@ -250,16 +181,7 @@ mbobin:
         message: ""
       bot: false
       activeReviews:
-        nodes:
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
-          - approvedBy:
-              nodes:
-                - username: someone
+        count: 3
 
 GitLabDuo:
   data:
@@ -273,4 +195,4 @@ GitLabDuo:
       status:
       bot: true
       activeReviews:
-        nodes: []
+        count: 0

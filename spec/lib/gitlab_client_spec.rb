@@ -179,7 +179,7 @@ RSpec.describe GitlabClient do
       expect { fetch_group_reviewers }.not_to raise_error
     end
 
-    it "counts only reviews not already approved by the reviewer" do
+    it "counts active reviews on the server, excluding reviews the reviewer approved" do
       reviewers = fetch_group_reviewers.response.data.group.groupMembers.nodes
         .filter_map(&:user)
         .to_h { |user| [user.username, user.activeReviews.count] }
@@ -191,6 +191,14 @@ RSpec.describe GitlabClient do
         "pedropombeiro" => 0,
         "grzesiek" => 8
       )
+      expect(
+        a_request(:post, graphql_url).with do |request|
+          query = JSON.parse(request.body)["query"]
+
+          query.include?("reviewStates: [UNREVIEWED, REVIEWED, REQUESTED_CHANGES, UNAPPROVED, REVIEW_STARTED]") &&
+            !query.include?("approvedBy")
+        end
+      ).to have_been_made
     end
   end
 
@@ -206,6 +214,23 @@ RSpec.describe GitlabClient do
     it "does not raise when the user is not visible" do
       expect { fetch_reviewer }.not_to raise_error
       expect(fetch_reviewer.response.data.user).to be_nil
+    end
+
+    context "when the user is visible" do
+      before do
+        stub_request(:post, graphql_url)
+          .with(body: hash_including("operationName" => "GitlabClient__ReviewerQuery"))
+          .to_return_json(body: {data: {user: {username: "ghost", activeReviews: {count: 2}}}})
+      end
+
+      it "excludes reviews the reviewer approved on the server" do
+        expect(fetch_reviewer.response.data.user.activeReviews.count).to eq(2)
+        expect(
+          a_request(:post, graphql_url).with do |request|
+            JSON.parse(request.body)["query"].include?("not: {approvedBy: [$reviewer]}")
+          end
+        ).to have_been_made
+      end
     end
   end
 
