@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "async/semaphore"
+
 class FetchMergeRequestsService
   include Honeybadger::InstrumentationHelper
 
@@ -11,6 +13,8 @@ class FetchMergeRequestsService
 
   # Result object wrapping the response and cache status
   FetchResult = Struct.new(:response, :freshly_fetched?)
+
+  MAX_CONCURRENT_REQUESTS = 10
 
   attr_reader :author
   delegate :make_full_url, to: :gitlab_client
@@ -28,13 +32,7 @@ class FetchMergeRequestsService
         case type
         when :open
           gitlab_client.fetch_open_merge_requests(author).tap do |response|
-            merge_requests_from_response(response.response.data, type)
-              .tap do |mrs|
-                fill_reviewers_info(mrs)
-                fill_project_milestone(mrs)
-                fill_linked_work_items(mrs)
-                fill_approval_state(mrs)
-              end
+            enrich_open_merge_requests(merge_requests_from_response(response.response.data, type))
           end
         when :merged
           gitlab_client.fetch_merged_merge_requests(author)
@@ -103,6 +101,23 @@ class FetchMergeRequestsService
       .any? { |pipeline| pipeline.status == "PENDING" || (pipeline.startedAt.present? && pipeline.finishedAt.nil?) }
   end
 
+  # Each stage fills independent fields, so run them concurrently. The shared semaphore
+  # bounds the total number of in-flight GitLab requests across all stages.
+  def enrich_open_merge_requests(merge_requests)
+    Sync do |task|
+      [
+        -> { fill_reviewers_info(merge_requests) },
+        -> { fill_project_milestone(merge_requests) },
+        -> { fill_linked_work_items(merge_requests) },
+        -> { fill_approval_state(merge_requests) }
+      ].map { |stage| task.async { stage.call } }.map(&:wait)
+    end
+  end
+
+  def request_limiter
+    @request_limiter ||= Async::Semaphore.new(MAX_CONCURRENT_REQUESTS)
+  end
+
   def issues_from_merge_requests(merge_requests)
     issue_iids = merge_request_issue_iids(merge_requests).uniq
 
@@ -114,9 +129,9 @@ class FetchMergeRequestsService
   def fill_project_milestone(open_merge_requests)
     project_full_paths = open_merge_requests.filter_map { |mr| mr.project.webUrl }.uniq
 
-    project_versions = Sync do |task|
+    project_versions = Sync do
       project_full_paths.map do |project_full_path|
-        task.async do
+        request_limiter.async do
           Rails.cache.fetch(self.class.project_version_cache_key(project_full_path), expires_in: PROJECT_VERSION_VALIDITY) do
             gitlab_client.fetch_project_version(project_full_path).tap do |v|
               Rails.logger.info "#{project_full_path} = #{v}"
@@ -137,9 +152,9 @@ class FetchMergeRequestsService
     mrs_without_branch_iid = merge_requests.reject { |mr| issue_iid_from_branch(mr.sourceBranch) }
     return if mrs_without_branch_iid.empty?
 
-    Sync do |task|
+    Sync do
       mrs_without_branch_iid.map do |mr|
-        task.async do
+        request_limiter.async do
           linked_work_items = gitlab_client.fetch_linked_work_items(mr.project.fullPath, mr.iid)
           mr.linkedWorkItems = linked_work_items || []
         end
@@ -151,9 +166,9 @@ class FetchMergeRequestsService
     unapproved_mrs = open_merge_requests.reject(&:approved)
     return if unapproved_mrs.empty?
 
-    Sync do |task|
+    Sync do
       unapproved_mrs.map do |mr|
-        task.async do
+        request_limiter.async do
           mr.approvalState = gitlab_client.fetch_approval_state(mr.project.fullPath, mr.iid)
         end
       end.map(&:wait)
@@ -163,9 +178,9 @@ class FetchMergeRequestsService
   def fill_reviewers_info(open_merge_requests)
     reviewer_usernames = open_merge_requests.flat_map { |mr| mr.reviewers.nodes.map(&:username) }.uniq
 
-    reviewers_info = Sync do |task|
+    reviewers_info = Sync do
       reviewer_usernames.map do |reviewer_username|
-        task.async do
+        request_limiter.async do
           Rails.cache.fetch(self.class.reviewer_cache_key(reviewer_username), expires_in: REVIEWER_VALIDITY) do
             gitlab_client.fetch_reviewer(reviewer_username)
           end
