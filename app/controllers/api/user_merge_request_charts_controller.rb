@@ -1,25 +1,43 @@
 # frozen_string_literal: true
 
+require "async"
+require "ostruct"
+
 class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
+  MONTHS_COUNT = 12
+  EMPTY_MONTH_STATS = OpenStruct.new(count: 0, totalTimeToMerge: nil).freeze
+
   def monthly_merged_merge_request_stats
     return unless ensure_author
 
-    response = Rails.cache.fetch(
-      self.class.monthly_merged_mr_lists_cache_key(author),
-      expires_in: MONTHLY_GRAPH_CACHE_VALIDITY
-    ) do
-      gitlab_client.fetch_monthly_merged_merge_requests(author)
-    end
-
-    render json: monthly_mrs_graph(response.response.data.user)
+    render json: monthly_mrs_graph(monthly_stats)
   end
 
   private
 
-  def series_values(user, fn)
-    12.times.map do |index|
+  # Returns the stats for the last MONTHS_COUNT months, most recent first. Each month is cached
+  # separately, so a refresh usually only needs to query the current month.
+  def monthly_stats
+    Sync do |task|
+      MONTHS_COUNT.times.map do |offset|
+        month = offset.months.ago.beginning_of_month.to_date
+
+        task.async do
+          Rails.cache.fetch(
+            self.class.monthly_merged_mr_stats_cache_key(author, month),
+            expires_in: self.class.monthly_merged_mr_stats_cache_validity(month),
+            skip_nil: true
+          ) do
+            gitlab_client.fetch_monthly_merged_merge_request_stats(author, month)
+          end || EMPTY_MONTH_STATS
+        end
+      end.map(&:wait)
+    end
+  end
+
+  def series_values(monthly_stats, fn)
+    monthly_stats.each_with_index.map do |stats, index|
       month = index.months.ago.beginning_of_month
-      stats = user["monthlyMergedMergeRequests#{index}"]
 
       {
         x: month.strftime("%b"),
@@ -28,7 +46,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
     end.reverse
   end
 
-  def monthly_mrs_graph(user)
+  def monthly_mrs_graph(monthly_stats)
     fetch_service = FetchMergeRequestsService.new(author)
     result = fetch_service.execute(:merged)
     user_dto = fetch_service.parse_dto(result.response, :merged)
@@ -51,7 +69,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           order: 1,
           backgroundColor: "#FF6384",
           borderColor: "#FF6384A0",
-          data: series_values(user, ->(stats) do
+          data: series_values(monthly_stats, ->(stats) do
             stats.totalTimeToMerge ? (stats.totalTimeToMerge.seconds.in_days / stats.count).round(1) : nil
           end)
         },
@@ -63,7 +81,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           borderColor: "#FF6384A0",
           pointStyle: false,
           borderDash: [10, 5],
-          data: series_values(user, overall_monthly_merge_ttm)
+          data: series_values(monthly_stats, overall_monthly_merge_ttm)
         },
         {
           label: "Merged count",
@@ -72,7 +90,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           order: 2,
           backgroundColor: "#37A2EBA0",
           borderColor: "#37A2EB",
-          data: series_values(user, ->(stats) { stats.count }).take(11),
+          data: series_values(monthly_stats, ->(stats) { stats.count }).take(11),
           trendlineLinear: {
             label: {
               color: "#000",
@@ -97,7 +115,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           order: 2,
           backgroundColor: "#37A2EB60",
           borderColor: "#37A2EB",
-          data: series_values(user, ->(stats) { stats.count }).drop(11)
+          data: series_values(monthly_stats, ->(stats) { stats.count }).drop(11)
         },
         {
           label: "All-time average (#{monthly_merge_rate.round}/month)",
@@ -107,7 +125,7 @@ class Api::UserMergeRequestChartsController < MergeRequestsControllerBase
           borderDash: [10, 5],
           borderColor: "#37A2EBA0",
           backgroundColor: "#37A2EBA0",
-          data: series_values(user, monthly_merge_rate)
+          data: series_values(monthly_stats, monthly_merge_rate)
         }
       ]
     }

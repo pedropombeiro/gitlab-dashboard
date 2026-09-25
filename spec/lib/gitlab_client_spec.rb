@@ -252,31 +252,34 @@ RSpec.describe GitlabClient do
     end
   end
 
-  describe "#fetch_monthly_merged_merge_requests", :freeze_time do
+  describe "#fetch_monthly_merged_merge_request_stats" do
     let(:author) { "user.1" }
+    let(:month) { Date.new(2026, 2, 1) }
+    let(:user) { {monthlyMergedMergeRequests: {count: 3, totalTimeToMerge: 1234.5}} }
 
-    subject(:fetch_monthly_merged_merge_requests) do
-      client.fetch_monthly_merged_merge_requests(author)
-    end
+    subject(:fetch_stats) { client.fetch_monthly_merged_merge_request_stats(author, month) }
 
     before do
       stub_request(:post, graphql_url)
         .with(body: hash_including(
           "operationName" => "GitlabClient__MonthlyMergeRequestsQuery",
-          "variables" => matching(
+          "variables" => {
             "author" => author,
-            "mergedAfter" => an_instance_of(String),
-            "mergedBefore" => an_instance_of(String)
-          )
+            "mergedAfter" => "2026-02-01",
+            "mergedBefore" => "2026-02-28"
+          }
         ))
-        .to_return_json(body: {data: {user: {monthlyMergedMergeRequests: []}}})
-        .times(12)
+        .to_return_json(body: {data: {user: user}})
     end
 
-    it "returns monthly merged merge requests" do
-      expect(fetch_monthly_merged_merge_requests.response.data.user.table).to eq(
-        12.times.to_h { |index| [:"monthlyMergedMergeRequests#{index}", []] }
-      )
+    it "returns the stats for the requested calendar month" do
+      expect(fetch_stats).to have_attributes(count: 3, totalTimeToMerge: 1234.5)
+    end
+
+    context "when the user is not visible" do
+      let(:user) { nil }
+
+      it { is_expected.to be_nil }
     end
   end
 

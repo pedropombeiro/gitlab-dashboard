@@ -56,8 +56,11 @@ class GenerateNotificationsService
     app_badge_count = notification_app_badge_count(dto) if notifications.any?
 
     if notifications.pluck(:type).include?(:merge_request_merged)
-      # Clear monthly MR count cache if an MR has been merged
-      Rails.cache.delete(self.class.monthly_merged_mr_lists_cache_key(author_user.username))
+      # Clear the monthly MR stats cache if an MR has been merged. Only the current month can change,
+      # but also clear the previous one in case the merge happened around the month boundary.
+      [Date.current, 1.month.ago.to_date].each do |month|
+        Rails.cache.delete(self.class.monthly_merged_mr_stats_cache_key(author_user.username, month))
+      end
 
       # Clear merged MRs cache if its next scheduled update is too far in the future,
       # since an MR might just have been merged and moved out of the open MRs list

@@ -138,42 +138,17 @@ class GitlabClient
     end
   end
 
-  def fetch_monthly_merged_merge_requests(author, format: :open_struct)
-    format_response(format) do
-      self.class.tracer.in_span(
-        "gitlab.fetch_monthly_merged_merge_requests",
-        kind: :client,
-        attributes: {
-          "graphql.variable.author" => author,
-          "gitlab.months_count" => 12,
-          "gitlab.concurrent_queries" => true
-        }
-      ) do |span|
-        Sync do |task|
-          12.times.map do |offset|
-            bom = offset.months.ago.beginning_of_month.to_date
+  # Returns the merged merge request stats (count and totalTimeToMerge) for the calendar month
+  # starting at `month`, or nil if the user is not visible to the token.
+  def fetch_monthly_merged_merge_request_stats(author, month)
+    response = execute_query(
+      MonthlyMergeRequestsQuery,
+      author: author,
+      mergedAfter: month.to_fs,
+      mergedBefore: month.end_of_month.to_fs
+    )
 
-            task.async do
-              execute_query(
-                MonthlyMergeRequestsQuery,
-                author: author,
-                mergedAfter: bom.to_fs,
-                mergedBefore: bom.end_of_month.to_fs
-              )
-            end
-          end.map(&:wait)
-        end
-      end
-    end.tap do |aggregate|
-      next unless format == :open_struct
-
-      user = OpenStruct.new
-      aggregate.response.each_with_index do |monthly_result, offset|
-        user["monthlyMergedMergeRequests#{offset}"] = monthly_result.data.user.delete_field!("monthlyMergedMergeRequests")
-      end
-
-      aggregate.response = OpenStruct.new(data: OpenStruct.new(user: user))
-    end
+    make_serializable(response).data.user&.monthlyMergedMergeRequests
   end
 
   # Fetches a list of issues given a lists of MRs, represented by a hash of { project_full_path:, issue_iid: }

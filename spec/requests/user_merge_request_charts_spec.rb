@@ -86,6 +86,18 @@ RSpec.describe "UserMergeRequestCharts", type: :request do
 
             merged_mrs_request_stubs.each { |stub| expect(stub).to have_been_requested.once }
           end
+
+          it "only refetches the months missing from the cache" do
+            perform_request
+            Rails.cache.delete(
+              Api::UserMergeRequestChartsController.monthly_merged_mr_stats_cache_key(author, Date.current)
+            )
+            perform_request
+
+            current_month_stub, *completed_month_stubs = merged_mrs_request_stubs
+            expect(current_month_stub).to have_been_requested.twice
+            completed_month_stubs.each { |stub| expect(stub).to have_been_requested.once }
+          end
         end
       end
     end

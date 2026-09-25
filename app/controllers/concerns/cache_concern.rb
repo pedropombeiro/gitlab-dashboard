@@ -7,11 +7,13 @@ module CacheConcern
   MR_CACHE_VALIDITY = 5.minutes
   REVIEWER_VALIDITY = 30.minutes
   MONTHLY_GRAPH_CACHE_VALIDITY = 3.hours
+  # Stats for completed months rarely change, so they can be cached much longer than the current month.
+  COMPLETED_MONTH_STATS_CACHE_VALIDITY = 1.week
   GROUP_REVIEWERS_CACHE_VALIDITY = 1.hour
   PROJECT_VERSION_VALIDITY = 6.hours
 
   LOCATION_VERSION = "v3"
-  MONTHLY_MERGE_REQUEST_STATS_VERSION = "v2"
+  MONTHLY_MERGE_REQUEST_STATS_VERSION = "v3"
 
   class_methods do
     def user_cache_key(username)
@@ -43,8 +45,17 @@ module CacheConcern
       "#{redis_namespace}/merge_requests/#{merge_requests_version}/authored_#{type}_list/#{user_hash(user)}"
     end
 
-    def monthly_merged_mr_lists_cache_key(user)
-      "#{redis_namespace}/merge_requests/#{monthly_merge_request_stats_version}/monthly_merged/#{user_hash(user)}"
+    def monthly_merged_mr_stats_cache_key(user, month)
+      "#{redis_namespace}/merge_requests/#{monthly_merge_request_stats_version}/monthly_merged/" \
+        "#{user_hash(user)}/#{month.strftime("%Y-%m")}"
+    end
+
+    def monthly_merged_mr_stats_cache_validity(month)
+      if month.beginning_of_month == Date.current.beginning_of_month
+        MONTHLY_GRAPH_CACHE_VALIDITY
+      else
+        COMPLETED_MONTH_STATS_CACHE_VALIDITY
+      end
     end
 
     def last_authored_mr_lists_cache_key(user, type)
