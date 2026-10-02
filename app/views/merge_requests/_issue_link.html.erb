@@ -19,6 +19,14 @@
     <% end %>
   <% end %>
 
+  <% if issue.unavailable %>
+    <%= tag.i(
+      class: %w[small bi bi-lock-fill text-body-secondary],
+      role: "img",
+      aria: { label: issue.titleHtml },
+      data: { bs_toggle: "tooltip", bs_title: issue.titleHtml }) %>
+  <% end %>
+
   <span class="small">
     <%= render("milestone", milestone: issue.milestone) %>
   </span>

@@ -163,8 +163,37 @@ RSpec.describe MergeRequestsParsingHelper do
         context "when issue is not known" do
           let(:source_branch) { "pedropombeiro/511344/update-sharding_key_id-on-project-runners" }
 
-          it { is_expected.to be_nil }
+          before do
+            allow(mr).to receive(:project).and_return(double(fullPath: "gitlab-org/gitlab"))
+          end
+
+          it "returns a placeholder linking to the inferred issue" do
+            is_expected.to have_attributes(
+              iid: "511344",
+              webUrl: "https://gitlab.com/gitlab-org/gitlab/-/issues/511344",
+              titleHtml: described_class::UNAVAILABLE_ISSUE_TITLE_HTML,
+              milestone: nil,
+              labels: have_attributes(nodes: []),
+              unavailable: true
+            )
+          end
         end
+      end
+
+      context "with no iid in branch name" do
+        let(:source_branch) { "j.castillo-master-patch-a0c9-docs" }
+
+        it { is_expected.to be_nil }
+      end
+    end
+
+    context "with an unknown linked work item in another namespace" do
+      let(:source_branch) { "j.castillo-master-patch-a0c9-docs" }
+      let(:work_item) { double(iid: "123", namespace: double(fullPath: "gitlab-org/security/gitlab")) }
+      let(:linked_work_items) { [make_linked_work_item(work_item, "CLOSES")] }
+
+      it "links to the work item's namespace" do
+        is_expected.to have_attributes(iid: "123", webUrl: "https://gitlab.com/gitlab-org/security/gitlab/-/issues/123")
       end
     end
 
