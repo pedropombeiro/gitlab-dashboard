@@ -1,0 +1,35 @@
+<div class="mr-detail-content">
+  <div class="mr-detail-item">
+    <span class="detail-label">Branches</span>
+    <%= render "branch_relation", source_branch: mr.sourceBranch, target_branch: mr.targetBranch %>
+  </div>
+  <div class="mr-detail-item">
+    <span class="detail-label">Commits</span>
+    <span><%= number_with_delimiter(mr.commitCount) %><%= " · Squash on merge" if mr.squashOnMerge %></span>
+  </div>
+  <% if mr.assignees.nodes.any? %>
+    <div class="mr-detail-item">
+      <span class="detail-label">Assignees</span>
+      <span><%= render partial: "user_avatar", collection: mr.assignees.nodes, as: :user %></span>
+    </div>
+  <% end %>
+  <% if mr.milestone %>
+    <div class="mr-detail-item">
+      <span class="detail-label">Milestone</span>
+      <%= tag.span class: mr_presenter.milestone_class, data: { bs_toggle: "tooltip", bs_title: mr_presenter.milestone_mismatch_tooltip } do %>
+        <%= render("info_symbol") if mr_presenter.milestone_class %>
+        <%= render "milestone", milestone: mr.milestone %>
+      <% end %>
+    </div>
+  <% end %>
+  <% if mr.issue %>
+    <div class="mr-detail-item"><span class="detail-label">Issue</span><%= render "issue_link", issue: mr.issue %></div>
+  <% end %>
+  <% last_comment = mr.notes.nodes.first %>
+  <% if last_comment && !last_comment.author.bot %>
+    <div class="mr-last-comment">
+      <span class="detail-label">Latest comment · <%= last_comment.author.name %></span>
+      <div><%= sanitize last_comment.bodyHtml.gsub('="/', "=\"#{File.join(GitlabClient.gitlab_instance_url, "")}") %></div>
+    </div>
+  <% end %>
+</div>

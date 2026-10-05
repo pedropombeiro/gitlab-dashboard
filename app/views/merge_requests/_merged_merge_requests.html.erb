@@ -143,7 +143,7 @@
 <% if merge_requests.any? %>
   <% any_milestones = merge_requests.any? { |mr| mr.milestone&.title&.present? } %>
 
-  <table class="table table-hover mb-0">
+  <table class="table table-hover merged-table mb-0">
     <caption>
       <div class="d-flex justify-content-between align-items-baseline">
         <div></div>
@@ -162,7 +162,8 @@
         <%= tag.tr do %>
           <!-- MR ID -->
           <th scope="row">
-            <%= render "mr_relation", merge_request: mr %>
+            <%= render "mr_title", mr: mr %>
+            <div class="mr-metadata"><span class="mr-project"><%= mr.project.fullPath %></span><%= render "mr_relation", merge_request: mr %></div>
           </th>
           <!-- Merged at -->
           <td>
@@ -204,10 +205,6 @@
             spacer_template: "space",
             collection: mr.contextualLabels,
             as: :label %>
-          </td>
-          <!-- Title -->
-          <td>
-            <%= render "mr_title", mr: mr %>
           </td>
           <% if any_milestones %>
             <!-- Milestone -->

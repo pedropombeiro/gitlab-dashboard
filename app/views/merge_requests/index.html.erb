@@ -18,11 +18,12 @@
   } do %>
   <%= link_to "Skip to main content", "#main-content", class: "skip-link" %>
 
-  <% nav_bg_class = Rails.env.production? ? %w[] : %w[bg-danger] %>
-
-  <%= tag.nav class: %w[navbar bg-body bg-gradient navbar-expand-sm fixed-top px-3] + nav_bg_class do %>
+  <%= tag.nav class: %w[navbar dashboard-navbar navbar-expand-sm px-3], aria: { label: "Dashboard" } do %>
+    <% unless Rails.env.production? %>
+      <span class="environment-label">Dev</span>
+    <% end %>
     <% if params.include?(:referrer) %>
-      <%= link_to(safe_url(params[:referrer]), class: %w[btn mx-2 text-light]) do %>
+      <%= link_to(safe_url(params[:referrer]), class: %w[btn mx-2], aria: { label: "Back to dashboard" }) do %>
         <%= tag.i class: %w[fa-solid fa-home] %>
       <% end %>
     <% end %>
@@ -31,15 +32,14 @@
     <%= render "shared/links_button", links: links %>
 
     <div
-      class="navbar-brand text-light d-flex align-items-center m-auto"
+      class="navbar-brand dashboard-brand d-flex align-items-center me-auto"
       data-controller="bootstrap-tooltip">
-      <%= tag.span class: "mb-0 ms-2 text-body fw-lighter d-flex flex-grow-1 justify-content-center" do %>
+      <%= tag.div class: "mb-0 ms-2 text-body d-flex align-items-center" do %>
         <span class="d-sm-none me-2">
           <%= render "shared/user_image", user: @user, size: 24 %>
         </span>
-        Merge Requests Dashboard
-        <span class="collapse navbar-collapse">
-          &nbsp;for&nbsp;
+        <h1 class="dashboard-heading">Merge requests</h1>
+        <span class="d-none d-md-flex align-items-center dashboard-user">
           <% user_presenter = UserPresenter.new(@user, self) %>
           <%= render "shared/user_badge", user: @user, user_presenter: user_presenter, content: user_presenter.help_content, size: 24 %>
         </span>
@@ -47,6 +47,7 @@
 
       <%= tag.button(
         class: %w[btn mx-2],
+        aria: { label: "Subscribe to merge request notifications" },
         data: {
           bs_toggle: "tooltip",
           bs_title: "Subscribe to web push notifications for MR events, such as MR merged, or workflow label changes",
@@ -61,9 +62,9 @@
     <%= render "shared/navbar_right_section" %>
   <% end %>
 
-  <%= tag.div(id: "main-content", class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
-    <%= tag.div(id: "open_merge_requests", class: mr_list_panel_classes + %w[bg-body mt-5], data: { controller: "turbo-frame-focus" }) do %>
-      <%= turbo_frame_tag @dto, :open_merge_requests, src: open_merge_requests_list_path(merge_requests_controller_params), data: { turbo_frame_focus_target: "frame" } do %>
+  <%= tag.main(id: "main-content", class: %w[dashboard-content]) do %>
+    <%= tag.section(id: "open_merge_requests", class: mr_list_panel_classes, aria: { label: "Open merge requests" }, data: { controller: "mr-list" }) do %>
+      <%= turbo_frame_tag @dto, :open_merge_requests, src: open_merge_requests_list_path(merge_requests_controller_params) do %>
         <% if @dto.has_content? %>
           <!-- Show last stored state, while we wait for the refreshed state
           -->
@@ -84,7 +85,8 @@
       <% end %>
     <% end %>
 
-    <%= tag.div(id: "merged_merge_requests", class: mr_list_panel_classes + %w[bg-tertiary mt-3 mt-sm-5 bg-opacity-10], data: { controller: "turbo-frame-focus" }) do %>
+    <%= tag.section(id: "merged_merge_requests", class: mr_list_panel_classes + %w[merged-panel], aria: { label: "Recently merged" }, data: { controller: "turbo-frame-focus" }) do %>
+      <div class="panel-heading"><h2>Recently merged</h2><span class="text-secondary small">Past week</span></div>
       <%= turbo_frame_tag(@dto, :merged_merge_requests, loading: "lazy", src: merged_merge_requests_list_path(merge_requests_controller_params), data: { turbo_frame_focus_target: "frame" }) do %>
         <%= tag.div(class: "d-flex align-items-center justify-content-center p-3 w-100 h-100") do %>
           <span

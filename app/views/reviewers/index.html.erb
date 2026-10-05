@@ -1,17 +1,20 @@
 <% content_for(:title) { "Reviewers Dashboard" } %>
 
 <%= tag.div class: "container-fluid m-0 p-0", data: { controller: "heartbeat" } do %>
-  <% nav_bg_class = Rails.env.production? ? %w[] : %w[bg-danger] %>
+  <%= link_to "Skip to main content", "#main-content", class: "skip-link" %>
 
-  <%= tag.nav class: %w[navbar bg-gradient navbar-expand-md fixed-top px-3] + nav_bg_class do %>
+  <%= tag.nav class: %w[navbar dashboard-navbar navbar-expand-md px-3], aria: { label: "Dashboard" } do %>
+    <% unless Rails.env.production? %>
+      <span class="environment-label">Dev</span>
+    <% end %>
     <% links = Rails.application.config_for(:reviewers)&.dig(:dashboard, :links) %>
     <%= render "shared/links_button", links: links %>
 
     <div
-      class="navbar-brand d-flex align-items-center m-auto"
+      class="navbar-brand dashboard-brand d-flex align-items-center me-auto"
       data-controller="bootstrap-tooltip">
-      <%= tag.span class: "mb-0 ms-2 fw-lighter d-flex flex-grow-1 justify-content-center" do %>
-        Reviewers Dashboard
+      <%= tag.div class: "mb-0 ms-2 d-flex align-items-center" do %>
+        <h1 class="dashboard-heading">Reviewers</h1>
         <span class="collapse navbar-collapse">
           &nbsp;for&nbsp;
           <%= params[:group_path] %>
@@ -22,8 +25,8 @@
     <%= render "shared/navbar_right_section" %>
   <% end %>
 
-  <%= tag.div(class: %w[align-middle p-1 p-sm-3 mx-auto mt-3 mt-sm-4], style: "width: fit-content;") do %>
-    <%= tag.div(id: "reviewers", class: %w[table-responsive shadow align-middle border rounded bg-gradient p-2 bg-body mt-5]) do %>
+  <%= tag.main(id: "main-content", class: %w[dashboard-content]) do %>
+    <%= tag.div(id: "reviewers", class: %w[table-responsive dashboard-panel align-middle]) do %>
       <%= turbo_frame_tag :reviewers, GroupReviewersDto.name.underscore, params[:group_path], src: reviewers_list_path(reviewers_controller_params) do %>
         <%= tag.div(class: "d-flex align-items-center justify-content-center p-3 w-100 h-100") do %>
           <span

@@ -24,6 +24,10 @@ export default class ThemeSelectorController extends Controller {
     }
 
     const isDark = this.isDark();
+    if (this.hasButtonTarget) {
+      this.buttonTarget.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} theme`);
+      this.buttonTarget.setAttribute("title", `Switch to ${isDark ? "light" : "dark"} theme`);
+    }
 
     if (isDark) {
       this.element.setAttribute("data-bs-theme", "dark");
@@ -71,7 +75,7 @@ export default class ThemeSelectorController extends Controller {
   }
 
   toggleTheme(): void {
-    if (localStorage.theme === "dark") {
+    if (this.isDark()) {
       localStorage.theme = "light";
     } else {
       localStorage.theme = "dark";

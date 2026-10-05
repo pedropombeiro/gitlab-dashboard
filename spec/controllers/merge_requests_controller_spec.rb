@@ -529,11 +529,21 @@ RSpec.describe MergeRequestsController, type: :controller do
               'href="https://gitlab.example.com/gitlab-org/analytics-section/product-analytics/product-analytics-devkit-mirror/-/jobs/8651198918">Failed<'
             )
 
-            # Captions
-            expect(response.body).to include(%r{10 merge requests,\s+open\s+for\s+an\s+average\s+of\s+<span>\s+about 12 hours})
+            # Compact summary and title-first table
+            document = Nokogiri::HTML(response.body)
+            expect(document.at_css(".section-count").text).to eq("10")
+            expect(document.at_css(".mr-age-summary").text).to include("about 12 hours")
+            expect(document.css(".mr-table thead th").map(&:text).map(&:strip)).to eq(
+              ["Merge request", "Status", "Pipeline", "Review", "Activity"]
+            )
+            expect(document.css("[data-mr-list-target='row']").count).to eq(10)
+            expect(document.css(".mr-details").count).to eq(10)
+            expect(document.at_css("#mr_gitlab-org-gitlab_173007")["data-failed"]).to eq("true")
+            expect(document.at_css("#mr_gitlab-org-gitlab_173885")["data-review"]).to eq("false")
+            expect(document.at_css("#mr-search")["type"]).to eq("search")
 
             # Squash MR
-            expect(response.body).to include(%(bi bi-chevron-bar-down))
+            expect(response.body).to include("Squash on merge")
             # Unreviewed icon
             expect(response.body).to include(%(fa-solid fa-hourglass-start))
             # Reviewed icon
@@ -542,12 +552,26 @@ RSpec.describe MergeRequestsController, type: :controller do
             expect(response.body).to include(%(text-danger))
 
             # Blocked MRs
-            expect(response.body).to include(%(This MR is blocked by 1 merge request: !173886))
+            expect(response.body).to include("Blocked by !173886")
+            expect(response.body).not_to include('class="opacity-50"')
 
             # Code owner approval tooltip
             expect(response.body).to include("Code owner approval needed:")
             expect(response.body).to include("<li><code>/spec/</code>")
             expect(response.body).to include("3 eligible approvers")
+          end
+
+          context "without open merge requests" do
+            let(:open_mrs) { {data: {user: {openMergeRequests: {nodes: []}}}} }
+
+            it "renders the summary and empty state without a table" do
+              request
+
+              expect(response).to have_http_status(:ok)
+              expect(response.body).to include("No open merge requests")
+              expect(response.body).to include("All open")
+              expect(response.body).not_to include('class="table table-hover mr-table')
+            end
           end
         end
 

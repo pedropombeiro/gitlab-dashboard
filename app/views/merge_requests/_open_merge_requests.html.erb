@@ -1,263 +1,79 @@
 <% merge_requests = merge_requests_dto.items %>
 
+<%= render "merge_requests/open_mrs_summary",
+  merge_requests: merge_requests,
+  mr_age_limit: mr_age_limit,
+  mttm_handbook_url: mttm_handbook_url,
+  request_duration: request_duration,
+  updated_at: updated_at,
+  next_update_at: next_update_at %>
+
 <% if merge_requests.empty? %>
-  <p class="h4 fw-light text-sm-center p-2 text-secondary">🥱 No open merge requests 😴</p>
+  <div class="dashboard-empty">
+    <i class="bi bi-check2-circle" aria-hidden="true"></i>
+    <h3>No open merge requests</h3>
+    <p>Your open merge requests will appear here.</p>
+  </div>
 <% else %>
-  <table class="table table-hover mb-0">
-    <% any_conflicts = merge_requests.any?(&:conflicts) %>
-    <% any_milestones = merge_requests.any? { |mr| mr.milestone&.title&.present? } %>
-
-    <%= render "merge_requests/open_mrs_summary",
-      merge_requests: merge_requests,
-      mr_age_limit: mr_age_limit,
-      mttm_handbook_url: mttm_handbook_url,
-      request_duration: request_duration,
-      updated_at: updated_at,
-      next_update_at: next_update_at %>
-
-    <%= render "merge_requests/open_mrs_table_header",
-      any_conflicts: any_conflicts,
-      any_milestones: any_milestones %>
-
+  <table class="table table-hover mr-table mb-0">
+    <caption class="visually-hidden">Open merge requests, most recently updated first</caption>
+    <%= render "merge_requests/open_mrs_table_header" %>
     <tbody>
       <% merge_requests.each do |mr| %>
         <% mr_presenter = MergeRequestPresenter.new(mr) %>
-        <%= tag.tr(class: mr.blocked ? "opacity-50" : nil) do %>
-          <!-- MR ID -->
-          <th scope="row">
-            <%= render "mr_relation", merge_request: mr %>
+        <% row_id = "mr_#{mr.project.fullPath.parameterize}_#{mr.iid}" %>
+        <%= tag.tr id: row_id, data: {
+          mr_list_target: "row", failed: failed_pipeline?(mr), review: !mr.approved && mr.approvalsLeft.positive?,
+          search: strip_tags("#{mr.titleHtml} #{mr.project.fullPath} #{mr.reference}").downcase
+        } do %>
+          <th scope="row" class="mr-identity">
+            <%= link_to mr.titleHtml.html_safe, mr.webUrl, target: "_blank", rel: "noopener", class: "mr-title", id: "#{row_id}_title" %>
+            <div class="mr-metadata">
+              <span class="mr-project"><%= mr.project.fullPath %></span>
+              <%= render "mr_relation", merge_request: mr %>
+            </div>
+            <details id="<%= row_id %>_details" class="mr-details" data-action="toggle->mr-list#rememberDetails">
+              <summary id="<%= row_id %>_summary">Details</summary>
+              <%= render "open_mr_details", mr: mr, mr_presenter: mr_presenter %>
+            </details>
           </th>
-          <!-- Created at -->
-          <td>
-            <%= render "shared/relative_timestamp",
-            timestamp: mr.createdAt,
-            age_warning: true,
-            most_significant_only: true %>
-          </td>
-          <!-- Updated at -->
-          <td>
-            <%= render "shared/relative_timestamp",
-            timestamp: mr.updatedAt,
-            most_significant_only: true %>
-          </td>
-          <!-- Merge status -->
-          <td>
-            <%= render(
-              "label",
-              title: mr.mergeStatusLabel,
-              class: [ "bg-#{mr.bootstrapClass[:mergeStatus]}" ],
-            ) %>
-            <% open_blockers =
-              mr.blockingMergeRequests.visibleMergeRequests.filter do |blocker|
-                blocker.state == "opened"
-              end %>
-
-            <% if open_blockers&.any? %>
-              <%= render "shared/abbr_with_title",
-              content: tag.i(class: %w[fa-solid fa-road-barrier]),
-              class: "text-danger",
-              title:
-                "This MR is blocked by #{pluralize(open_blockers.count, "merge request")}: " \
-                  "#{open_blockers.map { |mr| "!#{mr.iid}" }.join(", ")}" %>
+          <td data-label="Status" class="mr-status-cell">
+            <%= render "label", title: mr.mergeStatusLabel, class: [ "bg-#{mr.bootstrapClass[:mergeStatus]}" ] %>
+            <% if mr.blocked && mr.mergeStatusLabel != "Blocked" %><span class="status-note"><i class="bi bi-lock" aria-hidden="true"></i> Blocked</span><% end %>
+            <% if mr.conflicts %><span class="status-note text-danger-emphasis"><i class="bi bi-exclamation-diamond" aria-hidden="true"></i> Conflicts</span><% end %>
+            <% open_blockers = mr.blockingMergeRequests.visibleMergeRequests.select { |blocker| blocker.state == "opened" } %>
+            <% if open_blockers.any? %>
+              <%= tag.span class: "status-note", title: "Blocked by #{open_blockers.map { |blocker| "!#{blocker.iid}" }.join(", ")}" do %>
+                <i class="bi bi-sign-stop" aria-hidden="true"></i> <%= pluralize(open_blockers.count, "blocker") %>
+              <% end %>
             <% end %>
           </td>
-          <!-- Pipeline -->
-          <td>
-            <nobr>
-              <% pipeline = mr.headPipeline %>
-
-              <% if pipeline %>
-                <% failed_jobs = pipeline.failedJobs.nodes.reject(&:allowFailure) %>
-                <% summary = pipeline_summary(pipeline) %>
-
-                <%= tag.span(class: %W[badge badge-pill bg-#{mr.bootstrapClass[:pipeline]}]) do %>
-                  <%= link_to pipeline_status(pipeline) || "??",
-                  pipeline_web_url(pipeline),
-                  escape: false,
-                  class: "text-light",
-                  target: "_blank",
-                  **(
-                    if summary
-                      {
-                        title: summary,
-                        data: {
-                          bs_toggle: "tooltip",
-                          bs_html: "true",
-                          bs_custom_class: "x-wide-tooltip"
-                        }
-                      }
-                    else
-                      {}
-                    end
-                  ) %>
-                <% end %>
-
-                <%= link_to(pipeline_visualizer_web_url(pipeline), target: "_blank", class: "text-decoration-none") do %>
-                  <%= tag.i(class: %w[bi bi-bar-chart-steps]) %>
-                <% end %>
-
-                <% if failed_jobs.any? && %w[SUCCESS FAILED].exclude?(pipeline.status) %>
-                  <%= link_to(pipeline_web_url(pipeline, true), target: "_blank", class: "text-decoration-none") do %>
-                    <%= render "shared/abbr_with_title",
-                    content: tag.i(class: %w[bi bi-exclamation-triangle-fill]),
-                    title: pipeline_failure_summary(pipeline),
-                    class: "text-warning",
-                    data: {
-                      bs_html: "true",
-                      bs_custom_class: "x-wide-tooltip"
-                    } %>
-                  <% end %>
-                <% end %>
-                <% if pipeline.failureReason %>
-                  <%= render "shared/abbr_with_title",
-                  content: tag.i(class: %w[fa-solid fa-comment-dots]),
-                  class: "text-warning",
-                  title: pipeline.failureReason,
-                  data: {
-                    bs_html: "true",
-                    bs_custom_class: "x-wide-tooltip"
-                  } %>
-                <% end %>
-                <% if pipeline.startedAt %>
-                  <% if pipeline.finishedAt.nil? %>
-                    <%= render "shared/relative_timestamp", timestamp: pipeline.startedAt %>
-                  <% elsif pipeline.outdated? %>
-                    <%= render "shared/abbr_with_title",
-                    content: "🥶",
-                    title: "Pipeline too old, must be re-run before being merged" %>
-                  <% end %>
-                <% end %>
-              <% end %>
-
-              <% if mr.autoMergeEnabled %>
-                <%= render "shared/abbr_with_title", content: "🚀", title: "Auto-merge is enabled" %>
-              <% end %>
-            </nobr>
-
-            <br>
-
-            <%= render partial: "gitlab_label",
-            spacer_template: "space",
-            collection: mr.contextualLabels,
-            as: :label %>
+          <td data-label="Pipeline" class="mr-pipeline-cell">
+            <%= render "open_mr_pipeline", mr: mr %>
           </td>
-          <!-- Title -->
-          <td>
-            <%= render "mr_title", mr: mr %>
-          </td>
-          <!-- Last comment -->
-          <td class="d-none d-xxl-table-cell last-comment-width">
-            <% last_comment = mr.notes.nodes.first %>
-            <% unless last_comment.nil? || last_comment.author.bot %>
-              <%= tag.figure id: "last_comment_#{mr.iid}", class: %w[fade-text mb-0] do %>
-                <%= tag.small(
-                  last_comment.bodyHtml.gsub(
-                    '="/',
-                    "=\"#{File.join(GitlabClient.gitlab_instance_url, "")}",
-                  ),
-                  class: %w[mt-2 mb-0 text-muted],
-                  escape: false,
-                ) %>
-                <%= tag.cite("‐ #{last_comment.author.name}", class: %w[mt-2 text-muted small]) %>
-              <% end %>
-              <%= tag.div "Show More",
-                      class: "toggle-link",
-                      onclick: "toggleParagraph('last_comment_#{mr.iid}', this)" %>
-            <% end %>
-          </td>
-          <% if any_milestones %>
-            <!-- Milestone -->
-            <td class="text-end">
-              <% if mr.milestone %>
-                <% div_class = mr_presenter.milestone_class %>
-                <%= tag.div class: div_class,
-                    data: {
-                      bs_toggle: "tooltip",
-                      bs_title: mr_presenter.milestone_mismatch_tooltip
-                    } do %>
-                  <%= render("info_symbol") if div_class %>
-                  <%= render("milestone", milestone: mr.milestone) %>
-                <% end %>
-              <% end %>
-            </td>
-          <% end %>
-          <!-- Commit info -->
-          <td class="text-center">
-            <div>
-              <%= tag.span(
-                class: %w[badge rounded-pill text-dark] + (mr.commitCount && mr.commitCount > 10 ? [ "bg-warning" ] : [ "bg-info" ]),
-                data: {
-                  bs_toggle: "tooltip",
-                  bs_title: pluralize(mr.commitCount, "commit")
-                },
-              ) do %>
-                <%= number_with_delimiter(mr.commitCount) %>
-                <span class="visually-hidden">commits</span>
+          <td data-label="Review" class="mr-review-cell">
+            <div class="approval-progress">
+              <% if mr.approved %>
+                <span class="text-success-emphasis"><i class="bi bi-check2" aria-hidden="true"></i> Approved</span>
+              <% elsif mr.approvalsRequired.zero? %>
+                <span class="text-secondary">No approvals required</span>
+              <% else %>
+                <%= tag.span "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired} approved", data: {
+                  bs_toggle: "tooltip", bs_html: "true", bs_custom_class: "x-wide-tooltip", bs_title: mr_presenter.approvals_tooltip
+                } %>
               <% end %>
             </div>
-            <% if mr.squashOnMerge %>
-              <%= render "shared/abbr_with_title",
-              content: tag.i(class: %w[align-middle bi bi-chevron-bar-down]),
-              title: "MR set to squash on merge",
-              class: "text-info" %>
-            <% end %>
+            <div class="mr-reviewers">
+              <%= render(partial: "reviewer_badge", collection: mr.reviewers.nodes.sort_by { |r| r.mergeRequestInteraction.reviewState }.reverse, as: :reviewer) || tag.span("No reviewers", class: "text-secondary small") %>
+            </div>
           </td>
-          <!-- Conflicts -->
-          <% if any_conflicts %>
-            <td class="text-center">
-              <% if mr.conflicts %>
-                <%= render "shared/abbr_with_title",
-                content: tag.i(class: %w[bi bi-exclamation-diamond-fill]),
-                class: "align-middle text-danger",
-                title: "MR branch has conflicts and should be rebased" %>
-              <% end %>
-            </td>
-          <% end %>
-          <!-- Approvals -->
-          <td class="text-end">
-            <% if mr.approved %>
-              <%= render "shared/abbr_with_title",
-              content: tag.i(class: %w[fa-regular fa-thumbs-up]),
-              class: "align-middle text-success",
-              title: "Approved" %>
-            <% else %>
-              <%= tag.nobr "#{mr.approvalsRequired - mr.approvalsLeft} / #{mr.approvalsRequired}",
-                       class:
-                         (
-                           if mr.approvalsRequired.present? && mr.approvalsRequired > 3
-                             "text-warning"
-                           else
-                             nil
-                           end
-                         ),
-                       data: {
-                         bs_toggle: "tooltip",
-                         bs_html: "true",
-                         bs_custom_class: "x-wide-tooltip",
-                         bs_title: mr_presenter.approvals_tooltip
-                       } %>
-            <% end %>
-          </td>
-          <!-- Reviewers -->
-          <td>
-            <%= render(
-              partial: "reviewer_badge",
-              spacer_template: "space",
-              collection:
-                mr
-                  .reviewers
-                  .nodes
-                  .sort_by { |r| r.mergeRequestInteraction.reviewState }
-                  .reverse,
-              as: :reviewer,
-            ) || tag.span("Not assigned", class: "text-warning") %>
-          </td>
-          <!-- Issue -->
-          <td>
-            <%= render("issue_link", issue: mr.issue) %>
+          <td data-label="Activity" class="mr-activity-cell">
+            <div><%= render "shared/relative_timestamp", timestamp: mr.updatedAt, most_significant_only: true %></div>
+            <div class="mr-created text-secondary">Opened <%= render "shared/relative_timestamp", timestamp: mr.createdAt, age_warning: true, most_significant_only: true %></div>
           </td>
         <% end %>
       <% end %>
     </tbody>
   </table>
+  <p class="dashboard-empty mb-0" data-mr-list-target="empty" hidden>No merge requests match these filters.</p>
 <% end %>

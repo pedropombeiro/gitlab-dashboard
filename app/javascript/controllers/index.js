@@ -19,6 +19,9 @@ application.register("heartbeat", HeartbeatController);
 import MergedMergeRequestsChartController from "./merged_merge_requests_chart_controller";
 application.register("merged-merge-requests-chart", MergedMergeRequestsChartController);
 
+import MrListController from "./mr_list_controller";
+application.register("mr-list", MrListController);
+
 import ThemeSelectorController from "./theme_selector_controller";
 application.register("theme-selector", ThemeSelectorController);
 

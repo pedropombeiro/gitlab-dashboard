@@ -62,4 +62,26 @@ RSpec.describe MergeRequestsHelper do
       expect(any_failed_pipeline?(merge_requests)).to be(false)
     end
   end
+
+  describe "failed_pipeline?" do
+    it "includes failed pipelines even without failed job data" do
+      mr = double(headPipeline: double(status: "FAILED"))
+
+      expect(failed_pipeline?(mr)).to be(true)
+    end
+
+    it "includes blocking failures in a running pipeline" do
+      jobs = [double(allowFailure: false)]
+      mr = double(headPipeline: double(status: "RUNNING", failedJobs: double(nodes: jobs)))
+
+      expect(failed_pipeline?(mr)).to be(true)
+    end
+
+    it "excludes missing pipelines and allowed failures" do
+      mr = double(headPipeline: double(status: "SUCCESS", failedJobs: double(nodes: [double(allowFailure: true)])))
+
+      expect(failed_pipeline?(mr)).to be(false)
+      expect(failed_pipeline?(double(headPipeline: nil))).to be(false)
+    end
+  end
 end

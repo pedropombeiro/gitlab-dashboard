@@ -26,13 +26,6 @@
     <%= javascript_include_tag :application,
     "data-turbo-track": Rails.env.production? ? "reload" : "",
     type: "module" %>
-    <script>
-      function toggleParagraph(id, link) {
-        const para = document.getElementById(id);
-        para.classList.toggle('expanded');
-        link.textContent = para.classList.contains('expanded') ? 'Show Less' : 'Show More';
-      }
-    </script>
 
     <%= debugbar_head if defined?(Debugbar) %>
   </head>
@@ -50,7 +43,7 @@
     </script>
   <% end %>
 
-  <body class="bg-body bg-gradient min-vh-100" data-controller="theme-selector">
+  <body class="min-vh-100 dashboard-body" data-controller="theme-selector">
     <%= yield %>
 
     <%= if defined?(Debugbar)

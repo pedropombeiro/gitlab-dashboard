@@ -1,0 +1,36 @@
+<% pipeline = mr.headPipeline %>
+<% if pipeline %>
+  <% failed_jobs = pipeline.failedJobs.nodes.reject(&:allowFailure) %>
+  <% summary = pipeline_summary(pipeline) %>
+  <div class="pipeline-status">
+    <%= tag.span class: "badge bg-#{mr.bootstrapClass[:pipeline]}" do %>
+      <%= link_to pipeline_status(pipeline) || "Unknown", pipeline_web_url(pipeline), escape: false, target: "_blank", rel: "noopener", data: {
+        bs_toggle: "tooltip", bs_html: "true", bs_custom_class: "x-wide-tooltip", bs_title: summary
+      } %>
+    <% end %>
+    <%= link_to pipeline_visualizer_web_url(pipeline), target: "_blank", rel: "noopener", class: "pipeline-graph-link", aria: { label: "View pipeline graph" } do %>
+      <i class="bi bi-bar-chart-steps" aria-hidden="true"></i>
+    <% end %>
+  </div>
+  <% if failed_jobs.any? %>
+    <%= link_to pluralize(failed_jobs.count, "failed job"), pipeline_web_url(pipeline, true), target: "_blank", rel: "noopener", class: "status-note text-danger-emphasis", data: {
+      bs_toggle: "tooltip", bs_html: "true", bs_custom_class: "x-wide-tooltip", bs_title: pipeline_failure_summary(pipeline)
+    } %>
+  <% end %>
+  <% if pipeline.failureReason %>
+    <%= tag.span pipeline.failureReason.humanize, class: "status-note text-warning-emphasis" %>
+  <% end %>
+  <% if pipeline.startedAt && pipeline.finishedAt.nil? %>
+    <span class="status-note">Started <%= render "shared/relative_timestamp", timestamp: pipeline.startedAt %></span>
+  <% elsif pipeline.startedAt && pipeline.outdated? %>
+    <span class="status-note text-warning-emphasis">Outdated · Re-run required</span>
+  <% end %>
+<% else %>
+  <span class="text-secondary small">No pipeline</span>
+<% end %>
+<% if mr.autoMergeEnabled %>
+  <span class="status-note"><i class="bi bi-arrow-repeat" aria-hidden="true"></i> Auto-merge on</span>
+<% end %>
+<div class="mr-context-labels">
+  <%= render partial: "gitlab_label", spacer_template: "space", collection: mr.contextualLabels, as: :label %>
+</div>

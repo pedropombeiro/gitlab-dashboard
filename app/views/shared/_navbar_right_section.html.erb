@@ -1,5 +1,6 @@
 <%= tag.button(
-  class: %w[btn mx-2 d-none d-sm-inline],
+  class: %w[btn dashboard-icon-button mx-1],
+  aria: { label: "Switch color theme" },
   data: {
     action: "theme-selector#switch",
     theme_selector_target: "button"
@@ -14,6 +15,7 @@ target: "_blank" %>
 <%= link_to tag.i(class: %w[fa-brands fa-github]),
 git_repo_url,
 class: "text-body",
+aria: { label: "View source on GitHub" },
 target: "_blank",
 title: git_repo_link_title,
 data: { bs_toggle: "tooltip" } %>

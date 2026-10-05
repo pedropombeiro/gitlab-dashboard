@@ -49,15 +49,11 @@ module MergeRequestsHelper
   end
 
   def mr_list_panel_classes
-    %w[
-      table-responsive
-      shadow
-      align-middle
-      border
-      rounded
-      bg-gradient
-      p-2
-    ]
+    %w[dashboard-panel align-middle]
+  end
+
+  def failed_pipeline?(merge_request)
+    merge_request.headPipeline&.status == "FAILED" || attention_needed?(merge_request)
   end
 
   def mttm_handbook_url
