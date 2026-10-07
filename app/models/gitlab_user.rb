@@ -24,7 +24,7 @@ class GitlabUser < ApplicationRecord
       #
       # When calling this method on an association, just calling `self.create` would call `ActiveRecord::Persistence.create`
       # and that skips some code that adds the newly created record to the association.
-      transaction(requires_new: true) { all.create(*args, &block) } # rubocop:disable Performance/ActiveRecordSubtransactions
+      transaction(requires_new: true) { all.create(*args, &block) }
     rescue ActiveRecord::RecordNotUnique
       find_by(*args)
     end
