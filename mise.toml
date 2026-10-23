@@ -1,5 +1,5 @@
 [tools]
-ruby = "4.0.8"
+ruby = "4.0.9"
 node = "25.9.0"
 "npm:prettier" = "latest"
 redis = "8.10.2"
