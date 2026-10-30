@@ -241,7 +241,7 @@ GEM
     hashdiff (1.2.1)
     heapy (0.2.0)
       thor
-    honeybadger (6.10.0)
+    honeybadger (6.10.1)
       logger
       ostruct
     hotwire-livereload (2.1.1)
