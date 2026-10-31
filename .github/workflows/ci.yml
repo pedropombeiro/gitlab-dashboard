@@ -91,6 +91,7 @@ jobs:
               - ".github/workflows/ci.yml"
               - "app/**"
               - "bin/docker-entrypoint"
+              - "bin/with-file-env"
               - "config/**"
               - "db/**"
               - "lib/**"
