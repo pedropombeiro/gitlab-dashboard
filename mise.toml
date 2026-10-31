@@ -1,6 +1,6 @@
 [tools]
 ruby = "4.0.9"
-node = "25.9.0"
+node = "26.13.0"
 "npm:prettier" = "latest"
 redis = "8.10.2"
 hk = "latest"
