@@ -8,6 +8,7 @@ for managing GitLab merge requests.
 - [Features](#features)
 - [Installation](#installation)
 - [Usage](#usage)
+- [Container secrets](#container-secrets)
 - [Observability](#observability)
 - [License](#license)
 
@@ -61,6 +62,49 @@ bin/dev
 ```
 
 Access the application at `http://localhost:3000`.
+
+## Container secrets
+
+The container image (`ghcr.io/pedropombeiro/gitlab-dashboard`) reads configuration from environment
+variables, such as `DATABASE_URL`, `RAILS_MASTER_KEY`, `GITLAB_TOKEN`, and `HONEYBADGER_API_KEY`. To keep
+secrets out of `docker inspect`, you can store any of these variables in a file instead. Set `NAME_FILE` to the
+file's path, and the image exports the file contents as `NAME`. This is the same convention that the official
+Postgres image uses, and it works with [Docker Compose secrets](https://docs.docker.com/compose/how-tos/use-secrets/):
+
+```yaml
+services:
+  webserver:
+    image: ghcr.io/pedropombeiro/gitlab-dashboard
+    environment:
+      DATABASE_URL_FILE: /run/secrets/gitlab_dashboard_database_url
+      RAILS_MASTER_KEY_FILE: /run/secrets/gitlab_dashboard_rails_master_key
+    secrets:
+      - gitlab_dashboard_database_url
+      - gitlab_dashboard_rails_master_key
+secrets:
+  gitlab_dashboard_database_url:
+    file: ../../secrets/gitlab_dashboard_database_url
+  gitlab_dashboard_rails_master_key:
+    file: ../../secrets/gitlab_dashboard_rails_master_key
+```
+
+The image's entrypoint, [`bin/with-file-env`](bin/with-file-env), loads the files before it runs the command,
+so this works for the default command and for overridden commands such as `bin/jobs start`. It works like this:
+
+- It strips trailing newlines from the file contents, as `$(cat file)` does.
+- It unsets `NAME_FILE` after it exports `NAME`.
+- It ignores an empty `NAME_FILE`.
+- It exits with an error if both `NAME` and `NAME_FILE` are set, or if the file can't be read. Error messages
+  name the variable and the path, but never the value.
+
+The container runs as UID 1000, so make sure that user can read the secret files. Any variable that ends in
+`_FILE` follows this convention, so don't pass variables such as `SSL_CERT_FILE` to the container.
+
+`docker exec` doesn't run the entrypoint. To load the secrets in a one-off command, run it through the wrapper:
+
+```sh
+docker exec -it <container> bin/with-file-env bin/rails console
+```
 
 ## Observability
 

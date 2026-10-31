@@ -374,6 +374,9 @@ The GitlabClient is the core integration layer with GitLab's GraphQL API.
 - `GITLAB_URL`: GitLab instance URL (default: <https://gitlab.com>)
 - `RAILS_MAX_THREADS`: Database connection pool size
 
+In the container image, any variable can also be read from a file by setting `NAME_FILE` to its path, for example
+with Docker Compose secrets. See [Container secrets](README.md#container-secrets).
+
 ## Deployment
 
 ### Docker-based Deployment (Kamal)
