@@ -1,4 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
 # Load secrets from files, then run the given command.
 #
 # For every environment variable named NAME_FILE, read the file it points to and
@@ -6,45 +8,49 @@
 # unset. This is the same convention as the official Postgres image, and it works
 # with Docker Compose secrets mounted under /run/secrets.
 #
-# Errors name variables and paths, never values.
+# It fails if both NAME and NAME_FILE are set, even to empty strings, or if
+# NAME_FILE can't be read. Errors name variables and paths, never values.
+#
+# This is plain Ruby without Bundler, so that local variables can never collide
+# with environment variable names, as shell variables would.
 #
 # Usage: bin/with-file-env COMMAND [ARGS...]
 
-set -eu
+def fail_with(message, status: 1)
+  warn "with-file-env: #{message}"
+  exit status
+end
 
-prog=with-file-env
+file_vars = ENV.keys.grep(/\A[A-Za-z_][A-Za-z0-9_]*_FILE\z/).sort
 
-fail() {
-  echo "${prog}: $*" >&2
-  exit 1
-}
+conflicts = file_vars.map { |file_var| file_var.delete_suffix("_FILE") }.select { |var| ENV.key?(var) }
+fail_with "both #{conflicts.first} and #{conflicts.first}_FILE are set; set only one" if conflicts.any?
 
-# awk lists only names, so values with newlines can't confuse the loop, and the
-# pattern guarantees that every name is a valid shell identifier for eval.
-file_vars=$(awk 'BEGIN { for (name in ENVIRON) if (name ~ /^[A-Za-z_][A-Za-z0-9_]*_FILE$/) print name }')
+loaded = file_vars.to_h do |file_var|
+  path = ENV.fetch(file_var)
+  value =
+    begin
+      File.binread(path)
+    rescue SystemCallError, IOError
+      fail_with "#{file_var}: cannot read '#{path}'"
+    end
 
-for file_var in $file_vars; do
-  var=${file_var%_FILE}
-  eval "path=\${${file_var}:-}"
-  eval "current=\${${var}:-}"
+  value = value.sub(/\n+\z/, "")
+  fail_with "#{file_var}: '#{path}' contains a NUL byte" if value.include?("\0")
 
-  # An empty NAME_FILE is ignored, like in the Postgres image.
-  [ -n "$path" ] || continue
+  [file_var, value]
+end
 
-  if [ -n "$current" ]; then
-    fail "both ${var} and ${file_var} are set; set only one"
-  fi
+loaded.each do |file_var, value|
+  ENV[file_var.delete_suffix("_FILE")] = value
+  ENV.delete(file_var)
+end
 
-  if [ -d "$path" ] || ! value=$(cat -- "$path" 2>/dev/null); then
-    fail "${file_var}: cannot read '${path}'"
-  fi
+fail_with "usage: with-file-env COMMAND [ARGS...]" if ARGV.empty?
 
-  export "${var}=${value}"
-  unset "$file_var"
-done
-
-unset file_vars file_var var path current value
-
-[ "$#" -gt 0 ] || fail "usage: ${prog} COMMAND [ARGS...]"
-
-exec "$@"
+begin
+  # The [command, argv0] form never goes through a shell, even with one argument.
+  exec([ARGV.first, ARGV.first], *ARGV.drop(1))
+rescue SystemCallError => e
+  fail_with "cannot run '#{ARGV.first}': #{e.message.sub(/ - .*\z/, "")}", status: 127
+end

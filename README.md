@@ -93,9 +93,11 @@ so this works for the default command and for overridden commands such as `bin/j
 
 - It strips trailing newlines from the file contents, as `$(cat file)` does.
 - It unsets `NAME_FILE` after it exports `NAME`.
-- It ignores an empty `NAME_FILE`.
-- It exits with an error if both `NAME` and `NAME_FILE` are set, or if the file can't be read. Error messages
-  name the variable and the path, but never the value.
+- It exits with an error if both `NAME` and `NAME_FILE` are set, even to an empty string. Unset one of them
+  instead of setting it to an empty value.
+- It exits with an error if the file can't be read, including when `NAME_FILE` is empty, or if the file contains
+  a NUL byte.
+- Error messages name the variable and the path, but never the value.
 
 The container runs as UID 1000, so make sure that user can read the secret files. Any variable that ends in
 `_FILE` follows this convention, so don't pass variables such as `SSL_CERT_FILE` to the container.

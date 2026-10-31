@@ -13,9 +13,9 @@ RSpec.describe "bin/with-file-env" do
     File.join(dir, name).tap { |path| File.write(path, content) }
   end
 
-  # Runs the script under /bin/sh with only the given variables, plus PATH.
+  # Runs the script with only the given variables, plus PATH.
   def run_script(env, *command)
-    Open3.capture3({"PATH" => ENV.fetch("PATH"), **env}, "/bin/sh", script, *command, unsetenv_others: true)
+    Open3.capture3({"PATH" => ENV.fetch("PATH"), **env}, script, *command, unsetenv_others: true)
   end
 
   # Exits 0 only when $NAME equals the expected value, without printing it.
@@ -122,12 +122,72 @@ RSpec.describe "bin/with-file-env" do
     include_examples "does not leak the secret"
   end
 
-  context "when NAME_FILE is empty" do
-    it "ignores it" do
-      _, _, status = run_script({"GITLAB_TOKEN_FILE" => ""}, *check_value("GITLAB_TOKEN", "unset"))
+  context "when NAME is set to an empty string and NAME_FILE is set" do
+    let(:path) { write_secret("token", secret) }
+    let(:result) { run_script({"GITLAB_TOKEN" => "", "GITLAB_TOKEN_FILE" => path}, "true") }
+
+    it "fails and names the variables" do
+      _, stderr, status = result
+
+      expect(status.exitstatus).to eq(1)
+      expect(stderr).to eq("with-file-env: both GITLAB_TOKEN and GITLAB_TOKEN_FILE are set; set only one\n")
+    end
+
+    include_examples "does not leak the secret"
+  end
+
+  context "when NAME_FILE is set to an empty string" do
+    it "fails because there is no file to read" do
+      _, stderr, status = run_script({"GITLAB_TOKEN_FILE" => ""}, "true")
+
+      expect(status.exitstatus).to eq(1)
+      expect(stderr).to eq("with-file-env: GITLAB_TOKEN_FILE: cannot read ''\n")
+    end
+  end
+
+  context "when the file contains a NUL byte" do
+    let(:path) { write_secret("token", "#{secret}\0more") }
+    let(:result) { run_script({"GITLAB_TOKEN_FILE" => path}, "true") }
+
+    it "fails and names the variable and the path" do
+      _, stderr, status = result
+
+      expect(status.exitstatus).to eq(1)
+      expect(stderr).to eq("with-file-env: GITLAB_TOKEN_FILE: '#{path}' contains a NUL byte\n")
+    end
+
+    include_examples "does not leak the secret"
+  end
+
+  context "when variable names match the loader's own names" do
+    # The previous shell implementation used these as internal variables.
+    let(:internal_names) { %w[path current value prog var file_var file_vars loaded conflicts] }
+
+    it "leaves plain variables with those names unchanged" do
+      env = internal_names.to_h { |name| [name, "keep-#{name}"] }
+      checks = internal_names.map { |name| %(test "${#{name}-unset}" = "keep-#{name}") }.join(" && ")
+
+      _, _, status = run_script(env, "/bin/sh", "-c", checks)
 
       expect(status).to be_success
     end
+
+    it "loads NAME_FILE variables with those names" do
+      env = internal_names.to_h { |name| ["#{name}_FILE", write_secret(name, "#{secret}-#{name}\n")] }
+      checks = internal_names.map { |name| %(test "${#{name}-unset}" = "#{secret}-#{name}") }.join(" && ")
+
+      stdout, stderr, status = run_script(env, "/bin/sh", "-c", checks)
+
+      expect(status).to be_success
+      expect(stdout + stderr).not_to include(secret)
+    end
+  end
+
+  it "fails before reading any file when a later variable conflicts" do
+    _, stderr, status = run_script({"A_FILE" => File.join(dir, "missing"), "B" => "x", "B_FILE" => "/dev/null"}, "true")
+
+    expect(status.exitstatus).to eq(1)
+    expect(stderr).to eq("with-file-env: both B and B_FILE are set; set only one\n")
   end
 
   context "when only a plain variable is set" do
@@ -145,6 +205,13 @@ RSpec.describe "bin/with-file-env" do
 
     expect(stdout).to eq("a b|c|")
     expect(status.exitstatus).to eq(3)
+  end
+
+  it "runs a single-word command without a shell" do
+    _, stderr, status = run_script({}, "echo hello; exit 0")
+
+    expect(status.exitstatus).to eq(127)
+    expect(stderr).to eq("with-file-env: cannot run 'echo hello; exit 0': No such file or directory\n")
   end
 
   it "fails without a command" do
