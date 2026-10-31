@@ -1,0 +1,50 @@
+#!/bin/sh
+# Load secrets from files, then run the given command.
+#
+# For every environment variable named NAME_FILE, read the file it points to and
+# export its contents as NAME, with trailing newlines stripped. NAME_FILE is then
+# unset. This is the same convention as the official Postgres image, and it works
+# with Docker Compose secrets mounted under /run/secrets.
+#
+# Errors name variables and paths, never values.
+#
+# Usage: bin/with-file-env COMMAND [ARGS...]
+
+set -eu
+
+prog=with-file-env
+
+fail() {
+  echo "${prog}: $*" >&2
+  exit 1
+}
+
+# awk lists only names, so values with newlines can't confuse the loop, and the
+# pattern guarantees that every name is a valid shell identifier for eval.
+file_vars=$(awk 'BEGIN { for (name in ENVIRON) if (name ~ /^[A-Za-z_][A-Za-z0-9_]*_FILE$/) print name }')
+
+for file_var in $file_vars; do
+  var=${file_var%_FILE}
+  eval "path=\${${file_var}:-}"
+  eval "current=\${${var}:-}"
+
+  # An empty NAME_FILE is ignored, like in the Postgres image.
+  [ -n "$path" ] || continue
+
+  if [ -n "$current" ]; then
+    fail "both ${var} and ${file_var} are set; set only one"
+  fi
+
+  if [ -d "$path" ] || ! value=$(cat -- "$path" 2>/dev/null); then
+    fail "${file_var}: cannot read '${path}'"
+  fi
+
+  export "${var}=${value}"
+  unset "$file_var"
+done
+
+unset file_vars file_var var path current value
+
+[ "$#" -gt 0 ] || fail "usage: ${prog} COMMAND [ARGS...]"
+
+exec "$@"

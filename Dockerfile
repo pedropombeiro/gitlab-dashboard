@@ -4,6 +4,7 @@
 # This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
 # docker build -t demo .
 # docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name demo demo
+# Any variable can also be read from a file with NAME_FILE, for example RAILS_MASTER_KEY_FILE=/run/secrets/master_key
 
 # For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
 
@@ -135,8 +136,9 @@ ENV LD_PRELOAD="libjemalloc.so.2" \
 HEALTHCHECK --interval=1m --timeout=5s --start-period=30s --retries=3 \
   CMD curl --fail --silent --show-error http://localhost/up || exit 1
 
-# Entrypoint prepares the database.
-ENTRYPOINT ["/rails/bin/docker-entrypoint"]
+# with-file-env loads NAME from NAME_FILE (for example Docker Compose secrets),
+# then the entrypoint prepares the database.
+ENTRYPOINT ["/rails/bin/with-file-env", "/rails/bin/docker-entrypoint"]
 
 # Start server via Thruster by default, this can be overwritten at runtime
 EXPOSE 80
