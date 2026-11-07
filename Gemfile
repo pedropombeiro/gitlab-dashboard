@@ -76,7 +76,7 @@ group :development, :test do
 
   gem "erb_lint", require: false
 
-  gem "rspec-rails", "~> 8.0.0"
+  gem "rspec-rails", "~> 8.1.0"
   gem "factory_bot", "~> 6.5"
   gem "factory_bot_rails", "~> 6.4"
 end
