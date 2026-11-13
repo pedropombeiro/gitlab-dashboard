@@ -1,8 +1,16 @@
 #!/usr/bin/env bash
 #MISE description="Run RSpec tests"
+#MISE raw_args=true
 #USAGE arg "[args]" var=#true help="Arguments passed to rspec"
+#USAGE flag "-e --example <pattern>" var=#true help="Run examples matching the pattern"
+#USAGE flag "-f --format <formatter>" help="Output formatter"
+#USAGE flag "--seed <seed>" help="Random ordering seed"
+#USAGE flag "--fail-fast" help="Stop after the first failure"
+#USAGE flag "--bisect" help="Find the minimal failing example set"
+#USAGE flag "--only-failures" help="Run previously failed examples"
+#USAGE complete "args" type="file"
+#USAGE complete "formatter" run="printf '%s\n' progress documentation json html failures"
 
 set -euo pipefail
 
-eval "args=(${usage_args:-})"
-bundle exec rspec "${args[@]+"${args[@]}"}"
+bundle exec rspec "$@"

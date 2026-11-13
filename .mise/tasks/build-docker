@@ -1,10 +1,25 @@
 #!/usr/bin/env bash
 #MISE description="Build a Docker image for the project"
+#MISE raw_args=true
 #USAGE arg "[args]" var=#true help="Extra arguments passed to docker buildx build"
+#USAGE flag "--build-arg <value>" var=#true help="Build-time variable"
+#USAGE flag "-f --file <file>" help="Dockerfile path"
+#USAGE flag "-t --tag <tag>" var=#true help="Image name and tag"
+#USAGE flag "--target <stage>" help="Target build stage"
+#USAGE flag "--platform <platform>" help="Target platform"
+#USAGE flag "--progress <progress>" help="Progress output style" {
+#USAGE   choices "auto" "plain" "tty" "rawjson" "quiet" "none"
+#USAGE }
+#USAGE flag "--no-cache" help="Disable build cache"
+#USAGE flag "--pull" help="Always pull base images"
+#USAGE flag "--push" help="Push the resulting image"
+#USAGE flag "--load" help="Load the resulting image locally"
+#USAGE complete "args" type="file"
+#USAGE complete "file" type="file"
+#USAGE complete "stage" run="awk 'toupper($1) == \"FROM\" && toupper($(NF-1)) == \"AS\" {print $NF}' Dockerfile"
 
 set -euo pipefail
 
 project_name="$(basename "$(pwd)")"
 
-eval "args=(${usage_args:-})"
-docker buildx build --platform linux/amd64 -t "$project_name" "${args[@]+"${args[@]}"}" .
+docker buildx build --platform linux/amd64 -t "$project_name" "$@" .

@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 #MISE description="Run pre-push linting hooks"
 #USAGE arg "[files]" var=#true help="Specific files to lint (default: all files)"
+#USAGE complete "files" type="file"
 
 set -euo pipefail
 
+files=()
 eval "files=(${usage_files:-})"
 if [ ${#files[@]} -gt 0 ]; then
   hk run pre-push "${files[@]}"
