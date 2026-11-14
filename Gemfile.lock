@@ -244,7 +244,7 @@ GEM
     honeybadger (6.10.2)
       logger
       ostruct
-    hotwire-livereload (2.1.1)
+    hotwire-livereload (2.1.2)
       actioncable (>= 7.0.0)
       listen (>= 3.0.0)
       railties (>= 7.0.0)
