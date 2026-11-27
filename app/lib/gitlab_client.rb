@@ -4,6 +4,15 @@ require "async"
 require "ostruct"
 
 class GitlabClient
+  # Keep the foreground ServerError handler, without matching FaradayServerError retries.
+  class RateLimitedError < Graphlient::Errors::ServerError
+    def initialize(error)
+      super(error.message, error.inner_exception)
+      @status_code = error.status_code
+      @response = error.response
+    end
+  end
+
   # Faraday middleware to track GitLab API rate limiting as OpenTelemetry span events
   class RateLimitMiddleware < Faraday::Middleware
     RATE_LIMIT_WARNING_THRESHOLD = 100
@@ -574,6 +583,11 @@ class GitlabClient
             span.add_event("retry", attributes: {"retry.attempt" => retry_count})
           end
           Client.query(query, **args)
+        rescue Graphlient::Errors::FaradayServerError => e
+          raise unless e.status_code == 429
+
+          GitlabRateLimitCooldown.record(e.inner_exception.response[:headers])
+          raise RateLimitedError.new(e)
         end
       rescue => e
         span.record_exception(e)

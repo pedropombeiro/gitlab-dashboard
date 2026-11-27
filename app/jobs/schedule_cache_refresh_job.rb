@@ -4,6 +4,8 @@ class ScheduleCacheRefreshJob < ApplicationJob
   queue_as :default
 
   def perform(*_args)
+    return if GitlabRateLimitCooldown.active?
+
     service = MergeRequestsCacheService.new
     usernames = scope.pluck(:username)
 
