@@ -36,4 +36,14 @@ RSpec.describe ScheduleSubscribedUsersCacheRefreshJob do
 
     expect(MergeRequestsFetchJob).to have_received(:perform_later).with(subscribed_user.username, :open)
   end
+
+  it "skips enqueuing during the cooldown", :with_cache do
+    GitlabRateLimitCooldown.record({"Retry-After" => "120"})
+    allow(cache_service).to receive(:needs_scheduled_update?).and_return(true)
+    allow(MergeRequestsFetchJob).to receive(:perform_later)
+
+    perform
+
+    expect(MergeRequestsFetchJob).not_to have_received(:perform_later)
+  end
 end

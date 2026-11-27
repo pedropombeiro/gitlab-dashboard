@@ -12,6 +12,31 @@ RSpec.describe GitlabClient do
     stub_const("#{described_class}::Client", graphql_client)
   end
 
+  describe "HTTP errors" do
+    it "preserves the status and body for foreground error handling without retrying a 429", :with_cache do
+      request = stub_request(:post, graphql_url)
+        .to_return(status: 429, body: "Too Many Requests")
+
+      expect { client.fetch_user("ghost") }.to raise_error(Graphlient::Errors::ServerError) do |error|
+        expect(error).to be_a(described_class::RateLimitedError)
+        expect(error.status_code).to eq(429)
+        expect(error.response).to eq("Too Many Requests")
+        expect(error.inner_exception).to be_a(Faraday::TooManyRequestsError)
+      end
+      expect(request).to have_been_requested.once
+      expect(GitlabRateLimitCooldown).to be_active
+    end
+
+    it "still retries a 503 once" do
+      request = stub_request(:post, graphql_url).to_return(status: 503)
+
+      expect { client.fetch_user("ghost") }.to raise_error(Graphlient::Errors::FaradayServerError) do |error|
+        expect(error.status_code).to eq(503)
+      end
+      expect(request).to have_been_requested.twice
+    end
+  end
+
   describe "#fetch_user" do
     let_it_be(:user_requests_response_body) { YAML.load_file(file_fixture("user_requests.yml")) }
 
